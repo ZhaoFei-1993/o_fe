@@ -1,0 +1,177 @@
+@import "./variables.scss";
+
+$fontSizeList: 12 14 16 18 20 22 24 30 40 50 60;
+
+@each $fontSize in $fontSizeList {
+  .fz-#{$fontSize} {
+    font-size: #{$fontSize}px !important;
+  }
+}
+
+@for $lineHeight from 1 through 4 {
+  .lh-#{$lineHeight} {
+    line-height: $lineHeight;
+  }
+}
+
+$pxSizeList: 0 5 10 15 20 25 30 40 50 60 90 100;
+
+// ml/mr/mt/mb/mx/my/m/pl/pr/pt/pb/px/py/p 的 1~5 都已经内置在bootstrap里面了，且含义是级别，而不是px
+@each $size in $pxSizeList {
+  .w-#{$size} {
+    width: #{$size}px!important;
+  }
+  .w-#{$size}p {
+    width: #{$size}% !important;
+  }
+  .ml-#{$size} {
+    margin-left: #{$size}px!important;
+  }
+  .mr-#{$size} {
+    margin-right: #{$size}px!important;
+  }
+  .mt-#{$size} {
+    margin-top: #{$size}px!important;
+  }
+  .mb-#{$size} {
+    margin-bottom: #{$size}px!important;
+  }
+  .my-#{$size} {
+    margin-bottom: #{$size}px!important;
+    margin-top: #{$size}px!important;
+  }
+  .mx-#{$size} {
+    margin-left: #{$size}px!important;
+    margin-right: #{$size}px!important;
+  }
+
+  .pt-#{$size} {
+    padding-top: #{$size}px!important;
+  }
+  .pb-#{$size} {
+    padding-bottom: #{$size}px!important;
+  }
+  .pl-#{$size} {
+    padding-left: #{$size}px!important;
+  }
+  .pr-#{$size} {
+    padding-right: #{$size}px!important;
+  }
+
+  .px-#{$size} {
+    padding-right: #{$size}px !important;
+    padding-left: #{$size}px !important;
+  }
+  .py-#{$size} {
+    padding-top: #{$size}px!important;
+    padding-bottom: #{$size}px!important;
+  }
+
+  .h-#{$size} {
+    height: #{$size}px!important;
+  }
+
+  .p-#{$size} {
+    padding: #{$size}px!important;
+  }
+}
+
+.ml-a {
+  margin-left: auto;
+}
+.mr-a {
+  margin-right: auto;
+}
+.mt-a {
+  margin-top: auto;
+}
+.mb-a {
+  margin-bottom: auto;
+}
+
+.pr-500 {
+  padding-right: 500px !important;
+}
+
+.c-brand-yellow {
+  color: $brandYellow !important;
+}
+
+.c-brand-green {
+  color: $brandGreen !important;
+}
+
+.c-white {
+  color: #fff;
+}
+.c-black {
+  color: $black;
+}
+.c-dark {
+  color: $dark !important;
+}
+.c-gray {
+  color: $gray !important;
+}
+.c-darkred {
+  color: $darkRed;
+}
+.c-red {
+  color: $red;
+}
+
+.c-green {
+  color: #008000;
+}
+
+.ps-a {
+  position: absolute;
+}
+.ps-r {
+  position: relative;
+}
+
+.no-underline {
+  text-decoration: none!important;
+}
+
+.cur-hand {
+  cursor: pointer;
+}
+
+.ff-light {
+  font-family: "PingFangSC-Light" ,"Helvetica Neue",Helvetica,Arial,Microsoft YaHei, sans-serif;
+}
+.ff-thin {
+  font-family: "PingFangSC-Thin" ,"Helvetica Neue",Helvetica,Arial,Microsoft YaHei, sans-serif;
+}
+.ff-medium {
+  font-family: "PingFangSC-Medium" ,"Helvetica Neue",Helvetica,Arial,Microsoft YaHei, sans-serif;
+}
+
+.o-h {
+  overflow: hidden;
+}
+
+.bgc-f9 {
+  background-color: #f9f9f9;
+}
+
+.bgc-w {
+  background-color: #fff;
+}
+
+.break-word {
+  word-wrap: break-word;
+}
+
+.default-box-shadow {
+  box-shadow: 0 0 20px 0 #ececec;
+}
+
+.modal-header .close{
+  font-size: 36px !important;
+  font-weight: 200 !important;
+  text-shadow: none;
+  font-family: sans-serif;
+}

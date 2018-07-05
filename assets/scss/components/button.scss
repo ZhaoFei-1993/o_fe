@@ -1,0 +1,196 @@
+@import "../variables.scss";
+
+$image-gradient-green: linear-gradient(to left, #22e6b8, #00c1ce);
+$image-gradient-yellow: linear-gradient(to left, #ffe170, #ffb900);
+$image-red: linear-gradient(to left, #ffe170, #ffb900);
+$background-red: #e45555;
+
+.btn {
+  padding-top: 0;
+  padding-bottom: 0;
+  border-width: 2px;
+  color: #fff;
+  transition: color 0.15s ease-in-out,
+              background-color 0.15s ease-in-out,
+              border-color 0.15s ease-in-out,
+              box-shadow 0.15s ease-in-out;
+
+  &:focus,
+  &.focus {
+    box-shadow: 0 0 0 !important;
+  }
+
+  &[disabled] {
+    cursor: default !important;
+  }
+}
+
+.btn-green {
+  background-color: $brandGreen;
+  border: none;
+  &:hover {
+    box-shadow:0 5px 20px 0 #d3d3d3;
+    color: #ffffff;
+  }
+  &:active {
+    background-color: $brandGreen;
+  }
+}
+
+.btn-gradient-green {
+  background-image: $image-gradient-green;
+  border: none;
+  &:hover {
+    box-shadow:0 5px 20px 0 #d3d3d3;
+    color: white;
+  }
+  &[disabled]:hover {
+    box-shadow: none;
+  }
+  &:active {
+    background-image: $image-gradient-green;
+  }
+}
+
+.btn-outline-green {
+  background-color: transparent;
+  border-color: $brandGreen;
+  color: $brandGreen;
+
+  &:hover {
+    background-color: $brandGreen;
+    border-color: transparent;
+    color: #fff;
+  }
+  &[disabled]:hover {
+    background-color: transparent;
+    border-color: $brandGreen;
+    color: $brandGreen;
+  }
+}
+
+.btn-outline-gray {
+  background-color: transparent;
+  border-color: #6f6f6f;
+  color: #6f6f6f;
+  &:hover {
+    background-color: #6f6f6f;
+    color: #fff;
+  }
+  &[disabled]:hover {
+    background-color: transparent;
+    color: #6f6f6f;
+  }
+}
+
+.btn-yellow {
+  background-color: $brandYellow;
+  border-color: $brandYellow;
+
+  &:hover {
+    box-shadow:0 5px 20px 0 #d3d3d3;
+    color: #fff;
+  }
+  &:active {
+    background-color: $brandYellow;
+  }
+}
+
+.btn-gradient-yellow {
+  background-image: $image-gradient-yellow;
+
+  &:hover {
+    box-shadow:0 5px 20px 0 #d3d3d3;
+    color: #fff;
+  }
+  &[disabled]:hover {
+    box-shadow: none;
+  }
+  &:active {
+    background-image: $image-gradient-yellow;
+  }
+}
+
+.btn-outline-yellow {
+  background-color: transparent;
+  border-color: $brandYellow;
+  color: $brandYellow;
+
+  &:hover {
+    background-color: $brandYellow;
+    border-color: transparent;
+    color: #fff;
+  }
+}
+
+.btn-outline-white {
+  background-color: transparent;
+  border-color: white;
+  color: white;
+  &:hover {
+    background:white;
+    border-color: transparent;
+    color: #192330;
+  }
+}
+
+.btn-plain {
+  padding: 0 2px;
+  color: $gray;
+  background-color: transparent;
+
+  &:hover {
+    color: $brandGreen;
+  }
+}
+
+.btn-red {
+  background-color: $background-red;
+  border: none;
+  &:hover {
+    box-shadow:0 5px 20px 0 #d3d3d3;
+  }
+  &:active {
+    background-color: $background-red;
+  }
+}
+
+.btn-xl {
+  min-width: 360px;
+  line-height: 48px;
+  font-size: 22px;
+  border-radius: 48px;
+}
+
+.btn-lg {
+  min-width: 230px;
+  padding: 0 24px;
+  font-size: 22px;
+  line-height: 42px;
+  border-radius: 44px;
+}
+
+.btn-sm {
+  min-width: 160px;
+  padding-left: 20px;
+  padding-right: 20px;
+  line-height: 34px;
+  font-size: 22px;
+  border-width: 2px;
+  border-radius: 34px;
+}
+
+.btn-xs {
+  min-width: 100px;
+  line-height: 28px;
+  font-size: 16px;
+  border-radius: 28px;
+}
+
+.btn-xxs {
+  min-width: 40px;
+  line-height: 26px;
+  font-size: 14px;
+  border-width: 1px;
+  border-radius: 100px;
+}

@@ -1,0 +1,3 @@
+static/js/**
+.nuxt/**
+node_modules/**

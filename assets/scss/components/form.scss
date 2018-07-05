@@ -1,0 +1,16 @@
+.via-form {
+  form {
+    position: relative;
+    padding: 40px 50px;
+    &:before {
+      content: '';
+      display: block;
+      position: absolute;
+      background-image: linear-gradient(to left, #ffc21e, #00c1ce);
+      height: 6px;
+      top: 0;
+      left: 0;
+      right: 0;
+    }
+  }
+}

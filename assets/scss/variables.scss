@@ -1,0 +1,12 @@
+$brandGreen:#52cbca;
+$brandYellow: #feb132;
+$black:#192330;
+$dark:#27313e;
+$gray:#6f6f6f;
+$red:#e45555;
+$darkRed: #d2495a;
+
+@mixin fs($val:14px){
+    font-size: $val !important
+}
+

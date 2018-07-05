@@ -1,0 +1,10 @@
+@import "~m-normalize";
+@import './common.scss';
+@import './custom.scss';
+@import './helpers.scss';
+@import './components/button.scss';
+@import './components/modal.scss';
+@import './components/form.scss';
+
+table,tbody,td,tfoot,th,thead{margin:0;padding:0;border:0;}
+table{border-collapse:collapse;border-spacing:0;}

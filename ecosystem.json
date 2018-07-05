@@ -1,0 +1,55 @@
+{
+  /**
+   * Application configuration section
+   * http://pm2.keymetrics.io/docs/usage/application-declaration/
+   */
+  "apps" : [
+
+    // First application
+    {
+      "name"      : "otc-pre",
+      "script"    : "app.js",
+      "instances" : 1,
+      "instance_var": "OTC",
+      "exec_mode" : "cluster",
+      "watch"     : false,
+      "ignore_watch" : ["logs", ".nuxt"],
+      "error_file":"logs/otc.stderr.log",
+      "out_file"  :"logs/otc.stdout.log",
+      "env": {
+        "NODE_ENV": "development",
+        "MODE": "development" // 运行的位置，本地、测试、线上
+      },
+      "env_pre" : {
+        "NODE_ENV": "production",
+        "MODE": "pre"
+      },
+      "env_production" : {
+        "NODE_ENV": "production",
+        "MODE": "production"
+      }
+    },{
+      "name"      : "otc",
+      "script"    : "app.js",
+      "instances" : 0,
+      "instance_var": "OTC",
+      "exec_mode" : "cluster",
+      "watch"     : false,
+      "ignore_watch" : ["logs", ".nuxt"],
+      "error_file":"logs/otc.stderr.log",
+      "out_file"  :"logs/otc.stdout.log",
+      "env": {
+        "NODE_ENV": "development",
+        "MODE": "development" // 运行的位置，本地、测试、线上
+      },
+      "env_pre" : {
+        "NODE_ENV": "production",
+        "MODE": "pre"
+      },
+      "env_production" : {
+        "NODE_ENV": "production",
+        "MODE": "production"
+      }
+    }
+  ]
+}
