@@ -1,6 +1,8 @@
+import {clientApiDomain} from '~/modules/variables'
+const request = require('request')
 module.exports = (req, res, next) => {
   // fake auth
-  console.log(req.cookies)
+  console.log(req.url)
   // 验证逻辑根据测试需要修改
   // if (!req.cookies || !req.cookies.token) {
   //   return res.sendStatus(401)
@@ -10,6 +12,15 @@ module.exports = (req, res, next) => {
   }
   if (req.url === '/logout' && req.method === 'POST') {
     return res.json({data: {}})
+  }
+  // 后端已经开发好的api就直接转发，没有开发好的就用本地json server
+  const backendAPI = ['/posts']
+  for (let url of backendAPI) {
+    if (req.url.indexOf(url) === 0) {
+      // const redirected = 'http://jsonplaceholder.typicode.com' + req.url
+      const redirected = clientApiDomain + req.url
+      return req.pipe(request(redirected)).pipe(res)
+    }
   }
   // 转换成后端使用的数据结构
   const transformedData = {

@@ -46,7 +46,7 @@ if (config.dev) {
   }
 }
 
-if (process.env.MODE === 'local') { // 本地开发mock接口
+if (config.dev) { // 本地开发mock接口
   const jsonServer = require('json-server') // 基于express的，我们的server是koa，不过同时存在也不太影响
   const cookieParser = require('cookie-parser')
   const db = require('./server/mock/db')
@@ -55,7 +55,7 @@ if (process.env.MODE === 'local') { // 本地开发mock接口
   const router = jsonServer.router(db())
   const defaultMiddlewares = jsonServer.defaults()
   server.use(jsonServer.rewriter({
-    '/api/admin/*': '/$1',
+    '/api/*': '/$1',
   }))
   server.use(cookieParser())
   server.use((req, res, next) => {

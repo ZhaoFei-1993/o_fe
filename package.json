@@ -37,7 +37,6 @@
     "xss": "^1.0.3"
   },
   "scripts": {
-    "local": "cross-env NODE_ENV=development MODE=local DEBUG=nuxt:* node app",
     "dev": "cross-env NODE_ENV=development MODE=development DEBUG=nuxt:* node app",
     "build-pre": "cross-env NODE_ENV=pre MODE=pre nuxt build",
     "deploy-pre": "git checkout . && git pull && npm i && npm run build-pre && pm2 startOrRestart ecosystem.json --only otc-pre --env pre",
