@@ -46,6 +46,29 @@ if (config.dev) {
   }
 }
 
+if (config.dev) { // 本地开发mock接口
+  const jsonServer = require('json-server') // 基于express的，我们的server是koa，不过同时存在也不太影响
+  const cookieParser = require('cookie-parser')
+  const db = require('./server/mock/db')
+  const middleware = require('./server/mock/middleware')
+  const server = jsonServer.create()
+  const router = jsonServer.router(db())
+  const defaultMiddlewares = jsonServer.defaults()
+  server.use(jsonServer.rewriter({
+    '/api/*': '/$1',
+  }))
+  server.use(cookieParser())
+  server.use((req, res, next) => {
+    return middleware(req, res, next)
+  })
+  server.use(defaultMiddlewares)
+  server.use(router)
+
+  server.listen(4006, () => {
+    console.log('JSON Server is running on localhost:4006')
+  })
+}
+
 // http路由
 route(app, koaRouter)
 app.use(koaRouter.routes())
@@ -53,8 +76,8 @@ app.use(koaRouter.routes())
 if (!config.dev) {
   // gzip
   app.use(compress({
-    filter: function (content_type) {
-      return /js|css|jpe?g|png|gif|apk|svg/i.test(content_type)
+    filter: function (contentType) {
+      return /js|css|jpe?g|png|gif|apk|svg/i.test(contentType)
     },
     threshold: 2048,
     flush: require('zlib').Z_SYNC_FLUSH
@@ -90,5 +113,5 @@ app.use(async function (ctx, next) {
 // });
 
 app.listen(3006, '0.0.0.0', () => {
-  console.info(`Server listening on 0.0.0.0:3003`)
+  console.info(`Server listening on 0.0.0.0:3006`)
 })
