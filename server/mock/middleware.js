@@ -1,4 +1,3 @@
-import {clientApiDomain} from '~/modules/variables'
 const request = require('request')
 module.exports = (req, res, next) => {
   // fake auth
@@ -18,7 +17,7 @@ module.exports = (req, res, next) => {
   for (let url of backendAPI) {
     if (req.url.indexOf(url) === 0) {
       // const redirected = 'http://jsonplaceholder.typicode.com' + req.url
-      const redirected = clientApiDomain + req.url
+      const redirected = 'http://dev.otc.coinex.com/api' + req.url
       return req.pipe(request(redirected)).pipe(res)
     }
   }
