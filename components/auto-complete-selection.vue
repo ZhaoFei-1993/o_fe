@@ -1,5 +1,5 @@
 <template>
-  <div class="selection-wrapper">
+  <div class="auto-complete-selection">
     <input
       type="text"
       :placeholder="placeholder"
@@ -164,8 +164,8 @@
     },
   }
 </script>
-<style lang="scss" scoped>
-  .selection-wrapper {
+<style lang="scss">
+  .auto-complete-selection {
     position: relative;
     /*padding: 4px 0;*/
     // 这里为什么有padding了？todo
