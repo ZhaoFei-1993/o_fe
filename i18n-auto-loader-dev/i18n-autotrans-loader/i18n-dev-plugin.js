@@ -28,7 +28,7 @@ function createFile(root, filename, callback) {
 function mergeContent(newContent, oldContent, isFirst) {
   newContent = JSON.parse(JSON.stringify(newContent))
 
-  for (let key in oldContent) {
+  for (const key in oldContent) {
     if (!oldContent.hasOwnProperty(key)) continue
 
     if (!newContent[key] && !isFirst) {
@@ -111,7 +111,7 @@ function writeContentToFile(i18nRoot, filename, content) {
  */
 function simplified2Traditional(simplified) {
   const traditional = {}
-  for (let key in simplified) {
+  for (const key in simplified) {
     if (!simplified.hasOwnProperty(key)) continue
 
     if (typeof simplified[key] === 'object') {
@@ -129,7 +129,7 @@ function onCompilationComplete() {
   const content = loader.getContent()
   const filePath = path.resolve(sharedConfig.i18nRoot, sharedConfig.originalLang + '.json')
 
-  fs.readFile(filePath, 'utf8', function(err, data) {
+  fs.readFile(filePath, 'utf8', function (err, data) {
     if (err) throw err
 
     // 由于global不是自动生成的，而是手动填写的，因此先要把global给复制过来
@@ -168,7 +168,7 @@ module.exports = class I18nPlugin {
       // Object.assign(extractedLocal, diskLocal)
     })
 
-    for (let name of sharedConfig.targetLangs) {
+    for (const name of sharedConfig.targetLangs) {
       createFile(sharedConfig.i18nRoot, name)
     }
   }

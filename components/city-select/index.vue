@@ -23,14 +23,14 @@ export default {
   props: {
     value: {
       type: Object,
-      default: () => ({})
-    }
+      default: () => ({}),
+    },
   },
   components: {
-    Selects
+    Selects,
   },
   computed: {
-    ...mapState(['constant'])
+    ...mapState(['constant']),
   },
   methods: {
     onUpdate(level, value) {
@@ -43,11 +43,11 @@ export default {
       if (level === 'city') {
         this.$emit('input', Object.assign({}, this.value, {cityCode: value}))
       }
-    }
+    },
   },
   // 在客户端再加载地理位置数据
   mounted() {
     this.$store.dispatch('initGlobalCities')
-  }
+  },
 }
 </script>

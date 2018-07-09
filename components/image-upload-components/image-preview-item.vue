@@ -50,13 +50,13 @@ export default {
   },
   props: {
     image: {
-      type: [Object, String]        // { url, blob } 或者  url
-    }
+      type: [Object, String],        // { url, blob } 或者  url
+    },
   },
   methods: {
     onRemove() {
       this.$emit('remove')
-    }
-  }
+    },
+  },
 }
 </script>

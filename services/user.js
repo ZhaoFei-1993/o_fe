@@ -1,5 +1,3 @@
-import {KYC_TYPE} from '~/modules/constant'
-
 export default (axios) => {
   return {
     /**
@@ -11,9 +9,9 @@ export default (axios) => {
       // return Promise.resolve(require('./mock/user').userData)
       return axios.get('/user', {
         params: {
-          is_force_sync: force ? 1 : 0
-        }
+          is_force_sync: force ? 1 : 0,
+        },
       })
-    }
+    },
   }
 }

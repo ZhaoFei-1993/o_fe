@@ -80,7 +80,7 @@ if (!config.dev) {
       return /js|css|jpe?g|png|gif|apk|svg/i.test(contentType)
     },
     threshold: 2048,
-    flush: require('zlib').Z_SYNC_FLUSH
+    flush: require('zlib').Z_SYNC_FLUSH,
   }))
   // cdn回源
   // todo: 有用到？
@@ -88,7 +88,7 @@ if (!config.dev) {
 
   app.use(staticCache(path.join(__dirname, 'static'), {
     maxAge: 24 * 60 * 60 * 7,
-    filter: ['js', 'css', 'jpg', 'png', 'apk', 'svg']
+    filter: ['js', 'css', 'jpg', 'png', 'apk', 'svg'],
   }))
 }
 

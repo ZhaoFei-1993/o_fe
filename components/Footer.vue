@@ -138,7 +138,6 @@
 </template>
 
 <script>
-  import Vue from 'vue'
   import cookies from '~/plugins/cookies'
   import {mapState} from 'vuex'
 
@@ -157,13 +156,13 @@
         cookies.setItem(document, 'lang', lang, expire, '/')
         this.$store.dispatch('setLang', lang)
 
-        let newLink = this.utils.removeParamInLink('lang')
+        const newLink = this.utils.removeParamInLink('lang')
         if (location.href === newLink) {
           location.reload()
         } else {
           location.href = newLink
         }
-      }
-    }
+      },
+    },
   }
 </script>

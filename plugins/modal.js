@@ -12,22 +12,22 @@ export default ({app, store}) => {
         title: '',
         content: '',        // content的占位
         footer: '',         // footer的占位，会取代modal默认的footer
-        okOnly: false
+        okOnly: false,
       },
       render() {
         return (
           <b-modal ref="modal"
-                   onOk={this.onOk}
-                   onCancel={this.onCancel}
-                   ok-only={this.okOnly}
-                   centered={this.centered}
-                   ok-title={this.okTitle}
-                   cancel-title={this.cancelTitle}
-                   ok-variant="yellow"
-                   cancel-variant="outline-green"
-                   hide-footer={this.hideFooter}
-                   button-size="sm"
-                   class="text-center"
+            onOk={this.onOk}
+            onCancel={this.onCancel}
+            ok-only={this.okOnly}
+            centered={this.centered}
+            ok-title={this.okTitle}
+            cancel-title={this.cancelTitle}
+            ok-variant="yellow"
+            cancel-variant="outline-green"
+            hide-footer={this.hideFooter}
+            button-size="sm"
+            class="text-center"
           >
             <h4>{this.title}</h4>
             <div class={this.title ? 'mt-20' : ''} style="line-height: 1.5">{this.content}</div>
@@ -40,8 +40,8 @@ export default ({app, store}) => {
         },
         onCancel() {
           console.log('inner cancel')
-        }
-      }
+        },
+      },
     })
 
     const  $showDialog = function (config) {

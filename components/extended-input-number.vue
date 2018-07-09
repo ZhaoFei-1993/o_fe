@@ -17,16 +17,16 @@
       value: [Number, String],
       max: {
         type: Number,
-        default: Infinity
+        default: Infinity,
       },
       min: {
         type: Number,
-        default: -Infinity
+        default: -Infinity,
       },
       disabled: {
         type: Boolean,
         default: false,
-      }
+      },
     },
     methods: {
       onInput(value) {
@@ -40,7 +40,7 @@
         // }
         // console.log(value)
         this.$emit('input', value)
-      }
-    }
+      },
+    },
   }
 </script>

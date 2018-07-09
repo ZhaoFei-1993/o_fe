@@ -165,7 +165,7 @@
 
   export default {
     head: {
-      link: [{rel: 'stylesheet', href: '//at.alicdn.com/t/font_613200_z9fptmpd8daq0k9.css'}]
+      link: [{rel: 'stylesheet', href: '//at.alicdn.com/t/font_613200_z9fptmpd8daq0k9.css'}],
     },
     components: {},
 
@@ -191,7 +191,7 @@
           default:
             return 'https://support.viabtc.com/hc/en-us/categories/360000471452'
         }
-      }
+      },
     },
 
     watch: {},
@@ -226,7 +226,7 @@
         }).catch(err => {
           onApiError(err, this)
         })
-      }
-    }
+      },
+    },
   }
 </script>

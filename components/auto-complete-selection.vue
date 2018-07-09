@@ -76,22 +76,22 @@
           } else {
             this.selectedOption = null
           }
-        }
+        },
       },
       parentId() {
         this.customInput.name = ''
-      }
+      },
     },
     props: {
       placeholder: {
         type: String,
         required: false,
-        default: ''
+        default: '',
       },
       searchOptions: {              // {name: '', value: ''}
         type: Array,
         required: false,
-        default: []
+        default: [],
       },
       selectedId: {},
       parentId: {},
@@ -100,7 +100,7 @@
         default: 'id',
       },
       onSelect: {
-        type: Function
+        type: Function,
       },
       disabled: {
         type: Boolean,
@@ -113,7 +113,7 @@
       disableCustomOption: {
         type: Boolean,
         default: false,
-      }
+      },
     },
     methods: {
       selectOption(option) {
@@ -161,7 +161,7 @@
       tab() {
         this.selectCustomInput()
       },
-    }
+    },
   }
 </script>
 <style lang="scss">
