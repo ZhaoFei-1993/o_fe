@@ -2,10 +2,10 @@
   <footer class="f_ft">
     <div class="f_wrapper">
       <div class="color-line"></div>
-      <div class="ft_content">
+      <div class="ft_content container">
         <div class="mediaBox">
           <p class="slogan">
-            <i class="iconfont icon-coin-ex-logo logo"></i>
+            <img src="~assets/img/logo-gray.svg">
           </p>
           <p class="mt-10 fs-24 ff-light">The Global Digital Coin Exchange</p>
           <div class="medias mt-10">
@@ -16,7 +16,6 @@
             <a v-if="lang.lang==='zh_Hans_CN'||lang.lang==='zh_Hant_HK'" target="_blank" href="https://t.me/CoinExCN"><i class="iconfont icon-telegram"></i></a>
             <a v-else target="_blank" href="https://t.me/TheCoinEx"><i class="iconfont icon-telegram"></i></a>
           </div>
-
         </div>
         <div class="linksWrap">
           <div class="linkBox">
@@ -50,7 +49,7 @@
         </div>
       </div>
       <div class="cprBar fs-12">
-        <div class="d-flex flex-space-between pl-30">
+        <div class="d-flex flex-space-between container">
           <div>
             <p class="cpr">Copyright @ 2017-2018 CoinEx.com.   All rights reserved.</p>
           </div>
@@ -94,9 +93,6 @@
       padding-bottom:20.6px;
       color:#9b9b9b;
       margin:0 auto;
-      padding-left: 30px;
-      padding-right: 30px;
-      max-width: 1800px;
     }
     .linksWrap {
       overflow: hidden;
@@ -152,7 +148,6 @@
       background: #1a2029;
 
       .flex-space-between{
-        max-width: 1800px;
         margin: auto;
       }
       .cpr {

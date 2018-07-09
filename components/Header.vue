@@ -35,7 +35,10 @@
           color: $brandGreen;
         }
       }
-
+      .message-button{
+        border:none;
+        background: transparent;
+      }
       .icon-user {
         margin-right: 10px;
         font-size: 20px;
@@ -113,10 +116,18 @@
       </b-navbar-nav>
       <b-navbar-nav class="ml-auto">
         <div v-if="user.data">
+
+          <b-nav-item-dropdown id="user-dropdown" text="订单">
+            <b-dropdown-item>示例订单</b-dropdown-item>
+          </b-nav-item-dropdown>
+          <span style="color: #d5d5d5">|</span>
+          <button class="message-button"><i class="iconfont icon-message"></i></button>
           <b-nav-item-dropdown id="user-dropdown" :text="'Hi, '+simplifyUserName(user.data.username)">
             <!--<b-dropdown-item :href="accountSetting">账户设置</b-dropdown-item>-->
-            <b-dropdown-item>OTC账户</b-dropdown-item>
-            <b-dropdown-item>广告管理</b-dropdown-item>
+            <b-dropdown-item><i class="iconfont icon-manage-account"></i> OTC账户</b-dropdown-item>
+            <b-dropdown-item><i class="iconfont icon-manage-item"></i> 广告管理</b-dropdown-item>
+            <b-dropdown-item><i class="iconfont icon-apply-merchant"></i> 商家申请</b-dropdown-item>
+            <b-dropdown-item><i class="iconfont icon-manage-ticket"></i> 工单系统</b-dropdown-item>
             <b-dropdown-divider></b-dropdown-divider>
             <b-dropdown-item @click="signOut">退出登录</b-dropdown-item>
           </b-nav-item-dropdown>
@@ -152,11 +163,10 @@
   import {mapState} from 'vuex'
   import {loginPage, webDomain, signupPage} from '~/modules/variables'
   import {onApiError} from '~/modules/error-code'
-  // import cookies from '~/plugins/cookies'
 
   export default {
     head: {
-      link: [{rel: 'stylesheet', href: '//at.alicdn.com/t/font_613200_z9fptmpd8daq0k9.css'}]
+      link: [{rel: 'stylesheet', href: '//at.alicdn.com/t/font_739076_y6fhzmtcfd.css'}]
     },
     components: {},
 
