@@ -31,23 +31,23 @@ export default {
   props: {
     selectClass: {
       type: String,
-      default: 'form-control'
+      default: 'form-control',
     },
     textKey: {
       type: String,
-      default: 'name'
+      default: 'name',
     },
     valueKey: {
       type: String,
-      default: 'code'
+      default: 'code',
     },
     countries: {
       type: Array,
-      default: []
+      default: [],
     },
     country: undefined, // country value
     province: undefined,
-    city: undefined
+    city: undefined,
   },
   data() {
     return {
@@ -56,12 +56,12 @@ export default {
     }
   },
   mounted() {
-    let selectedCountry = this.countries.filter(item => item[this.valueKey] === this.country)[0]
+    const selectedCountry = this.countries.filter(item => item[this.valueKey] === this.country)[0]
 
     if (selectedCountry) {
       this.provinces = selectedCountry['level2']
 
-      let selectedCity = this.provinces.filter(item => item[this.valueKey] === this.province)[0]
+      const selectedCity = this.provinces.filter(item => item[this.valueKey] === this.province)[0]
 
       if (selectedCity) {
         this.cities = selectedCity['level3']
@@ -70,7 +70,7 @@ export default {
   },
   methods: {
     onCountryChange(e) {
-      let selectedCountry = this.countries.filter(item => item[this.valueKey] === e.target.value)[0]
+      const selectedCountry = this.countries.filter(item => item[this.valueKey] === e.target.value)[0]
 
       this.$emit('update:country', e.target.value) // this.country = e.target.value
       // this.$emit('countryChange', selectedCountry)
@@ -83,7 +83,7 @@ export default {
       this.$nextTick(() => this.$emit('update:city', undefined))
     },
     onProvinceChange(e) {
-      let selectedCity = this.provinces.filter(item => item[this.valueKey] === e.target.value)[0]
+      const selectedCity = this.provinces.filter(item => item[this.valueKey] === e.target.value)[0]
       // this.$emit('provinceChange', selectedCity)
 
       this.$emit('update:province', e.target.value)
@@ -97,6 +97,6 @@ export default {
       this.$emit('update:city', e.target.value)
       // this.$emit('cityChange', selectedCity)
     },
-  }
+  },
 }
 </script>

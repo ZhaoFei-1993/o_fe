@@ -13,86 +13,80 @@
 </template>
 
 <script>
-import Vue from 'vue'
 export default {
   props: {
     type: {
       type: String,
       required: false,
-      default: 'text'
+      default: 'text',
     },
     value: {
-      default: null
+      default: null,
     },
     placeholder: {
       type: String,
       required: false,
-      default: ''
+      default: '',
     },
     error: {
       type: String,
       required: false,
-      default: ''
+      default: '',
     },
     state: {
       // true/'valid', false/'invalid', '',null
       type: [Boolean, String],
-      default: null
-    },
-    buttonText: {
-      type: String,
-      required: false,
-      default: ''
+      default: null,
     },
     formatter: {
-      type: Function
+      type: Function,
     },
     lazyFormatter: {
       type: Boolean,
-      default: false
+      default: false,
     },
     maxlength: {
       type: [String, Number],
       required: false,
-      default: ''
+      default: '',
     },
     autofocus: {
-      type: [String, Boolean]
+      type: [String, Boolean],
     },
 
     buttonDisabled: {
       type: Boolean,
-      default: true
+      default: true,
     },
 
     buttonInactive: {
       type: Boolean,
-      default: false
+      default: false,
     },
 
     leftDropdown: {
       type: Boolean,
-      default: false
+      default: false,
     },
 
     buttonText: {
       type: String,
-      default: ''
+      default: '',
     },
     buttonText2: {
       type: String,
-      default: ''
+      default: '',
     },
     readonly: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
 
   data() {
     return {
       focused: false,
-      localValue: this.value
+      localValue: this.value,
     }
   },
 
@@ -117,7 +111,7 @@ export default {
         return 'is-invalid'
       }
       return null
-    }
+    },
   },
   watch: {
     value(newVal, oldVal) {
@@ -129,7 +123,7 @@ export default {
       if (newVal !== oldVal) {
         this.$emit('input', newVal)
       }
-    }
+    },
   },
 
   methods: {
@@ -169,8 +163,8 @@ export default {
     },
     onButtonClick() {
       this.$emit('button-click', true)
-    }
-  }
+    },
+  },
 
 }
 </script>

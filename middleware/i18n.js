@@ -4,7 +4,7 @@ export default function ({store, query, error, req, res, replace, hotReload}) {
   if (hotReload) return
 
   // 从query读取lang并设给cookie，防止跳转后丢lang
-  let langs = store.state.lang.locales.map((item) => item.val)
+  const langs = store.state.lang.locales.map((item) => item.val)
 
   if (query.lang && (langs.indexOf(query.lang) !== -1)) {
     if (process.client) {

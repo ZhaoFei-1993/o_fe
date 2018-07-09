@@ -118,7 +118,7 @@
   export default {
     name: 'verify-password',
     components: {
-      EMsgs
+      EMsgs,
     },
     props: {
       password: String,
@@ -126,7 +126,7 @@
       sms: String,
       userData: Object,
       verifyCodeType: Number,
-      businessType: Number
+      businessType: Number,
     },
     data() {
       return {
@@ -140,18 +140,18 @@
         return {
           ga: {
             required: '请输入google验证码',
-            ga: '请输入6位数字'
+            ga: '请输入6位数字',
           },
           sms: {
             required: '请输入短信验证码',
-            sms: '请输入6位数字'
+            sms: '请输入6位数字',
           },
           password: {
             required: '请输入支付密码',
-            password: '请输入6位支付密码'
-          }
+            password: '请输入6位支付密码',
+          },
         }
-      }
+      },
     },
     validations: function () {
       const rules = {}
@@ -159,21 +159,21 @@
       if (this.userData.is_have_payment_password) {
         rules.password = {
           required,
-          password: regex('password', /^.{6}$/)
+          password: regex('password', /^.{6}$/),
         }
       }
 
       if (this.verifyCodeType === VERIFY_CODE_TYPE.GOOGLE) {
         rules.ga = {
           required,
-          ga: regex('ga', /^\d{6}$/)
+          ga: regex('ga', /^\d{6}$/),
         }
       }
 
       if (this.verifyCodeType === VERIFY_CODE_TYPE.MESSAGE) {
         rules.sms = {
           required,
-          sms: regex('sms', /^\d{6}$/)
+          sms: regex('sms', /^\d{6}$/),
         }
       }
 
@@ -235,6 +235,6 @@
           onApiError(err, this)
         })
       },
-    }
+    },
   }
 </script>

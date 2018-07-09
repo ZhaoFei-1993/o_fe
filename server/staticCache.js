@@ -1,4 +1,4 @@
-var path = require('path')
+const path = require('path')
 
 module.exports = function staticCache(dir, options, files) {
   if (typeof dir === 'object') {
@@ -13,23 +13,22 @@ module.exports = function staticCache(dir, options, files) {
   files = new FileManager(files || options.files)
   dir = dir || options.dir || process.cwd()
   dir = path.normalize(dir)
-  var filePrefix = path.normalize(options.prefix.replace(/^\//, ''))
 
   // option.filter
-  var fileFilter = function () { return true }
+  let fileFilter = function () { return true }
   if (Array.isArray(options.filter)) fileFilter = function (file) { return ~options.filter.indexOf(file) }
   if (typeof options.filter === 'function') fileFilter = options.filter
 
   return async (ctx, next) => {
     // only accept HEAD and GET
-    if (ctx.method !== 'HEAD' && ctx.method !== 'GET') return await next()
+    if (ctx.method !== 'HEAD' && ctx.method !== 'GET') return next()
     // check prefix first to avoid calculate
-    if (ctx.path.indexOf(options.prefix) !== 0) return await next()
+    if (ctx.path.indexOf(options.prefix) !== 0) return next()
 
     // decode for `/%E4%B8%AD%E6%96%87`
     // normalize for `//index`
-    var filename = path.normalize(safeDecodeURIComponent(ctx.path))
-    let ext = filename.split('.').slice(-1).join('')
+    const filename = path.normalize(safeDecodeURIComponent(ctx.path))
+    const ext = filename.split('.').slice(-1).join('')
 
     if (fileFilter(ext)) {
       ctx.set('Cache-Control', 'public, max-age=' + options.maxAge)
@@ -48,7 +47,7 @@ module.exports = function staticCache(dir, options, files) {
     //     file.md5 = hash.digest("base64")
     //   })
     // }
-    return await next()
+    return next()
     // ctx.body = stream
     // enable gzip will remove content length
   }

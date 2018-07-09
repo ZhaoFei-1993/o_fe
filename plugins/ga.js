@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 if (process.env.NODE_ENV === 'production') {
   /*
   ** Include Google Analytics Script
@@ -30,7 +32,7 @@ if (process.env.NODE_ENV === 'production') {
     debugger
     ga('send', 'exception', {
       'exDescription': '[' + new Date() + ']:' + JSON.stringify(e) + '|cookie:' + document.cookie + '|ua:' + navigator.userAgent,
-      'exFatal': false
+      'exFatal': false,
     })
   })
 } else {

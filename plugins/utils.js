@@ -21,17 +21,17 @@ const emailDomainMap = {
   'eyou.com': 'http://www.eyou.com/',
   '21cn.com': 'http://mail.21cn.com/',
   '188.com': 'http://www.188.com/',
-  'foxmail.coom': 'http://www.foxmail.com'
+  'foxmail.coom': 'http://www.foxmail.com',
 }
 
 const imgTypeArr = ['JPEG', 'TIFF', 'RAW', 'BMP', 'GIF', 'PNG', 'JPG']
 
 const utils = {
   isImage(fileName) {
-    let arr = fileName.split('.')
+    const arr = fileName.split('.')
     if (!arr.length) return false
 
-    let type = arr[arr.length - 1].toUpperCase()
+    const type = arr[arr.length - 1].toUpperCase()
 
     return imgTypeArr.some(element => element === type)
   },
@@ -42,7 +42,7 @@ const utils = {
    * @return {*}
    */
   getEmailSite: function (email) {
-    let mail = /@(.*)$/.exec(email)
+    const mail = /@(.*)$/.exec(email)
     if (mail && mail[1]) {
       return emailDomainMap[mail[1]]
     } else {
@@ -84,7 +84,7 @@ const utils = {
    * @return {string | void | *}
    */
   numberFormat: function (value, event) {
-    let newVal = value.replace(/[^0-9]/gi, '')
+    const newVal = value.replace(/[^0-9]/gi, '')
     event.target.value = newVal
     return newVal
   },
@@ -96,7 +96,7 @@ const utils = {
    * @return {string | void | *}
    */
   textFormat: function (value, event) {
-    let newVal = value.replace(/[^a-zA-Z]/gi, '')
+    const newVal = value.replace(/[^a-zA-Z]/gi, '')
     event.target.value = newVal
     return newVal
   },
@@ -158,7 +158,7 @@ const utils = {
     let previous = null
 
     return function () {
-      let now = new Date()
+      const now = new Date()
 
       if (!previous) {
         previous = now

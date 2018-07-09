@@ -22,13 +22,13 @@ export default {
   },
   props: {
     active: Number,
-    tabs: Array
+    tabs: Array,
   },
   methods: {
     onClick(index) {
       // this.$emit('input', index)
       this.$emit('click', index)
-    }
-  }
+    },
+  },
 }
 </script>

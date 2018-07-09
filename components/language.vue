@@ -14,12 +14,12 @@
       },
       tag: {      // 渲染什么标签
         type: String,
-        default: 'span'
+        default: 'span',
       },
     },
 
     computed: {
-      'parts': function() {
+      'parts': function () {
         const text = this.text
         return text
           .replace(/\[(.+?)\].*?\[\/\1\]/g, value => {
@@ -51,8 +51,8 @@
       })
 
       return h(this.tag, {
-        class: 'component-language'
+        class: 'component-language',
       }, children)
-    }
+    },
   }
 </script>
