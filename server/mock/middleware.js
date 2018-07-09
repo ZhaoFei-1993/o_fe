@@ -1,4 +1,6 @@
 const request = require('request')
+const faker = require('faker/locale/zh_CN')
+
 module.exports = (req, res, next) => {
   // fake auth
   console.log(req.url)
@@ -11,6 +13,49 @@ module.exports = (req, res, next) => {
   }
   if (req.url === '/logout' && req.method === 'POST') {
     return res.json({data: {}})
+  }
+
+  if (req.url === '/me/balance') {
+    let balances = []
+    for (let i = 0; i < 4; i++) {
+      balances.push({
+        id: faker.random.number(),
+        coin_type: i, // 数字货币币种
+        total: faker.random.number(),
+        frozen: faker.random.number(),
+        create_time: faker.date.past(),
+        update_time: faker.date.past(),
+      })
+    }
+    return res.json({
+      code: 0,
+      message: 'OK',
+      data: {
+        total: 4,
+        data: balances,
+      }
+    })
+  }
+  if (req.url === '/me/balanceHistory') {
+    let transactions = []
+    for (let i = 0; i < 10 + faker.random.number(); i++) {
+      transactions.push({
+        id: i,
+        coin_type: faker.random.arrayElement([1, 2, 3, 4]), // 数字货币币种
+        amount: faker.random.number(),
+        business_type: faker.random.arrayElement([1, 2]),
+        balance: faker.random.number(), // 余额
+        create_time: faker.date.past(),
+      })
+    }
+    return res.json({
+      code: 0,
+      message: 'OK',
+      data: {
+        total: transactions.length,
+        data: transactions,
+      }
+    })
   }
   // 后端已经开发好的api就直接转发，没有开发好的就用本地json server
   const backendAPI = ['/posts']
