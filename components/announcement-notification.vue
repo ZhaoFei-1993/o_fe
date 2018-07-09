@@ -33,7 +33,7 @@
           default:
             return this.recent.title_en
         }
-      }
+      },
     },
     mounted() {
       this.axios.announcement.getAnnouncements().then(response => {
@@ -42,7 +42,7 @@
           this.recent = announcements.sort((a, b) => new Date(b.announce_time) - new Date(a.announce_time))[0]
         }
       })
-    }
+    },
   }
 </script>
 <style lang="scss" scoped>

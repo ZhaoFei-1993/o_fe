@@ -13,5 +13,5 @@ module.exports = {
   replacerMap: {
     'vueTemplate': '_vm.$t',
     'vueScript': 'this.$t',
-  }
+  },
 }

@@ -35,7 +35,10 @@
           color: $brandGreen;
         }
       }
-
+      .message-button{
+        border:none;
+        background: transparent;
+      }
       .icon-user {
         margin-right: 10px;
         font-size: 20px;
@@ -101,23 +104,30 @@
   <div class="page-header pr bgc-w">
     <b-navbar class="navbar-main" toggleable="md">
       <b-navbar-brand to="/">
-        <!--<img :src="require('~/assets/img/viabtc-logo.svg')" alt="CoinEx OTC" height="34" width="120">-->
+        <img src="~assets/img/logo.png" alt="CoinEx OTC" height="34" width="120">
       </b-navbar-brand>
       <b-navbar-nav class="ml-30">
-        <b-nav-item :href="'//pool.viabtc.com?lang='+lang.lang">矿池</b-nav-item>
-        <b-nav-item to="/">矿机</b-nav-item>
-        <b-nav-item :href="'//pool.viabtc.com/wallet/home/?lang='+lang.lang">钱包</b-nav-item>
+        <b-nav-item to="/" exact>法币交易</b-nav-item>
+        <b-nav-item to="/items/create">发布广告</b-nav-item>
+        <b-nav-item to="/wallet">OTC钱包</b-nav-item>
         <b-nav-item :href="helpLink" target="_blank">帮助</b-nav-item>
         <span style="color: #d5d5d5">|</span>
-        <b-nav-item :href="'//www.viabtc.com?lang='+lang.lang">区块</b-nav-item>
-        <b-nav-item :href="'//www.coinex.com?lang='+lang.lang">交易</b-nav-item>
+        <b-nav-item :href="'//www.coinex.com?lang='+lang.lang">返回主站</b-nav-item>
       </b-navbar-nav>
       <b-navbar-nav class="ml-auto">
         <div v-if="user.data">
+
+          <b-nav-item-dropdown id="user-dropdown" text="订单">
+            <b-dropdown-item>示例订单</b-dropdown-item>
+          </b-nav-item-dropdown>
+          <span style="color: #d5d5d5">|</span>
+          <button class="message-button"><i class="iconfont icon-message"></i></button>
           <b-nav-item-dropdown id="user-dropdown" :text="'Hi, '+simplifyUserName(user.data.username)">
             <!--<b-dropdown-item :href="accountSetting">账户设置</b-dropdown-item>-->
-            <b-dropdown-item hidden>我的工单</b-dropdown-item>
-            <b-dropdown-item hidden>消息中心</b-dropdown-item>
+            <b-dropdown-item><i class="iconfont icon-manage-account"></i> OTC账户</b-dropdown-item>
+            <b-dropdown-item><i class="iconfont icon-manage-item"></i> 广告管理</b-dropdown-item>
+            <b-dropdown-item><i class="iconfont icon-apply-merchant"></i> 商家申请</b-dropdown-item>
+            <b-dropdown-item><i class="iconfont icon-manage-ticket"></i> 工单系统</b-dropdown-item>
             <b-dropdown-divider></b-dropdown-divider>
             <b-dropdown-item @click="signOut">退出登录</b-dropdown-item>
           </b-nav-item-dropdown>
@@ -129,15 +139,7 @@
         </div>
       </b-navbar-nav>
     </b-navbar>
-    <b-navbar class="navbar-sub">
-      <b-navbar-nav>
-        <b-nav-item to="/" :exact="true">浏览广告</b-nav-item>
-        <b-nav-item to="/items/create" :exact="true">发布广告</b-nav-item>
-        <b-nav-item to="/orders" :exact="true">我的订单</b-nav-item>
-        <b-nav-item to="/items/mine" :exact="true">我的广告</b-nav-item>
-        <b-nav-item to="/kyc/info" :exact="true">卖家认证</b-nav-item>
-      </b-navbar-nav>
-    </b-navbar>
+
     <b-modal v-if="attention[activeAttentionIndex]"
              id="alert"
              v-model="attentionModelShowing"
@@ -161,11 +163,10 @@
   import {mapState} from 'vuex'
   import {loginPage, webDomain, signupPage} from '~/modules/variables'
   import {onApiError} from '~/modules/error-code'
-  // import cookies from '~/plugins/cookies'
 
   export default {
     head: {
-      link: [{rel: 'stylesheet', href: '//at.alicdn.com/t/font_613200_z9fptmpd8daq0k9.css'}]
+      link: [{rel: 'stylesheet', href: '//at.alicdn.com/t/font_739076_y6fhzmtcfd.css'}]
     },
     components: {},
 
@@ -182,15 +183,19 @@
     computed: {
       ...mapState(['lang', 'user', 'messages']),
       helpLink() {
+        let lang = 'en-us'
         switch (this.lang.lang) {
           case 'zh_Hans_CN':
-            return 'https://support.viabtc.com/hc/zh-cn/categories/360000471452'
+            lang = 'zh-cn'
+            break
           case 'zh_Hant_HK':
-            return 'https://support.viabtc.com/hc/zh-tw/categories/360000471452'
+            lang = 'zh-tw'
+            break
           case 'en_US':
           default:
-            return 'https://support.viabtc.com/hc/en-us/categories/360000471452'
+            break
         }
+        return 'https://support.coinex.com/hc/' + lang
       }
     },
 

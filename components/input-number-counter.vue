@@ -63,16 +63,16 @@
       value: [Number, String],
       size: {
         type: String,
-        default: 'sm'
+        default: 'sm',
       },
       max: {
         type: Number,
-        default: Infinity
+        default: Infinity,
       },
       min: {
         type: Number,
-        default: -Infinity
-      }
+        default: -Infinity,
+      },
     },
     methods: {
       onInput(value) {
@@ -94,7 +94,7 @@
         if (value >= this.min) {
           this.$emit('input', value)
         }
-      }
-    }
+      },
+    },
   }
 </script>

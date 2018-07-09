@@ -45,30 +45,30 @@
 </template>
 
 <script>
-import AutoCompleteSelection from '~/components/AutoCompleteSelection.vue'
+import AutoCompleteSelection from '~/components/auto-complete-selection.vue'
 
 // todo: 将其他几个位置选择器也用本组件代替
 export default {
   name: 'location-cascade-select',
   components: {
-    AutoCompleteSelection
+    AutoCompleteSelection,
   },
   props: {
     // 默认选中的选项
     selected: {
       type: Array,
-      default: () => []
+      default: () => [],
     },
     // 各个输入框里面的占位文字
     placeholders: {
       type: Array,
-      default: () => []
+      default: () => [],
     },
     // 国家的信息要外部传入
     countryOptions: {
       type: Array,
-      required: true
-    }
+      required: true,
+    },
   },
   data() {
     const [countryCode, provinceCode, cityCode] = this.selected
@@ -99,7 +99,7 @@ export default {
       } else {
         return null
       }
-    }
+    },
   },
   methods: {
     onCountryChange(option) {
@@ -132,7 +132,7 @@ export default {
     },
     onChange() {
       this.$emit('change', [this.countryCode, this.provinceCode, this.cityCode])
-    }
-  }
+    },
+  },
 }
 </script>

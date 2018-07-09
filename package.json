@@ -47,7 +47,7 @@
     "pm2": "pm2 startOrRestart ecosystem.json --env production",
     "pm2-pre": "pm2 startOrRestart ecosystem.json --env pre",
     "generate": "nuxt generate",
-    "lint": "eslint --ext .js,.vue --ignore-path .gitignore .",
+    "lint": "eslint --fix --ext .js,.vue --ignore-path .gitignore .",
     "precommit": "npm run lint"
   },
   "devDependencies": {
@@ -57,7 +57,7 @@
     "cross-env": "^5.2.0",
     "escodegen": "^1.10.0",
     "eslint": "^5.0.1",
-    "eslint-config-standard": "^11.0.0",
+    "eslint-config-standard": "^12.0.0-alpha.0",
     "eslint-loader": "2.0.0",
     "eslint-plugin-html": "^4.0.5",
     "eslint-plugin-import": "^2.13.0",

@@ -1,4 +1,7 @@
 // https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Array/find
+
+/* eslint-disable */
+
 if (!Array.prototype.find) {
   Object.defineProperty(Array.prototype, 'find', {
     value: function (predicate) {
@@ -25,6 +28,6 @@ if (!Array.prototype.find) {
       }
 
       return undefined
-    }
+    },
   })
 }

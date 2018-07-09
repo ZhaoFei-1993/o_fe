@@ -1,5 +1,4 @@
 import Vue from 'vue'
-import cookieParser from '~/plugins/cookies'
 
 export default async ({app, store}) => {
   Vue.prototype.$t = function (key, lang) {

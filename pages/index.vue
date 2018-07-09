@@ -21,8 +21,8 @@
     },
     data() {
       return {
-        message: 'Hello OTC'
+        message: 'Hello OTC',
       }
-    }
+    },
   }
 </script>

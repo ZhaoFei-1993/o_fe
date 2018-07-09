@@ -25,7 +25,7 @@ export default {
     if (!this.$isServer) {
       ga('send', 'exception', {
         'exDescription': '[' + new Date() + ']:' + JSON.stringify(this.error) + '|cookie:' + document.cookie + '|ua:' + navigator.userAgent,
-        'exFatal': true
+        'exFatal': true,
       })
     }
     if (this.error.statusCode === 401 || this.error.statusCode === 403) {
@@ -38,6 +38,6 @@ export default {
         this.$router.push('/account/signin')
       }
     }
-  }
+  },
 }
 </script>

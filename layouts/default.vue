@@ -40,6 +40,6 @@ export default {
   components: {
     PageHeader,
     PageFooter,
-  }
+  },
 }
 </script>

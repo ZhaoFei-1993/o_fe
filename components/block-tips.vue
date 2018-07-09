@@ -25,7 +25,7 @@
     name: 'block-tips',
     props: {
       title: String,      // 大字号标题
-      text: String        // 小字号说明文字
+      text: String,        // 小字号说明文字
     },
     // slot: ['icon', 'extra']
   }

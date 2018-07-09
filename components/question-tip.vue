@@ -13,7 +13,7 @@
   export default {
     name: 'question-tip',
     props: {
-      content: String
-    }
+      content: String,
+    },
   }
 </script>

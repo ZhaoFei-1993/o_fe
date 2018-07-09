@@ -1,169 +1,159 @@
-<!--通用页脚-->
-<style lang="scss">
-  @import "~assets/scss/variables.scss";
-
-  .page-footer {
-    color: #fff;
-
-    .footer_wrapper {
-      background-color: #212a35;
-    }
-    .footer_top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding-top: 50px;
-      padding-bottom: 54px;
-      width: 1200px;
-      margin: 0 auto;
-      overflow: hidden;
-      color: #9b9b9b;
-    }
-
-    .footer_links {
-      overflow: hidden;
-      position: relative;
-
-      .link_wrapper {
-        width: 180px;
-        float: left;
-      }
-
-      .link_title {
-        font-size: 16px;
-        margin-bottom: 21px;
-        color: white;
-      }
-
-      a {
-        display: block;
-        margin-bottom: 7px;
-        color: #9b9b9b;
-      }
-    }
-
-    .media_wrapper {
-
-      a {
-        color: #9b9b9b;
-        text-decoration: none;
-
-        &:hover {
-          color: $brandGreen;
-        }
-      }
-
-      .iconfont {
-        margin-right: 22.5px;
-      }
-
-      .icon-viabtc-logo {
-        font-size: 45px;
-        color: #9b9b9b;
-      }
-    }
-    .footer_bottom_wrapper{
-      background-color: #1a2029;
-    }
-    .footer_bottom {
-      width: 1200px;
-      margin: 0 auto;
-      height: 58px;
-      padding: 25px 0;
-      font-size: 14px;
-      color: #aaaaaa;
-
-      .lang-select {
-        width: 120px;
-        height: 26px;
-        line-height: 26px;
-        padding-top: 0;
-        padding-bottom: 0;
-        border: 1px solid #6f6f6f;
-        color: white;
-        background-color: #1a2029 !important;
-      }
-    }
-  }
-</style>
-
 <template>
-  <footer class="page-footer">
-    <div class="footer_wrapper">
-      <div class="footer_top">
-        <div class="media_wrapper">
-          <div>
-            <i class="iconfont icon-viabtc-logo"></i>
-          </div>
-          <div class="mt-30">
-            <a href="mailto:support@viabtc.com"><i class="iconfont icon-email"></i></a>
-            <a target="_blank" href="//weibo.com/viabtc"><i class="iconfont icon-weibo"></i></a>
-            <a target="_blank" href="//twitter.com/viabtc"><i class="iconfont icon-twitter"></i></a>
-            <a target="_blank" href="//www.facebook.com/viabtc"><i class="iconfont icon-facebook"></i></a>
-            <a target="_blank" href="//t.me/joinchat/GW1OYlAkoeWG7J_vO--nCA"><i class="iconfont icon-telegram"></i></a>
-          </div>
-        </div>
-        <div class="footer_links">
-          <div class="link_wrapper">
-            <p class="link_title">产品</p>
-            <b-link :href="'//pool.viabtc.com/?lang='+lang.lang">矿池</b-link>
-            <b-link href="/">矿机</b-link>
-            <b-link :href="'//www.viabtc.com/?lang='+lang.lang">区块浏览器</b-link>
-          </div>
-          <div class="link_wrapper">
-            <p class="link_title">公司</p>
-            <b-link target="_blank" :href="'//www.viabtc.com/aboutus?lang='+lang.lang">关于我们</b-link>
-            <b-link target="_blank" href="//www.lagou.com/gongsi/276586.html">加入我们</b-link>
-            <b-link target="_blank" :href="'//www.viabtc.com/contact?lang='+lang.lang">联系我们</b-link>
-          </div>
-          <div class="link_wrapper">
-            <p class="link_title">客服</p>
-            <b-link target="_blank" :href="supportTicketUrl">提交工单</b-link>
-            <b-link href="/announcements">公告</b-link>
+  <footer class="f_ft">
+    <div class="f_wrapper">
+      <div class="color-line"></div>
+      <div class="ft_content container">
+        <div class="mediaBox">
+          <p class="slogan">
+            <img src="~assets/img/logo-gray.svg">
+          </p>
+          <p class="mt-10 fs-24 ff-light">The Global Digital Coin Exchange</p>
+          <div class="medias mt-10">
+            <a href="mailto:support@coinex.com"><i class="iconfont icon-email"></i></a>
+            <a target="_blank" href="https://weibo.com/coinex"><i class="iconfont icon-weibo"></i></a>
+            <a target="_blank" href="https://twitter.com/coinexcom"><i class="iconfont icon-twitter"></i></a>
+            <a target="_blank" href="https://www.facebook.com/TheCoinEx/"><i class="iconfont icon-facebook"></i></a>
+            <a v-if="lang.lang==='zh_Hans_CN'||lang.lang==='zh_Hant_HK'" target="_blank" href="https://t.me/CoinExCN"><i class="iconfont icon-telegram"></i></a>
+            <a v-else target="_blank" href="https://t.me/TheCoinEx"><i class="iconfont icon-telegram"></i></a>
           </div>
         </div>
-
+        <div class="linksWrap">
+          <div class="linkBox">
+            <p class="boxTitle">产品</p>
+            <b-link to="https://www.coinex.com">币币交易</b-link>
+            <b-link to="/">OTC交易</b-link>
+            <b-link target="_blank" :href="'https://pool.viabtc.com/?lang='+lang.lang">矿池</b-link>
+            <b-link target="_blank" :href="'https://www.viabtc.com/?lang='+lang.lang">区块浏览器</b-link>
+          </div>
+          <div class="linkBox">
+            <p class="boxTitle">关于</p>
+            <b-link to="/aboutus">关于我们</b-link>
+            <!-- <b-link to="/">加入我们</b-link> -->
+            <b-link to="/token">关于CET</b-link>
+            <b-link to="/announcement">公告</b-link>
+          </div>
+          <div class="linkBox">
+            <p class="boxTitle">声明</p>
+            <b-link to="/service">服务协议</b-link>
+            <b-link to="/privacy">隐私协议</b-link>
+            <b-link to="/fees">费率</b-link>
+          </div>
+          <div class="linkBox" style="width:auto">
+            <p class="boxTitle">支持</p>
+            <b-link href="https://support.coinex.com" target="_blank">常见问题</b-link>
+            <b-link href="https://www.coinex.com/res/support/ticket" target="_blank">提交工单</b-link>
+            <b-link target="_blank" href="https://github.com/coinexcom/coinex_exchange_api/wiki">API文档</b-link>
+            <!-- <b-link target="_blank" :href="lang.lang !== 'en_US'?'http://coinex.udesk.cn':'http://coinex-en.udesk.cn'">客服</b-link> -->
+            <b-link :href="'https://docs.google.com/forms/d/e/1FAIpQLSdA8WGHG8SJrWEDbYXJeNSzjovUtU8kmcLKSOHDfACGdgMgUQ/viewform'">上币申请</b-link>
+          </div>
+        </div>
       </div>
-
-    </div>
-    <div class="footer_bottom_wrapper">
-      <div class="footer_bottom d-flex justify-content-between align-items-center">
-        <div>Copyright © 2016-2018 ViaBTC Technology Limited</div>
-        <b-form-select class="lang-select fz-12" @change="setLang" v-model="lang.lang">
-          <option v-for="(item,index) in lang.locales" :key="index" :value="item.val">{{item.text}}</option>
-        </b-form-select>
+      <div class="cprBar fs-12">
+        <div class="d-flex flex-space-between container">
+          <div>
+            <p class="cpr">Copyright @ 2017-2018 CoinEx.com.   All rights reserved.</p>
+          </div>
+        </div>
       </div>
     </div>
   </footer>
 </template>
 
 <script>
-  import Vue from 'vue'
-  import cookies from '~/plugins/cookies'
-  import {mapState} from 'vuex'
+  import Vue from "vue";
+  import {
+    mapState,
+  } from "vuex";
 
   export default {
-    computed: {
-      ...mapState(['lang', 'user']),
-      supportTicketUrl: function () {
-        const ticketUrl = 'https://support.coinex.com/hc/requests/new'
-        return this.user.data ? `https://support.coinex.com/hc/signin?return_to=${encodeURIComponent(ticketUrl)}` : ticketUrl
-      },
+    data() {
+      return {};
     },
-    methods: {
-      setLang(lang) {
-        const date = new Date()
-        const expire = new Date(date.getTime() + 30 * 24 * 60 * 60 * 1000)
-        cookies.setItem(document, 'lang', lang, expire, '/')
-        this.$store.dispatch('setLang', lang)
+    computed: {
+      ...mapState(['lang']),
+    },
+  };
+</script>
+<style scoped lang="scss">
+  @import "~assets/scss/variables.scss";
 
-        let newLink = this.utils.removeParamInLink('lang')
-        if (location.href === newLink) {
-          location.reload()
-        } else {
-          location.href = newLink
+  .f_ft {
+    background-color: #212a35;
+    color: #fff;
+    .color-line{
+      height: 6px;
+      background-image: linear-gradient(to left, #ffc21e, #00c1ce);
+    }
+    .ft_content {
+      overflow: hidden;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 30px;
+      padding-bottom:20.6px;
+      color:#9b9b9b;
+      margin:0 auto;
+    }
+    .linksWrap {
+      overflow: hidden;
+      position: relative;
+      //min-width: 750px;
+      .linkBox {
+        width: 180px;
+        float: left;
+      }
+      .boxTitle {
+        font-size: 16px;
+        margin-bottom: 21px;
+        color:white;
+      }
+      a {
+        color:#9b9b9b;
+        display: block;
+        margin-bottom: 7px;
+        //   &:hover{color: #999}
+      }
+    }
+    .mediaBox {
+      .medias {
+        .wechatToggle {
+          display: inline-block;
+        }
+        a{
+          color:#9b9b9b;
+          text-decoration: none;
+          &:hover{
+            color:$brandGreen;
+          }
+        }
+        .iconfont{
+          margin-right: 22.5px;
+        }
+      }
+      .slogan {
+        font-size: 18px;
+        display: flex;
+        align-items: center;
+        color: #fff;
+        margin-top: -32px;
+        .logo {
+          font-size:34px
         }
       }
     }
+    .cprBar {
+      height: 70px;
+      line-height: 70px;
+      padding-top: 20px;
+      background: #1a2029;
+
+      .flex-space-between{
+        margin: auto;
+      }
+      .cpr {
+        color: #666666;
+        line-height: 26px;
+      }
+    }
   }
-</script>
+</style>

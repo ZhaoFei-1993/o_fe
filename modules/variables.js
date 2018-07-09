@@ -6,8 +6,7 @@ let loginPage = '//www.coinex.com/account/signin'
 let signupPage = '//www.coinex.com/account/signup'
 let webDomain = '//otc.coinex.com'
 
-let NODE_ENV = process.env.NODE_ENV || 'production'
-let MODE = process.env.MODE || 'production'
+const MODE = process.env.MODE || 'production'
 
 // 非正式环境(pre & dev)
 if (MODE !== 'production') {
@@ -42,5 +41,5 @@ export {
   serverApiDomain,
   loginPage,
   signupPage,
-  webDomain
+  webDomain,
 }

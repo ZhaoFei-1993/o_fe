@@ -15,7 +15,7 @@ const createStore = () => {
       lang: createLang(),
       user: createUser(),
       webp: createWebp(),
-    }
+    },
   })
 }
 

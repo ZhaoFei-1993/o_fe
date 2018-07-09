@@ -3,7 +3,7 @@ import {mapState} from 'vuex'
 
 Vue.mixin({
   computed: mapState([
-    'webp'
+    'webp',
   ]),
 
   methods: {
@@ -19,6 +19,6 @@ Vue.mixin({
       } else {
         return source.default
       }
-    }
-  }
+    },
+  },
 })

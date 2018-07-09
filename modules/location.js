@@ -22,7 +22,7 @@ export function resolveLocationText(location, countries) {
   return {
     country: country,
     province: province,
-    city: city
+    city: city,
   }
 }
 

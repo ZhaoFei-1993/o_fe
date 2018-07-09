@@ -14,7 +14,7 @@ export default ({app, store}) => {
       data: {
         errorContent: '',
         successContent: '',
-        time: SHOW_TIME
+        time: SHOW_TIME,
       },
       render() {
         if (this.successContent) {
@@ -37,8 +37,8 @@ export default ({app, store}) => {
         close() {
           this.errorContent = null
           this.successContent = null
-        }
-      }
+        },
+      },
     })
 
     const $showTips = function (content, type = 'success', time = SHOW_TIME) {
