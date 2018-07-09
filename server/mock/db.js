@@ -36,7 +36,7 @@ module.exports = () => {
       min_deal_fiat_amount: faker.random.number(),
       max_deal_fiat_amount: faker.random.number(),
       counterparty_limit: faker.random.number(),
-      auto_reply_content: faker.random.sentence(),
+      auto_reply_content: faker.lorem.sentence(),
       status: faker.random.arrayElement([0, 1]),
       create_time: faker.date.past(),
       update_time: faker.date.past(),
