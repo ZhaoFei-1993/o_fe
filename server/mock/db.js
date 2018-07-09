@@ -5,7 +5,6 @@ module.exports = () => {
     users: [],
     items: [],
     orders: [],
-    balances: [],
   }
   // Create data with faker
   for (let i = 0; i < 1000; i++) {
