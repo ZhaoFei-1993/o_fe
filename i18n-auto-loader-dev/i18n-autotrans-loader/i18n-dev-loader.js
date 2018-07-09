@@ -6,9 +6,9 @@ const escodegen = require('escodegen')
 const md5 = require('blueimp-md5')
 const sharedConfig = require('./shared-config')
 
-let extractedLocale = {
+const extractedLocale = {
   i18n_autotrans_version: 3,
-  global: {}
+  global: {},
 }
 
 const I18N_ANNOTATION_REGEX = /@i18n\s+([^\s*]+)/
@@ -42,12 +42,11 @@ function parseHtml(html) {
 
   attrArr && attrArr
     .map(attr => {
-      let [name, value] = attr.split('=')
-      value = value.replace(/^"/, '').replace(/"$/, '')             // 匹配的形如 nam
+      const [name, value] = attr.split('=')
 
       return {
         name,
-        value
+        value: value.replace(/^"/, '').replace(/"$/, ''), // 匹配的形如 nam
       }
     })
     .forEach(attr => {
@@ -107,12 +106,12 @@ function replaceAst(ast, replacer, filenameKey, fileMap) {
           }
         }
       }
-    }
+    },
   })
 }
 
 function replaceText(source, replacer, filenameKey, fileMap) {
-  let ast = esprima.parseModule(source, {
+  const ast = esprima.parseModule(source, {
     // comment: true
   })
 
@@ -128,7 +127,7 @@ function replaceText(source, replacer, filenameKey, fileMap) {
 
   return {
     source,
-    fileMap
+    fileMap,
   }
 }
 

@@ -1,2 +1,2 @@
-module.exports = function(app, routers) {
+module.exports = function (app, routers) {
 }

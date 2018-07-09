@@ -5,7 +5,7 @@
 const shortLangMap = {
   'en_US': 'en',
   'zh_Hans_CN': 'cn',
-  'zh_Hant_HK': 'hk'
+  'zh_Hant_HK': 'hk',
 }
 
 export default () => {
@@ -13,7 +13,7 @@ export default () => {
     locales: [
       {val: 'en_US', text: 'English'},
       {val: 'zh_Hans_CN', text: '简体中文'},
-      {val: 'zh_Hant_HK', text: '繁体中文'}
+      {val: 'zh_Hant_HK', text: '繁体中文'},
     ], // available languages
     lang: null,           // en_US格式的lang
     short: '',            // 简略版本的lang，比如en、cn
@@ -21,7 +21,7 @@ export default () => {
       zh_Hans_CN: null,
       zh_Hant_HK: null,
       en_US: null,
-    }
+    },
   }
 
   const mutations = {
@@ -31,7 +31,7 @@ export default () => {
     },
     SET_I18N(state, {lang, value}) {
       state.i18n[lang] = value
-    }
+    },
   }
 
   const actions = {
@@ -49,6 +49,6 @@ export default () => {
   return {
     state,
     actions,
-    mutations
+    mutations,
   }
 }

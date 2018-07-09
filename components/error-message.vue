@@ -13,14 +13,14 @@
     props: {
       name: String,
       result: Object,     // vuelidate 针对表单字段的校验结果
-      msgs: Object        // 字段的错误提示信息
+      msgs: Object,        // 字段的错误提示信息
     },
     computed: {
       i18ntext: function () {
         return {
-          errorMessage: '请正确填写该字段'
+          errorMessage: '请正确填写该字段',
         }
-      }
+      },
     },
     render() {
       const result = this.result
@@ -28,12 +28,12 @@
 
       if (!result || !result.$error) return
 
-      for (let validationName in result) {
+      for (const validationName in result) {
         if (!result[validationName] && msgs[validationName]) {
           return <div class="error-message">{msgs[validationName]}</div>
         }
       }
       return <div class="error-message">{this.i18ntext.errorMessage}</div>
-    }
+    },
   }
 </script>

@@ -34,7 +34,7 @@ const cookies = {
   },
   keys: function (context) {
     if (!context || !context.cookie) { return null }
-    const aKeys = context.cookie.replace(/((?:^|\s*;)[^=]+)(?=;|$)|^\s*|\s*(?:\=[^;]*)?(?:\1|$)/g, '').split(/\s*(?:\=[^;]*)?;\s*/)
+    const aKeys = context.cookie.replace(/((?:^|\s*;)[^=]+)(?=;|$)|^\s*|\s*(?:=[^;]*)?(?:\1|$)/g, '').split(/\s*(?:=[^;]*)?;\s*/)
     for (let nIdx = 0; nIdx < aKeys.length; nIdx++) { aKeys[nIdx] = decodeURIComponent(aKeys[nIdx]) }
     return aKeys
   },
@@ -81,7 +81,7 @@ const cookies = {
     }
 
     return obj
-  }
+  },
 }
 
 export default cookies

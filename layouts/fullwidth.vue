@@ -28,7 +28,6 @@
     components: {
       PageHeader,
       PageFooter,
-      Alert
-    }
+    },
   }
 </script>

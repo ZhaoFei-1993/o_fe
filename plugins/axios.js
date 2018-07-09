@@ -13,7 +13,7 @@ function sleep(ms = 100) {
 }
 
 export default ({ app, store }) => {
-  let options = {
+  const options = {
     baseURL: process.client ? clientApiDomain : serverApiDomain,
   }
   const inst = axios.create(options)
@@ -110,12 +110,12 @@ export default ({ app, store }) => {
     function (config) {
       // Do something before request is sent
       if (!/get|options/i.test(config.method)) {
-        let Tokens = require('csrf')
-        let tokens = new Tokens({
+        const Tokens = require('csrf')
+        const tokens = new Tokens({
           secretLength: 6,
-          saltLength: 8
+          saltLength: 8,
         })
-        let token = tokens.secretSync()
+        const token = tokens.secretSync()
 
         // todo: 看一下 csrf 具体怎么用
         config.headers.common['X-CSRF-TOKEN'] = token
@@ -159,7 +159,7 @@ export default ({ app, store }) => {
         if (process.client) {
           ga('send', 'exception', {
             exDescription: `[${new Date()}]:${JSON.stringify(err)}|cookie:${document.cookie}|ua:${navigator.userAgent}`,
-            exFatal: true
+            exFatal: true,
           })
         }
 

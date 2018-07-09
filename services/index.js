@@ -1,7 +1,7 @@
 import createUserService from './user'
 
 export default function injectService(axiosInst) {
-  let services = {
+  const services = {
     user: createUserService(axiosInst),
   }
 
