@@ -3,9 +3,12 @@
     min-width: 1200px;
     font-size: 14px;
     background-color: #f2f2f2;
-
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
     .fullwidth-page-container {
       width: 100%;
+      flex: 1;
       min-height: 500px;
     }
   }

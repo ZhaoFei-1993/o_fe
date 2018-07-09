@@ -4,7 +4,7 @@
   .page-header {
     position: sticky;
     z-index: 11;
-    top: -60px;
+    top: 0px;
 
     .navbar-nav {
       display: inline-block;
@@ -166,7 +166,7 @@
 
   export default {
     head: {
-      link: [{rel: 'stylesheet', href: '//at.alicdn.com/t/font_739076_y6fhzmtcfd.css'}]
+      link: [{rel: 'stylesheet', href: '//at.alicdn.com/t/font_739076_uldg3o7ditk.css'}]
     },
     components: {},
 
@@ -196,7 +196,7 @@
             break
         }
         return 'https://support.coinex.com/hc/' + lang
-      }
+      },
     },
 
     watch: {},
