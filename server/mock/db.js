@@ -25,6 +25,7 @@ module.exports = () => {
     data.items.push({
       id: i,
       user_id: randUser.id,
+      user: randUser,
       is_buy_side: faker.random.boolean(),
       coin_type: faker.random.arrayElement([1, 2, 3, 4]), // 数字货币币种
       fiat_type: faker.random.arrayElement([1]), // 法币货币币种
