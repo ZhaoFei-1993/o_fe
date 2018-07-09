@@ -13,19 +13,19 @@ export default {
     val: {
       type: String,
       required: true,
-      default: ''
+      default: '',
     },
     size: {
       type: Number,
-      default: 100
+      default: 100,
     },
     bgColor: {
       type: String,
-      default: '#FFFFFF'
+      default: '#FFFFFF',
     },
     fgColor: {
       type: String,
-      default: '#000000'
+      default: '#000000',
     },
   },
   watch: {
@@ -40,7 +40,7 @@ export default {
     },
     fgColor: function () {
       this.update()
-    }
+    },
   },
   mounted() {
     this.update()
@@ -73,8 +73,8 @@ export default {
           ctx.fillRect(Math.round(cdx * tileW), Math.round(rdx * tileH), w, h)
         })
       })
-    }
-  }
+    },
+  },
 }
 
 function getBackingStorePixelRatio(ctx) {

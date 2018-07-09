@@ -8,11 +8,11 @@ module.exports = {
     meta: [
       {charset: 'utf-8'},
       {
-        renderer: 'webkit'
+        renderer: 'webkit',
       },
       {
         name: 'format-detection',
-        content: 'telephone=no'
+        content: 'telephone=no',
       },
       {name: 'viewport', content: 'width=1200'},
       {'http-equiv': 'X-UA-Compatible', content: 'IE=edge'},
@@ -20,48 +20,48 @@ module.exports = {
         hid: 'description',
         name: 'description',
         content:
-          'CoinEx OTC'
+          'CoinEx OTC',
       },
       {
         hid: 'keywords',
         name: 'keywords',
         content:
-          '比特币，以太坊，买卖比特币，交易所，数字货币，虚拟货币，Bitcoin, BTC, Litecoin, LTC, Ethereum, ETH, Zcash, ZEC, buy Bitcoin, sell Bitcoin, exchange, trading, cryptocurrency, digital asset'
-      }
+          '比特币，以太坊，买卖比特币，交易所，数字货币，虚拟货币，Bitcoin, BTC, Litecoin, LTC, Ethereum, ETH, Zcash, ZEC, buy Bitcoin, sell Bitcoin, exchange, trading, cryptocurrency, digital asset',
+      },
     ],
     link: [
-      {rel: 'icon', type: 'image/ico', sizes: '48x48', href: '/favicon.ico'}
-    ]
+      {rel: 'icon', type: 'image/ico', sizes: '48x48', href: '/favicon.ico'},
+    ],
   },
   render: {
     gzip: true,
-    resourceHints: false // 可以禁用prefetch/preload，prefetch太消耗带宽了... todo:仅仅禁止prefetch就够了，preload不应该禁止
+    resourceHints: false, // 可以禁用prefetch/preload，prefetch太消耗带宽了... todo:仅仅禁止prefetch就够了，preload不应该禁止
   },
   watchers: {
     chokidar: {
       paths: '*.json',
       usePolling: true,
-      useFsEvents: false
-    }
+      useFsEvents: false,
+    },
   },
   router: {
     middleware: ['i18n', 'webp'],
     extendRoutes(routes) {
       // 把_c开头的文件、目录过滤掉，这些是页面相关组件，不生成路由
       for (let i = 0; i < routes.length; i++) {
-        let route = routes[i]
+        const route = routes[i]
 
         if (route.component.match(/\/_c/)) {
           routes.splice(i, 1)
         }
       }
-    }
+    },
   },
   /*
    ** Global CSS
    */
   css: [
-    {src: '~assets/scss/global.scss', lang: 'scss'}
+    {src: '~assets/scss/global.scss', lang: 'scss'},
   ],
 
   performance: {
@@ -73,7 +73,7 @@ module.exports = {
   loading: '~/components/Loading.vue',
 
   modules: [
-    'bootstrap-vue/nuxt'
+    'bootstrap-vue/nuxt',
   ],
   /*
    ** Build configuration
@@ -88,7 +88,7 @@ module.exports = {
       css: 'style.[chunkhash:7].css',
       vendor: 'vendor.[chunkhash:7].js',
       app: 'otc.[hash:7].js',
-      chunk: '[name].[chunkhash:7].js'
+      chunk: '[name].[chunkhash:7].js',
     },
     vendor: ['babel-polyfill', 'axios'],
     extend(webpackConfig, { isDev }) {
@@ -100,18 +100,18 @@ module.exports = {
 
       webpackConfig.plugins.push(new webpack.DefinePlugin({
         'process.env': {
-          MODE: `"${process.env.MODE}"`
-        }
+          MODE: `"${process.env.MODE}"`,
+        },
       }))
       webpackConfig.plugins.push(new webpack.ProvidePlugin({
-        Vue: 'vue'
+        Vue: 'vue',
       }))
 
       webpackConfig.module.rules.push({
         test: /\.(jpe?g|png|svg|gif)$/,
         loader: ['srcset-loader'],
         exclude: /(node_modules)/,
-        resourceQuery: /[?&](sizes|placeholder)(=|&|\[|$)/
+        resourceQuery: /[?&](sizes|placeholder)(=|&|\[|$)/,
       })
 
       if (!isDev) {
@@ -126,18 +126,18 @@ module.exports = {
                   quality: '65-90',
                   speed: 4,
                   optimizationLevel: 7,
-                  interlaced: true
+                  interlaced: true,
                 },
                 gifsicle: {
-                  optimizationLevel: 7
+                  optimizationLevel: 7,
                 },
                 mozjpeg: {
                   progressive: true,
-                  quality: 80
-                }
-              }
-            }
-          ]
+                  quality: 80,
+                },
+              },
+            },
+          ],
         })
         /**
          * 生成webp文件
@@ -150,21 +150,21 @@ module.exports = {
             expose: 'default', // webp、all、default
             name: 'img/[name].[hash:7].[ext]',
             webp: {
-              quality: 75
-            }
-          }
+              quality: 75,
+            },
+          },
         })
       }
       // 指定使用loader的文件类型
       const vueLoader = webpackConfig.module.rules.find((rule) => rule.loader === 'vue-loader')
       vueLoader.options.postLoaders = {
         js: 'i18n-autotrans-loader?SFC=script',
-        html: 'i18n-autotrans-loader?SFC=template'
+        html: 'i18n-autotrans-loader?SFC=template',
       }
 
       // i18n未正式发布，先放在项目底下引用
       webpackConfig.resolveLoader = {
-        modules: ['node_modules', 'i18n-auto-loader-dev']
+        modules: ['node_modules', 'i18n-auto-loader-dev'],
       }
 
       // i18n auto loader 配套的 plugin
@@ -172,9 +172,9 @@ module.exports = {
         replacerMap: {
           'vueScript': '$t_i18n',
         },
-        writeFile: !!isDev
+        writeFile: !!isDev,
       }))
-    }
+    },
   },
 
   plugins: [
@@ -187,6 +187,6 @@ module.exports = {
     {src: '~/plugins/utils'},
     {src: '~/plugins/modal', ssr: false},
     {src: '~/plugins/tips', ssr: false},
-    {src: '~/plugins/vue-components'}
-  ]
+    {src: '~/plugins/vue-components'},
+  ],
 }

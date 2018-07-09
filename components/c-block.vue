@@ -17,11 +17,11 @@ export default {
   props: {
     x: {
       type: Number,
-      default: 30
+      default: 30,
     },
     y: {
       type: Number,
-      default: 30
+      default: 30,
     },
   },
 }

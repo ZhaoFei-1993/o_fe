@@ -42,11 +42,11 @@ export default {
     'text': {
       type: String,
       // default: '添加照片'
-    }
+    },
   },
   methods: {
     onAddImage() {
-      for (let file of event.target.files) {
+      for (const file of event.target.files) {
         if (!this.utils.isImage(file.name)) {
           this.$showTips('仅限图片格式', 'error')
           return false
@@ -56,22 +56,22 @@ export default {
           return false
         }
 
-        let URL = window.URL || window.webkitURL
+        const URL = window.URL || window.webkitURL
         let blob = ''
 
         if (URL && URL.createObjectURL) {
           blob = URL.createObjectURL(file)
         }
-        let image = {
+        const image = {
           name: file.name, // 名字
           file: file,
           blob: blob,
           size: file.size,      // 大小
-          time: Date.now()
+          time: Date.now(),
         }
         this.$emit('change', image)
       }
-    }
-  }
+    },
+  },
 }
 </script>

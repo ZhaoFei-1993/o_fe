@@ -23,7 +23,7 @@
     },
     props: {
       size: [Number, String],
-      colorful: Boolean
+      colorful: Boolean,
     },
     computed: {
       'style': function () {
@@ -31,10 +31,10 @@
         if (size) {
           return {
             height: `${size}px`,
-            width: `${size}px`
+            width: `${size}px`,
           }
         }
-      }
-    }
+      },
+    },
   }
 </script>

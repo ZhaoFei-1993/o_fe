@@ -43,13 +43,13 @@ module.exports = () => {
       title: faker.lorem.words(),
       detail: faker.lorem.paragraphs(),
       images: [{
-        caption: faker.lorem.words(), src: faker.random.image()
+        caption: faker.lorem.words(), src: faker.random.image(),
       }, {
         caption: faker.lorem.words(),
-        src: faker.random.image()
+        src: faker.random.image(),
       }, {
         caption: faker.lorem.words(),
-        src: faker.random.image()
+        src: faker.random.image(),
       }],
       contact_phone: faker.phone.phoneNumber(),
       contact_name: faker.random.word(),

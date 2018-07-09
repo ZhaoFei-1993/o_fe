@@ -1,6 +1,6 @@
 export default () => {
   const state = {
-    data: null
+    data: null,
   }
   const mutations = {
 
@@ -12,6 +12,6 @@ export default () => {
   return {
     state,
     actions,
-    mutations
+    mutations,
   }
 }
