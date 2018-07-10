@@ -5,7 +5,7 @@
     position: sticky;
     z-index: 11;
     top: 0px;
-
+    font-size: 14px;
     .navbar-nav {
       display: inline-block;
     }
@@ -20,11 +20,11 @@
       max-width: 1200px;
       height: 60px;
       margin: 0 auto;
-      font-size: 16px;
+      font-size: 14px;
 
       .nav-link {
         height: 50px;
-        line-height: 50px;
+        line-height: 60px;
         padding-top: 0;
 
         &:hover {
@@ -35,8 +35,8 @@
           color: $brandGreen;
         }
       }
-      .message-button{
-        border:none;
+      .message-button {
+        border: none;
         background: transparent;
       }
       .icon-user {
@@ -166,7 +166,7 @@
 
   export default {
     head: {
-      link: [{rel: 'stylesheet', href: '//at.alicdn.com/t/font_739076_uldg3o7ditk.css'}]
+      link: [{rel: 'stylesheet', href: '//at.alicdn.com/t/font_739076_yolhcc9iwc.css'}]
     },
     components: {},
 

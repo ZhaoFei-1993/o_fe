@@ -34,19 +34,25 @@
           background-color: white;
           box-shadow: 0 0 10px 0 #ececec;
           text-align: center;
+          display: flex;
           .direction {
-            border-bottom: 1px solid #eeeeee;
             height: 50px;
             line-height: 50px;
-            color: $brandYellow;
+            width: 120px;
+            color: white;
+            background-image: linear-gradient(to left, #ffe070, #ffb900);
             font-size: 22px;
+            i.iconfont {
+              font-size: 22px;
+              margin-right: 0.5rem;
+            }
           }
           .coin-types {
             height: 50px;
-            padding-top: 10px;
+            line-height: 50px;
+            flex: 1;
             .coin-type {
-              line-height: 40px;
-              margin: 0 10px;
+              line-height: 50px;
               width: 80px;
               display: inline-block;
               cursor: pointer;
@@ -56,12 +62,89 @@
             .coin-type.active {
               border-bottom: 2px solid $brandYellow;
             }
+            &.sell .coin-type.active {
+              border-bottom: 2px solid $brandGreen;
+            }
           }
           &.sell {
             .direction {
-              color: $brandGreen;
+              background-image: linear-gradient(to left, #22e6b8, #00c1ce);
             }
           }
+        }
+      }
+      .items-list {
+        box-shadow: 0 0 10px 0 #ececec;
+        .list-title {
+          display: flex;
+          justify-content: space-between;
+          padding: 24px 20px 8px;
+          background-color: white;
+          span:first-of-type {
+            font-size: 18px;
+          }
+        }
+        .list-header {
+          padding: 0 20px;
+          height: 40px;
+          line-height: 40px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          background-color: #f9f9f9;
+          .col-narrow, .col-wide {
+            text-align: center;
+          }
+          .select-payment {
+            height: 24px;
+            border: 1px solid #dddddd;
+          }
+        }
+        .list{
+          &.sell .item-row:nth-of-type(even){
+            background-color: #fafffe;
+          }
+          .item-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: white;
+            height: 90px;
+            padding: 20px;
+            &:nth-of-type(even){
+              background-color: #fffdfa;
+            }
+            .btn-order {
+              width: 100px;
+              height: 26px;
+              border-radius: 100px;
+              font-size: 14px;
+              line-height: 22px;
+            }
+            .payment {
+              i {
+                margin: 0 4px;
+              }
+              .icon-bank-card {
+                color: $brandYellow;
+              }
+              .icon-alipay {
+                color: rgb(0, 174, 239);
+              }
+              .icon-wechat-color {
+                color: rgb(89, 170, 0);
+              }
+            }
+          }
+        }
+
+        .col-narrow {
+          width: 12%;
+          padding: 0 16px;
+        }
+        .col-wide {
+          flex: 1;
+          padding: 0 16px;
         }
       }
     }
@@ -82,29 +165,63 @@
     <div class="layout-content">
       <div class="trade-choices row">
         <div class="col-6">
-          <div :class="['choice-block buy', {active:'buy'===selectedDirection}]">
-            <div class="direction">购买</div>
+          <div :class="['choice-block buy', {active:'BUY'===selectedDirection}]">
+            <div class="direction"><i class="iconfont icon-arrow-down"></i>购买</div>
             <div class="coin-types">
               <span :class="['coin-type', {active:coin===selectedCoin}]" v-for="coin in constant.COIN_TYPES"
-                    @click="showItems('buy',coin)">{{coin}}</span>
+                    @click="showItems('BUY',coin)">{{coin}}</span>
             </div>
           </div>
         </div>
         <div class="col-6">
-          <div :class="['choice-block sell', {active:'sell'===selectedDirection}]">
-            <div class="direction">出售</div>
+          <div :class="['choice-block sell', {active:'SELL'===selectedDirection}]">
+            <div class="direction"><i class="iconfont icon-arrow-up"></i>出售</div>
             <div class="coin-types">
               <span :class="['coin-type', {active:coin===selectedCoin}]" v-for="coin in constant.COIN_TYPES"
-                    @click="showItems('sell',coin)">{{coin}}</span>
+                    @click="showItems('SELL',coin)">{{coin}}</span>
             </div>
           </div>
         </div>
       </div>
-      <CBlock>
-        <div v-for="item in items">
-          {{item.id}}
+      <div class="items-list">
+        <div class="list-title">
+          <span>广告列表</span>
+          <span>没有合适的？<a href="/items/create">自己发布广告&gt;</a></span>
         </div>
-      </CBlock>
+        <div class="list-header">
+          <span class="col-narrow">{{selectedDirection==='BUY'?'卖家':'买家'}}</span>
+          <span class="col-narrow">30天成单/完成率</span>
+          <span class="col-narrow">数量</span>
+          <span class="col-wide">限额</span>
+          <b-form-select class='select-payment col-narrow' v-model="selectedPayment"
+                         :options="constant.PAYMENT_OPTIONS"></b-form-select>
+          <span :class="['sort-price col-wide',sortPrice]">单价</span>
+          <span class="col-narrow">操作</span>
+        </div>
+        <div :class="['list',selectedDirection.toLowerCase()]">
+          <div class="item-row" v-for="item in items">
+            <span class="col-narrow text-center fz-18 c-6f">{{item.user.name}}</span>
+            <div class="col-narrow">
+              <div class="fz-12 c-4a">1024单/50%</div>
+              <div class="fz-12 c-6f">放行时间7分钟</div>
+            </div>
+            <span class="col-narrow text-right fz-12 c-6f">{{item.coin_amount+' '+selectedCoin}}</span>
+            <span class="col-wide text-right pr-60 fz-12 c-6f">{{item.min_deal_cash_amount+ '-'+ item.max_deal_cash_amount + 'CNY'}}</span>
+            <span class='payment col-narrow'>
+              <i class="iconfont icon-bank-card"></i>
+              <i class="iconfont icon-alipay"></i>
+              <i class="iconfont icon-wechat-color"></i>
+            </span>
+            <span :class="['sort-price col-wide pr-60 text-right',sortPrice]">{{item.price + ' CNY'}}</span>
+            <span class="col-narrow">
+              <button
+                :class="['btn btn-order',{'btn-outline-yellow':selectedDirection==='BUY','btn-outline-green':selectedDirection==='SELL'}]">
+              {{(selectedDirection==='BUY'?'购买':'出售')+ selectedCoin}}
+            </button>
+            </span>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -118,9 +235,12 @@
     data() {
       return {
         message: 'Hello OTC',
-        selectedCoin: 'BTC',
-        selectedDirection: 'buy',
+        selectedCoin: this.$route.query.coin || 'BTC',
+        selectedDirection: this.$route.query.direction || 'BUY',
+        selectedPayment: this.$route.query.payment || 'ALL',
+        sortPrice: this.$route.query.sort || this.selectedDirection === 'BUY' ? 'ASC' : 'DESC',
         items: [],
+        busy: false,
       }
     },
     computed: {
@@ -141,8 +261,9 @@
         })
       },
       initItems() {
+        this.busy = true
         this.axios.item.getItems({direction: this.selectedDirection, coin: this.selectedCoin}).then(response => {
-          console.log(response)
+          this.busy = false
           this.items = response.data.data.slice(0, 30)
         })
       },

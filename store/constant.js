@@ -1,5 +1,6 @@
 import {
   COIN_TYPES,
+  PAYMENT_OPTIONS,
 } from '~/modules/constant'
 
 export default () => {
@@ -7,6 +8,7 @@ export default () => {
     // 这边变量都是通过/constant拉回来的
     fetched: false,             // 下面四个options都是通过同一个接口获得的。
     COIN_TYPES, // 暂时简单的字符串，之后根据后端情况改
+    PAYMENT_OPTIONS,
   }
 
   const mutations = {
