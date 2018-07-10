@@ -100,8 +100,8 @@
             border: 1px solid #dddddd;
           }
         }
-        .list{
-          &.sell .item-row:nth-of-type(even){
+        .list {
+          &.sell .item-row:nth-of-type(even) {
             background-color: #fafffe;
           }
           .item-row {
@@ -111,7 +111,7 @@
             background-color: white;
             height: 90px;
             padding: 20px;
-            &:nth-of-type(even){
+            &:nth-of-type(even) {
               background-color: #fffdfa;
             }
             .btn-order {
@@ -215,7 +215,9 @@
             <span :class="['sort-price col-wide pr-60 text-right',sortPrice]">{{item.price + ' CNY'}}</span>
             <span class="col-narrow">
               <button
-                :class="['btn btn-order',{'btn-outline-yellow':selectedDirection==='BUY','btn-outline-green':selectedDirection==='SELL'}]">
+                :class="['btn btn-order',{'btn-outline-yellow':selectedDirection==='BUY','btn-outline-green':selectedDirection==='SELL'}]"
+                @click="placeOrder(item)"
+              >
               {{(selectedDirection==='BUY'?'购买':'出售')+ selectedCoin}}
             </button>
             </span>
@@ -266,6 +268,8 @@
           this.busy = false
           this.items = response.data.data.slice(0, 30)
         })
+      },
+      placeOrder() {
       },
     },
   }

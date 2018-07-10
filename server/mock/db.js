@@ -29,10 +29,13 @@ module.exports = () => {
       side: faker.random.arrayElement(['BUY', 'SELL']),
       coin_type: faker.random.arrayElement([1, 2, 3, 4]), // 数字货币币种
       cash_type: faker.random.arrayElement([1]), // 法币货币币种
+      pricing_type: faker.random.arrayElement([1, 2]),
       float_rate: faker.random.number({max: 100}),
       price_limit: faker.random.number({max: 1000}),
       price: faker.random.number(),
       coin_amount: faker.random.number(),
+      remain_coin_amount: faker.random.number(),
+      freeze_coin_amount: faker.random.number(),
       min_deal_cash_amount: faker.random.number(),
       max_deal_cash_amount: faker.random.number(),
       counterparty_limit: faker.random.number(),
