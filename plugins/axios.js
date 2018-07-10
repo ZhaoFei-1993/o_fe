@@ -3,6 +3,7 @@ import axios from 'axios'
 import { serverApiDomain, clientApiDomain, loginPage, webDomain } from '../modules/variables'
 import cookieParser from '~/plugins/cookies'
 import injectServices from '../services/index'
+import {onApiError} from '~/modules/error-code'
 
 function sleep(ms = 100) {
   return new Promise(function (resolve, reject) {
@@ -105,6 +106,9 @@ export default ({ app, store }) => {
 
     console.error(err)
   }
+
+  // 挂载一下api错误处理函数
+  inst.onError = (error) => onApiError(error, app)
 
   inst.interceptors.request.use(
     function (config) {
