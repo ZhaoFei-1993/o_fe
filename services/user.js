@@ -5,7 +5,7 @@ export default (axios) => {
      * @param {Number} force 1/0 是否强制从矿池那里获取用户的信息并更新商城的后端缓存。在用户数据比较敏感，如支付的时候需要使用该参数
      * @return {Promise<void>}
      */
-    info(force) {
+    userInfo(force) {
       // return Promise.resolve(require('./mock/user').userData)
       return axios.get('/user', {
         params: {
@@ -13,5 +13,17 @@ export default (axios) => {
         },
       })
     },
+
+    /**
+     * 获取其他用户的信息
+     * @param id
+     */
+    otherUserInfo(id) {
+      return Promise.resolve(require('./mock/user').otherUser)
+    },
+
+    balance() {
+      return Promise.resolve(require('./mock/user').balance)
+    }
   }
 }
