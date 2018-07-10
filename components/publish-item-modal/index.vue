@@ -34,7 +34,7 @@
 </style>
 
 <template>
-  <b-modal class="publish-item-modal" v-model="value" size="lg" title="发布广告" @change="onShowingChange">
+  <b-modal class="publish-item-modal" v-model="value" size="lg" title="发布广告" @input="onShowingChange">
     <b-form>
       <b-form-group label="我想" class="group-purpose">
         <b-form-select v-model="form.side" :options="tradeSideOptions"></b-form-select>

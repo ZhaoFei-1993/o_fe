@@ -24,3 +24,14 @@ export const balance = {
     bch: '9999.99'
   }
 }
+
+
+export const userData = {
+  data: {
+    username: 'Bruce Wayne',
+    recent_deal_amount: 100,
+    recent_order_amount: 200,
+    average_pay_time: 100,
+    average_release_time: 200,
+  }
+}
