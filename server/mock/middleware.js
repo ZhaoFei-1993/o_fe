@@ -16,7 +16,7 @@ module.exports = (req, res, next) => {
   }
 
   if (req.url === '/me/balance') {
-    let balances = []
+    const balances = []
     for (let i = 0; i < 4; i++) {
       balances.push({
         id: faker.random.number(),
@@ -33,11 +33,11 @@ module.exports = (req, res, next) => {
       data: {
         total: 4,
         data: balances,
-      }
+      },
     })
   }
   if (req.url === '/me/balanceHistory') {
-    let transactions = []
+    const transactions = []
     for (let i = 0; i < 10 + faker.random.number(); i++) {
       transactions.push({
         id: i,
@@ -54,7 +54,7 @@ module.exports = (req, res, next) => {
       data: {
         total: transactions.length,
         data: transactions,
-      }
+      },
     })
   }
   // 后端已经开发好的api就直接转发，没有开发好的就用本地json server
@@ -66,16 +66,6 @@ module.exports = (req, res, next) => {
       return req.pipe(request(redirected)).pipe(res)
     }
   }
-  // 转换成后端使用的数据结构
-  const transformedData = {
-    'code': (res.status >= 200 && res.status < 300) ? 0 : res.status,
-    'message': 'OK',
-    'data': res.data && res.data.length ? {
-      total: res.headers['x-total-count'] || 1000,
-      data: res.data,
-    } : res.data,
-  }
-  res.data = transformedData
   req.query._page = req.query.page
   req.query._limit = req.query.limit
   req.query._start = req.query.start
