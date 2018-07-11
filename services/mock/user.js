@@ -25,7 +25,6 @@ export const balance = {
   }
 }
 
-
 export const userData = {
   data: {
     username: 'Bruce Wayne',

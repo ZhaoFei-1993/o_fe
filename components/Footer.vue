@@ -60,19 +60,16 @@
 </template>
 
 <script>
-  import Vue from "vue";
-  import {
-    mapState,
-  } from "vuex";
+import { mapState } from 'vuex'
 
-  export default {
-    data() {
-      return {};
-    },
-    computed: {
-      ...mapState(['lang']),
-    },
-  };
+export default {
+  data() {
+    return {}
+  },
+  computed: {
+    ...mapState(['lang']),
+  },
+}
 </script>
 <style scoped lang="scss">
   @import "~assets/scss/variables.scss";
