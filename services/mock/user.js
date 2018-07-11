@@ -27,9 +27,9 @@ export const balance = {
 
 export const userData = {
   data: {
-    username: 'Bruce Wayne',
-    recent_deal_amount: 100,
-    recent_order_amount: 200,
+    username: 'Wruce Wayne',
+    recent_deal_count: 100,
+    recent_order_count: 200,
     average_pay_time: 100,
     average_release_time: 200,
   }
