@@ -2,6 +2,7 @@
 <style lang="scss">
   .c-block {
     background-color: #fff;
+    box-shadow: 0 0 20px 0 #ececec;
   }
 </style>
 
