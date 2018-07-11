@@ -5,22 +5,20 @@
 </style>
 
 <template>
-  <My2Column>
-    <MySidebar slot="left"></MySidebar>
-    <CBlock slot="right">
-      <h3>
-        支付方式
-        <b-btn @click="onAddPayment" variant="success">添加支付方式</b-btn>
-      </h3>
-      <p>被激活的支付方式将在交易时向买方展示，最多激活3种</p>
-      <MyInfoItem title="银行卡">
-        <p slot="content">中国</p>
-        <div slot="action">
-          <b-btn size="xxs" variant="plain">修改</b-btn>
-          <ToggleButton></ToggleButton>
-        </div>
-      </MyInfoItem>
-    </CBlock>
+  <CBlock class="page-my-payments">
+    <h3>
+      支付方式
+      <b-btn @click="onAddPayment" variant="success">添加支付方式</b-btn>
+    </h3>
+    <p>被激活的支付方式将在交易时向买方展示，最多激活3种</p>
+    <MyInfoItem title="银行卡">
+      <p slot="content">中国</p>
+      <div slot="action">
+        <b-btn size="xxs" variant="plain">修改</b-btn>
+        <ToggleButton></ToggleButton>
+      </div>
+    </MyInfoItem>
+
     <b-modal title="添加支付方式" v-model="modalShowing">
       <b-form>
         <b-form-group label="类型" horizontal>
@@ -71,12 +69,12 @@
         </div>
       </b-form>
     </b-modal>
-  </My2Column>
+  </CBlock>
 </template>
 
 <script>
-import MySidebar from './_c/my-sidebar.vue'
-import My2Column from './_c/my-2column.vue'
+import MySidebar from '../../components/my-sidebar.vue'
+import My2Column from '../../components/my-2column.vue'
 import MyInfoItem from './_c/my-info-item.vue'
 import ToggleButton from '~/components/toggle-button.vue'
 
@@ -88,6 +86,7 @@ export default {
     MyInfoItem,
     ToggleButton,
   },
+  layout: 'my',
   data() {
     return {
       form: {

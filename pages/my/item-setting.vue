@@ -5,74 +5,71 @@
 </style>
 
 <template>
-  <My2Column class="page-item-setting">
-    <MySidebar slot="left"></MySidebar>
-    <CBlock slot="right">
-      <h3>
-        广告设置
-        <b-link>管理我的广告</b-link>
-      </h3>
+  <CBlock class="page-item-setting">
+    <h3>
+      广告设置
+      <b-link>管理我的广告</b-link>
+    </h3>
 
-      <MyInfoItem title="交易限额">
-        <div slot="content">
-          <div v-if="amountLimitEditing">
-            <b-input-group :append="currency.currentCash">
-              <b-input v-model="amount_limit_min"></b-input>
-            </b-input-group>
-            <b-input-group :append="currency.currentCash">
-              <b-input v-model="amount_limit_max"></b-input>
-            </b-input-group>
-          </div>
-          <div v-else>
-            {{amount_limit_min}} {{currency.currentCash}} —— {{amount_limit_max}} {{currency.currentCash}}
-          </div>
+    <MyInfoItem title="交易限额">
+      <div slot="content">
+        <div v-if="amountLimitEditing">
+          <b-input-group :append="currency.currentCash">
+            <b-input v-model="amount_limit_min"></b-input>
+          </b-input-group>
+          <b-input-group :append="currency.currentCash">
+            <b-input v-model="amount_limit_max"></b-input>
+          </b-input-group>
         </div>
-
-        <div slot="action">
-          <b-btn variant="plain" @click="onEditAmountLimit">修改</b-btn>
-          <template v-if="amountLimitEditing">
-            <b-btn variant="success" @click="onEditAmountLimitConfirm">确定</b-btn>
-            <b-btn variant="secondary" @click="onEditAmountLimitCancel">取消</b-btn>
-          </template>
+        <div v-else>
+          {{amount_limit_min}} {{currency.currentCash}} —— {{amount_limit_max}} {{currency.currentCash}}
         </div>
-      </MyInfoItem>
+      </div>
 
-      <MyInfoItem title="自动回复">
-        <b-form-textarea slot="content" v-model="auto_reply_content" :disabled="!autoReplyEditing"></b-form-textarea>
+      <div slot="action">
+        <b-btn variant="plain" @click="onEditAmountLimit">修改</b-btn>
+        <template v-if="amountLimitEditing">
+          <b-btn variant="success" @click="onEditAmountLimitConfirm">确定</b-btn>
+          <b-btn variant="secondary" @click="onEditAmountLimitCancel">取消</b-btn>
+        </template>
+      </div>
+    </MyInfoItem>
 
-        <div slot="action">
-          <b-btn variant="plain" @click="onEditAutoReply">修改</b-btn>
-          <template v-if="autoReplyEditing">
-            <b-btn variant="success" @click="onEditAutoReplyConfirm">确定</b-btn>
-            <b-btn variant="secondary" @click="onEditAutoReplyCancel">取消</b-btn>
-          </template>
-        </div>
-      </MyInfoItem>
+    <MyInfoItem title="自动回复">
+      <b-form-textarea slot="content" v-model="auto_reply_content" :disabled="!autoReplyEditing"></b-form-textarea>
 
-      <MyInfoItem title="交易方限制">
-        <b-form-checkbox-group v-model="counterpartyLimit"
-                               slot="content"
-                               :disabled="!counterpartyLimitEditing"
-                               :options="constant.COUNTERPARTY_LIMIT_OPTIONS">
-        </b-form-checkbox-group>
+      <div slot="action">
+        <b-btn variant="plain" @click="onEditAutoReply">修改</b-btn>
+        <template v-if="autoReplyEditing">
+          <b-btn variant="success" @click="onEditAutoReplyConfirm">确定</b-btn>
+          <b-btn variant="secondary" @click="onEditAutoReplyCancel">取消</b-btn>
+        </template>
+      </div>
+    </MyInfoItem>
 
-        <div slot="action">
-          <b-btn variant="plain" @click="onEditCounterpartyLimit">修改</b-btn>
-          <template v-if="counterpartyLimitEditing">
-            <b-btn variant="success" @click="onEditCounterpartyLimitConfirm">确定</b-btn>
-            <b-btn variant="secondary" @click="onEditCounterpartyLimitCancel">取消</b-btn>
-          </template>
-        </div>
-      </MyInfoItem>
-    </CBlock>
-  </My2Column>
+    <MyInfoItem title="交易方限制">
+      <b-form-checkbox-group v-model="counterpartyLimit"
+                             slot="content"
+                             :disabled="!counterpartyLimitEditing"
+                             :options="constant.COUNTERPARTY_LIMIT_OPTIONS">
+      </b-form-checkbox-group>
+
+      <div slot="action">
+        <b-btn variant="plain" @click="onEditCounterpartyLimit">修改</b-btn>
+        <template v-if="counterpartyLimitEditing">
+          <b-btn variant="success" @click="onEditCounterpartyLimitConfirm">确定</b-btn>
+          <b-btn variant="secondary" @click="onEditCounterpartyLimitCancel">取消</b-btn>
+        </template>
+      </div>
+    </MyInfoItem>
+  </CBlock>
 </template>
 
 <script>
   import Vue from 'vue'
   import {mapState} from 'vuex'
-  import MySidebar from './_c/my-sidebar.vue'
-  import My2Column from './_c/my-2column.vue'
+  import MySidebar from '../../components/my-sidebar.vue'
+  import My2Column from '../../components/my-2column.vue'
   import MyInfoItem from './_c/my-info-item.vue'
 
   export default {
@@ -95,6 +92,7 @@
         backupCache: {}
       }
     },
+    layout: 'my',
     computed: {
       ...mapState(['constant', 'currency'])
     },
