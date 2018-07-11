@@ -226,6 +226,7 @@
       </div>
     </div>
     <PlaceOrderModal
+      v-if="selectedItem"
       :item="selectedItem"
       :balance="userBalance"
       v-model="showPlaceOrderModal"
@@ -254,7 +255,10 @@
         showPlaceOrderModal: false,
         busy: false,
         userBalance: {
-          // TODO use store
+          BTC: 1000,
+          BCH: 1000,
+          ETH: 1000,
+          USDT: 1000,
         },
       }
     },
