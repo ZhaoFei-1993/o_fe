@@ -23,7 +23,13 @@ module.exports = {
     "no-multi-spaces": [0], // todo: 看一下如何允许注释的格式化前面的空格
     "semi": [2, "never"],
     "no-console": 0,
-    "comma-dangle": [2, "always-multiline"],
+    "comma-dangle": [2, {
+      "arrays": "always-multiline",
+      "objects": "ignore",            // 对象并不总是需要的
+      "imports": "always-multiline",
+      "exports": "always-multiline",
+      "functions": "ignore",
+    }],
     "no-var": 2,
     "prefer-const": 2,
   }
