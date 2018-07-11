@@ -8,12 +8,14 @@ export const ERROR_CODE = {
 export const errorCodeMessageMap = {
 }
 
-// todo:挂载到axios上去
 /**
  * 在api出错时使用的办通用处理函数。调用位置，要在catch的末尾
+ * 已经挂载到了this.axios上，所以要通过this.axios.onError来调用。这里仅做调用
  * @param err
  * @param vm
- * @return {boolean} true，说明被正确处理过了; false说明未知错误
  */
-export function onApiError() {
+export function onApiError(err, vm) {
+  const message = err.message
+
+  vm.$showTips && vm.$showTips(message, 'error')
 }
