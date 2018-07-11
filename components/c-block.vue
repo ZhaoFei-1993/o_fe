@@ -2,12 +2,11 @@
 <style lang="scss">
   .c-block {
     background-color: #fff;
-    box-shadow: 0 0 20px 0 #ececec;
   }
 </style>
 
 <template>
-  <div class="c-block" :style="{padding: `${x}px ${y}px`}">
+  <div class="c-block default-box-shadow" :style="{padding: `${x}px ${y}px`}">
     <slot/>
   </div>
 </template>

@@ -34,21 +34,20 @@
 </template>
 
 <script>
-import Vue from 'vue'
-import MySidebar from './_c/my-sidebar.vue'
-import My2Column from './_c/my-2column.vue'
-import MyInfoItem from './_c/my-info-item.vue'
+  
+  import MySidebar from './_c/my-sidebar.vue'
+  import My2Column from './_c/my-2column.vue'
+  import MyInfoItem from './_c/my-info-item.vue'
 
-export default {
-  name: 'page-my-security',
-  components: {
-    MySidebar,
-    My2Column,
-    MyInfoItem,
-  },
-  data() {
-    return {
+  export default {
+    name: 'page-my-security',
+    components: {
+      MySidebar,
+      My2Column,
+      MyInfoItem
+    },
+    data() {
+      return {}
     }
   }
-}
 </script>

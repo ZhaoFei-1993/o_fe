@@ -12,9 +12,9 @@ $background-red: #e45555;
   box-sizing: border-box;
   color: #fff;
   transition: color 0.15s ease-in-out,
-  background-color 0.15s ease-in-out,
-  border-color 0.15s ease-in-out,
-  box-shadow 0.15s ease-in-out;
+              background-color 0.15s ease-in-out,
+              border-color 0.15s ease-in-out,
+              box-shadow 0.15s ease-in-out;
 
   &:focus,
   &.focus {
@@ -101,8 +101,7 @@ $background-red: #e45555;
   background-image: $image-gradient-yellow;
   border: none;
   &:hover {
-    box-shadow: 0 5px 20px 0 #d3d3d3;
-    color: #fff;
+    box-shadow: 0 16px 20px 0 #d3d3d3;
   }
   &[disabled]:hover {
     box-shadow: none;
