@@ -9,6 +9,7 @@ $background-red: #e45555;
   padding-top: 0;
   padding-bottom: 0;
   border-width: 2px;
+  box-sizing: border-box;
   color: #fff;
   transition: color 0.15s ease-in-out,
               background-color 0.15s ease-in-out,
@@ -29,7 +30,7 @@ $background-red: #e45555;
   background-color: $brandGreen;
   border: none;
   &:hover {
-    box-shadow:0 5px 20px 0 #d3d3d3;
+    box-shadow: 0 5px 20px 0 #d3d3d3;
     color: #ffffff;
   }
   &:active {
@@ -41,7 +42,7 @@ $background-red: #e45555;
   background-image: $image-gradient-green;
   border: none;
   &:hover {
-    box-shadow:0 5px 20px 0 #d3d3d3;
+    box-shadow: 0 5px 20px 0 #d3d3d3;
     color: white;
   }
   &[disabled]:hover {
@@ -88,7 +89,7 @@ $background-red: #e45555;
   border-color: $brandYellow;
 
   &:hover {
-    box-shadow:0 5px 20px 0 #d3d3d3;
+    box-shadow: 0 5px 20px 0 #d3d3d3;
     color: #fff;
   }
   &:active {
@@ -127,7 +128,7 @@ $background-red: #e45555;
   border-color: white;
   color: white;
   &:hover {
-    background:white;
+    background: white;
     border-color: transparent;
     color: #192330;
   }
@@ -147,7 +148,7 @@ $background-red: #e45555;
   background-color: $background-red;
   border: none;
   &:hover {
-    box-shadow:0 5px 20px 0 #d3d3d3;
+    box-shadow: 0 5px 20px 0 #d3d3d3;
   }
   &:active {
     background-color: $background-red;
@@ -156,40 +157,45 @@ $background-red: #e45555;
 
 .btn-xl {
   min-width: 360px;
-  line-height: 48px;
+  line-height: 44px;
   font-size: 22px;
   border-radius: 48px;
+  height:48px;
 }
 
 .btn-lg {
   min-width: 230px;
   padding: 0 24px;
   font-size: 22px;
-  line-height: 42px;
+  line-height: 38px;
   border-radius: 44px;
+  height:42px;
 }
 
 .btn-sm {
   min-width: 160px;
   padding-left: 20px;
   padding-right: 20px;
-  line-height: 34px;
+  line-height: 30px;
   font-size: 22px;
   border-width: 2px;
   border-radius: 34px;
+  height:34px;
 }
 
 .btn-xs {
   min-width: 100px;
-  line-height: 28px;
+  line-height: 24px;
   font-size: 16px;
   border-radius: 28px;
+  height:28px;
 }
 
 .btn-xxs {
   min-width: 40px;
-  line-height: 26px;
+  line-height: 22px;
   font-size: 14px;
   border-width: 1px;
   border-radius: 100px;
+  height:26px;
 }

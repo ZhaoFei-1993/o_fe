@@ -176,6 +176,21 @@ const utils = {
       }
     }
   },
+  processValidationConfig(validationConfig) {
+    const validations = {}
+    const invalidMessages = {}
+
+    for (let key in validationConfig) {
+      validations[key] = validationConfig[key].validation
+      console.log(validations[key],validationConfig[key])
+      invalidMessages[key] = validationConfig[key].message
+    }
+
+    return {
+      validations,
+      invalidMessages
+    }
+  }
 }
 
 export default ({app, store}) => {
