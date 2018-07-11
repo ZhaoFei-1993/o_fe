@@ -1,7 +1,7 @@
 <template>
   <div class="page-wallet">
     <c-block style="min-height: 240px;">
-      <div class="fl asset-info">
+      <div class="float-left asset-info">
         <p style="color: #192330;font-size: 18px;">总资产估值</p>
         <p style="height: 40px;display: block;margin-top: 40px;color: #192330;" >
           <span style="font-size:24px;">
@@ -29,7 +29,7 @@
           2341234
         </p>
       </div>
-      <div class="fr" style="position:relative;">
+      <div class="float-right" style="position:relative;">
         <div class="pie-chart-container" v-if="showPieChart">
           <fund-pie :datas="pieDatas" :asset="defaultAsset" name="市场份额"></fund-pie>
         </div>
@@ -49,7 +49,7 @@
     </c-block>
     <div class="row-header" style="padding-bottom:15px;">
       <span>资产流水</span>
-      <div class="fr">
+      <div class="float-right">
         <div style="display: inline-block;" ><span style="font-size: 12px;">币种：</span><b-form-select style="width: 100px;" v-model="filterCoin" :options="coinOptions"></b-form-select></div>
         <div style="display: inline-block;margin-left: 30px;"><span style="font-size: 12px;">流水类型：</span><b-form-select style="width: 100px;" v-model="filterCoin" :options="coinOptions"></b-form-select></div>
         <div style="display: inline-block;margin-left: 20px;"><i style="font-size: 20px;vertical-align: sub;" class="iconfont icon-download"></i></div>
@@ -85,7 +85,7 @@
           <div class="amount-available">
             <span>可转数量：</span>
             <span>{{ availableAmount }}</span>
-            <b-link style="float: right;" @click="onshowHand">全部划转</b-link>
+            <b-link class="float-right" @click="onshowHand">全部划转</b-link>
           </div>
         </b-form-group>
         <div style="width: 280px;height: 44px;margin: 0 auto;">
@@ -200,16 +200,16 @@
               width: '110px',
               paddingLeft: '28px',
             },
-            thClass: [ 'ta-l' ],
-            tdClass: [ 'ta-l', 'td-pl' ],
+            thClass: [ 'text-left' ],
+            tdClass: [ 'text-left', 'td-pl' ],
           },
           total: {
             label: '总额',
             thStyle: {
               width: '250px',
             },
-            thClass: [ 'ta-r' ],
-            tdClass: [ 'ta-r' ],
+            thClass: [ 'text-right' ],
+            tdClass: [ 'text-right' ],
             sortable: false,
           },
           freeze: {
@@ -217,8 +217,8 @@
             thStyle: {
               width: '250px',
             },
-            thClass: [ 'ta-r' ],
-            tdClass: [ 'ta-r' ],
+            thClass: [ 'text-right' ],
+            tdClass: [ 'text-right' ],
             sortable: false,
           },
           availInfo: {
@@ -226,13 +226,13 @@
             thStyle: {
               width: '250px',
             },
-            thClass: [ 'ta-r' ],
-            tdClass: [ 'ta-r' ],
+            thClass: [ 'text-right' ],
+            tdClass: [ 'text-right' ],
             sortable: false,
           },
           action: {
             label: '与主站资金划转',
-            tdClass: [ 'ta-c' ],
+            tdClass: [ 'text-center' ],
             thStyle: {
               textAlign: 'center',
             },
@@ -268,16 +268,16 @@
               width: '110px',
               paddingLeft: '28px',
             },
-            thClass: [ 'ta-l' ],
-            tdClass: [ 'ta-l', 'td-pl' ],
+            thClass: [ 'text-left' ],
+            tdClass: [ 'text-left', 'td-pl' ],
           },
           total: {
             label: '时间',
             thStyle: {
               width: '250px',
             },
-            thClass: [ 'ta-r' ],
-            tdClass: [ 'ta-r' ],
+            thClass: [ 'text-right' ],
+            tdClass: [ 'text-right' ],
             sortable: false,
           },
           freeze: {
@@ -285,8 +285,8 @@
             thStyle: {
               width: '250px',
             },
-            thClass: [ 'ta-r' ],
-            tdClass: [ 'ta-r' ],
+            thClass: [ 'text-right' ],
+            tdClass: [ 'text-right' ],
             sortable: false,
           },
           availInfo: {
@@ -294,13 +294,13 @@
             thStyle: {
               width: '250px',
             },
-            thClass: [ 'ta-r' ],
-            tdClass: [ 'ta-r' ],
+            thClass: [ 'text-right' ],
+            tdClass: [ 'text-right' ],
             sortable: false,
           },
           action: {
             label: '余额',
-            tdClass: [ 'ta-c' ],
+            tdClass: [ 'text-center' ],
             thStyle: {
               textAlign: 'center',
             },
@@ -346,18 +346,6 @@
 
 <style lang="scss">
   .page-wallet {
-    .fl {
-      float: left;
-    }
-    .fr {
-      float: right;
-    }
-    .mt-30 {
-      margin-top: 30px;
-    }
-    .mb-10 {
-      margin-bottom: 10px;
-    }
     .asset-info {
       position: absolute;
       z-index: 9;
@@ -447,15 +435,6 @@
     }
     .td-pl {
       padding-left: 28px;
-    }
-    .ta-l {
-      text-align: left;
-    }
-    .ta-r {
-      text-align: right;
-    }
-    .ta-c {
-      text-align: center;
     }
     .amount-input {
       &:focus {
