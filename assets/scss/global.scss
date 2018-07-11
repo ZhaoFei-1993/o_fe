@@ -9,6 +9,7 @@
 
 html, body, #__nuxt, #__layout {
   height: 100%;
+  -webkit-font-smoothing: antialiased;
 }
 
 table, tbody, td, tfoot, th, thead {

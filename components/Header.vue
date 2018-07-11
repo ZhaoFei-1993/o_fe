@@ -26,7 +26,7 @@
         height: 50px;
         line-height: 60px;
         padding-top: 0;
-
+        color: #27313e;
         &:hover {
           color: $brandGreen;
         }

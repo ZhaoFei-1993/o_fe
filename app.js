@@ -28,14 +28,6 @@ const nuxt = new Nuxt(config)
 
 // Build only in dev mode
 if (config.dev) {
-  // logger
-  app.use(async function (ctx, next) {
-    const start = new Date()
-    await next()
-    const ms = new Date() - start
-    console.info(`koa:render ${ctx.method} ${ctx.url} - ${ms}ms`)
-  })
-
   if (!isApiDev && !isPm2Dev) {
     // API调试模式下，不build
     const builder = new Builder(nuxt)

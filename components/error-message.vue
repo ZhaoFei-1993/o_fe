@@ -3,7 +3,8 @@
 
   .error-message {
     color: $red;
-    margin-top: 4px;
+    margin: 4px;
+    height:21px;
   }
 </style>
 <!--和vuelidate 强绑定，根据其校验结果和配置的message来显示表单校验结果-->
@@ -26,7 +27,7 @@
       const result = this.result
       const msgs = this.msgs
 
-      if (!result || !result.$error) return
+      if (!result || !result.$error) return <div class="error-message"></div>
 
       for (const validationName in result) {
         if (!result[validationName] && msgs[validationName]) {
