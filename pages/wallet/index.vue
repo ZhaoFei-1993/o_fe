@@ -98,7 +98,7 @@
 
 <script>
   import cBlock from '~/components/c-block'
-  import FundPie from './fundPie'
+  import FundPie from './_c/fund-pie'
 
   export default {
     data() {
