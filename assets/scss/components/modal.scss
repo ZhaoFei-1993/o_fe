@@ -1,6 +1,6 @@
 /* 定制 bootstrap-vue 的 modal 的样式 */
 .modal {
-  &.show .modal-dialog{
+  &.show .modal-dialog {
     margin-top: 50px;
   }
 }
@@ -17,13 +17,26 @@
 
 .modal-content {
   padding-bottom: 20px;
+  border-radius: 0;
 }
 
 .modal-header {
-  padding: 30px 15px 10px 15px;
+  padding: 40px 15px 10px 15px;
+  height:100px;
   border-bottom: 0;
-  font-size:22px;
-
+  font-size: 22px;
+  color: #192330;
+  font-family: PingFangSC;
+  position: relative;
+  &:before {
+    content: '';
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 6px;
+    background-image: linear-gradient(to left, #ffc21e, #00c1ce);
+  }
   .close {
     font-size: 40px;
     font-weight: 400;
@@ -32,6 +45,7 @@
     top: -2px;
     right: 10px;
     outline: 0;
+    font-size: 24px !important;
   }
 
   .modal-title {

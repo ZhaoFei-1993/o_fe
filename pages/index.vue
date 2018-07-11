@@ -225,14 +225,22 @@
         </div>
       </div>
     </div>
+    <PlaceOrderModal
+      :item="selectedItem"
+      :balance="userBalance"
+      v-model="showPlaceOrderModal"
+    ></PlaceOrderModal>
   </div>
 </template>
 
 <script>
   import {mapState} from 'vuex'
+  import PlaceOrderModal from '~/components/place-order-modal'
 
   export default {
-    components: {},
+    components: {
+      PlaceOrderModal,
+    },
     layout: 'fullwidth',
     data() {
       return {
@@ -242,7 +250,12 @@
         selectedPayment: this.$route.query.payment || 'ALL',
         sortPrice: this.$route.query.sort || this.selectedDirection === 'BUY' ? 'ASC' : 'DESC',
         items: [],
+        selectedItem: null,
+        showPlaceOrderModal: false,
         busy: false,
+        userBalance: {
+          // TODO use store
+        },
       }
     },
     computed: {
@@ -269,7 +282,9 @@
           this.items = response.data.data.slice(0, 30)
         })
       },
-      placeOrder() {
+      placeOrder(item) {
+        this.selectedItem = item
+        this.showPlaceOrderModal = true
       },
     },
   }
