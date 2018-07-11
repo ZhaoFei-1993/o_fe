@@ -53,6 +53,14 @@ if (config.dev) { // 本地开发mock接口
   server.use((req, res, next) => {
     return middleware(req, res, next)
   })
+  router.render = (req, res) => {
+    // 转换成后端使用的数据结构
+    res.jsonp({
+      data: {data: res.locals.data, total: res.locals.data.length},
+      code: 0,
+      message: 'ok',
+    })
+  }
   server.use(defaultMiddlewares)
   server.use(router)
 
