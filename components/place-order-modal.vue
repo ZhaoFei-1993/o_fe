@@ -65,7 +65,7 @@
           </div>
           <div class="payment-tip">
             * 提交信息即生成订单，请在15分钟内完成打款。
-            <b-link href="TODO">更多交易须知 &gt;</b-link>
+            <b-link href="TODO">更多交易须知 ></b-link>
           </div>
           <div class="actions">
             <button class="btn btn-outline-green btn-lg" @click="hideModal">取消</button>
@@ -219,26 +219,21 @@
         min_deal_coin_amount: this.item.min_deal_cash_amount / this.item.price,
         max_deal_coin_amount: Math.min(this.item.max_deal_cash_amount / this.item.price, this.balance[this.item.coin_type]),
       }
-    }
-    ,
+    },
     validations() {
       return {form: this.validationConf.validations}
-    }
-    ,
+    },
     computed: {
       sideText() {
         return this.item.side === 'BUY' ? '购买' : '出售'
-      }
-      ,
+      },
       title() {
         if (!this.item) return ''
         return '确认' + this.sideText + ' ' + this.item.coin_type
-      }
-      ,
+      },
       balanceTip() {
         return this.form.coin_amount > this.balance[this.item.coin_type] ? '余额不足，' : ''
-      }
-      ,
+      },
       validationConf() {
         return this.utils.processValidationConfig({
           cash_amount: {
@@ -266,14 +261,11 @@
             },
           },
         })
-      }
-      ,
+      },
       invalidMessages() {
         return this.validationConf.invalidMessages
-      }
-      ,
-    }
-    ,
+      },
+    },
     methods: {
       onSubmit() {
         this.$v.form.$touch()
@@ -290,8 +282,7 @@
           this.hideModal()
           this.$router.push(`/orders/${response.data.data.id}`) // TODO 数据格式
         })
-      }
-      ,
+      },
       hideModal() {
         this.$emit('input', false)
         this.$v.$reset()
@@ -299,31 +290,26 @@
           coin_amount: null,
           cash_amount: null,
         }
-      }
-      ,
+      },
       cashAmountChanged(value) {
         this.$v.form.cash_amount.$touch()
         if (this.form.focusInput === 'cashAmount') {
           this.form.coin_amount = this.form.cash_amount === '' ? null : (this.form.cash_amount / this.item.price)
         }
-      }
-      ,
+      },
       coinAmountChanged() {
         this.$v.form.coin_amount.$touch()
         if (this.form.focusInput === 'coinAmount') {
           this.form.cash_amount = this.form.coin_amount === '' ? null : (this.form.coin_amount * this.item.price)
         }
-      }
-      ,
+      },
       onFocus(inputName) {
         this.form.focusInput = inputName
-      }
-      ,
+      },
       purchaseAll() {
         this.form.cash_amount = this.item.max_deal_cash_amount
         this.form.coin_amount = this.item.max_deal_cash_amount / this.item.price
       }
-    }
-    ,
+    },
   }
 </script>
