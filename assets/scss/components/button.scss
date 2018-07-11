@@ -98,16 +98,15 @@ $background-red: #e45555;
 
 .btn-gradient-yellow {
   background-image: $image-gradient-yellow;
-
+  border: none;
   &:hover {
-    box-shadow:0 5px 20px 0 #d3d3d3;
-    color: #fff;
+    box-shadow: 0 16px 20px 0 #d3d3d3;
   }
   &[disabled]:hover {
     box-shadow: none;
   }
   &:active {
-    background-image: $image-gradient-yellow;
+    background-image: $image-gradient-yellow !important;
   }
 }
 
