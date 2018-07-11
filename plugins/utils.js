@@ -180,9 +180,9 @@ const utils = {
     const validations = {}
     const invalidMessages = {}
 
-    for (let key in validationConfig) {
+    for (const key in validationConfig) {
       validations[key] = validationConfig[key].validation
-      console.log(validations[key],validationConfig[key])
+      console.log(validations[key], validationConfig[key])
       invalidMessages[key] = validationConfig[key].message
     }
 
