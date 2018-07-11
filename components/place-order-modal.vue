@@ -41,10 +41,11 @@
                 <ExtendedInputNumber v-model="form.cash_amount" :name="item.id+'cash_amount'"
                                      @focus="()=>onFocus('cashAmount')"
                                      @change="cashAmountChanged"
-                                     placeholder="可填写想买的金额"/>
+                                     :placeholder="'可填写想'+sideText+'的金额'"/>
               </b-input-group>
-              <div class="max-value">最高金额{{' '+item.max_deal_cash_amount+ ' '}}CNY<span class="purchase-all"
-                                                                                        @click="purchaseAll">全部购买</span>
+              <div class="max-value">最高金额{{' '+item.max_deal_cash_amount+ ' '}}CNY
+                <span class="purchase-all"
+                      @click="purchaseAll">全部{{sideText}}</span>
               </div>
             </div>
             <span class="separator"><i class="iconfont icon-exchange"></i></span>
@@ -54,11 +55,11 @@
                 <ExtendedInputNumber v-model="form.coin_amount" :name="item.id+'coin_amount'"
                                      @focus="()=>onFocus('coinAmount')"
                                      @change="coinAmountChanged"
-                                     placeholder="可填写想买的数量"/>
+                                     :placeholder="'可填写想'+sideText+'的数量'"/>
               </b-input-group>
               <div class="max-value">最高数量{{' '+(item.max_deal_cash_amount/item.price)+ ' '+ item.coin_type}}<span
                 class="purchase-all"
-                @click="purchaseAll">全部购买</span>
+                @click="purchaseAll">全部{{sideText}}</span>
               </div>
             </div>
           </div>
@@ -210,9 +211,12 @@
       return {form: this.validationConf.validations}
     },
     computed: {
+      sideText() {
+        return this.item.side === 'BUY' ? '购买' : '出售'
+      },
       title() {
         if (!this.item) return ''
-        return '确认' + (this.item.side === 'BUY' ? '购买' : '出售') + ' ' + this.item.coin_type
+        return '确认' + this.sideText + ' ' + this.item.coin_type
       },
       balanceTip() {
         return this.form.coin_amount > this.balance[this.item.coin_type] ? '余额不足，' : ''
@@ -256,7 +260,15 @@
           return this.$showTips('请检查表单并正确输入内容', 'error')
         }
         this.submitting = true
-        // this.axios.order
+        this.axios.order.createOrder({
+          item_id: this.item.id,
+          coin_amount: this.form.coin_amount,
+          cash_amount: this.form.cash_amount,
+        }).then(response => {
+          this.submitting = false
+          this.hideModal()
+          this.$router.push(`/orders/${response.data.data.id}`) // TODO 数据格式
+        })
       },
       hideModal() {
         this.$emit('input', false)

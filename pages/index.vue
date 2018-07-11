@@ -35,7 +35,7 @@
           box-shadow: 0 0 10px 0 #ececec;
           text-align: center;
           display: flex;
-          .direction {
+          .side {
             height: 50px;
             line-height: 50px;
             width: 120px;
@@ -67,7 +67,7 @@
             }
           }
           &.sell {
-            .direction {
+            .side {
               background-image: linear-gradient(to left, #22e6b8, #00c1ce);
             }
           }
@@ -165,8 +165,8 @@
     <div class="layout-content">
       <div class="trade-choices row">
         <div class="col-6">
-          <div :class="['choice-block buy', {active:'BUY'===selectedDirection}]">
-            <div class="direction"><i class="iconfont icon-arrow-down"></i>购买</div>
+          <div :class="['choice-block buy', {active:'BUY'===selectedSide}]">
+            <div class="side"><i class="iconfont icon-arrow-down"></i>购买</div>
             <div class="coin-types">
               <span :class="['coin-type', {active:coin===selectedCoin}]" v-for="coin in constant.COIN_TYPES"
                     @click="showItems('BUY',coin)">{{coin}}</span>
@@ -174,8 +174,8 @@
           </div>
         </div>
         <div class="col-6">
-          <div :class="['choice-block sell', {active:'SELL'===selectedDirection}]">
-            <div class="direction"><i class="iconfont icon-arrow-up"></i>出售</div>
+          <div :class="['choice-block sell', {active:'SELL'===selectedSide}]">
+            <div class="side"><i class="iconfont icon-arrow-up"></i>出售</div>
             <div class="coin-types">
               <span :class="['coin-type', {active:coin===selectedCoin}]" v-for="coin in constant.COIN_TYPES"
                     @click="showItems('SELL',coin)">{{coin}}</span>
@@ -189,7 +189,7 @@
           <span>没有合适的？<a href="/items/create">自己发布广告&gt;</a></span>
         </div>
         <div class="list-header">
-          <span class="col-narrow">{{selectedDirection==='BUY'?'卖家':'买家'}}</span>
+          <span class="col-narrow">{{selectedSide==='BUY'?'卖家':'买家'}}</span>
           <span class="col-narrow">30天成单/完成率</span>
           <span class="col-narrow">数量</span>
           <span class="col-wide">限额</span>
@@ -198,7 +198,7 @@
           <span :class="['sort-price col-wide',sortPrice]">单价</span>
           <span class="col-narrow">操作</span>
         </div>
-        <div :class="['list',selectedDirection.toLowerCase()]">
+        <div :class="['list',selectedSide.toLowerCase()]">
           <div class="item-row" v-for="item in items">
             <span class="col-narrow text-center fz-18 c-6f">{{item.user.name}}</span>
             <div class="col-narrow">
@@ -215,10 +215,10 @@
             <span :class="['sort-price col-wide pr-60 text-right',sortPrice]">{{item.price + ' CNY'}}</span>
             <span class="col-narrow">
               <button
-                :class="['btn btn-order',{'btn-outline-yellow':selectedDirection==='BUY','btn-outline-green':selectedDirection==='SELL'}]"
+                :class="['btn btn-order',{'btn-outline-yellow':selectedSide==='BUY','btn-outline-green':selectedSide==='SELL'}]"
                 @click="placeOrder(item)"
               >
-              {{(selectedDirection==='BUY'?'购买':'出售')+ selectedCoin}}
+              {{(selectedSide==='BUY'?'购买':'出售')+ selectedCoin}}
             </button>
             </span>
           </div>
@@ -247,9 +247,9 @@
       return {
         message: 'Hello OTC',
         selectedCoin: this.$route.query.coin || 'BTC',
-        selectedDirection: this.$route.query.direction || 'BUY',
+        selectedSide: this.$route.query.side || 'BUY',
         selectedPayment: this.$route.query.payment || 'ALL',
-        sortPrice: this.$route.query.sort || this.selectedDirection === 'BUY' ? 'ASC' : 'DESC',
+        sortPrice: this.$route.query.sort || this.selectedSide === 'BUY' ? 'ASC' : 'DESC',
         items: [],
         selectedItem: null,
         showPlaceOrderModal: false,
@@ -269,19 +269,19 @@
       this.initItems()
     },
     methods: {
-      showItems(direction, coin) {
-        this.selectedDirection = direction
+      showItems(side, coin) {
+        this.selectedSide = side
         this.selectedCoin = coin
         this.$router.replace({
           query: {
-            direction,
+            side,
             coin,
           },
         })
       },
       initItems() {
         this.busy = true
-        this.axios.item.getItems({direction: this.selectedDirection, coin: this.selectedCoin}).then(response => {
+        this.axios.item.getItems({side: this.selectedSide, coin_type: this.selectedCoin}).then(response => {
           this.busy = false
           this.items = response.data.data.slice(0, 30)
         })
@@ -289,6 +289,7 @@
       placeOrder(item) {
         this.selectedItem = item
         this.showPlaceOrderModal = true
+        this.initItems()
       },
     },
   }
