@@ -30,12 +30,13 @@
     "nodemailer": "4.6.7",
     "nuxt": "1.4.1",
     "qr.js": "0.0.0",
+    "vue": "^2.5.16",
     "vue-clipboard2": "0.2.0",
     "vue-quill-editor": "^3.0.6",
     "vuejs-datepicker": "^1.5.2",
     "vuelidate": "^0.7.4",
-    "xss": "^1.0.3",
-    "vue": "latest"
+    "vuex": "^3.0.1",
+    "xss": "^1.0.3"
   },
   "scripts": {
     "dev": "cross-env NODE_ENV=development MODE=development DEBUG=nuxt:* node app",

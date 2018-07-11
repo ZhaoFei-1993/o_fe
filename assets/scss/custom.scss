@@ -1,6 +1,6 @@
 /*
 本文件仅用于覆盖现有的一些样式，例如bootrap默认的a标签的样式、input样式等等。
-如果是自定义的业务组件，需要在./helpers中体现1
+如果是自定义的业务组件，需要在./helpers中体现
 */
 @import "./variables.scss";
 @import "./common.scss";
@@ -103,7 +103,6 @@ select.form-control {
   }
 }
 
-/* bootstrap */
 // radio 的按钮有些偏下，这里修复下
 .custom-radio {
   .custom-control-label {
@@ -372,10 +371,15 @@ a.dropdown-item {
 }
 
 /* alert */
-/* bootstrap end*/
 
 .b-form-group {
   .form-text {
     font-size: 14px;
   }
+}
+
+// 列表没有圆角
+.list-group-item:first-child,
+.list-group-item:last-child {
+  border-radius: 0;
 }
