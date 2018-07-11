@@ -139,6 +139,7 @@
       // 用户单子完成率
       userOrderCompleteRatio: function () {
         const userData = this.user.data
+        // todo: 这里根据后台返回数据，来显示  0% 和 -
         return userData.recent_deal_count ? (userData.recent_deal_count / userData.recent_order_count * 100).toFixed(1) + '%' : '-'
       },
       ...mapState(['user'])
