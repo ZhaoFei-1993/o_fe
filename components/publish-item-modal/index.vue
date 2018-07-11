@@ -113,7 +113,7 @@
         </b-form-group>
         <b-form-group label="交易方限制">
           <b-form-checkbox-group v-model="form.counterpartyLimit"
-                                 :options="counterpartyLimitOptions">
+                                 :options="constant.COUNTERPARTY_LIMIT_OPTIONS">
           </b-form-checkbox-group>
         </b-form-group>
       </div>
@@ -182,18 +182,6 @@ export default {
         text: '出售'
       }]
     },
-    counterpartyLimitOptions: function () {
-      return [{
-        text: '交易方必须完成过 1 次交易',
-        value: 0
-      }, {
-        text: '交易方必须通过手机验证',
-        value: 1,
-      }, {
-        text: '交易方必须通过实名验证',
-        value: 2,
-      }]
-    }
   },
   mounted() {
     this.$store.dispatch('setUserBalance')
