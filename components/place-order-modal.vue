@@ -68,7 +68,7 @@
             <b-link href="TODO">更多交易须知 ></b-link>
           </div>
           <div class="actions">
-            <button class="btn btn-outline-green btn-lg" @click="hideModal">取消</button>
+            <button class="btn btn-outline-green btn-lg" @click="onCancel">取消</button>
             <button class="btn btn-gradient-yellow btn-lg" :disabled="submitting" @click="onSubmit">确定</button>
           </div>
         </b-form>
@@ -285,11 +285,15 @@
       },
       hideModal() {
         this.$emit('input', false)
-        this.$v.$reset()
         this.form = {
           coin_amount: null,
           cash_amount: null,
         }
+        this.$v.$reset()
+      },
+      onCancel(event) {
+        event.preventDefault()
+        this.hideModal()
       },
       cashAmountChanged(value) {
         this.$v.form.cash_amount.$touch()
