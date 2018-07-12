@@ -8,6 +8,20 @@
     display: flex;
     flex-direction: column;
 
+    .layout-my-title {
+      padding: 30px 30px 0 30px;
+      font-size: 20px;
+      color: #192330;
+    }
+
+    .layout-my-desc {
+      margin-bottom: 33px;
+      padding: 12px 30px;
+      font-size: 14px;
+      color: #6f6f6f;
+    }
+
+
     .page-enter-active, .page-leave-active {
       transition: opacity 0.1s;
     }

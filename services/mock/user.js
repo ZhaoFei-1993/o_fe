@@ -27,10 +27,14 @@ export const balance = {
 
 export const userData = {
   data: {
-    username: 'Wruce Wayne',
-    recent_deal_count: 100,
-    recent_order_count: 200,
-    average_pay_time: 100,
-    average_release_time: 200,
+    'id': 1,                         // 用户id
+    'name': 'wuyanzu',               // 用户名
+    'email': '25479932@qq.com',      // 邮箱
+    'country_code': '86',            // 手机号国家区号
+    'mobile': '12345678900',         // 手机号
+    'kyc_status': 'yes',             // kyc实名状态, yes: 已通过，no: 未通过
+    'kyc_name': '吴彦祖',             // kyc实名姓名
+    'is_have_totp_auth': true,       // 是否绑定谷歌验证器
+    'status': 'normal'               // 账户状态，normal: 正常，forbidden: 封禁
   }
 }

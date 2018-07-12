@@ -1,10 +1,22 @@
 <style lang="scss">
   .my-info-item {
     display: flex;
-    margin-bottom: 50px;
+    padding: 27px 30px;
+    border-top: 1px solid #eee;
 
     .info-title {
       margin-right: 30px;
+      font-size: 18px;
+      flex: 2 1 0;
+    }
+
+    .info-content {
+      flex: 5 1 0;
+      color: #6f6f6f;
+    }
+
+    .info-action {
+      flex: 1 1 0;
     }
   }
 </style>
@@ -12,8 +24,12 @@
 <template>
   <div class="my-info-item">
     <span class="info-title">{{title}}</span>
-    <slot name="content"></slot>
-    <slot name="action"></slot>
+    <div class="info-content">
+      <slot name="content"/>
+    </div>
+    <div class="info-action">
+      <slot name="action"/>
+    </div>
   </div>
 </template>
 

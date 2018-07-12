@@ -19,3 +19,5 @@ export const COUNTERPARTY_LIMIT_OPTIONS = [{
   text: '交易方必须通过实名验证',
   value: 2,
 }]
+
+export const KYC_STATUS_PASS = 'pass'
