@@ -190,7 +190,7 @@ const utils = {
       validations,
       invalidMessages
     }
-  }
+  },
 }
 
 export default ({app, store}) => {

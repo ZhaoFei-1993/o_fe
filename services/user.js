@@ -7,8 +7,7 @@ export default (axios) => {
     userInfo() {
       return Promise.resolve(require('./mock/user').userData)
       return axios.get('/user', {
-        params: {
-        },
+        params: {},
       })
     },
 
@@ -17,11 +16,16 @@ export default (axios) => {
      * @param id
      */
     otherUserInfo(id) {
-      return Promise.resolve(require('./mock/user').otherUser)
+      return axios.get(`users/${id}`)
+      // return Promise.resolve(require('./mock/user').otherUser)
     },
 
     balance() {
       return Promise.resolve(require('./mock/user').balance)
-    }
+    },
+
+    getUserPaymentMethods(id) {
+      return Promise.resolve(require('./mock/user').paymentMethods)
+    },
   }
 }

@@ -1,6 +1,6 @@
 <template>
   <div class="user-stats-profile">
-    <UserMiniProfile class="user-mini-profile" :username="userData.username" :online="true"/>
+    <UserMiniProfile class="user-mini-profile" :username="userData.name" :online="true"/>
     <div class="pt-20 px-20">
       <SidebarInfoItem title="30天成交量">
         <Language text="[t][/t]单">

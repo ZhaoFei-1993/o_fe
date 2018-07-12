@@ -277,10 +277,13 @@
           item_id: this.item.id,
           coin_amount: this.form.coin_amount,
           cash_amount: this.form.cash_amount,
+          coin_type: this.item.coin_type,
+          cash_type: 'CNY',
+          price: this.item.price,
         }).then(response => {
           this.submitting = false
           this.hideModal()
-          this.$router.push(`/orders/${response.data.data.id}`) // TODO 数据格式
+          this.$router.push(`/orders/${response.data.id}`) // TODO 数据格式
         })
       },
       hideModal() {

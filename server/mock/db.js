@@ -12,6 +12,7 @@ module.exports = () => {
       id: i,
       name: faker.name.findName(),
       create_time: faker.date.past(),
+      first_trade_time: faker.date.past(),
       address: faker.address.country(),
       status: faker.random.arrayElement([0, 1, 2, 3]),
       email: faker.random.word() + faker.internet.email(),
@@ -20,6 +21,17 @@ module.exports = () => {
       kyc_status: faker.random.boolean(),
       kyc_name: faker.name.findName(),
       kyc_number: faker.random.number(),
+      self_description: '诚信交易，能下单人就是在线的。联系电话：14888888888',
+      trade_count_last_30_days: faker.random.number(),
+      trade_count_total: faker.random.number(),
+      average_response_time: faker.random.number(),
+      recent_deal_count: faker.random.number(),
+      recent_order_count: faker.random.number(),
+      average_pay_time: faker.random.number(),
+      average_release_time: faker.random.number(),
+      email_verified: faker.random.boolean(),
+      phone_verified: faker.random.boolean(),
+      idcard_verified: faker.random.boolean(),
     })
     const randUser = data.users[faker.random.number({max: i})]
     data.items.push({
@@ -47,16 +59,18 @@ module.exports = () => {
     data.orders.push({
       id: i,
       item_id: faker.random.number(), // 可能广告不存在，顺便测试错误吧
-      item_user_id: faker.random.number(),
-      user_id: faker.random.number(),
-      side: faker.random.boolean(),
+      merchant_id: faker.random.number({max: 1000}),
+      user_id: faker.random.number({max: 1000}),
+      user_side: faker.random.arrayElement(['BUY', 'SELL']),
       coin_type: faker.random.arrayElement(['BTC', 'BCH', 'ETH', 'USDT']),
       coin_amount: faker.random.number(),
       cash_type: faker.random.arrayElement(['CNY']),
       cash_amount: faker.random.number(),
       price: faker.random.number() * faker.random.number({max: 10}),
       memo: faker.random.word(),
-      status: faker.random.arrayElement([0, 1]),
+      appeal_status: faker.random.arrayElement(['', 'processing', 'completed']),
+      status: faker.random.arrayElement(['success', 'created', 'paid', 'cancel']),
+      is_reopened: faker.random.boolean(),
       create_time: faker.date.past(),
       update_time: faker.date.past(),
     })

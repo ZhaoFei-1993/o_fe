@@ -1,7 +1,10 @@
 export default (axios) => {
   return {
-    async createOrder(payload) {
+    createOrder(payload) {
       return axios.post('/orders', payload)
+    },
+    getOrderById(id) {
+      return axios.get(`/orders/${id}`)
     },
   }
 }
