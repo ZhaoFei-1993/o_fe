@@ -7,7 +7,7 @@
     .info-title {
       margin-right: 30px;
       font-size: 18px;
-      flex: 2 1 0;
+      flex: 0 0 200px;
     }
 
     .info-content {
@@ -16,7 +16,9 @@
     }
 
     .info-action {
-      flex: 1 1 0;
+      flex: 0 0 220px;
+      display: flex;
+      justify-content: flex-end;
     }
   }
 </style>

@@ -184,7 +184,7 @@ export default {
     },
   },
   mounted() {
-    this.$store.dispatch('setUserBalance')
+    this.$store.dispatch('fetchUserBalance')
   },
   methods: {
     onShowingChange(bool) {

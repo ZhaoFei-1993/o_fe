@@ -35,7 +35,7 @@
     <PageHeader type="white"/>
 
     <My2Column>
-      <MySidebar slot="left"></MySidebar>
+      <MySidebar slot="left"/>
       <nuxt slot="right" class="layout-my-content"></nuxt>
     </My2Column>
 

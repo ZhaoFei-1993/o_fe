@@ -29,7 +29,6 @@ if (process.env.NODE_ENV === 'production') {
 
   // basic错误上报
   window.addEventListener('error', function (e) {
-    debugger
     ga('send', 'exception', {
       'exDescription': '[' + new Date() + ']:' + JSON.stringify(e) + '|cookie:' + document.cookie + '|ua:' + navigator.userAgent,
       'exFatal': false,
@@ -37,7 +36,7 @@ if (process.env.NODE_ENV === 'production') {
   })
 } else {
   window.addEventListener('error', function (ev) {
-    debugger
+    console.log(ev)
   })
   window.ga = function (op, category, obj) {
     console.error(obj)
