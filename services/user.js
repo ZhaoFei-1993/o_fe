@@ -9,8 +9,12 @@ export default (axios) => {
       return axios.get('/user/account')
     },
 
+    /**
+     * 用户支付方式
+     * @return {Promise<any>}
+     */
     payments() {
-      return Promise.resolve(require('./mock/user').payments)
+      return Promise.resolve(require('./mock/user').paymentMethods)
       return axios.get('/user/payment/method')
     },
 
@@ -64,10 +68,6 @@ export default (axios) => {
     otherUserInfo(id) {
       return axios.get(`users/${id}`)
       // return Promise.resolve(require('./mock/user').otherUser)
-    },
-
-    getUserPaymentMethods(id) {
-      return Promise.resolve(require('./mock/user').paymentMethods)
     },
   }
 }
