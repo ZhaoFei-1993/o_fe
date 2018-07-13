@@ -8,12 +8,8 @@
         </div>
         <div class="info-detail">
           <div class="title">{{paymentTitle}}</div>
-          <div class="content" v-if="isMaker">
-            {{tradeText.counterparty}}<a :href="'/users/'+counterparty.id">{{counterparty.name}}</a>从我的{{paymentOrigin}}
-          </div>
-          <div class="content" v-else>
-            我从{{tradeText.counterparty}}<a :href="'/users/'+counterparty.id">{{counterparty.name}}</a>
-            的{{paymentOrigin}}
+          <div class="content">
+            {{paymentOrigin}}
           </div>
         </div>
       </div>
@@ -46,12 +42,16 @@
               v-if="(order.status!=='cancel'||order.pay_time)&&order.status!=='closed'">
             <div class="message">{{stepsMessage.payCash}}</div>
             <div class="step-time" v-if="order.pay_time">{{utils.local(order.pay_time)}}</div>
-            <button v-if="isBuySide&&!order.pay_time" class="btn btn-gradient-yellow btn-xs">我已付款</button>
+            <button v-if="isBuySide&&!order.pay_time" class="btn btn-gradient-yellow btn-xs" @click="confirmPay()">
+              我已付款
+            </button>
           </li>
           <li :class="['step',{active:order.status==='paid'}]" v-if="order.status!=='cancel'&&order.status!=='closed'">
             <div class="message">{{stepsMessage.payCoin}}</div>
             <div class="step-time" v-if="order.complete_time">{{utils.local(order.complete_time,true)}}</div>
-            <button v-if="!isBuySide&&order.status==='paid'" class="btn btn-gradient-yellow btn-xs">确认收款</button>
+            <button v-if="!isBuySide&&order.status==='paid'" class="btn btn-gradient-yellow btn-xs"
+                    @click="confirmReceipt()">确认收款
+            </button>
           </li>
           <li :class="['step',{active:order.status==='success'}]"
               v-if="order.status!=='cancel'&&order.status!=='closed'">
@@ -67,12 +67,14 @@
         </ol>
       </div>
       <div class="order-helper">
-        <span v-if="!order.appeal_status||order.appeal_status===''">交易出现问题？需要<span class="c-brand-green">申诉</span></span>
+        <span v-if="!order.appeal_status||order.appeal_status===''">
+          交易出现问题？需要
+          <span class="c-brand-green" v-if="canAppeal" @click="appeal">申诉</span></span>
+        <span class="c-brand-green" v-else v-b-tooltip.hover title="买家付款30分钟后，可发起申诉。">申诉</span></span>
         <div v-if="order.appeal_status==='processing'"><span>已发起申诉，请等待申诉专员介入</span>
           <button class="btn btn-outline-green btn-xs">取消申诉</button>
         </div>
-        <div v-if="order.appeal_status==='completed'"><span>已发起申诉，请等待申诉专员介入</span>
-          <button class="btn btn-outline-green btn-xs">取消申诉</button>
+        <div v-if="order.appeal_status==='completed'" @click="cancelAppeal"><span>申诉结果TODO</span>
         </div>
       </div>
     </div>
@@ -159,6 +161,7 @@
         padding: 25px 30px;
         ol {
           list-style-type: none;
+          border-bottom: 1px solid #eeeeee;
           li {
             counter-increment: level1;
             font-size: 16px;
@@ -226,6 +229,10 @@
           }
         }
       }
+      .order-helper {
+        padding: 0 30px 30px;
+        font-size: 16px;
+      }
     }
     .sidebar {
       width: 400px;
@@ -250,6 +257,7 @@
         selectedMethod: null,
         secondCountdown: null,
         payRemainTime: 0,
+        canAppeal: false,
       }
     },
     components: {
@@ -263,7 +271,6 @@
     },
     computed: {
       ...mapState(['user']),
-
       orderStatus() {
         return Object.values(ORDER_STATUS).find(s => s.value === this.order.status).text
       },
@@ -295,68 +302,42 @@
         return this.tradeText.side + ' ' + this.order.coin_amount + ' ' + this.order.coin_type + ', ' + this.tradeText.payment + ' ' + this.order.cash_amount + ' ' + this.order.cash_type
       },
       paymentOrigin() {
-        return '交易广告 #' + this.order.item_id + ' 进入，单价 ' + this.order.price + ' CNY/ ' + this.order.coin_type
+        return '交易广告 #' + this.order.item_id + ' ，单价 ' + this.order.price + ' CNY/ ' + this.order.coin_type
       },
       referCode() {
         return this.order.id
       },
       paymentStatusMessage() {
-        if (this.isBuySide) {
-          switch (this.order.status) {
-            case 'created':
-              return {
-                message: `待支付，请于 <span class="c-red">${Math.floor(this.payRemainTime / 60)}分${this.payRemainTime % 60}秒</span>内完成支付，付款参考号：<span class="c-red">${this.referCode}</span>`,
-                warning: '请使用实名付款，转账时除参考号外请不要备注任何信息！'
-              }
-            case 'paid':
-              return {message: `已支付，待${this.counterparty.name} 确认并放币，付款参考号：<span class="c-red">${this.referCode}</span>`}
-            case 'success':
-              return {message: `${this.counterparty.name} 已确认收款，付款参考号：<span class="c-red">${this.referCode}</span>`}
-            case 'cancel':
-              return {message: `您已取消交易，无法查看支付信息。`}
-            case 'closed':
-              return {message: `订单超时已关闭，无法查看支付信息。`}
-            default:
-              return {}
-          }
-        } else {
-          switch (this.order.status) {
-            case 'created':
-              return {message: `待支付，${this.counterparty.name} 需在 <span class="c-red">${Math.floor(this.payRemainTime / 60)}分${this.payRemainTime % 60}秒</span>内完成支付，付款参考号：<span class="c-red">${this.referCode}</span>`}
-            case 'paid':
-              return {
-                message: `已支付，请查收您的收款账户，付款参考号：<span class="c-red">${this.referCode}</span>`,
-                warning: '请务必确认收到款项后确认收款并核实买家是否实名付款。'
-              }
-            case 'success':
-              return {message: `您已确认收款，付款参考号：<span class="c-red">${this.referCode}</span>`}
-            case 'cancel':
-              return {message: `买家已取消交易，无法查看支付信息。`}
-            case 'closed':
-              return {message: `订单超时已关闭，无法查看支付信息。`}
-            default:
-              return {}
-          }
+        switch (this.order.status) {
+          case 'created':
+            return {message: `待支付，买方需在 <span class="c-red">${Math.floor(this.payRemainTime / 60)}分${this.payRemainTime % 60}秒</span>内完成支付，付款参考号：<span class="c-red">${this.referCode}</span>`}
+          case 'paid':
+            return {
+              message: `已支付，卖方需确认收款并放行数字币，付款参考号：<span class="c-red">${this.referCode}</span>`,
+              warning: '请务必确认收到款项后确认收款并核实买家是否实名付款。'
+            }
+          case 'success':
+            return {message: `卖方已确认收款，付款参考号：<span class="c-red">${this.referCode}</span>`}
+          case 'cancel':
+            return {message: `买家已取消交易，无法查看支付信息。`}
+          case 'closed':
+            return {message: `订单超时已关闭，无法查看支付信息。`}
+          default:
+            return {}
         }
       },
       stepsMessage() {
         const success = '交易完成'
         const closed = '订单已关闭'
         const cancel = '订单已取消'
-        return this.isBuySide ? {
-          payCash: `向${this.counterparty.name}付款`,
-          payCoin: `等待${this.counterparty.name}确认放款放币`,
-          success,
-          cancel,
-          closed,
-        } : {
-          payCash: `等待${this.counterparty.name}付款`,
-          payCoin: `确认收款，向${this.counterparty.name}放行数字币`,
+        return {
+          payCash: `买家付款`,
+          payCoin: `卖家确认收款，放行数字币`,
           success,
           cancel,
           closed,
         }
-      }
+      },
     },
     methods: {
       getCurrentOrder(withUsers) {
@@ -411,12 +392,48 @@
         })
       },
       checkOrderStatus() {
-        if (this.order.status === 'created' || this.order.status === 'paid') {
+        if (
+          (this.order.status === 'paid' && (Date.now() - (new Date(this.order.pay_time)).valueOf()) > 30 * 60 * 1000) ||
+          (this.order.status === 'success' && (Date.now() - (new Date(this.order.complete_time)).valueOf()) > 7 * 24 * 3600 * 1000)
+        ) {
+          this.canAppeal = true
+        } else {
+          this.canAppeal = false
+        }
+        if (this.order.status === 'created' || this.order.status === 'paid' || this.order.appeal_status !== '') {
           setTimeout(() => {
             this.refreshOrderStatus()
           }, 20000)
         }
       },
+      confirmPay() {
+        this.$showDialog({
+          title: '确认付款',
+          content: (<div>确认您已向买方付款？<span class="c-red">未付款点击“我已付款”将被冻结账户。</span></div>),
+          onOk: () => {
+            this.axios.order.updatePayMethod(this.order.id, this.selectedMethod).then(response => {
+              this.axios.order.confirmPay(this.order.id)
+            })
+          }
+        })
+      },
+      confirmReceipt() {
+        this.$showDialog({
+          title: '确认收款',
+          content: (<div>确认已收到该笔款项？<span class="c-red">如您没有收到买家付款，确认收款后，放行的数字货币将无法追回。</span></div>),
+          onOk: () => {
+            this.axios.order.confirmReceipt(this.order.id).then(response => {
+              this.refreshOrderStatus()
+            })
+          }
+        })
+      },
+      appeal() {
+        // 等后端给申诉原因列表再做吧
+      },
+      cancelAppeal() {
+        this.axios.order.cancelAppeal(this.order.id)
+      }
     }
   }
 </script>
