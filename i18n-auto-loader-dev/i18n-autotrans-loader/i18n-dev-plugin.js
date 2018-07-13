@@ -132,21 +132,25 @@ function onCompilationComplete() {
   fs.readFile(filePath, 'utf8', function (err, data) {
     if (err) throw err
 
-    // 由于global不是自动生成的，而是手动填写的，因此先要把global给复制过来
-    const diskOriginContent = JSON.parse(data)
-    content.global = diskOriginContent.global || content.global
+    try {
+      // 由于global不是自动生成的，而是手动填写的，因此先要把global给复制过来
+      const diskOriginContent = JSON.parse(data)
+      content.global = diskOriginContent.global || content.global
 
-    writeContentToFile(sharedConfig.i18nRoot, sharedConfig.originalLang, content)
+      writeContentToFile(sharedConfig.i18nRoot, sharedConfig.originalLang, content)
 
-    if (sharedConfig.targetLangs && sharedConfig.targetLangs.length) {
-      sharedConfig.targetLangs.forEach(lang => {
-        if (lang === 'zh_Hant_HK') {
-          const traditionalContent = simplified2Traditional(content)
-          writeContentToFile(sharedConfig.i18nRoot, lang, traditionalContent)
-        } else {
-          writeContentToFile(sharedConfig.i18nRoot, lang, content)
-        }
-      })
+      if (sharedConfig.targetLangs && sharedConfig.targetLangs.length) {
+        sharedConfig.targetLangs.forEach(lang => {
+          if (lang === 'zh_Hant_HK') {
+            const traditionalContent = simplified2Traditional(content)
+            writeContentToFile(sharedConfig.i18nRoot, lang, traditionalContent)
+          } else {
+            writeContentToFile(sharedConfig.i18nRoot, lang, content)
+          }
+        })
+      }
+    } catch (e) {
+      console.error(e)
     }
   })
 }

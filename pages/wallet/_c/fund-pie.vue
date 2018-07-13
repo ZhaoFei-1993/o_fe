@@ -241,7 +241,7 @@ export default {
       },
       currencyRate: {
         rates: {
-          BCH_to_CET: {
+          BCH_to_CNY: {
             rate: 1,
           },
           BCH_to_BTC: {
@@ -280,9 +280,8 @@ export default {
         rate = this.currencyRate.rates['BCH_to_' + this.asset].rate
       }
       if (rate && y) {
-        y = (y + '').decimalMul(rate)
+        y = `${y}`.decimalMul(rate)
       }
-
       y = this.toDecimal2(y)
       if (y > 100000) {
         y = this.toDecimal2(y / 10000) + 'w'
