@@ -26,13 +26,6 @@ a.disabled {
   cursor: default;
 }
 
-/* input start */
-::-webkit-input-placeholder {
-  //@extend .ff-light;
-  font-size: 14px;
-  color: #acacac;
-}
-
 .form-control {
   border-radius: 0;
   color: $dark;
@@ -41,6 +34,12 @@ a.disabled {
     background-color: #eeeeee !important;
     border: none !important;
   }
+}
+
+/* input start */
+::-webkit-input-placeholder {
+  font-size: 14px;
+  color: #acacac;
 }
 
 input::-webkit-outer-spin-button,
@@ -61,27 +60,56 @@ input.form-control {
     box-shadow: none;
     border-color: #ffb900;
   }
+
+  &.form-control-xs {
+    height: 26px;
+    padding: 0 7px;
+    font-size: 14px;
+  }
+  &.form-control-lg {
+    height: 40px;
+    font-size: 16px;
+  }
 }
 
-input.form-control-xs {
-  height: 26px;
-  padding: 0 7px;
-  font-size: 14px;
+.input-group-append {
+  .input-group-text {
+    border-radius: 0;
+    padding: 0 12px;
+    background-color: #f9f9f9;
+  }
 }
-
 /* input end */
 
-select.form-control {
-  height: 32px !important;
+.custom-control-indicator {
+  top: 2px;
+}
+
+.custom-control-input:checked ~ .custom-control-indicator {
+  color: #fff;
+  background-color: $brandGreen;
+  box-shadow: 0 0 0 1px #fff, 0 0 0 3px $brandGreen;
+}
+
+.custom-control-input:focus ~ .custom-control-indicator {
+  box-shadow: 0 0 0 1px #fff, 0 0 0 3px $brandGreen;
+}
+
+.custom-select.form-control {
+  border: solid 1px #d1d1d1;
   font-size: 14px;
-  border: none;
   border-radius: 0px !important;
+  background-size: 16px;
+  background-image: url(~assets/img/arrow-down.png);
   background-color: #f9f9f9;
-  background-size: 9px;
 
   &:disabled {
     background-color: #f9f9f9;
     background-image: none;
+  }
+
+  &.form-control-lg.custom-select-lg {
+    height: 40px;
   }
 }
 
@@ -92,14 +120,6 @@ select.form-control {
 
   .form-text {
     font-size: 14px;
-  }
-}
-
-.input-group-append {
-  .input-group-text {
-    border-radius: 0;
-    padding: 0 12px;
-    background-color: #f9f9f9;
   }
 }
 
@@ -144,20 +164,6 @@ select.form-control {
       }
     }
   }
-}
-
-.custom-control-indicator {
-  top: 2px;
-}
-
-.custom-control-input:checked ~ .custom-control-indicator {
-  color: #fff;
-  background-color: $brandGreen;
-  box-shadow: 0 0 0 1px #fff, 0 0 0 3px $brandGreen;
-}
-
-.custom-control-input:focus ~ .custom-control-indicator {
-  box-shadow: 0 0 0 1px #fff, 0 0 0 3px $brandGreen;
 }
 
 // 自定义checkbox的样式
