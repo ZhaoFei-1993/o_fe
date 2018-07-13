@@ -57,7 +57,7 @@
 
 <template>
   <label class="switch">
-    <input class="switch-input" type="checkbox" @change.stop="toggle" @click.stop="click" value="isChecked" :disabled="disabled">
+    <input class="switch-input" type="checkbox" @change.stop="toggle" @click.stop="click" :checked="isChecked" :disabled="disabled">
     <span :class="['switch-handle',{'checked':isChecked},disabled?'disabled':'']"></span>
   </label>
 </template>
