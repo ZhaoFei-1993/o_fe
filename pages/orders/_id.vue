@@ -16,20 +16,63 @@
             的{{paymentOrigin}}
           </div>
         </div>
-        <div class="payment-info">
-          <div class="payment-method" v-if="!isMaker && selectedMethod">
-            <i v-if="selectedMethod.method === 'wechat'" class="iconfont icon-wechat-round"></i>
-            <i v-if="selectedMethod.method === 'bankcard'" class="iconfont icon-bank"></i>
-            <i v-if="selectedMethod.method === 'alipay'" class="iconfont icon-alipay"></i>
-            <select v-model="selectedMethod">
-              <option v-for="payment in paymentMethods" :value="payment" :class="payment.method">
-                <span v-if="payment.method === 'bankcard'">银行转帐</span>
-                <span v-if="payment.method === 'wechat'">微信支付</span>
-                <span v-if="payment.method === 'alipay'">支付宝支付</span>
-              </option>
-            </select>
-            <span>{{selectedMethod.account_name + ' '+ selectedMethod.account_no}}</span>
-          </div>
+      </div>
+      <div class="payment-info">
+        <div class="payment-method" v-if="!isMaker && selectedMethod">
+          <i v-if="selectedMethod.method === 'wechat'" class="iconfont icon-wechat-round"></i>
+          <i v-if="selectedMethod.method === 'bankcard'" class="iconfont icon-bank"></i>
+          <i v-if="selectedMethod.method === 'alipay'" class="iconfont icon-alipay"></i>
+          <select v-model="selectedMethod">
+            <option v-for="payment in paymentMethods" :value="payment" :class="payment.method">
+              <span v-if="payment.method === 'bankcard'">银行转帐</span>
+              <span v-if="payment.method === 'wechat'">微信支付</span>
+              <span v-if="payment.method === 'alipay'">支付宝支付</span>
+            </option>
+          </select>
+          <span class="payment-account">{{selectedMethod.account_name + ' '+ selectedMethod.account_no}}</span>
+          <span class="qr-code-button" v-if="selectedMethod.qr_code_image">支付二维码</span>
+        </div>
+        <div class="payment-method" v-if="order.pay_method">
+          <span v-if="order.pay_method === 'bankcard'"><i class="iconfont icon-bank"></i>银行转帐</span>
+          <span v-if="order.pay_method === 'wechat'"><i class="iconfont icon-wechat-round"></i>微信支付</span>
+          <span v-if="order.pay_method === 'alipay'"><i class="iconfont icon-wechat-round"></i>支付宝支付</span>
+        </div>
+        <div class="payment-status" v-html="paymentStatusMessage.message"></div>
+        <div class="payment-warning">{{paymentStatusMessage.warning}}</div>
+      </div>
+      <div class="order-steps">
+        <ol>
+          <li :class="['step',{active:order.status==='created'}]"
+              v-if="(order.status!=='cancel'||order.pay_time)&&order.status!=='closed'">
+            <div class="message">{{stepsMessage.payCash}}</div>
+            <div class="step-time" v-if="order.pay_time">{{utils.local(order.pay_time)}}</div>
+            <button v-if="isBuySide&&!order.pay_time" class="btn btn-gradient-yellow btn-xs">我已付款</button>
+          </li>
+          <li :class="['step',{active:order.status==='paid'}]" v-if="order.status!=='cancel'&&order.status!=='closed'">
+            <div class="message">{{stepsMessage.payCoin}}</div>
+            <div class="step-time" v-if="order.complete_time">{{utils.local(order.complete_time,true)}}</div>
+            <button v-if="!isBuySide&&order.status==='paid'" class="btn btn-gradient-yellow btn-xs">确认收款</button>
+          </li>
+          <li :class="['step',{active:order.status==='success'}]"
+              v-if="order.status!=='cancel'&&order.status!=='closed'">
+            <div class="message">{{stepsMessage.success}}</div>
+            <div class="step-time" v-if="order.complete_time">{{utils.local(order.complete_time,true)}}</div>
+          </li>
+          <li :class="['step',{active:order.status==='cancel'}]" v-if="order.status==='cancel'">
+            <div class="message">{{stepsMessage.cancel}}</div>
+          </li>
+          <li :class="['step',{active:order.status==='closed'}]" v-if="order.status==='closed'">
+            <div class="message">{{stepsMessage.closed}}</div>
+          </li>
+        </ol>
+      </div>
+      <div class="order-helper">
+        <span v-if="!order.appeal_status||order.appeal_status===''">交易出现问题？需要<span class="c-brand-green">申诉</span></span>
+        <div v-if="order.appeal_status==='processing'"><span>已发起申诉，请等待申诉专员介入</span>
+          <button class="btn btn-outline-green btn-xs">取消申诉</button>
+        </div>
+        <div v-if="order.appeal_status==='completed'"><span>已发起申诉，请等待申诉专员介入</span>
+          <button class="btn btn-outline-green btn-xs">取消申诉</button>
         </div>
       </div>
     </div>
@@ -41,6 +84,8 @@
   </div>
 </template>
 <style lang="scss">
+  @import "~assets/scss/variables.scss";
+
   .page-order-detail {
     padding: 40px 0 118px 0px;
     width: 1200px;
@@ -49,8 +94,7 @@
     display: flex;
     .main-content {
       flex: 1;
-      margin: -10px; //解决内容边界有阴影被隐藏的问题
-      padding: 10px;
+      padding: 0px;
       overflow: hidden;
       background-color: #ffffff;
       box-shadow: 0 0 10px 0 #ececec;
@@ -77,18 +121,107 @@
             }
           }
         }
-        .payment-info {
-          .payment-method {
-            select {
-              border: none;
-              background-color: transparent;
-              color: #6f6f6f;
-              &:focus {
-                outline: none;
+
+      }
+      .payment-info {
+        padding: 20px 30px;
+        background-color: #f9f9f9;
+        .payment-method {
+          margin-bottom: 20px;
+          color: #6f6f6f;
+          select {
+            border: none;
+            background-color: transparent;
+            color: #6f6f6f;
+            &:focus {
+              outline: none;
+            }
+            option {
+              width: 120px;
+            }
+          }
+          .payment-account {
+            margin: 0 1rem;
+          }
+          .qr-code-button {
+            cursor: pointer;
+          }
+        }
+        .payment-status {
+          font-size: 18px;
+        }
+        .payment-warning {
+          color: $red;
+          margin-top: 10px;
+        }
+      }
+      .order-steps {
+        padding: 25px 30px;
+        ol {
+          list-style-type: none;
+          li {
+            counter-increment: level1;
+            font-size: 16px;
+            color: #6f6f6f;
+            margin-bottom: 50px;
+            width: 100%;
+            position: relative;
+            &.active {
+              color: #192330;
+              div:first-child {
+                &:after {
+                  position: absolute;
+                  content: '';
+                  width: 11px;
+                  height: 11px;
+                  border-radius: 50%;
+                  background-color: $brandGreen;
+                  border: 1px solid $brandGreen;
+                  left: 40px;
+                  top: 8px;
+                }
               }
-              option {
-                width: 120px;
+            }
+            &:before {
+              content: counter(level1) " "; /*Instead of ". " */
+              color: $brandGreen;
+              margin-right: 24px;
+              position: absolute;
+              left: 0;
+              top: 0px;
+            }
+            &:not(:last-child):after {
+              position: absolute;
+              left: 45px;
+              top: 18px;
+              content: '';
+              width: 0px;
+              height: 64px;
+              border-right: 1px solid $brandGreen;
+            }
+            div:first-child {
+              position: relative;
+              padding-left: 60px;
+              &:before {
+                position: absolute;
+                content: '';
+                width: 11px;
+                height: 11px;
+                border-radius: 50%;
+                background-color: white;
+                border: 1px solid $brandGreen;
+                left: 40px;
+                top: 8px;
               }
+            }
+            div.step-time {
+              position: absolute;
+              left: 60px;
+            }
+            button {
+              position: absolute;
+              right: 0;
+              top: 0;
             }
           }
         }
@@ -115,44 +248,22 @@
         order: null,
         paymentMethods: null,
         selectedMethod: null,
+        secondCountdown: null,
+        payRemainTime: 0,
       }
     },
     components: {
       UserStatsProfile,
     },
+    beforeDestroy() {
+      clearInterval(this.secondCountdown)
+    },
     mounted() {
-      this.axios.order.getOrderById(this.id).then(response => {
-        if (response.code === 0) {
-          this.order = response.data
-          // 随机测试maker,taker
-          if (Math.random() < 0.5) {
-            this.order.merchant_id = this.user.id
-          } else {
-            this.order.user_id = this.user.id
-          }
-          // TODO 删除以上测试用代码
-          if (this.user.id === this.order.user_id) {
-            this.counterpartyId = this.order.merchant_id
-            this.axios.user.otherUserInfo(this.counterpartyId).then(res => {
-              this.counterparty = res.data
-              this.merchant = this.counterparty
-              this.axios.user.getUserPaymentMethods(this.merchant.id).then(methods => {
-                this.paymentMethods = methods.data
-                this.selectedMethod = this.paymentMethods[0]
-              })
-            })
-          } else {
-            this.counterpartyId = this.order.user_id
-            this.axios.user.otherUserInfo(this.counterpartyId).then(res => {
-              this.counterparty = res.data
-              this.merchant = this.user
-            })
-          }
-        }
-      })
+      this.getCurrentOrder(true)
     },
     computed: {
       ...mapState(['user']),
+
       orderStatus() {
         return Object.values(ORDER_STATUS).find(s => s.value === this.order.status).text
       },
@@ -179,11 +290,132 @@
           counterparty: '买家'
         }
       },
+
       paymentTitle() {
         return this.tradeText.side + ' ' + this.order.coin_amount + ' ' + this.order.coin_type + ', ' + this.tradeText.payment + ' ' + this.order.cash_amount + ' ' + this.order.cash_type
       },
       paymentOrigin() {
         return '交易广告 #' + this.order.item_id + ' 进入，单价 ' + this.order.price + ' CNY/ ' + this.order.coin_type
+      },
+      referCode() {
+        return this.order.id
+      },
+      paymentStatusMessage() {
+        if (this.isBuySide) {
+          switch (this.order.status) {
+            case 'created':
+              return {
+                message: `待支付，请于 <span class="c-red">${Math.floor(this.payRemainTime / 60)}分${this.payRemainTime % 60}秒</span>内完成支付，付款参考号：<span class="c-red">${this.referCode}</span>`,
+                warning: '请使用实名付款，转账时除参考号外请不要备注任何信息！'
+              }
+            case 'paid':
+              return {message: `已支付，待${this.counterparty.name} 确认并放币，付款参考号：<span class="c-red">${this.referCode}</span>`}
+            case 'success':
+              return {message: `${this.counterparty.name} 已确认收款，付款参考号：<span class="c-red">${this.referCode}</span>`}
+            case 'cancel':
+              return {message: `您已取消交易，无法查看支付信息。`}
+            case 'closed':
+              return {message: `订单超时已关闭，无法查看支付信息。`}
+            default:
+              return {}
+          }
+        } else {
+          switch (this.order.status) {
+            case 'created':
+              return {message: `待支付，${this.counterparty.name} 需在 <span class="c-red">${Math.floor(this.payRemainTime / 60)}分${this.payRemainTime % 60}秒</span>内完成支付，付款参考号：<span class="c-red">${this.referCode}</span>`}
+            case 'paid':
+              return {
+                message: `已支付，请查收您的收款账户，付款参考号：<span class="c-red">${this.referCode}</span>`,
+                warning: '请务必确认收到款项后确认收款并核实买家是否实名付款。'
+              }
+            case 'success':
+              return {message: `您已确认收款，付款参考号：<span class="c-red">${this.referCode}</span>`}
+            case 'cancel':
+              return {message: `买家已取消交易，无法查看支付信息。`}
+            case 'closed':
+              return {message: `订单超时已关闭，无法查看支付信息。`}
+            default:
+              return {}
+          }
+        }
+      },
+      stepsMessage() {
+        const success = '交易完成'
+        const closed = '订单已关闭'
+        const cancel = '订单已取消'
+        return this.isBuySide ? {
+          payCash: `向${this.counterparty.name}付款`,
+          payCoin: `等待${this.counterparty.name}确认放款放币`,
+          success,
+          cancel,
+          closed,
+        } : {
+          payCash: `等待${this.counterparty.name}付款`,
+          payCoin: `确认收款，向${this.counterparty.name}放行数字币`,
+          success,
+          cancel,
+          closed,
+        }
+      }
+    },
+    methods: {
+      getCurrentOrder(withUsers) {
+        this.axios.order.getOrderById(this.id).then(response => {
+          if (response.code === 0) {
+            this.order = response.data
+            this.checkOrderStatus()
+            // 随机测试maker,taker
+            if (Math.random() < 0.5) {
+              this.order.merchant_id = this.user.id
+            } else {
+              this.order.user_id = this.user.id
+            }
+            // TODO 删除以上测试用代码
+            if (this.order.status === 'created') {
+              this.payRemainTime = Math.floor(((new Date('2018-07-13 11:14:57').valueOf() + 15 * 60 * 1000) - Date.now()) / 1000)
+              clearInterval(this.secondCountdown)
+              this.secondCountdown = setInterval(() => {
+                if (this.payRemainTime > 0) {
+                  this.payRemainTime--
+                } else {
+                  clearInterval(this.secondCountdown)
+                }
+              }, 1000)
+            }
+            if (!withUsers) return
+            // 以下订单相关用户信息只需要获取一次
+            if (this.user.id === this.order.user_id) {
+              this.counterpartyId = this.order.merchant_id
+              this.axios.user.otherUserInfo(this.counterpartyId).then(res => {
+                this.counterparty = res.data
+                this.merchant = this.counterparty
+                this.axios.user.getUserPaymentMethods(this.merchant.id).then(methods => {
+                  this.paymentMethods = methods.data
+                  this.selectedMethod = this.paymentMethods[0]
+                })
+              })
+            } else {
+              this.counterpartyId = this.order.user_id
+              this.axios.user.otherUserInfo(this.counterpartyId).then(res => {
+                this.counterparty = res.data
+                this.merchant = this.user
+              })
+            }
+          }
+        })
+      },
+      refreshOrderStatus() {
+        this.axios.order.refreshOrderStatus(this.id).then(response => {
+          this.order = Object.assign({}, this.order, response.data)
+          this.checkOrderStatus()
+        })
+      },
+      checkOrderStatus() {
+        if (this.order.status === 'created' || this.order.status === 'paid') {
+          setTimeout(() => {
+            this.refreshOrderStatus()
+          }, 20000)
+        }
       },
     }
   }

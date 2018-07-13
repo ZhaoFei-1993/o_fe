@@ -56,6 +56,7 @@ module.exports = () => {
       create_time: faker.date.past(),
       update_time: faker.date.past(),
     })
+    const orderStatus = faker.random.arrayElement(['success', 'created', 'paid', 'cancel', 'closed'])
     data.orders.push({
       id: i,
       item_id: faker.random.number(), // 可能广告不存在，顺便测试错误吧
@@ -69,10 +70,14 @@ module.exports = () => {
       price: faker.random.number() * faker.random.number({max: 10}),
       memo: faker.random.word(),
       appeal_status: faker.random.arrayElement(['', 'processing', 'completed']),
-      status: faker.random.arrayElement(['success', 'created', 'paid', 'cancel']),
+      status: orderStatus,
       is_reopened: faker.random.boolean(),
       create_time: faker.date.past(),
       update_time: faker.date.past(),
+      place_time: faker.date.past(),       // 下单时间
+      pay_time: orderStatus === 'created' ? null : faker.date.past(),         // 支付时间
+      complete_time: ['success', 'cancel', 'closed'].indexOf(orderStatus) > -1 ? faker.date.past() : null,    // 完成时间，success cancel closed状态
+      appeal_time: faker.date.past(),      // 申诉时间
     })
   }
   return data

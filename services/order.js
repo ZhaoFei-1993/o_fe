@@ -6,5 +6,8 @@ export default (axios) => {
     getOrderById(id) {
       return axios.get(`/orders/${id}`)
     },
+    refreshOrderStatus(id) {
+      return axios.get(`/orders/${id}`)
+    }
   }
 }

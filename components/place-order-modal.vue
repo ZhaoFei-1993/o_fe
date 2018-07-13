@@ -40,7 +40,7 @@
               <b-input-group append="CNY">
                 <ExtendedInputNumber v-model="form.cash_amount" :name="item.id+'cash_amount'"
                                      @focus="()=>onFocus('cashAmount')"
-                                     @change="cashAmountChanged"
+                                     @input="cashAmountChanged"
                                      :placeholder="'可填写想'+sideText+'的金额'"/>
               </b-input-group>
               <div class="max-value">最高金额{{' '+item.max_deal_cash_amount+ ' '}}CNY
@@ -54,7 +54,7 @@
               <b-input-group :append="item.coin_type">
                 <ExtendedInputNumber v-model="form.coin_amount" :name="item.id+'coin_amount'"
                                      @focus="()=>onFocus('coinAmount')"
-                                     @change="coinAmountChanged"
+                                     @input="coinAmountChanged"
                                      :placeholder="'可填写想'+sideText+'的数量'"/>
               </b-input-group>
               <div class="max-value">最高数量{{' '+(item.max_deal_cash_amount/item.price)+ ' '+ item.coin_type}}<span
@@ -298,7 +298,7 @@
         event.preventDefault()
         this.hideModal()
       },
-      cashAmountChanged(value) {
+      cashAmountChanged() {
         this.$v.form.cash_amount.$touch()
         if (this.form.focusInput === 'cashAmount') {
           this.form.coin_amount = this.form.cash_amount === '' ? null : (this.form.cash_amount / this.item.price)
