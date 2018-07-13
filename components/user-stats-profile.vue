@@ -32,11 +32,21 @@
       padding: 0 18px 18px 18px;
       border-bottom: solid 1px #eeeeee;
     }
+    .sidebar-info-item {
+      margin-bottom: 14px;
+      color: #6f6f6f;
+
+      .sidebar-info-item-title {
+        display: inline-block;
+        min-width: 100px;
+      }
+    }
   }
 </style>
 <script>
   import Vue from 'vue'
   import UserMiniProfile from '~/components/user-mini-profile'
+
   const SidebarInfoItem = Vue.extend({
     props: {
       title: String,
