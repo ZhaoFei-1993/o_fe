@@ -20,11 +20,6 @@
 <script>
   export default {
     name: 'extended-input-number',
-    data() {
-      return {
-        inputVal: this.value,
-      }
-    },
     components: {},
     props: {
       value: [Number, String],
