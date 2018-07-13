@@ -19,8 +19,8 @@
 </template>
 
 <script>
-  import MySidebar from '../../components/my-sidebar.vue'
-  import My2Column from '../../components/my-2column.vue'
+  import MySidebar from '~/components/my-sidebar.vue'
+  import My2Column from '~/components/my-2column.vue'
 
   export default {
     name: 'page-merchant',

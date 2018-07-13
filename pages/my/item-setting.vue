@@ -83,8 +83,8 @@
 
 <script>
   import {mapState} from 'vuex'
-  import MySidebar from '../../components/my-sidebar.vue'
-  import My2Column from '../../components/my-2column.vue'
+  import MySidebar from '~/components/my-sidebar.vue'
+  import My2Column from '~/components/my-2column.vue'
   import MyInfoItem from './_c/my-info-item.vue'
   import CurrencyInput from '~/components/currency-input.vue'
 

@@ -73,8 +73,8 @@
 </template>
 
 <script>
-import MySidebar from '../../components/my-sidebar.vue'
-import My2Column from '../../components/my-2column.vue'
+import MySidebar from '~/components/my-sidebar.vue'
+import My2Column from '~/components/my-2column.vue'
 import MyInfoItem from './_c/my-info-item.vue'
 import ToggleButton from '~/components/toggle-button.vue'
 
