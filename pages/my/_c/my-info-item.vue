@@ -25,7 +25,10 @@
 
 <template>
   <div class="my-info-item">
-    <span class="info-title">{{title}}</span>
+    <div class="info-title">
+      {{title}}
+      <slot name="title"/>
+    </div>
     <div class="info-content">
       <slot name="content"/>
     </div>
@@ -40,5 +43,8 @@ export default {
   props: {
     title: String,
   },
+  // slots: {
+  //   title // 与props里面同名的slot，作用和props.title相同，只是更具扩展性
+  // }
 }
 </script>
