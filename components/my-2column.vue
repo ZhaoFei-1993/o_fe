@@ -1,3 +1,4 @@
+<!--个人中心，两栏结构-->
 <style lang="scss">
   .my-2column {
     padding: 40px 0 118px 0px;

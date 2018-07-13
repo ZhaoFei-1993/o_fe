@@ -1,12 +1,17 @@
 <style lang="scss">
   .extended-input-number {
-
+    width: 100%;
+    padding-left:4px;
+    &:focus{
+      outline:none;
+    }
   }
 </style>
 
 <template>
-  <b-form-input type="number" :disabled="disabled" :value="value" @input="onInput"
-                @change="$emit('change', $event)"></b-form-input>
+  <input class="extended-input-number" type="number" :disabled="disabled" :value="value"
+         @input="onInput" :placeholder="placeholder"
+         @focus="onFocus"/>
 </template>
 
 <script>
@@ -27,20 +32,18 @@
         type: Boolean,
         default: false,
       },
+      placeholder: {
+        type: String,
+      },
     },
     methods: {
-      onInput(value) {
-        // 需要看下为什么emit出去之后，本地的value没有改变 todo
-        // value = Number(value)
-        // if (value < this.min) {
-        //   value = this.min
-        // }
-        // if (value > this.max) {
-        //   value = this.max
-        // }
-        // console.log(value)
-        this.$emit('input', value)
+      onInput(evt) {
+        this.$emit('input', evt.target.value)
+        this.$emit('change', evt, evt.target.value)
       },
+      onFocus(evt) {
+        this.$emit('focus', evt)
+      }
     },
   }
 </script>

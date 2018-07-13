@@ -58,6 +58,7 @@
     <c-block style="padding: 0;">
       <b-table :fields="assetsFlowFields" :items="assetFlowItems">
       </b-table>
+      <blank v-if="!assetFlowItems.length"></blank>
     </c-block>
 
     <b-modal title="资金划转" v-model="showTransferModal" hide-footer no-close-on-backdrop>
@@ -98,6 +99,7 @@
 
 <script>
   import cBlock from '~/components/c-block'
+  import Blank from '~/components/blank'
   import FundPie from './_c/fund-pie'
 
   export default {
@@ -239,27 +241,7 @@
             sortable: false,
           },
         },
-        assetFlowItems: [{
-          asset: 'BCH',
-          total: 11134525,
-          freeze: 123,
-          availInfo: 999,
-        }, {
-          asset: 'BCH',
-          total: 111,
-          freeze: 6457633,
-          availInfo: 999,
-        }, {
-          asset: 'BCH',
-          total: 111,
-          freeze: 123,
-          availInfo: 999,
-        }, {
-          asset: 'BCH',
-          total: 111,
-          freeze: 123,
-          availInfo: 999,
-        }],
+        assetFlowItems: [],
         assetsFlowFields: {
           asset: {
             label: '币种',
@@ -312,6 +294,7 @@
     components: {
       cBlock,
       FundPie,
+      Blank,
     },
     methods: {
       toggleDropdown(val) {

@@ -2,12 +2,14 @@
 @import './common.scss';
 @import './custom.scss';
 @import './helpers.scss';
+@import './icons.scss';
 @import './components/button.scss';
 @import './components/modal.scss';
 @import './components/form.scss';
 
 html, body, #__nuxt, #__layout {
   height: 100%;
+  -webkit-font-smoothing: antialiased;
 }
 
 table, tbody, td, tfoot, th, thead {

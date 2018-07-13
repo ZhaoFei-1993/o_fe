@@ -26,7 +26,7 @@
         height: 50px;
         line-height: 60px;
         padding-top: 0;
-
+        color: #27313e;
         &:hover {
           color: $brandGreen;
         }
@@ -166,7 +166,7 @@
 
   export default {
     head: {
-      link: [{rel: 'stylesheet', href: '//at.alicdn.com/t/font_739076_8gs9l4a24h4.css'}]
+      link: [{rel: 'stylesheet', href: '//at.alicdn.com/t/font_739076_bnv1cw29f6q.css'}]
     },
     components: {},
 

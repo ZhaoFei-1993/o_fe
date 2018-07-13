@@ -27,8 +27,8 @@ module.exports = () => {
       user_id: randUser.id,
       user: randUser,
       side: faker.random.arrayElement(['BUY', 'SELL']),
-      coin_type: faker.random.arrayElement([1, 2, 3, 4]), // 数字货币币种
-      cash_type: faker.random.arrayElement([1]), // 法币货币币种
+      coin_type: faker.random.arrayElement(['BTC', 'BCH', 'ETH', 'USDT']), // 数字货币币种
+      cash_type: faker.random.arrayElement(['CNY']), // 法币货币币种
       pricing_type: faker.random.arrayElement([1, 2]),
       float_rate: faker.random.number({max: 100}),
       price_limit: faker.random.number({max: 1000}),
@@ -36,8 +36,8 @@ module.exports = () => {
       coin_amount: faker.random.number(),
       remain_coin_amount: faker.random.number(),
       freeze_coin_amount: faker.random.number(),
-      min_deal_cash_amount: faker.random.number(),
-      max_deal_cash_amount: faker.random.number(),
+      min_deal_cash_amount: faker.random.number({max: 100}),
+      max_deal_cash_amount: faker.random.number({min: 101}),
       counterparty_limit: faker.random.number(),
       auto_reply_content: faker.lorem.sentence(),
       status: faker.random.arrayElement([0, 1]),
@@ -50,9 +50,9 @@ module.exports = () => {
       item_user_id: faker.random.number(),
       user_id: faker.random.number(),
       side: faker.random.boolean(),
-      coin_type: faker.random.arrayElement([1, 2, 3, 4]),
+      coin_type: faker.random.arrayElement(['BTC', 'BCH', 'ETH', 'USDT']),
       coin_amount: faker.random.number(),
-      cash_type: faker.random.arrayElement([1, 2, 3, 4]),
+      cash_type: faker.random.arrayElement(['CNY']),
       cash_amount: faker.random.number(),
       price: faker.random.number() * faker.random.number({max: 10}),
       memo: faker.random.word(),

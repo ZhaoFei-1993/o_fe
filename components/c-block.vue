@@ -6,7 +6,7 @@
 </style>
 
 <template>
-  <div class="c-block default-box-shadow" :style="{padding: `${x}px ${y}px`}">
+  <div class="c-block default-box-shadow" :style="{padding: `${y}px ${x}px`}">
     <slot/>
   </div>
 </template>
