@@ -1,9 +1,12 @@
 <style lang="scss">
   .extended-input-number {
     width: 100%;
-    padding-left:4px;
+    padding: 0 4px;
+
     &:focus{
       outline:none;
+      border-color: #52cbca;
+      border-style: solid;
     }
   }
 </style>
@@ -17,16 +20,21 @@
 <script>
   export default {
     name: 'extended-input-number',
+    data() {
+      return {
+        inputVal: this.value,
+      }
+    },
     components: {},
     props: {
       value: [Number, String],
       max: {
         type: Number,
-        default: Infinity,
+        default: Number.MAX_SAFE_INTEGER,
       },
       min: {
         type: Number,
-        default: -Infinity,
+        default: Number.MIN_SAFE_INTEGER,
       },
       disabled: {
         type: Boolean,
@@ -35,11 +43,18 @@
       placeholder: {
         type: String,
       },
+      decimalDigit: {
+        type: Number,
+        default: 8,
+      }
     },
     methods: {
       onInput(evt) {
-        this.$emit('input', evt.target.value)
-        this.$emit('change', evt, evt.target.value)
+        let value = evt.target.value.setDigit(this.decimalDigit)
+        value = Math.min(this.max, value)
+        value = Math.max(this.min, value)
+        evt.target.value = value
+        this.$emit('input', value)
       },
       onFocus(evt) {
         this.$emit('focus', evt)

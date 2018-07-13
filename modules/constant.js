@@ -44,3 +44,26 @@ export const VERIFY_CODE_TYPE = {
 }
 
 export const KYC_STATUS_PASS = 'pass'
+
+export const ORDER_STATUS = {
+  CREATED: {
+    text: '等待买家付款',
+    value: 'created',
+  },
+  PAID: {
+    text: '已付款待确认',
+    value: 'paid',
+  },
+  SUCCESS: {
+    text: '已完成',
+    value: 'success',
+  },
+  CANCEL: {
+    text: '已取消',
+    value: 'cancel',
+  },
+  CLOSED: {
+    text: '已关闭',
+    value: 'closed',
+  },
+}
