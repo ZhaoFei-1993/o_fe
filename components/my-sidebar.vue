@@ -1,3 +1,4 @@
+<!--个人中心 侧边栏-->
 <style lang="scss">
   .my-sidebar {
     .my-sidebar-menu {
@@ -53,9 +54,9 @@
   }
 </style>
 <template>
-  <div class="my-sidebar" v-if="user.data">
+  <div class="my-sidebar" v-if="user.account">
     <CBlock class="my-sidebar-info" :x="0" :y="20">
-      <UserStatsProfile :user-data="user.data"/>
+      <UserStatsProfile :user-data="user.account"/>
     </CBlock>
 
     <b-list-group class="my-sidebar-menu">
@@ -94,7 +95,7 @@
       ...mapState(['user'])
     },
     beforeMount() {
-      this.$store.dispatch('setUserData')
+      this.$store.dispatch('fetchUserAccount')
     },
     methods: {},
   }

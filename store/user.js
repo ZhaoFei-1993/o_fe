@@ -1,27 +1,54 @@
 export default () => {
   const state = {
-    data: null,
-    balance: null,
+    account: null,
+    payments: null,       // 用户的支付手段
+    balance: null,        // todo:balance需要重新设计
+    merchant: null,       // 用户的商家信息
+    settings: null,       // 用户的广告设置
   }
   const mutations = {
-    SET_USER_DATA(state, data) {
-      state.data = data
+    SET_USER_ACCOUNT(state, data) {
+      state.account = data
+    },
+    SET_USER_PAYMENTS(state, data) {
+      state.payments = data
     },
     SET_USER_BALANCE(state, data) {
       state.balance = data
-    }
+    },
+    SET_USER_MERCHANT(state, data) {
+      state.merchant = data
+    },
+    SET_USER_SETTINGS(state, data) {
+      state.settings = data
+    },
   }
   const actions = {
-    setUserData({commit}) {
-      return this.app.axios.user.userInfo().then(data => {
-        commit('SET_USER_DATA', data.data)
+    fetchUserAccount({commit}) {
+      return this.app.axios.user.account().then(data => {
+        commit('SET_USER_ACCOUNT', data.data)
       })
     },
-    setUserBalance({commit, state, rootState}) {
+    fetchUserPayments({commit}) {
+      return this.app.axios.user.payments().then(data => {
+        commit('SET_USER_PAYMENTS', data.data)
+      })
+    },
+    fetchUserBalance({commit, state, rootState}) {
       return this.app.axios.user.balance().then(data => {
         commit('SET_USER_BALANCE', data.data)
       })
-    }
+    },
+    fetchUserMerchant({commit, state, rootState}) {
+      return this.app.axios.user.merchant().then(data => {
+        commit('SET_USER_MERCHANT', data.data)
+      })
+    },
+    fetchUserSettings({commit, state, rootState}) {
+      return this.app.axios.user.settings().then(data => {
+        commit('SET_USER_SETTINGS', data.data)
+      })
+    },
   }
 
   return {

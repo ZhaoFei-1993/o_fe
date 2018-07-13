@@ -10,15 +10,17 @@ export const PAYMENT_OPTIONS = [
 ]
 
 export const COUNTERPARTY_LIMIT_OPTIONS = [{
-  text: '交易方必须完成过 1 次交易',
+  text: '交易方必须通过手机验证',
   value: 0
 }, {
-  text: '交易方必须通过手机验证',
+  text: '交易方必须通过实名验证',
   value: 1,
 }, {
-  text: '交易方必须通过实名验证',
+  text: '交易方必须完成过 1 次交易',
   value: 2,
 }]
+
+export const KYC_STATUS_PASS = 'pass'
 
 export const ORDER_STATUS = {
   CREATED: {

@@ -4,11 +4,34 @@ export default (axios) => {
      * 获取用户自己的信息
      * @return {Promise<void>}
      */
-    userInfo() {
-      return Promise.resolve(require('./mock/user').userData)
-      return axios.get('/user', {
-        params: {},
-      })
+    account() {
+      return Promise.resolve(require('./mock/user').account)
+      return axios.get('/user/account')
+    },
+
+    payments() {
+      return Promise.resolve(require('./mock/user').payments)
+      return axios.get('/user/payment/method')
+    },
+
+    merchant() {
+      return Promise.resolve(require('./mock/user').merchant)
+      return axios.get('/user/merchant')
+    },
+
+    settings() {
+      return Promise.resolve(require('./mock/user').settings)
+      return axios.get('/user/settings')
+    },
+
+    setSettings() {
+      return Promise.resolve(require('./mock/user').settings)
+      return axios.get('/user/settings')
+    },
+
+    // todo:balance接口需要重新设计下
+    balance() {
+      return Promise.resolve(require('./mock/user').balance)
     },
 
     /**
@@ -18,10 +41,6 @@ export default (axios) => {
     otherUserInfo(id) {
       return axios.get(`users/${id}`)
       // return Promise.resolve(require('./mock/user').otherUser)
-    },
-
-    balance() {
-      return Promise.resolve(require('./mock/user').balance)
     },
 
     getUserPaymentMethods(id) {

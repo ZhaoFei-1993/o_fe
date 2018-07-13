@@ -180,7 +180,7 @@ const utils = {
     const validations = {}
     const invalidMessages = {}
 
-    for (let key in validationConfig) {
+    for (const key in validationConfig) {
       validations[key] = validationConfig[key].validation
       console.log(validations[key], validationConfig[key])
       invalidMessages[key] = validationConfig[key].message
@@ -190,6 +190,60 @@ const utils = {
       validations,
       invalidMessages
     }
+  },
+  /**
+   * 格式化时间
+   * @param  {Number} timestamp 时间戳，秒为单位
+   * @param  {String} precision 精确度
+   * @return {String}           格式化后的时间字符串
+   */
+  getTimeText: function (timestamp, precision = 'second') {
+    const time = new Date(timestamp * 1000)
+    let timeText = ''
+    switch (precision) {
+      case 'second':
+        timeText =
+          time.getSeconds() > 9 ? time.getSeconds() : '0' + time.getSeconds()
+      case 'minute': // eslint-disable-line no-fallthrough
+        if (precision !== 'minute') {
+          timeText = ':' + timeText
+        }
+        timeText =
+          (time.getMinutes() > 9
+            ? time.getMinutes()
+            : '0' + time.getMinutes()) + timeText
+      case 'hour': // eslint-disable-line no-fallthrough
+        if (precision !== 'hour') {
+          timeText = ':' + timeText
+        }
+        timeText =
+          (time.getHours() > 9 ? time.getHours() : '0' + time.getHours()) +
+          timeText
+      case 'day': // eslint-disable-line no-fallthrough
+        if (precision !== 'day') {
+          timeText = ' ' + timeText
+        }
+        timeText =
+          (time.getDate() > 9 ? time.getDate() : '0' + time.getDate()) +
+          timeText
+      case 'month': // eslint-disable-line no-fallthrough
+        if (precision !== 'month') {
+          timeText = '-' + timeText
+        }
+        timeText =
+          (time.getMonth() + 1 > 9
+            ? time.getMonth() + 1
+            : '0' + (time.getMonth() + 1)) + timeText
+      case 'year': // eslint-disable-line no-fallthrough
+        if (precision !== 'year') {
+          timeText = '-' + timeText
+        }
+        timeText = time.getFullYear() + timeText
+        break
+      default:
+        break
+    }
+    return timeText
   },
   // 改写自coinex项目
   formatDate(val) {
@@ -204,7 +258,7 @@ const utils = {
     return (new Date(date)).toLocaleString()
   },
 
-  //1990-09-78
+  // 1990-09-78
   text2Second(remindTime) {
     if (!remindTime) {
       return "";
@@ -258,7 +312,6 @@ const utils = {
       t2: timer2
     }
   },
-
 }
 
 export default ({app, store}) => {
