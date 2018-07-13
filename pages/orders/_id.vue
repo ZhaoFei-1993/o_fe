@@ -3,7 +3,7 @@
     <div class="main-content">
       <div class="order-basic-info">
         <div class="info-header">
-          <span class="c-19">订单#{{order.id+' '}}详情</span>
+          <span class="c-black">订单#{{order.id+' '}}详情</span>
           <span class="c-6f">交易状态：<span class="c-brand-yellow fz-18">{{orderStatus}}</span></span>
         </div>
         <div class="info-detail">
