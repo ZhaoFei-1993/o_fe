@@ -15,12 +15,14 @@
 export default {
   name: 'c-block',
   props: {
+    // 横向padding
     x: {
-      type: Number,
+      type: [Number, String],
       default: 30,
     },
+    // 纵向padding
     y: {
-      type: Number,
+      type: [Number, String],
       default: 30,
     },
   },
