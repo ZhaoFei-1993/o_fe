@@ -203,37 +203,37 @@ const utils = {
     switch (precision) {
       case 'second':
         timeText =
-        time.getSeconds() > 9 ? time.getSeconds() : '0' + time.getSeconds()
+          time.getSeconds() > 9 ? time.getSeconds() : '0' + time.getSeconds()
       case 'minute': // eslint-disable-line no-fallthrough
         if (precision !== 'minute') {
           timeText = ':' + timeText
         }
         timeText =
-        (time.getMinutes() > 9
-          ? time.getMinutes()
-          : '0' + time.getMinutes()) + timeText
+          (time.getMinutes() > 9
+            ? time.getMinutes()
+            : '0' + time.getMinutes()) + timeText
       case 'hour': // eslint-disable-line no-fallthrough
         if (precision !== 'hour') {
           timeText = ':' + timeText
         }
         timeText =
-        (time.getHours() > 9 ? time.getHours() : '0' + time.getHours()) +
-        timeText
+          (time.getHours() > 9 ? time.getHours() : '0' + time.getHours()) +
+          timeText
       case 'day': // eslint-disable-line no-fallthrough
         if (precision !== 'day') {
           timeText = ' ' + timeText
         }
         timeText =
-        (time.getDate() > 9 ? time.getDate() : '0' + time.getDate()) +
-        timeText
+          (time.getDate() > 9 ? time.getDate() : '0' + time.getDate()) +
+          timeText
       case 'month': // eslint-disable-line no-fallthrough
         if (precision !== 'month') {
           timeText = '-' + timeText
         }
         timeText =
-        (time.getMonth() + 1 > 9
-          ? time.getMonth() + 1
-          : '0' + (time.getMonth() + 1)) + timeText
+          (time.getMonth() + 1 > 9
+            ? time.getMonth() + 1
+            : '0' + (time.getMonth() + 1)) + timeText
       case 'year': // eslint-disable-line no-fallthrough
         if (precision !== 'year') {
           timeText = '-' + timeText
@@ -244,6 +244,9 @@ const utils = {
         break
     }
     return timeText
+  },
+  local(date) {
+    return (new Date(date)).toLocaleString()
   },
 }
 

@@ -39,7 +39,12 @@ export default (axios) => {
      * @param id
      */
     otherUserInfo(id) {
-      return Promise.resolve(require('./mock/user').otherUser)
+      return axios.get(`users/${id}`)
+      // return Promise.resolve(require('./mock/user').otherUser)
+    },
+
+    getUserPaymentMethods(id) {
+      return Promise.resolve(require('./mock/user').paymentMethods)
     },
   }
 }
