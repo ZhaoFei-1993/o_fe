@@ -181,10 +181,16 @@ select.form-control {
   }
 
   .custom-control-label::before {
+    top: 8px;
     border-radius: 0;
     background-color: transparent;
     border: 1px solid $brandYellow;
   }
+
+  .custom-control-label::after {
+    top: 8px;
+  }
+
   .custom-control-input:checked ~ .custom-control-label::before {
     background-color: $brandYellow;
   }

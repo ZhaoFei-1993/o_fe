@@ -1,3 +1,4 @@
+<!--个人中心 侧边栏-->
 <style lang="scss">
   .my-sidebar {
     .user-mini-profile {
@@ -58,13 +59,13 @@
   }
 </style>
 <template>
-  <div class="my-sidebar" v-if="user.data">
+  <div class="my-sidebar" v-if="user.account">
     <CBlock class="my-sidebar-info" :x="0" :y="20">
-      <UserMiniProfile class="user-mini-profile" :username="user.data.username" :online="true"/>
+      <UserMiniProfile class="user-mini-profile" :username="user.account.name" :online="true"/>
       <div class="pt-20 px-20">
         <SidebarInfoItem title="30天成交量">
           <Language text="[t][/t]单">
-            <span slot="t" class="c-brand-yellow">{{user.data.recent_deal_count || 0}} </span>
+            <span slot="t" class="c-brand-yellow">{{user.account.recent_deal_count || 0}} </span>
           </Language>
         </SidebarInfoItem>
 
@@ -74,13 +75,13 @@
 
         <SidebarInfoItem title="平均付款时间">
           <Language text="[t][/t]分钟">
-            <span slot="t" class="c-brand-yellow">{{user.data.average_pay_time}} </span> <!--空格勿删-->
+            <span slot="t" class="c-brand-yellow">{{user.account.average_pay_time}} </span> <!--空格勿删-->
           </Language>
         </SidebarInfoItem>
 
         <SidebarInfoItem title="平均放行时间">
           <Language text="[t][/t]分钟">
-           <span slot="t" class="c-brand-yellow">{{user.data.average_release_time}} </span>
+           <span slot="t" class="c-brand-yellow">{{user.account.average_release_time}} </span>
           </Language>
         </SidebarInfoItem>
       </div>
@@ -138,14 +139,14 @@
     computed: {
       // 用户单子完成率
       userOrderCompleteRatio: function () {
-        const userData = this.user.data
+        const userData = this.user.account
         // todo: 这里根据后台返回数据，来显示  0% 和 -
         return userData.recent_deal_count ? (userData.recent_deal_count / userData.recent_order_count * 100).toFixed(1) + '%' : '-'
       },
       ...mapState(['user'])
     },
     beforeMount() {
-      this.$store.dispatch('setUserData')
+      this.$store.dispatch('fetchUserAccount')
     },
     methods: {},
   }
