@@ -5,7 +5,7 @@
         <p style="color: #192330;font-size: 18px;">总资产估值</p>
         <p style="height: 40px;display: block;margin-top: 40px;color: #192330;" >
           <span style="font-size:24px;">
-            5,234,654.00 CNY
+            {{ totalBalance | formatMoney }} CNY
           </span>
         </p>
         <div style="color: #192330;">
@@ -39,26 +39,40 @@
       <span>资产结构</span>
     </div>
     <c-block style="padding: 0;">
-      <b-table :fields="assetsTableFields" :items="assetTableItems">
-        <template slot="action" slot-scope="{ item, index }">
-            <b-link @click="onShowTransferModal('in')">转入</b-link>
-            <span style="display: inline-block;width: 30px;"></span>
-            <b-link @click="onShowTransferModal('out')">转出</b-link>
+      <b-table :fields="assetsTableFields" :items="otcBalance">
+        <template slot="available" slot-scope="{ item }">
+          {{ item.available | formatMoney }}
+        </template>
+        <template slot="frozen" slot-scope="{ item }">
+          {{ item.frozen | formatMoney }}
+        </template>
+        <template slot="total" slot-scope="{ item }">
+          {{ item.total | formatMoney }}
+        </template>
+        <template slot="action" slot-scope="{ item }">
+          <b-link @click="onShowTransferModal('in', item)">转入</b-link>
+          <span style="display: inline-block;width: 30px;"></span>
+          <b-link @click="onShowTransferModal('out', item)">转出</b-link>
         </template>
       </b-table>
     </c-block>
     <div class="row-header" style="padding-bottom:15px;">
       <span>资产流水</span>
       <div class="float-right">
-        <div style="display: inline-block;" ><span style="font-size: 12px;">币种：</span><b-form-select style="width: 100px;" v-model="filterCoin" :options="coinOptions"></b-form-select></div>
-        <div style="display: inline-block;margin-left: 30px;"><span style="font-size: 12px;">流水类型：</span><b-form-select style="width: 100px;" v-model="filterCoin" :options="coinOptions"></b-form-select></div>
-        <div style="display: inline-block;margin-left: 20px;"><i style="font-size: 20px;vertical-align: sub;" class="iconfont icon-download"></i></div>
+        <div style="display: inline-block;" ><span style="font-size: 12px;">币种：</span><b-form-select style="width: 100px;" v-model="filterCoin" :options="coinOptions" @change="onFilterHistory"></b-form-select></div>
+        <div style="display: inline-block;margin-left: 30px;"><span style="font-size: 12px;">流水类型：</span><b-form-select style="width: 100px;" v-model="filterOperationType" :options="operationOptions" @change="onFilterHistory"></b-form-select></div>
       </div>
     </div>
     <c-block style="padding: 0;">
-      <b-table :fields="assetsFlowFields" :items="assetFlowItems">
+      <b-table :fields="assetsHistoryFields" :items="assetHistoryItems">
+        <template slot="amount" slot-scope="{ item }">
+          {{ item.amount | formatMoney }}
+        </template>
+        <template slot="total" slot-scope="{ item }">
+          {{ item.total | formatMoney }}
+        </template>
       </b-table>
-      <blank v-if="!assetFlowItems.length"></blank>
+      <b-pagination :total-rows="assetHistoryPage.totalRows" v-model="assetHistoryPage.currentPage" :per-page="assetHistoryPage.perPage"></b-pagination>
     </c-block>
 
     <b-modal title="资金划转" v-model="showTransferModal" hide-footer no-close-on-backdrop>
@@ -73,19 +87,12 @@
           <b-form-select v-model="form.to" :options="walletOptions" @change="onSwap"></b-form-select>
         </b-form-group>
         <b-form-group label="划转数量" horizontal>
-          <b-form-input
-            type="number"
-            autocomplete="off"
-            step="any"
-            size="lg"
-            v-model="form.amount"
-            class="amount-input"
-            ></b-form-input>
+            <ExtendedInputNumber v-model="form.amount" :min="0" :max="+availableAmount" class="amount-input" />
         </b-form-group>
         <b-form-group horizontal>
           <div class="amount-available">
             <span>可转数量：</span>
-            <span>{{ availableAmount }}</span>
+            <span>{{ availableAmount | formatMoney }}</span>
             <b-link class="float-right" @click="onshowHand">全部划转</b-link>
           </div>
         </b-form-group>
@@ -98,26 +105,41 @@
 </template>
 
 <script>
+  import ExtendedInputNumber from '~/components/extended-input-number'
   import cBlock from '~/components/c-block'
   import Blank from '~/components/blank'
   import FundPie from './_c/fund-pie'
 
-  export default {
+  const limit = 10
+
+export default {
     data() {
       return {
-        availableAmount: 123423,
+        filterOperationType: 'all',
+        operationOptions: [{
+          value: 'all',
+          text: '全部',
+        }, {
+          value: 'payout',
+          text: '支出',
+        }, {
+          value: 'income',
+          text: '收入',
+        }],
+        assetHistoryPage: {},
+        totalBalance: '0',
         showTransferModal: false,
         form: {
           coinType: 'BCH',
           from: 'otc',
-          to: 'exchange',
-          amount: '1000',
+          to: 'coinex',
+          amount: 0,
         },
         walletOptions: [{
           value: 'otc',
           text: 'OTC钱包',
         }, {
-          value: 'exchange',
+          value: 'coinex',
           text: '交易所钱包',
         }],
         filterCoin: 'BCH',
@@ -132,70 +154,16 @@
           text: 'EOS',
         }],
         defaultAsset: 'CNY',
-        pieDatas: [{
-          name: 'BCH',
-          y: 1,
-          colorIndex: 0,
-          virtual: true,
-        }, {
-          name: 'CET',
-          y: 20,
-          colorIndex: 1,
-          virtual: true,
-        }, {
-          name: 'EOS',
-          y: 1,
-          colorIndex: 0,
-          virtual: true,
-        }, {
-          name: 'BTC',
-          y: 1,
-          colorIndex: 0,
-          virtual: true,
-        }, {
-          name: 'AAA',
-          y: 1,
-          colorIndex: 0,
-          virtual: true,
-        }, {
-          name: 'BBB',
-          y: 1,
-          colorIndex: 0,
-          virtual: true,
-        }, {
-          name: 'CCC',
-          y: 1,
-          colorIndex: 0,
-          virtual: true,
-        }],
+        availableAmount: '0',
+        pieDatas: [],
         showPieChart: true,
         showCoinDropdown: false,
         totalCoin: '-',
         selectedCoin: 'BCH',
         priceCoins: ['BCH', 'BTC', 'ETH', 'USDT'],
-        assetTableItems: [{
-          asset: 'BCH',
-          total: 11134525,
-          freeze: 123,
-          availInfo: 999,
-        }, {
-          asset: 'BCH',
-          total: 111,
-          freeze: 6457633,
-          availInfo: 999,
-        }, {
-          asset: 'BCH',
-          total: 111,
-          freeze: 123,
-          availInfo: 999,
-        }, {
-          asset: 'BCH',
-          total: 111,
-          freeze: 123,
-          availInfo: 999,
-        }],
+        otcBalance: [],
         assetsTableFields: {
-          asset: {
+          coin_type: {
             label: '币种',
             sortable: false,
             thStyle: {
@@ -214,7 +182,7 @@
             tdClass: [ 'text-right' ],
             sortable: false,
           },
-          freeze: {
+          frozen: {
             label: '冻结',
             thStyle: {
               width: '250px',
@@ -223,7 +191,7 @@
             tdClass: [ 'text-right' ],
             sortable: false,
           },
-          availInfo: {
+          available: {
             label: '可用',
             thStyle: {
               width: '250px',
@@ -241,9 +209,9 @@
             sortable: false,
           },
         },
-        assetFlowItems: [],
-        assetsFlowFields: {
-          asset: {
+        assetHistoryItems: [],
+        assetsHistoryFields: {
+          coin_type: {
             label: '币种',
             sortable: false,
             thStyle: {
@@ -253,7 +221,7 @@
             thClass: [ 'text-left' ],
             tdClass: [ 'text-left', 'td-pl' ],
           },
-          total: {
+          create_time: {
             label: '时间',
             thStyle: {
               width: '250px',
@@ -262,7 +230,7 @@
             tdClass: [ 'text-right' ],
             sortable: false,
           },
-          freeze: {
+          operation_type: {
             label: '流水类型',
             thStyle: {
               width: '250px',
@@ -271,7 +239,7 @@
             tdClass: [ 'text-right' ],
             sortable: false,
           },
-          availInfo: {
+          amount: {
             label: '金额数量',
             thStyle: {
               width: '250px',
@@ -280,7 +248,7 @@
             tdClass: [ 'text-right' ],
             sortable: false,
           },
-          action: {
+          total: {
             label: '余额',
             tdClass: [ 'text-center' ],
             thStyle: {
@@ -289,14 +257,103 @@
             sortable: false,
           },
         },
+        coinexBalance: [],
+      }
+    },
+    async asyncData({ app, query, req, error }) {
+      const [otcBalanceData, historyData, coinexBalanceData] = await Promise.all([
+        app.axios.balance.otcBalance(),
+        app.axios.balance.history({ page: 1, limit }),
+        app.axios.balance.coinexBalance(),
+      ])
+      const pieDatas = []
+      let otcBalance = []
+      let assetHistoryItems = []
+      let coinexBalance = []
+      let totalBalance = '0'
+      let assetHistoryPage = {
+        currentPage: 0,
+        totalRows: 0,
+        perPage: 0,
+      }
+      if (otcBalanceData.code === 0 && otcBalanceData.data) {
+        otcBalanceData.data.forEach((item, index) => {
+          pieDatas.push({
+            name: item.coin_type,
+            y: +item.total,
+            colorIndex: index,
+            virtual: false,
+          })
+          otcBalance = otcBalanceData.data
+          totalBalance += (+item.total)
+        })
+      }
+      if (historyData.code === 0 && historyData.data) {
+        const { data, curr_page: currentPage, total: totalRows } = historyData.data
+        assetHistoryPage = {
+          currentPage,
+          totalRows,
+          perPage: limit,
+        }
+        assetHistoryItems = data.map(item => {
+          return {
+            ...item,
+            create_time: app.utils.getTimeText(item.create_time),
+          }
+        })
+      }
+      if (coinexBalanceData.code === 0 && coinexBalanceData.data) {
+        coinexBalance = coinexBalanceData.data
+      }
+  
+      return {
+        pieDatas,
+        totalBalance,
+        otcBalance,
+        assetHistoryItems,
+        assetHistoryPage,
+        coinexBalance,
       }
     },
     components: {
       cBlock,
       FundPie,
       Blank,
+      ExtendedInputNumber,
     },
     methods: {
+      onInputAmount(val) {
+        this.form.amount = val
+      },
+      onFilterHistory() {
+        this.fetchBalanceHistory({
+          coin_type: this.filterCoin,
+          side: this.filterOperationType,
+          page: this.assetHistoryPage.currentPage,
+          limit,
+        })
+      },
+      fetchBalanceHistory(query = { page: 1, limit }) {
+        this.axios.balance.history({
+          page: 1,
+          limit,
+        }).then(historyData => {
+          if (historyData.code === 0 && historyData.data) {
+            const { data, curr_page: currentPage, total: totalRows } = historyData.data
+            this.assetHistoryPage = {
+              currentPage,
+              totalRows,
+              perPage: limit,
+            }
+            this.assetHistoryItems = data.map(item => {
+              return {
+                ...item,
+                create_time: this.utils.getTimeText(item.create_time),
+              }
+            })
+          }
+        })
+      },
       toggleDropdown(val) {
         this.showCoinDropdown = !!val
       },
@@ -313,17 +370,22 @@
         this.form.from = this.form.to
         this.form.to = tmp
       },
-      onShowTransferModal(type) {
+      onShowTransferModal(type, item) {
+        const { coin_type: coinType } = item
         if (type === 'in') {
-          this.form.from = 'exchange'
+          this.form.from = 'coinex'
           this.form.to = 'otc'
         } else if (type === 'out') {
           this.form.from = 'otc'
-          this.form.to = 'exchange'
+          this.form.to = 'coinex'
         }
+        const fromBalance = this[`${this.form.from}Balance`].find(item => {
+          return item.coin_type === coinType
+        })
+        this.availableAmount = fromBalance ? fromBalance.available : '0'
         this.showTransferModal = true
       },
-    }
+    },
   }
 </script>
 
@@ -420,9 +482,7 @@
       padding-left: 28px;
     }
     .amount-input {
-      &:focus {
-        border-color: #52cbca;
-      }
+      height: 100%;
     }
     .amount-available {
       font-size: 14px;

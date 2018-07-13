@@ -188,5 +188,6 @@ module.exports = {
     {src: '~/plugins/modal', ssr: false},
     {src: '~/plugins/tips', ssr: false},
     {src: '~/plugins/vue-components'},
+    '~/plugins/filter',
   ],
 }
