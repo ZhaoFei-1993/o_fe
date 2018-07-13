@@ -132,9 +132,18 @@ String.prototype.formatCurrency = function(
     : prefix + integerString + charDec + decimalString;
 };
 
+/**
+ * [格式化数字]
+ * @param  {[Number]} c       [精确到小数位位数]
+ * @param  {[String]} charDec [小数点符号，默认点号]
+ * @param  {[String]} charSep [每三位数字的分隔符，默认逗号]
+ * @param  {[Boolean]} noZero  [小数位是否需要补0，默认true]
+ * @param  {[String]} lang    [单位语言]
+ * 
+ * @return {[String]}         [格式化后的数字字符串]
+ */
 String.prototype.formatMoney = function(c, charDec, charSep, noZero, lang) {
   let n = this || "0";
-  const names = [n, c, charDec, charSep, noZero, lang];
   let prefix = "";
   if (n[0] === "-") {
     prefix = "-";
@@ -175,7 +184,7 @@ String.prototype.formatMoney = function(c, charDec, charSep, noZero, lang) {
   // 三位加逗号
   for (let i = decimalArray[0].length - 1; i >= 0; i--) {
     if ((decimalArray[0].length - i) % 3 === 0 && i > 0) {
-    // 加逗号
+      // 加逗号
       integerString = charSep + decimalArray[0][i] + integerString;
     } else {
       integerString = decimalArray[0][i] + integerString;
@@ -186,7 +195,7 @@ String.prototype.formatMoney = function(c, charDec, charSep, noZero, lang) {
   }
 
   let decimalString =
-  decimalArray.length > 1 ? decimalArray[1].substring(0, c) : "";
+    decimalArray.length > 1 ? decimalArray[1].substring(0, c) : "";
 
   if (c > 0 && !noZero) {
     // 不足位数的补0
@@ -198,7 +207,13 @@ String.prototype.formatMoney = function(c, charDec, charSep, noZero, lang) {
     }
     return (prefix + integerString + charDec + decimalString + " " + postfix).trim();
   } else {
-    return (prefix + integerString + (c > 0 && decimalString * 1 > 0 ? charDec + decimalString : "") + " " + postfix).trim();
+    return (
+      prefix +
+      integerString +
+      (c > 0 && decimalString * 1 > 0 ? charDec + decimalString : "") +
+      " " +
+      postfix
+    ).trim();
   }
 };
 

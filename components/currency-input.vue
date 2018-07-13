@@ -43,7 +43,6 @@
     <ExtendedInputNumber :value="value"
                          @input="onInput"
                          @focus="onFocus"
-                         @change="onChange"
                          :placeholder="placeholder"/>
   </b-input-group>
 </template>
@@ -68,9 +67,6 @@ export default {
     onFocus(e) {
       this.$emit('focus', e)
     },
-    onChange(e) {
-      this.$emit('change', e)
-    }
   }
 }
 </script>
