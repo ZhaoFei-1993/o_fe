@@ -125,7 +125,7 @@
               i {
                 margin: 0 4px;
               }
-              .icon-bank {
+              .icon-bankcard {
                 color: $brandYellow;
               }
               .icon-alipay {
@@ -208,7 +208,7 @@
             <span class="col-narrow text-right fz-12 c-6f">{{item.coin_amount+' '+selectedCoin}}</span>
             <span class="col-wide text-right pr-60 fz-12 c-6f">{{item.min_deal_cash_amount+ '-'+ item.max_deal_cash_amount + 'CNY'}}</span>
             <span class='payment col-narrow'>
-              <i class="iconfont icon-bank"></i>
+              <i class="iconfont icon-bankcard"></i>
               <i class="iconfont icon-alipay"></i>
               <i class="iconfont icon-wechat-round"></i>
             </span>

@@ -46,6 +46,26 @@ export const payments = {
       'bank': '招商银行',              // 银行名
       'branch': '深圳支行',            // 银行支行
       'status': 'on'                  // 状态，on: 已开启, off: 未开启
+    }, {
+      'id': 1,                        // id
+      'user_id': 1,                   // 用户id
+      'method': 'wechat',             // 支付方式，alipay: 支付宝, wechat: 微信, bankcard: 银行卡
+      'accouont_no': 'wuyanzu',       // 账号或银行卡号
+      'account_name': '吴彦祖',        // 账户名
+      'qr_code_image': '',            // 支付宝或微信收款码图片id
+      'bank': '招商银行',              // 银行名
+      'branch': '深圳支行',            // 银行支行
+      'status': 'on'                  // 状态，on: 已开启, off: 未开启
+    }, {
+      'id': 1,                        // id
+      'user_id': 1,                   // 用户id
+      'method': 'bankcard',             // 支付方式，alipay: 支付宝, wechat: 微信, bankcard: 银行卡
+      'accouont_no': '333333333333333',       // 账号或银行卡号
+      'account_name': '吴彦祖',        // 账户名
+      'qr_code_image': '',            // 支付宝或微信收款码图片id
+      'bank': '招商银行招商银行招商银行招商银行',              // 银行名
+      'branch': '深圳支行深圳支行深圳支行深圳支行深圳支行深圳支行',            // 银行支行
+      'status': 'on'                  // 状态，on: 已开启, off: 未开启
     }]
   }
 }
