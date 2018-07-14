@@ -9,8 +9,12 @@ export default (axios) => {
       return axios.get('/user/account')
     },
 
+    /**
+     * 用户支付方式
+     * @return {Promise<any>}
+     */
     payments() {
-      return Promise.resolve(require('./mock/user').payments)
+      return Promise.resolve(require('./mock/user').paymentMethods)
       return axios.get('/user/payment/method')
     },
 
@@ -34,6 +38,29 @@ export default (axios) => {
       return axios.get('/user/settings')
     },
 
+    /**
+     * 更改payment开启、关闭状态
+     * @param id
+     * @param status 'on' 'off' 开启/关闭
+     */
+    changePaymentStatus(id, status) {
+      return Promise.resolve({data: {}, code: 0})
+      return axios.patch(`/user/payment/method/${id}`, {
+        status
+      })
+    },
+
+    /**
+     * 增加支付方式
+     * @param payment
+     * @return {*}
+     */
+    addPaymentMethod(payment) {
+      console.log(payment)
+      return Promise.resolve({data: {}, code: 0})
+      return axios.patch(`/user/payment/method`, payment)
+    },
+
     // todo:balance接口需要重新设计下
     balance() {
       return Promise.resolve(require('./mock/user').balance)
@@ -50,10 +77,6 @@ export default (axios) => {
     otherUserInfo(id) {
       return axios.get(`users/${id}`)
       // return Promise.resolve(require('./mock/user').otherUser)
-    },
-
-    getUserPaymentMethods(id) {
-      return Promise.resolve(require('./mock/user').paymentMethods)
     },
   }
 }

@@ -370,7 +370,7 @@
               this.axios.user.otherUserInfo(this.counterpartyId).then(res => {
                 this.counterparty = res.data
                 this.merchant = this.counterparty
-                this.axios.user.getUserPaymentMethods(this.merchant.id).then(methods => {
+                this.axios.user.payments(this.merchant.id).then(methods => {
                   this.paymentMethods = methods.data
                   this.selectedMethod = this.paymentMethods[0]
                 })
