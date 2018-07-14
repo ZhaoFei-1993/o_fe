@@ -13,7 +13,7 @@
   <div class="user-payments">
     <template v-for="payment in payments">
       <i v-if="payment === 'wechat'" class="iconfont icon-wechat-round"></i>
-      <i v-if="payment === 'bank'" class="iconfont icon-bank"></i>
+      <i v-if="payment === 'bank'" class="iconfont icon-bankcard"></i>
       <i v-if="payment === 'alipay'" class="iconfont icon-alipay"></i>
     </template>
   </div>

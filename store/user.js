@@ -22,6 +22,9 @@ export default () => {
     SET_USER_SETTINGS(state, data) {
       state.settings = data
     },
+    SET_USER_QUALIFICATION(state, data) {
+      state.qualification = data
+    },
   }
   const actions = {
     fetchUserAccount({commit}) {
@@ -47,6 +50,11 @@ export default () => {
     fetchUserSettings({commit, state, rootState}) {
       return this.app.axios.user.settings().then(data => {
         commit('SET_USER_SETTINGS', data.data)
+      })
+    },
+    fetchUserQualification({commit, state, rootState}) {
+      return this.app.axios.user.qualification().then(data => {
+        commit('SET_USER_QUALIFICATION', data.data)
       })
     },
   }

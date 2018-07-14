@@ -1,3 +1,5 @@
+import faker from 'faker'
+
 export const otherUser = {
   data: {
     id: 11,
@@ -79,6 +81,17 @@ export const balance = {
     btc: '0',
     bch: '9999.99'
   }
+}
+
+export const constraint = {
+  data: {
+    cancel: faker.random.boolean(),
+    kfc_time: faker.random.boolean(),
+  }
+}
+
+export const qualification = {
+  data: ['bind_phone', 'kyc', 'one_deal']
 }
 
 export const userData = {

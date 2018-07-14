@@ -12,7 +12,7 @@
 
     .nav-item {
       display: inline-block;
-      margin: 0 15px;
+      margin: 0 15px 0 0;
     }
 
     .navbar-main {
@@ -45,20 +45,25 @@
         vertical-align: middle;
       }
 
-      #user-dropdown > a {
-        span {
-          padding-left: 30px;
-          position: relative;
-
-          &:before {
-            content: '';
-            /*background-image: url('~assets/img/icons/user.svg');*/
+      #user-dropdown {
+        .dropdown-menu {
+          padding: 0;
+        }
+        a.dropdown-item {
+          padding: 12px 20px 12px 0;
+          display: flex;
+          justify-content: center;
+          &:not(:last-child) {
+            border-bottom: 1px solid #eeeeee;
+          }
+          &:hover {
+            color: $brandGreen;
+          }
+          i {
+            display: inline-block;
             width: 24px;
-            height: 24px;
-            position: absolute;
-            left: 0px;
-            top: 0px;
-            background-size: contain;
+            margin-right: 10px;
+            text-align: center;
           }
         }
       }
@@ -115,21 +120,22 @@
         <b-nav-item :href="'//www.coinex.com?lang='+lang.lang">返回主站</b-nav-item>
       </b-navbar-nav>
       <b-navbar-nav class="ml-auto">
-        <div v-if="user.data">
+        <div v-if="user.account">
+          <b-link class="mr-10 c-black" to="/orders">订单</b-link>
+          <!--TODO 暂时不做-->
+          <!--<b-nav-item-dropdown id="user-dropdown" text="订单">-->
 
-          <b-nav-item-dropdown id="user-dropdown" text="订单">
-            <b-dropdown-item>示例订单</b-dropdown-item>
-          </b-nav-item-dropdown>
+            <!--<b-dropdown-item v-for="order in orders">示例订单</b-dropdown-item>-->
+          <!--</b-nav-item-dropdown>-->
           <span style="color: #d5d5d5">|</span>
-          <button class="message-button"><i class="iconfont icon-message"></i></button>
-          <b-nav-item-dropdown id="user-dropdown" :text="'Hi, '+simplifyUserName(user.data.username)">
+          <button class="message-button" hidden><i class="iconfont icon-message"></i></button>
+          <b-nav-item-dropdown id="user-dropdown" :text="'Hi, '+simplifyUserName(user.account.name)">
             <!--<b-dropdown-item :href="accountSetting">账户设置</b-dropdown-item>-->
-            <b-dropdown-item><i class="iconfont icon-manage-account"></i> OTC账户</b-dropdown-item>
-            <b-dropdown-item><i class="iconfont icon-manage-item"></i> 广告管理</b-dropdown-item>
-            <b-dropdown-item><i class="iconfont icon-apply-merchant"></i> 商家申请</b-dropdown-item>
+            <b-dropdown-item to="/wallet"><i class="iconfont icon-manage-account"></i> OTC账户</b-dropdown-item>
+            <b-dropdown-item to="/items"><i class="iconfont icon-manage-item"></i> 广告管理</b-dropdown-item>
+            <b-dropdown-item to="/my/merchant"><i class="iconfont icon-apply-merchant"></i> 商家申请</b-dropdown-item>
             <b-dropdown-item><i class="iconfont icon-manage-ticket"></i> 工单系统</b-dropdown-item>
-            <b-dropdown-divider></b-dropdown-divider>
-            <b-dropdown-item @click="signOut">退出登录</b-dropdown-item>
+            <b-dropdown-item @click="signOut"><i class="iconfont icon-logout"></i>退出登录</b-dropdown-item>
           </b-nav-item-dropdown>
 
         </div>
@@ -166,7 +172,7 @@
 
   export default {
     head: {
-      link: [{rel: 'stylesheet', href: '//at.alicdn.com/t/font_739076_bnv1cw29f6q.css'}]
+      link: [{rel: 'stylesheet', href: '//at.alicdn.com/t/font_739076_fglb669agm4.css'}]
     },
     components: {},
 
@@ -175,8 +181,8 @@
         attentionModelShowing: null,
         attention: [],
         activeAttentionIndex: 0,
-        loginPage: `${loginPage}?next=${encodeURIComponent(webDomain + this.$route.fullPath)}`,
-        registerPage: signupPage,
+        loginPage: `${loginPage}?redirect=${encodeURIComponent(webDomain + this.$route.fullPath)}`,
+        registerPage: `${signupPage}?redirect=${encodeURIComponent(webDomain + this.$route.fullPath)}`,
       }
     },
 
@@ -199,9 +205,8 @@
       },
     },
 
-    watch: {},
     beforeMount() {
-      // this.$store.dispatch('initUserData')
+      this.$store.dispatch('fetchUserAccount')
     },
 
     methods: {
