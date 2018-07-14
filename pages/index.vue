@@ -209,7 +209,7 @@
             <span class="col-narrow text-right fz-12 c-6f">{{item.coin_amount+' '+selectedCoin}}</span>
             <span class="col-wide text-right pr-60 fz-12 c-6f">{{item.min_deal_cash_amount+ '-'+ item.max_deal_cash_amount + 'CNY'}}</span>
             <span class='payment col-narrow'>
-              <UserPayments :payments="item.payment_methods || ['wechat','alipay','bank']"></UserPayments>
+              <UserPayments :payments="item.payment_methods || ['wechat','alipay','bankcard']"></UserPayments>
             </span>
             <span :class="['sort-price col-wide pr-60 text-right',sortPrice]">{{item.price + ' CNY'}}</span>
             <span class="col-narrow">
@@ -340,7 +340,11 @@
           if (constraint.cancel || constraint.kyc_time) {
             this.$showDialog({
               title: '交易限制',
-              content: constraint.cancel ? (<div>您今天累计取消超过 3 次订单，被冻结交易功能。<b-link href="#TODO">了解更多交易规则。</b-link></div>):(<div>您今天累计取消超过 3 次订单，被冻结交易功能。<b-link href="#TODO">去完成实名认证。</b-link></div>),
+              content: constraint.cancel ? (<div>您今天累计取消超过 3 次订单，被冻结交易功能。
+                <b-link href="#TODO">了解更多交易规则。</b-link>
+              </div>) : (<div>您今天累计取消超过 3 次订单，被冻结交易功能。
+                <b-link href="#TODO">去完成实名认证。</b-link>
+              </div>),
               onOk: () => {
                 this.axios.order.updatePayMethod(this.order.id, this.selectedMethod).then(response => {
                   this.axios.order.confirmPay(this.order.id)
