@@ -176,6 +176,11 @@ const utils = {
       }
     }
   },
+  /**
+   * 将放在一起的validator 和 message 分开（放在一起是方便管理，分开是方便使用）
+   * @param validationConfig
+   * @return {{validations: {}, invalidMessages: {}}}
+   */
   processValidationConfig(validationConfig) {
     const validations = {}
     const invalidMessages = {}
@@ -188,7 +193,8 @@ const utils = {
 
     return {
       validations,
-      invalidMessages
+      invalidMessages,
+      messages: invalidMessages,
     }
   },
   /**

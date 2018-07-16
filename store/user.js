@@ -46,13 +46,13 @@ export default () => {
     fetchUserPayments({commit, state, rootState}) {
       return this.app.axios.user.payments().then(data => {
         // 将服务器返回的payments数据丰富化
-        data.data.data.forEach(payment => {
+        data.data.forEach(payment => {
           const paymentOption = rootState.constant.PAYMENT_MAP[payment.method]
           payment.title = paymentOption.text
           payment.icon = paymentOption.icon
           payment.isActive = paymentOption.status === rootState.constant.PAYMENT_STATUS.ON
         })
-        commit('SET_USER_PAYMENTS', data.data.data)
+        commit('SET_USER_PAYMENTS', data.data)
       })
     },
     fetchUserBalance({commit, state, rootState}) {
