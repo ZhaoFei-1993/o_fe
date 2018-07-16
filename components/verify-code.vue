@@ -4,7 +4,6 @@
     .error-message {
       width: 500px;
       margin: 4px auto 0 auto;
-      padding-left: 70px;
     }
 
     .code-input-group {
@@ -35,6 +34,7 @@
           <span>发送验证码</span> {{emailTimer ? `(${emailCountdown})` : ''}}
         </b-btn>
       </b-input-group>
+      <EMsgs :result="$v" :msgs="invalidMessages" keyName="email"/>
     </b-form-group>
 
     <b-form-group v-if="needGoogle && codeType === constant.VERIFY_CODE_TYPE.GOOGLE"
@@ -42,6 +42,7 @@
       <b-input-group class="code-input-group">
         <b-form-input class="code-input" :value="google" @input="onGoogleInput" size="lg"></b-form-input>
       </b-input-group>
+      <EMsgs :result="$v" :msgs="invalidMessages" keyName="google"/>
     </b-form-group>
 
     <b-form-group v-if="needSms && codeType === constant.VERIFY_CODE_TYPE.SMS"
@@ -52,6 +53,7 @@
           <span>发送验证码</span> {{smsTimer ? `(${smsCountdown})` : ''}}
         </b-btn>
       </b-input-group>
+      <EMsgs :result="$v" :msgs="invalidMessages" keyName="sms"/>
     </b-form-group>
 
     <!--sms、google都存在的情况下才可以切换-->
