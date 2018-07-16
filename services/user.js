@@ -28,6 +28,11 @@ export default (axios) => {
       return axios.get('/user/settings')
     },
 
+    qualification() {
+      return Promise.resolve(require('./mock/user').qualification)
+      return axios.get('/user/qualification')
+    },
+
     setSettings() {
       return Promise.resolve(require('./mock/user').settings)
       return axios.get('/user/settings')
@@ -77,6 +82,10 @@ export default (axios) => {
     // todo:balance接口需要重新设计下
     balance() {
       return Promise.resolve(require('./mock/user').balance)
+    },
+
+    dynamicConstraint(){
+      return Promise.resolve(require('./mock/user').constraint)
     },
 
     /**
