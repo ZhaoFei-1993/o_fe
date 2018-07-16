@@ -172,7 +172,7 @@
 
   export default {
     head: {
-      link: [{rel: 'stylesheet', href: '//at.alicdn.com/t/font_739076_fglb669agm4.css'}]
+      link: [{rel: 'stylesheet', href: '//at.alicdn.com/t/font_739076_qzmdkhyvrr.css'}]
     },
     components: {},
 
