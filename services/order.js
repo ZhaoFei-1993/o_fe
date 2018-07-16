@@ -87,5 +87,8 @@ export default (axios) => {
     cancelAppeal(id) {
       return axios.delete(`/orders/${id}/appeal`)
     },
+    cancelOrder(id) {
+      return axios.delete(`/order/${id}/cancel`)
+    }
   }
 }

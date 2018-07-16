@@ -90,10 +90,10 @@
                   <i class="iconfont icon-message"></i>
                 </div>
                 <div class="detail-btn-wrapper">
-                  <b-btn size="xs" variant="gradient-yellow" class="detail-btn">我已付款</b-btn>
+                  <b-btn size="xs" variant="gradient-yellow" class="detail-btn" @click="confirmPay(item)">我已付款</b-btn>
                 </div>
                 <div class="detail-btn-wrapper">
-                  <b-btn size="xs" variant="outline-green" class="detail-btn">取消订单</b-btn>
+                  <b-btn size="xs" variant="outline-green" class="detail-btn" @click="cancelOrder(item)">取消订单</b-btn>
                 </div>
               </div>
             </div>
@@ -261,6 +261,42 @@
       ...mapState(['user']),
     },
     methods: {
+      confirmPay(item) {
+        this.$showDialog({
+          hideHeader: true,
+          title: '确认付款',
+          content: (<div>确认您已向买方付款？<span class="c-red">未付款点击“我已付款”将被冻结账户。</span></div>),
+          onOk: () => {
+            this.axios.order.updatePayMethod(item.id, item._payment_method).then(response => {
+              this.axios.order.confirmPay(item.id)
+            })
+          }
+        })
+      },
+      cancelOrder(item) {
+        this.$showDialog({
+          hideHeader: true,
+          title: '取消订单',
+          content: (<div>确认取消订单？<span class="c-red">如您已向卖家付款，取消订单您将会损失付款资金。</span></div>),
+          onOk: () => {
+            this.axios.order.cancelOrder(item.id).then(response => {
+              console.log(response)
+            })
+          }
+        })
+      },
+      confirmReceipt(item) {
+        this.$showDialog({
+          hideHeader: true,
+          title: '确认收款',
+          content: (<div>确认已收到该笔款项？<span class="c-red">如您没有收到买家付款，确认收款后，放行的数字货币将无法追回。</span></div>),
+          onOk: () => {
+            this.axios.order.confirmReceipt(item.id).then(response => {
+              console.log(response)
+            })
+          }
+        })
+      },
       renderOrderList() {
         this.axios.order.getOrderList(this.queryParams)
           .then((res) => {
