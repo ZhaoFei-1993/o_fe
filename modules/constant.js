@@ -67,3 +67,8 @@ export const ORDER_STATUS = {
     value: 'closed',
   },
 }
+
+export const PRICING_TYPE = {
+  FLOAT: 'float',
+  FIXED: 'fixed'
+}
