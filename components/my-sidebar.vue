@@ -86,9 +86,6 @@
     computed: {
       ...mapState(['user'])
     },
-    beforeMount() {
-      this.$store.dispatch('fetchUserAccount')
-    },
     methods: {},
   }
 </script>

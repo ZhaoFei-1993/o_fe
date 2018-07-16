@@ -275,7 +275,7 @@
         return Object.values(ORDER_STATUS).find(s => s.value === this.order.status).text
       },
       isBuySide() {
-        return this.order.user_side === 'BUY' ? (this.user.id === this.order.user_id) : (this.user.id !== this.order.user_id)
+        return this.order.user_side === 'buy' ? (this.user.id === this.order.user_id) : (this.user.id !== this.order.user_id)
       },
       isMaker() {
         return this.merchant.id === this.user.id
@@ -370,7 +370,7 @@
               this.axios.user.otherUserInfo(this.counterpartyId).then(res => {
                 this.counterparty = res.data
                 this.merchant = this.counterparty
-                this.axios.user.getUserPaymentMethods(this.merchant.id).then(methods => {
+                this.axios.user.payments(this.merchant.id).then(methods => {
                   this.paymentMethods = methods.data
                   this.selectedMethod = this.paymentMethods[0]
                 })

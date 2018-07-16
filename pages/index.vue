@@ -121,18 +121,19 @@
               font-size: 14px;
               line-height: 22px;
             }
+            .btn-order-disabled {
+              width: 100px;
+              height: 26px;
+              border-radius: 100px;
+              font-size: 14px;
+              line-height: 22px;
+              background-color: transparent;
+              border-color: #cbcbcb;
+              color: #cbcbcb;
+            }
             .payment {
               i {
                 margin: 0 4px;
-              }
-              .icon-bank {
-                color: $brandYellow;
-              }
-              .icon-alipay {
-                color: rgb(0, 174, 239);
-              }
-              .icon-wechat-round {
-                color: rgb(89, 170, 0);
               }
             }
           }
@@ -169,16 +170,16 @@
             <div class="side"><i class="iconfont icon-arrow-down"></i>购买</div>
             <div class="coin-types">
               <span :class="['coin-type', {active:coin===selectedCoin}]" v-for="coin in constant.COIN_TYPES"
-                    @click="showItems('BUY',coin)">{{coin}}</span>
+                    @click="showItems('buy',coin)">{{coin}}</span>
             </div>
           </div>
         </div>
         <div class="col-6">
-          <div :class="['choice-block sell', {active:'SELL'===selectedSide}]">
+          <div :class="['choice-block sell', {active:'sell'===selectedSide}]">
             <div class="side"><i class="iconfont icon-arrow-up"></i>出售</div>
             <div class="coin-types">
               <span :class="['coin-type', {active:coin===selectedCoin}]" v-for="coin in constant.COIN_TYPES"
-                    @click="showItems('SELL',coin)">{{coin}}</span>
+                    @click="showItems('sell',coin)">{{coin}}</span>
             </div>
           </div>
         </div>
@@ -189,12 +190,12 @@
           <span>没有合适的？<a href="/items/create">自己发布广告&gt;</a></span>
         </div>
         <div class="list-header">
-          <span class="col-narrow">{{selectedSide==='BUY'?'卖家':'买家'}}</span>
+          <span class="col-narrow">{{selectedSide==='buy'?'卖家':'买家'}}</span>
           <span class="col-narrow">30天成单/完成率</span>
           <span class="col-narrow">数量</span>
           <span class="col-wide">限额</span>
           <b-form-select class='select-payment col-narrow' v-model="selectedPayment"
-                         :options="constant.PAYMENT_OPTIONS"></b-form-select>
+                         :options="constant.PAYMENT_OPTIONS" @change="filterPayment"></b-form-select>
           <span :class="['sort-price col-wide',sortPrice]">单价</span>
           <span class="col-narrow">操作</span>
         </div>
@@ -208,65 +209,82 @@
             <span class="col-narrow text-right fz-12 c-6f">{{item.coin_amount+' '+selectedCoin}}</span>
             <span class="col-wide text-right pr-60 fz-12 c-6f">{{item.min_deal_cash_amount+ '-'+ item.max_deal_cash_amount + 'CNY'}}</span>
             <span class='payment col-narrow'>
-              <i class="iconfont icon-bank"></i>
-              <i class="iconfont icon-alipay"></i>
-              <i class="iconfont icon-wechat-round"></i>
+              <UserPayments :payments="item.payment_methods || ['wechat','alipay','bankcard']"></UserPayments>
             </span>
             <span :class="['sort-price col-wide pr-60 text-right',sortPrice]">{{item.price + ' CNY'}}</span>
             <span class="col-narrow">
+              <template v-if="user && user.id ===item.user_id">
+                <button class="btn btn-order-disabled" :id="'button-order-'+item.id" v-b-tooltip.hover title="不能与自己交易"> {{(selectedSide==='buy'?'购买':'出售')+ selectedCoin}} </button>
+              </template>
               <button
-                :class="['btn btn-order',{'btn-outline-yellow':selectedSide==='BUY','btn-outline-green':selectedSide==='SELL'}]"
+                v-else-if="qualified(item)"
+                :class="['btn btn-order',{'btn-outline-yellow':selectedSide==='buy','btn-outline-green':selectedSide==='sell'}]"
                 @click="placeOrder(item)"
               >
-              {{(selectedSide==='BUY'?'购买':'出售')+ selectedCoin}}
-            </button>
+                {{(selectedSide==='buy'?'购买':'出售')+ selectedCoin}}
+              </button>
+              <template v-else>
+                <button class="btn btn-order-disabled" :id="'button-order-'+item.id"> {{(selectedSide==='buy'?'购买':'出售')+ selectedCoin}} </button>
+                <b-popover triggers="hover click" :target="'button-order-'+item.id"
+                           title="商家交易限制">
+                  <ol>
+                    <li v-if="true||item.qualification">交易方必须完成过1次交易</li>
+                    <li v-if="true||item.qualification">交易方必须通过手机认证</li>
+                    <li v-if="true||item.qualification">交易方必须通过实名认证</li>
+                  </ol>
+                </b-popover>
+              </template>
             </span>
           </div>
         </div>
       </div>
     </div>
     <PlaceOrderModal
-      v-if="selectedItem"
+      v-if="selectedItem&&user.balance"
       :item="selectedItem"
-      :balance="userBalance"
+      :balance="user.balance"
       v-model="showPlaceOrderModal"
     ></PlaceOrderModal>
   </div>
 </template>
 
 <script>
+  import Vue from 'vue'
   import {mapState} from 'vuex'
   import PlaceOrderModal from '~/components/place-order-modal'
+  import UserPayments from '~/components/user-payments'
 
   export default {
     components: {
       PlaceOrderModal,
+      UserPayments,
     },
     layout: 'fullwidth',
     data() {
       return {
         message: 'Hello OTC',
         selectedCoin: this.$route.query.coin || 'BTC',
-        selectedSide: this.$route.query.side || 'BUY',
+        selectedSide: this.$route.query.side || 'buy',
         selectedPayment: this.$route.query.payment || 'ALL',
-        sortPrice: this.$route.query.sort || this.selectedSide === 'BUY' ? 'ASC' : 'DESC',
+        sortPrice: this.$route.query.sort || this.selectedSide === 'buy' ? 'ASC' : 'DESC',
         items: [],
         selectedItem: null,
         showPlaceOrderModal: false,
         busy: false,
-        userBalance: {
-          BTC: 1000,
-          BCH: 1000,
-          ETH: 1000,
-          USDT: 1000,
-        },
       }
     },
     computed: {
-      ...mapState(['constant']),
+      ...mapState(['constant', 'user']),
     },
     beforeMount() {
-      this.initItems()
+      this.$store.dispatch('fetchUserQualification')
+      this.getItems()
+      this.requestItems = setInterval(() => {
+        this.getItems()
+      }, 5000)
+    },
+    beforeDestroy() {
+      clearInterval(this.requestItems)
     },
     methods: {
       showItems(side, coin) {
@@ -276,21 +294,69 @@
           query: {
             side,
             coin,
+            payment: this.selectedPayment,
           },
         })
+        this.getItems()
       },
-      initItems() {
+      getItems() {
         this.busy = true
-        this.axios.item.getItems({side: this.selectedSide, coin_type: this.selectedCoin}).then(response => {
+        this.axios.item.getItems({
+          side: this.selectedSide,
+          coin_type: this.selectedCoin,
+          payment_method: this.selectedPayment === 'ALL' ? undefined : this.selectedPayment.toLowerCase(),
+        }).then(response => {
           this.busy = false
           this.items = response.data.data.slice(0, 30)
         })
       },
       placeOrder(item) {
-        this.selectedItem = item
-        this.showPlaceOrderModal = true
-        this.initItems()
+        this.verifyDynamicConstraint().then(res => {
+          this.$store.dispatch('fetchUserBalance').then(_ => {
+            this.selectedItem = item
+            this.showPlaceOrderModal = true
+          })
+        })
       },
+      filterPayment(payment) {
+        this.$router.replace({
+          query: {
+            side: this.selectedSide,
+            coin: this.selectedCoin,
+            payment,
+          },
+        })
+        Vue.nextTick(() => {
+          this.getItems()
+        })
+      },
+      qualified(item) {
+        // TODO 后端返回每个广告的条件
+        return Math.random() > 0.5
+      },
+      verifyDynamicConstraint() {
+        return this.axios.user.dynamicConstraint().then(response => {
+          const constraint = response.data
+          if (constraint.cancel || constraint.kyc_time) {
+            this.$showDialog({
+              title: '交易限制',
+              content: constraint.cancel ? (<div>您今天累计取消超过 3 次订单，被冻结交易功能。
+                <b-link href="#TODO">了解更多交易规则。</b-link>
+              </div>) : (<div>您今天累计取消超过 3 次订单，被冻结交易功能。
+                <b-link href="#TODO">去完成实名认证。</b-link>
+              </div>),
+              onOk: () => {
+                this.axios.order.updatePayMethod(this.order.id, this.selectedMethod).then(response => {
+                  this.axios.order.confirmPay(this.order.id)
+                })
+              }
+            })
+            return Promise.reject(constraint)
+          } else {
+            return Promise.resolve()
+          }
+        })
+      }
     },
   }
 </script>
