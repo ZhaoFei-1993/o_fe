@@ -275,7 +275,7 @@
         return Object.values(ORDER_STATUS).find(s => s.value === this.order.status).text
       },
       isBuySide() {
-        return this.order.user_side === 'BUY' ? (this.user.id === this.order.user_id) : (this.user.id !== this.order.user_id)
+        return this.order.user_side === 'buy' ? (this.user.id === this.order.user_id) : (this.user.id !== this.order.user_id)
       },
       isMaker() {
         return this.merchant.id === this.user.id

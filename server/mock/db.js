@@ -38,7 +38,7 @@ module.exports = () => {
       id: i,
       user_id: randUser.id,
       user: randUser,
-      side: faker.random.arrayElement(['BUY', 'SELL']),
+      side: faker.random.arrayElement(['buy', 'sell']),
       coin_type: faker.random.arrayElement(['BTC', 'BCH', 'ETH', 'USDT']), // 数字货币币种
       cash_type: faker.random.arrayElement(['CNY']), // 法币货币币种
       pricing_type: faker.random.arrayElement([1, 2]),
@@ -62,7 +62,7 @@ module.exports = () => {
       item_id: faker.random.number(), // 可能广告不存在，顺便测试错误吧
       merchant_id: faker.random.number({max: 1000}),
       user_id: faker.random.number({max: 1000}),
-      user_side: faker.random.arrayElement(['BUY', 'SELL']),
+      user_side: faker.random.arrayElement(['buy', 'sell']),
       coin_type: faker.random.arrayElement(['BTC', 'BCH', 'ETH', 'USDT']),
       coin_amount: faker.random.number(),
       cash_type: faker.random.arrayElement(['CNY']),
