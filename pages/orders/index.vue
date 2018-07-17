@@ -12,7 +12,7 @@
           </template>
           <template slot="_order_type" slot-scope="{ item }">
             <!-- 自定义的属性 -->
-            <span class="order-type" :style="{ color: item._order_type === 'buy' ? '#ffbc32' : '#52cbca' }">
+            <span :class="['order-type', item._order_type === 'buy' ? 'order-type-buy' : 'order-type-sell']">
               {{ item._order_type === 'buy' ? '买' : '卖' }}
             </span>
           </template>
@@ -221,7 +221,7 @@
       }
       const [orderData, paymentData] = await Promise.all([
         app.axios.order.getOrderList(queryParams),
-        app.axios.user.getUserPaymentMethods(merchant.id),
+        app.axios.user.payments(merchant.id),
       ])
       let orderTableItems = []
       let paymentMethods = []
@@ -367,6 +367,12 @@
         text-align: center;
         font-size: 12px;
         line-height: 22px;
+      }
+      .order-type-buy {
+        color: #ffbc32;
+      }
+      .order-type-sell {
+        color: #52cbca;
       }
       .detail {
         display: inline-block;
