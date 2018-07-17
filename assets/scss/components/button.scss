@@ -135,9 +135,28 @@ $background-red: #e45555;
 }
 
 .btn-plain {
-  padding: 0 2px;
+  padding: 0;
   color: $gray;
   background-color: transparent;
+  vertical-align: unset;
+
+  &:hover {
+    color: $brandGreen;
+  }
+}
+
+.btn-plain-yellow {
+  @extend .btn-plain;
+  color: $brandYellow;
+
+  &:hover {
+    color: $brandYellow;
+  }
+}
+
+.btn-plain-green {
+  @extend .btn-plain;
+  color: $brandGreen;
 
   &:hover {
     color: $brandGreen;
