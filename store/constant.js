@@ -5,9 +5,10 @@ import {
   PAYMENT_MAP,
   PAYMENT_TYPES,
   COUNTERPARTY_LIMIT_OPTIONS,
-  KYC_STATUS_PASS,
+  KYC_STATUS,
   VERIFY_CODE_TYPE,
   PRICING_TYPE,
+  MERCHANT_STATUS,
 } from '~/modules/constant'
 
 /**
@@ -33,8 +34,9 @@ export default () => {
     PAYMENT_MAP,
     PAYMENT_TYPES,
     COUNTERPARTY_LIMIT_OPTIONS,
-    KYC_STATUS_PASS,
+    KYC_STATUS,
     VERIFY_CODE_TYPE,
+    MERCHANT_STATUS,
     bankOptions: [],                    // 银行列表
     appealReasonOptions: [],            // 申诉原因列表
     cancelMerchantReasonOptions: [],    // 取消商家身份原因列表
