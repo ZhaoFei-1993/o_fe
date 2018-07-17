@@ -149,14 +149,7 @@ export const coinexBalance = {
 export const paymentMethods = {
   code: 0,
   data: [{
-    'method': 'bankcard',             // 支付方式，alipay: 支付宝, wechat: 微信, bankcard: 银行卡
-    'account_no': '1234567890978675645',       // 账号或银行卡号
-    'account_name': '吴孟达',        // 账户名
-    'qr_code_image': '',
-    'bank': '招商银行',              // 银行名
-    'branch': '深圳支行',            // 银行支行
-    'status': 'on',                 // 状态，on: 已开启, off: 未开启
-  }, {
+    id: 0,
     'method': 'alipay',             // 支付方式，alipay: 支付宝, wechat: 微信, bankcard: 银行卡
     'account_no': 'wuyanzu',       // 账号或银行卡号
     'account_name': '吴彦祖',        // 账户名
@@ -165,6 +158,16 @@ export const paymentMethods = {
     'branch': '',            // 银行支行
     'status': 'on',                 // 状态，on: 已开启, off: 未开启
   }, {
+    id: 1,
+    'method': 'bankcard',             // 支付方式，alipay: 支付宝, wechat: 微信, bankcard: 银行卡
+    'account_no': '1234567890978675645',       // 账号或银行卡号
+    'account_name': '吴孟达',        // 账户名
+    'qr_code_image': '',
+    'bank': '招商银行',              // 银行名
+    'branch': '深圳支行',            // 银行支行
+    'status': 'on',                 // 状态，on: 已开启, off: 未开启
+  }, {
+    id: 2,
     'method': 'wechat',             // 支付方式，alipay: 支付宝, wechat: 微信, bankcard: 银行卡
     'account_no': '1234567890978675645',       // 账号或银行卡号
     'account_name': '吴晓波',        // 账户名
