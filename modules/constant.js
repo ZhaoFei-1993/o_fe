@@ -43,7 +43,9 @@ export const VERIFY_CODE_TYPE = {
   SMS: 'sms'
 }
 
-export const KYC_STATUS_PASS = 'pass'
+export const KYC_STATUS = {
+  PASS: 'pass'
+}
 
 export const ORDER_STATUS = {
   CREATED: {
@@ -68,7 +70,16 @@ export const ORDER_STATUS = {
   },
 }
 
+// 定价方式: 浮动定价 固定定价
 export const PRICING_TYPE = {
   FLOAT: 'float',
   FIXED: 'fixed'
+}
+
+// 商家认证状态
+export const MERCHANT_STATUS = {
+  CREATED: 'created',
+  PASS: 'pass',
+  NO: 'no',
+  CANCEL: 'cancel',
 }

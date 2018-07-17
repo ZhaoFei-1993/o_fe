@@ -189,7 +189,7 @@ export default {
         qr_code_image: '',
       },
       modalShowing: false,
-      isPaymentEditing: null,     // 是否正在被编辑payment
+      isPaymentEditing: false,     // 是否正在被编辑payment
 
       bankList: [{
         text: '中国银行',

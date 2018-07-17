@@ -23,6 +23,29 @@ export default (axios) => {
       return axios.get('/user/merchant')
     },
 
+    /**
+     * 申请成为商家
+     * @param wechat
+     * @return {*}
+     */
+    applyMerchant({wechat}) {
+      require('./mock/user').merchant.data.status = 'created'
+      return Promise.resolve(require('./mock/user').merchant)
+      return axios.post('/user/merchant', {
+        wechat
+      })
+    },
+
+    /**
+     * 根据参数不同，可用于取消商家认证申请(还未成为商家)、取消商家身份(已经成为商家)
+     * 暂时后台只做了取消认证申请 jeff 20180716
+     */
+    cancelMerchant() {
+      require('./mock/user').merchant.data.status = 'cancel'
+      return Promise.resolve({data: {}, code: 0})
+      return axios.delete('/user/merchant')
+    },
+
     settings() {
       return Promise.resolve(require('./mock/user').settings)
       return axios.get('/user/settings')

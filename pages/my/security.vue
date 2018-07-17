@@ -45,8 +45,8 @@
       <b-btn slot="action" variant="outline-green" size="xs" href="//www.coinex.com/my/info/security" target="_blank">设置</b-btn>
     </MyInfoItem>
     <MyInfoItem title="实名认证">
-      <p slot="content">{{userData.kyc_status === constant.KYC_STATUS_PASS ? '已认证' : '未认证'}}</p>
-      <b-btn slot="action" v-if="userData.kyc_status !== constant.KYC_STATUS_PASS" variant="outline-green" size="xs" href="//www.coinex.com/my/info/auth/realname" target="_blank">认证</b-btn>
+      <p slot="content">{{userData.kyc_status === constant.KYC_STATUS.PASS ? '已认证' : '未认证'}}</p>
+      <b-btn slot="action" v-if="userData.kyc_status !== constant.KYC_STATUS.PASS" variant="outline-green" size="xs" href="//www.coinex.com/my/info/auth/realname" target="_blank">认证</b-btn>
     </MyInfoItem>
   </CBlock>
 </template>
