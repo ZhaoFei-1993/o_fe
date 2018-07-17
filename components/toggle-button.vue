@@ -40,7 +40,6 @@
       top: 0;
       left: 0;
       display: block;
-      z-index: 20;
       width: $slider-width;
       height:$slider-width;
       transition: transform .3s;
