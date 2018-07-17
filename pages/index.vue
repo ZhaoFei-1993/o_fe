@@ -40,6 +40,7 @@
             line-height: 50px;
             width: 120px;
             color: white;
+            padding-right: 16px;
             background-image: linear-gradient(to left, #ffe070, #ffb900);
             font-size: 22px;
             i.iconfont {

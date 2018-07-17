@@ -5,7 +5,7 @@ export default (axios) => {
      * @return {Promise<void>}
      */
     account() {
-      return Promise.resolve(require('./mock/user').account)
+      // return Promise.resolve(require('./mock/user').account)
       return axios.get('/user/account')
     },
 
@@ -66,6 +66,15 @@ export default (axios) => {
     },
 
     /**
+     * 确认用户昵称
+     * @param name
+     * @return {*}
+     */
+    updateName(name) {
+      return axios.patch(`/user/account`, {name})
+    },
+
+    /**
      * 更新payment
      * @param payment
      * @return {*}
@@ -84,7 +93,7 @@ export default (axios) => {
       return Promise.resolve(require('./mock/user').balance)
     },
 
-    dynamicConstraint(){
+    dynamicConstraint() {
       return Promise.resolve(require('./mock/user').constraint)
     },
 
