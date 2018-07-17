@@ -189,7 +189,7 @@ export default {
         qr_code_image: '',
       },
       modalShowing: false,
-      isPaymentEditing: null,     // 是否正在被编辑payment
+      isPaymentEditing: false,     // 是否正在被编辑payment
 
       bankList: [{
         text: '中国银行',
@@ -210,11 +210,9 @@ export default {
 
       if (this.form.method === PAYMENT_TYPES.ALIPAY || this.form.method === PAYMENT_TYPES.WECHAT) {
         return this.utils.processValidationConfig(Object.assign(baseValidations, qrcodeValidations))
-      }
-      else if (this.form.method === PAYMENT_TYPES.BANKCARD) {
+      } else if (this.form.method === PAYMENT_TYPES.BANKCARD) {
         return this.utils.processValidationConfig(Object.assign(baseValidations, bankValidations))
-      }
-      else {
+      } else {
         return this.utils.processValidationConfig(baseValidations)
       }
     }
@@ -263,7 +261,7 @@ export default {
     clearForm() {
       // 清空之前的值
       const form = Object.assign({}, this.form)
-      ;['method', 'account_name', 'bank', 'branch', 'account_no', 'qr_code_image'].forEach((key)=> {
+      ;['method', 'account_name', 'bank', 'branch', 'account_no', 'qr_code_image'].forEach((key) => {
         form[key] = ''
       })
       this.form = form

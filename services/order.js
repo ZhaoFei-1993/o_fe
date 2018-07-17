@@ -3,6 +3,10 @@ export default (axios) => {
     createOrder(payload) {
       return axios.post('/orders', payload)
     },
+    getOrderList(query) {
+      return Promise.resolve(require('./mock/order').orderList)
+      return axios.get('/orders', query)
+    },
     getOrderById(id) {
       return axios.get(`/orders/${id}`)
     },
@@ -27,5 +31,8 @@ export default (axios) => {
     cancelAppeal(id) {
       return axios.delete(`/orders/${id}/appeal`)
     },
+    cancelOrder(id) {
+      return axios.delete(`/order/${id}/cancel`)
+    }
   }
 }

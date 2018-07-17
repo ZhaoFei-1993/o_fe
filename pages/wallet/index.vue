@@ -109,10 +109,11 @@
   import cBlock from '~/components/c-block'
   import Blank from '~/components/blank'
   import FundPie from './_c/fund-pie'
+  import { mapState } from 'vuex'
 
   const limit = 10
 
-export default {
+  export default {
     data() {
       return {
         filterOperationType: 'all',
@@ -161,7 +162,6 @@ export default {
         totalCoin: '-',
         selectedCoin: 'BCH',
         priceCoins: ['BCH', 'BTC', 'ETH', 'USDT'],
-        otcBalance: [],
         assetsTableFields: {
           coin_type: {
             label: '币种',
@@ -257,36 +257,21 @@ export default {
             sortable: false,
           },
         },
-        coinexBalance: [],
       }
     },
-    async asyncData({ app, query, req, error }) {
-      const [otcBalanceData, historyData, coinexBalanceData] = await Promise.all([
-        app.axios.balance.otcBalance(),
+    fetch({ store }) {
+      store.dispatch('fetchOtcBalance')
+      store.dispatch('fetchCoinexBalance')
+    },
+    async asyncData({ app, query, req, error, store }) {
+      const [ historyData ] = await Promise.all([
         app.axios.balance.history({ page: 1, limit }),
-        app.axios.balance.coinexBalance(),
       ])
-      const pieDatas = []
-      let otcBalance = []
       let assetHistoryItems = []
-      let coinexBalance = []
-      let totalBalance = '0'
       let assetHistoryPage = {
         currentPage: 0,
         totalRows: 0,
         perPage: 0,
-      }
-      if (otcBalanceData.code === 0 && otcBalanceData.data) {
-        otcBalanceData.data.forEach((item, index) => {
-          pieDatas.push({
-            name: item.coin_type,
-            y: +item.total,
-            colorIndex: index,
-            virtual: false,
-          })
-          otcBalance = otcBalanceData.data
-          totalBalance += (+item.total)
-        })
       }
       if (historyData.code === 0 && historyData.data) {
         const { data, curr_page: currentPage, total: totalRows } = historyData.data
@@ -302,17 +287,10 @@ export default {
           }
         })
       }
-      if (coinexBalanceData.code === 0 && coinexBalanceData.data) {
-        coinexBalance = coinexBalanceData.data
-      }
   
       return {
-        pieDatas,
-        totalBalance,
-        otcBalance,
         assetHistoryItems,
         assetHistoryPage,
-        coinexBalance,
       }
     },
     components: {
@@ -320,6 +298,34 @@ export default {
       FundPie,
       Blank,
       ExtendedInputNumber,
+    },
+    computed: {
+      ...mapState(['balance']),
+      otcBalance() {
+        if (this.balance.otcBalance) {
+          const pieDatas = []
+          let totalBalance = 0
+          this.balance.otcBalance.forEach((item, index) => {
+            pieDatas.push({
+              name: item.coin_type,
+              y: +item.total,
+              colorIndex: index,
+              virtual: false,
+            })
+            totalBalance += (+item.total)
+          })
+          this.pieDatas = pieDatas
+          this.totalBalance = `${totalBalance}`
+          return this.balance.otcBalance
+        }
+        return []
+      },
+      coinexBalance() {
+        if (this.balance.coinexBalance) {
+          return this.balance.coinexBalance
+        }
+        return []
+      },
     },
     methods: {
       onInputAmount(val) {
