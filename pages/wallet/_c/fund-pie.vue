@@ -1,5 +1,5 @@
 <template>
-  <vue-highcharts :options="optionsData" ref="lineCharts"></vue-highcharts>
+  <vue-highcharts :options="optionsData" ref="pieCharts"></vue-highcharts>
 </template>
 
 <script>
@@ -258,14 +258,14 @@ export default {
     }
   },
 
-  load() {
-    const lineCharts = this.$refs.lineCharts
-    lineCharts.delegateMethod('showLoading', 'Loading...')
-  },
-
   watch: {
     datas(newVal) {
-      this.optionsData.series[0].data = newVal
+      const pieCharts = this.$refs.pieCharts.getChart()
+      if (pieCharts.series && pieCharts.series[0]) {
+        pieCharts.series[0].update({
+          data: newVal,
+        })
+      }
     },
   },
 
