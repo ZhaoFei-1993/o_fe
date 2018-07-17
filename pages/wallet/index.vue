@@ -112,7 +112,7 @@
 
   const limit = 10
 
-export default {
+  export default {
     data() {
       return {
         filterOperationType: 'all',

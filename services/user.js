@@ -107,7 +107,7 @@ export default (axios) => {
       return Promise.resolve(require('./mock/user').balance)
     },
 
-    dynamicConstraint(){
+    dynamicConstraint() {
       return Promise.resolve(require('./mock/user').constraint)
     },
 
