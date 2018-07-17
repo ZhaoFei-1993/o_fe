@@ -127,7 +127,8 @@
 
     <MyInfoItem v-else-if="merchant.status === constant.MERCHANT_STATUS.CREATED" title="商家认证">
       <p slot="content" class="c-brand-green">信息已提交，审核中</p>
-      <b-btn slot="action" variant="outline-green" size="xs" @click="onCancelApply">取消申请</b-btn>
+      <!--暂时不做取消申请 jeff 20180716-->
+      <!--<b-btn slot="action" variant="outline-green" size="xs" @click="onCancelApply">取消申请</b-btn>-->
     </MyInfoItem>
 
     <template v-else>

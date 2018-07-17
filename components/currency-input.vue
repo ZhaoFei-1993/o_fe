@@ -3,9 +3,6 @@
   @import "~assets/scss/variables.scss";
 
   .currency-input {
-    display: inline-block;
-    width: 190px;
-
     .extended-input-number {
       height: 40px;
       padding-right: 10px;
