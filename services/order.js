@@ -4,8 +4,10 @@ export default (axios) => {
       return axios.post('/orders', payload)
     },
     getOrderList(query) {
-      return Promise.resolve(require('./mock/order').orderList)
-      return axios.get('/orders', query)
+      // return Promise.resolve(require('./mock/order').orderList)
+      return axios.get('/orders', {
+        params: query,
+      })
     },
     getOrderById(id) {
       return axios.get(`/orders/${id}`)

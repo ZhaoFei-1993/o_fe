@@ -208,49 +208,54 @@
         orderStatus: ORDER_STATUS,
       }
     },
-    async asyncData({ app, query, req, error, store }) {
-      // const { user = {} } = store.state
-      const user = { id: 1 }
-      const merchant = { id: 111 }
-      const queryParams = {
-        status: 'processing',
-        side: '',
-        coin_type: '',
-        page: 1,
-        limit: 30,
-      }
-      const [orderData, paymentData] = await Promise.all([
-        app.axios.order.getOrderList(queryParams),
-        app.axios.user.payments(merchant.id),
-      ])
-      let orderTableItems = []
-      let paymentMethods = []
-      let selectedPaymentMethod = {}
-      if (paymentData.code === 0 && paymentData.data) {
-        paymentMethods = paymentData.data
-        selectedPaymentMethod = paymentMethods[0]
-      }
-      if (orderData.code === 0 && orderData.data) {
-        orderTableItems = orderData.data.data.map(item => {
-          let orderType
-          if (user.id === item.user_id) { // taker
-            orderType = item.user_side
-          } else if (user.id === item.merchant_id) {
-            orderType = item.merchant_side
-          }
-          return {
-            ...item,
-            _order_type: orderType,
-            _payment_method: selectedPaymentMethod,
-            merchantPaymentMethods: require('../../services/mock/user').paymentMethods.data,
-            place_time: app.utils.getTimeText(item.place_time),
-          }
-        })
-      }
-      return {
-        orderTableItems,
-        paymentMethods,
-        selectedPaymentMethod,
+    async asyncData({ app, req, redirect, route }) {
+      try {
+        const user = { id: 1 }
+        const merchant = { id: 111 }
+        const queryParams = {
+          status: 'processing',
+          page: 1,
+          limit: 30,
+        }
+        app.axios.init(req)
+        const [orderData, paymentData] = await Promise.all([
+          app.axios.order.getOrderList(queryParams),
+          app.axios.user.payments(merchant.id),
+        ])
+        console.log(orderData)
+        let orderTableItems = []
+        let paymentMethods = []
+        let selectedPaymentMethod = {}
+        if (paymentData.code === 0 && paymentData.data) {
+          paymentMethods = paymentData.data
+          selectedPaymentMethod = paymentMethods[0]
+        }
+        if (orderData.code === 0 && orderData.data) {
+          orderTableItems = orderData.data.data.map(item => {
+            let orderType
+            if (user.id === item.user_id) { // taker
+              orderType = item.user_side
+            } else if (user.id === item.merchant_id) {
+              orderType = item.merchant_side
+            }
+            return {
+              ...item,
+              _order_type: orderType,
+              _payment_method: selectedPaymentMethod,
+              merchantPaymentMethods: require('../../services/mock/user').paymentMethods.data,
+              place_time: app.utils.getTimeText(item.place_time),
+            }
+          })
+        }
+        return {
+          queryParams,
+          orderTableItems,
+          paymentMethods,
+          selectedPaymentMethod,
+        }
+      } catch (err) {
+        console.log(err)
+        // app.axios.needAuth(err, redirect, route.fullPath)
       }
     },
     components: {
@@ -314,7 +319,7 @@
         for (let i = 0; i < this.filterOptions.length; i++) {
           if (i !== index) {
             this.filterOptions[i].active = false
-          } else {
+          } else if (this.queryParams.status !== this.filterOptions[i].value) {
             this.filterOptions[i].active = true
             this.queryParams.status = this.filterOptions[i].value
             this.renderOrderList()

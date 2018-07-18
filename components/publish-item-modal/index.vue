@@ -278,7 +278,7 @@ export default {
       if (form.side === 'buy' && form.price_limit < price && Number(price) !== 0) form.price_limit = price
       if (form.side === 'sell' && form.price_limit > price && Number(price) !== 0) form.price_limit = price
     },
-    'form.float_rate': function(floatRate) {
+    'form.float_rate': function (floatRate) {
       if (this.form.pricing_type !== this.constant.PRICING_TYPE.FLOAT) return
       this.form.price = floatRate.decimalDiv(100).decimalMul(this.balance.currentRate[this.form.coin_type])
     }
