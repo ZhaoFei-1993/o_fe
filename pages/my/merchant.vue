@@ -127,7 +127,8 @@
 
     <MyInfoItem v-else-if="merchant.status === constant.MERCHANT_STATUS.CREATED" title="商家认证">
       <p slot="content" class="c-brand-green">信息已提交，审核中</p>
-      <b-btn slot="action" variant="outline-green" size="xs" @click="onCancelApply">取消申请</b-btn>
+      <!--暂时不做取消申请 jeff 20180716-->
+      <!--<b-btn slot="action" variant="outline-green" size="xs" @click="onCancelApply">取消申请</b-btn>-->
     </MyInfoItem>
 
     <template v-else>
@@ -165,16 +166,16 @@
           <p>手持身份证正面，进行视频录制，保持录制过程中声音和影像都清晰</p>
         </InfoItem>
         <InfoItem title="视频诵读范本">
-          <p class="info-item-content-example">本人（姓名），身份证号（身份证号码），我申请成为CoinEX认证商家，我的资金来源合法可靠，自愿交易比特币等数字资产，本人充分了解数字货币及潜在风险，本人具有抗风险的能力并愿意承担一切风险！</p>
+          <p class="info-item-content-example">本人（姓名），身份证号（身份证号码），我申请成为CoinEx认证商家，我的资金来源合法可靠，自愿交易比特币等数字资产，本人充分了解数字货币及潜在风险，本人具有抗风险的能力并愿意承担一切风险！</p>
         </InfoItem>
         <InfoItem title="提交认证视频" :required="true">
-          <p class="c-6f">请将视频资料发送邮至 bd@coinex.com，邮件主题为“申请成为CoinEX认证商家+CoinEX账户（注册邮箱或手机）”</p>
+          <p class="c-6f">请将视频资料发送邮至 bd@coinex.com，邮件主题为"申请成为CoinEx认证商家+CoinEx账户（注册邮箱或手机）"</p>
           <b-form-checkbox v-model="isVideoSent">我已发送认证视频道 bd@coinex.com 邮箱。</b-form-checkbox>
         </InfoItem>
       </ProgressItem>
 
       <ProgressItem title="缴纳保证金">
-        <p class="c-6f">申请成为CoinEX认证商家，需要同意冻结您交易所账户中 100,000 CET作为商家保证金，钱包中冻结的保证金依然享有分红权益，但是不
+        <p class="c-6f">申请成为CoinEx认证商家，需要同意冻结您交易所账户中 100,000 CET作为商家保证金，钱包中冻结的保证金依然享有分红权益，但是不
           可交易和体现。什么是 CET？</p>
         <InfoItem title="账户余额">
           {{balance.cet}}

@@ -87,10 +87,10 @@ export const merchant = {
 export const settings = {
   data: {
     'user_id': 1,                           // 用户id
-    'min_deal_cash_amount': '1000.00',      // 最小交易限额
-    'max_deal_cash_amount': '100.00',       // 最大交易限额
+    'min_deal_cash_amount': '100.00',      // 最小交易限额
+    'max_deal_cash_amount': '1000.00',       // 最大交易限额
     'auto_reply_content': '自动回复的内容123456',               // 自动回复内容
-    'counterparty_limit': [0, 1, 2],        // 交易限制, 0: 绑定手机号, 1: kyc实名, 2: 成交过一笔订单
+    'counterparty_limit': ['kyc'],        // 交易限制, 0: 绑定手机号, 1: kyc实名, 2: 成交过一笔订单
   }
 }
 

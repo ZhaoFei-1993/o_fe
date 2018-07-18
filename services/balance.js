@@ -105,5 +105,13 @@ export default (axios) => {
         data: query,
       })
     },
+
+    /**
+     * 获取汇率
+     */
+    exchangeRate() {
+      return Promise.resolve(require('./mock/balance').exchangeRate)
+      return axios.get('/system/price')
+    }
   }
 }

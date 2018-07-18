@@ -1,5 +1,11 @@
 <style lang="scss">
   .page-item-setting {
+
+    .currency-input {
+      display: inline-block;
+      width: 190px;
+    }
+
     .setting-button-group {
       display: flex;
       margin-top: 4px;
@@ -23,12 +29,12 @@
     <MyInfoItem title="交易限额">
       <div slot="content">
         <div v-if="amountLimitEditing">
-          <CurrencyInput v-model="editingSettings.min_deal_cash_amount" :currency="currency.currentCash"/>
+          <CurrencyInput v-model="editingSettings.min_deal_cash_amount" :currency="balance.currentCash"/>
           <span class="fz-12 mx-2">—</span>
-          <CurrencyInput v-model="editingSettings.max_deal_cash_amount" :currency="currency.currentCash"/>
+          <CurrencyInput v-model="editingSettings.max_deal_cash_amount" :currency="balance.currentCash"/>
         </div>
         <div v-else>
-          {{settings.min_deal_cash_amount}} {{currency.currentCash.toUpperCase()}} — {{settings.max_deal_cash_amount}} {{currency.currentCash.toUpperCase()}}
+          {{settings.min_deal_cash_amount}} {{balance.currentCash}} — {{settings.max_deal_cash_amount}} {{balance.currentCash}}
         </div>
       </div>
 
@@ -106,7 +112,7 @@
     },
     layout: 'my',
     computed: {
-      ...mapState(['constant', 'currency', 'user']),
+      ...mapState(['constant', 'balance', 'user']),
       settings: function () {
         return this.user.settings ? this.user.settings : {}
       }

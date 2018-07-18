@@ -1,118 +1,193 @@
 <style lang="scss">
+  @import "~assets/scss/variables.scss";
+
   .publish-item-modal {
+    .modal-dialog {
+      max-width: 940px !important;
+    }
+    // custom
+    .col-form-label {
+      font-size: 18px;
+      margin-bottom: 5px;
+      margin-top: 30px;
+    }
+
+    div[role="group"] {
+      /*display: flex;*/
+    }
+    // layout
+    .col-left,
+    .col-right {
+      flex: 1 1 400px;
+      max-width: 400px;
+    }
+
+    .col-right {
+      margin-left: 40px;
+    }
+
+    .input-label {
+      color: #6f6f6f;
+      margin-bottom: 5px;
+    }
+
     .group-purpose {
-      > div {
+      div[role="group"] {
         display: flex;
       }
     }
 
-    .group-item-price {
-      .item-price-container {
+    .item-price-group {
+      .item-float-price-container {
+        margin-top: 10px;
         display: flex;
         align-items: center;
+
+        .item-price-container {
+          flex: 1 1 250px;
+        }
+
+        .icon-bothway {
+          width: 50px;
+          text-align: center;
+          margin-bottom: -20px;
+        }
+
+        .item-float-rate-container {
+          flex: 1 1 150px;
+        }
+
+        .item-price-limit-container {
+          margin-left: 30px;
+          flex: 1 1 300px;
+        }
       }
 
       .item-price-float {
-        align-items: center;
+      }
+    }
+
+    .coin-amount-group {
+      .coin-amount-container {
         display: flex;
       }
     }
 
-    .group-coin-amount {
-      .group-coin-amount-inner {
+    .order-cash-limit-group {
+      margin-top: 20px;
+
+      div[role="group"] {
         display: flex;
+        align-items: center;
+      }
+
+      .order-cash-limit-separator {
+        width: 50px;
+        margin-bottom: -20px;
+        text-align: center;
+        color: #6f6f6f;
       }
     }
 
-    .group-price-limit {
-      > div {
-        display: flex;
-        align-items: center;
+    .more-setting-container {
+      border-bottom: 1px dotted $brandGreen;
+      .btn-more-setting {
+        font-size: 18px;
       }
     }
   }
 </style>
 
 <template>
-  <b-modal class="publish-item-modal" v-model="value" size="lg" title="发布广告" @input="onShowingChange">
-    <b-form>
+  <b-modal class="publish-item-modal" v-model="modalShowing" size="lg" title="发布广告" ok-variant="gradient-yellow" cancel-variant="outline-green" button-size="lg" ok-title="确定" cancel-title="取消" @ok="onSubmit">
+    <b-form v-if="balance.currentRate">
+      <!--<TabButtons :tabs="tradeSideOptions" v-model="form.side"/>-->
       <b-form-group label="我想" class="group-purpose">
-        <b-form-select v-model="form.side" :options="tradeSideOptions"></b-form-select>
-        <b-form-select v-model="form.coin_type" :options="currency.coinOptions"></b-form-select>
+        <b-form-select v-model="form.side" class="col-left" :options="tradeSideOptions"></b-form-select>
+        <b-form-select v-model="form.coin_type" class="col-right" :options="constant.COIN_TYPE_OPTIONS"></b-form-select>
       </b-form-group>
 
-      <b-form-group label="交易价格" class="group-item-price">
-        <b-form-radio-group v-model="form.pricing_type" :options="pricingTypeOptions"></b-form-radio-group>
-        <div class="item-price-container">
-          <div>
-            <div>当前市场价格 <span>{{currency.currentCoinPrices[form.coin_type]}}</span></div>
-            <b-input-group :append="currency.currentCashType">
-              <b-form-input v-model="form.price"></b-form-input>
-            </b-input-group>
+      <b-form-group label="交易价格" class="item-price-group">
+        <b-form-radio-group v-model="form.pricing_type" :options="pricingTypeOptions" class="mb-10" @input="onPricingTypeChange"></b-form-radio-group>
+
+        <div v-if="form.pricing_type === constant.PRICING_TYPE.FLOAT" class="item-float-price-container">
+          <div class="item-price-container">
+            <div class="input-label">
+              当前市场价格
+              <b-btn variant="plain-yellow" size="xxs" @click="onSetPrice2MarketPrice">{{marketPrice}}</b-btn>
+            </div>
+            <CurrencyInput v-model="form.price" :currency="balance.currentCash" :disabled="true" placeholder="请输入价格"/>
           </div>
 
-          <div v-if="form.pricing_type === constant.PRICING_TYPE.FLOAT" class="item-price-float">
-            <div>≈≈≈</div>
-            <div>
-              <div>浮动比例</div>
-              <b-input-group append="%">
-                <b-form-input v-model="form.floatRate"></b-form-input>
-              </b-input-group>
-            </div>
-            <div>
-              <div>最高单价<span>(可留空)</span></div>
-              <b-input-group :append="currency.currentCashType">
-                <b-form-input v-model="form.price_limit"></b-form-input>
-              </b-input-group>
-            </div>
+          <i class="iconfont icon-bothway"></i>
+
+          <div class="item-float-rate-container">
+            <div class="input-label">浮动比例</div>
+            <CurrencyInput v-model="form.float_rate" currency="%" placeholder="请输入价格" :decimalDigit="2"/>
           </div>
+
+          <div class="item-price-limit-container">
+            <div class="input-label">
+              {{form.side === 'buy' ? '最高单价（可留空）' : '最低单价（可留空）'}}
+            </div>
+            <CurrencyInput v-model="form.price_limit" :currency="balance.currentCash" placeholder="请输入价格"/>
+          </div>
+        </div>
+        <div v-else>
+          <div class="input-label" todo="todo:应该是参考价格吧？">
+            当前市场价格
+            <b-btn variant="plain-yellow" size="xxs" @click="onSetPrice2MarketPrice">{{marketPrice}}</b-btn>
+          </div>
+          <CurrencyInput v-model="form.price" :currency="balance.currentCash" placeholder="请输入价格" class="col-left"/>
         </div>
       </b-form-group>
 
-      <b-form-group label="交易数量" class="group-coin-amount">
+      <b-form-group label="交易数量" class="coin-amount-group">
         <Language text="最多可售[a][/a][c][/c]" v-if="form.side === 'sell'">
-          <span slot="a">{{user.balance[form.coin_type]}}</span>
+          <b-btn slot="a" variant="plain-yellow" @click="onSetCoinAmount2All">{{balance.otcMap[form.coin_type].available}}</b-btn>
           <span slot="c">{{form.coin_type}}</span>
         </Language>
-        <div class="group-coin-amount-inner">
-          <b-input-group :append="form.coin_type">
-            <b-form-input v-model="form.coin_amount"></b-form-input>
-          </b-input-group>
-          <div><span>总金额</span>≈<span>{{form.coin_amount * form.price}}</span></div>
+        <div class="coin-amount-container">
+          <CurrencyInput v-model="form.coin_amount" :currency="form.coin_type" class="col-left"/>
+          <div class="col-right fz-22">
+            <span>总金额 ≈</span>
+            <span class="c-bright-yellow ml-1"> {{totalCash}} {{balance.currentCash}}</span>
+          </div>
+        </div>
+        <div class="c-6f mt-2">
+          * 当日取消订单超过3次，会被冻结买入功能。
+          <b-link href="todo" class="ml-1">更多交易须知 ></b-link>
         </div>
       </b-form-group>
 
-      <div>
-        *当日取消订单超过3次，会被冻结买入功能。
-        <b-link>更多交易须知</b-link>
-      </div>
-
-      <div>
-        <b-btn @click="onClickMoreSetting">更多设置↓</b-btn>
+      <div class="more-setting-container">
+        <b-btn variant="plain-green" class="btn-more-setting" size="xs" @click="onClickMoreSetting">
+          更多设置 <i class="iconfont icon-double-arrow-down ml-1"></i>
+        </b-btn>
       </div>
 
       <!--更多设置-->
       <div v-if="moreSettingShowing">
-        <b-form-group label="交易限额" class="group-price-limit">
-          <div>
-            <p>最低金额 400 元</p>
-            <b-input-group :append="currency.currentCash">
-              <b-form-input v-model="form.min_deal_cash_amount" placeholder="最低单笔金额"></b-form-input>
-            </b-input-group>
+        <b-form-group label="交易限额" class="order-cash-limit-group">
+          <div class="col-left">
+            <Language text="最低金额[p][/p]元" class="input-label" tag="div">
+              <span slot="p">400</span>
+            </Language>
+            <CurrencyInput v-model="form.min_deal_cash_amount" :currency="balance.currentCash" placeholder="最低单笔金额"/>
           </div>
-          <div>至</div>
-          <div>
-            <p>最高金额 1000000 元</p>
-            <b-input-group :append="currency.currentCash">
-              <b-form-input v-model="form.max_deal_cash_amount" placeholder="最高单笔金额"></b-form-input>
-            </b-input-group>
+          <div class="order-cash-limit-separator">至</div>
+          <div class="col-right ml-0">
+            <Language text="最高金额[p][/p]元" class="input-label" tag="div">
+              <span slot="p">1,000,000</span>
+            </Language>
+            <CurrencyInput v-model="form.max_deal_cash_amount" :currency="balance.currentCash" placeholder="最高单笔金额"/>
           </div>
         </b-form-group>
         <b-form-group label="自动回复">
-          <b-form-textarea v-model="form.auto_reply_content"></b-form-textarea>
+          <b-form-textarea v-model="form.auto_reply_content" rows="3"></b-form-textarea>
         </b-form-group>
         <b-form-group label="交易方限制">
-          <b-form-checkbox-group v-model="form.counterpartyLimit"
+          <b-form-checkbox-group v-model="form.counterparty_limit"
                                  :options="constant.COUNTERPARTY_LIMIT_OPTIONS">
           </b-form-checkbox-group>
         </b-form-group>
@@ -123,10 +198,14 @@
 
 <script>
 import {mapState} from 'vuex'
+import TabButtons from '~/components/tab-buttons.vue'
+import CurrencyInput from '~/components/currency-input.vue'
 
 export default {
   name: 'publish-ad-modal',
   components: {
+    TabButtons,
+    CurrencyInput,
   },
   props: {
     value: {
@@ -138,41 +217,23 @@ export default {
     return {
       form: {
         side: 'buy',
-        float_rate: 1,
-        floatRate: 100,
-        price: 100,
+        float_rate: 100,      // todo:所有相关的小数位数限制？
+        price: 0,
         price_limit: 100,           // 价格限制，根据买卖方向不同，表示最大限制/最小限制
-        coin_amount: 100,
-        pricing_type: 'float',
+        coin_amount: 0,
+        pricing_type: 'fixed',
         min_deal_cash_amount: 0,
-        max_deal_cash_amount: 100,
-        coin_type: '',
+        max_deal_cash_amount: 0,
+        coin_type: 'BCH',
         auto_reply_content: '',
-        counterpartyLimit: [],
-        counterparty_limit: ''
+        counterparty_limit: [],
       },
 
       moreSettingShowing: false,
-      pricingTypeOptions: [{
-        value: 'float',
-        text: '浮动价格',
-      }, {
-        value: 'fixed',
-        text: '固定价格'
-      }]
     }
   },
   computed: {
-    ...mapState(['currency', 'constant', 'user']),
-    // pricingTypeOptions: function () {
-    //   return [{
-    //     value: 'float',
-    //     text: '浮动价格',
-    //   }, {
-    //     value: 'fixed',
-    //     text: '固定价格'
-    //   }]
-    // },
+    ...mapState(['constant', 'user', 'balance']),
     tradeSideOptions: function () {
       return [{
         value: 'buy',
@@ -182,16 +243,97 @@ export default {
         text: '出售'
       }]
     },
+    pricingTypeOptions: function () {
+      const PRICING_TYPE = this.constant.PRICING_TYPE
+      return [{
+        value: PRICING_TYPE.FIXED,
+        text: '固定价格'
+      }, {
+        value: PRICING_TYPE.FLOAT,
+        text: '浮动价格',
+      }]
+    },
+    modalShowing: {
+      get() {
+        return this.value
+      },
+      set(value) {
+        this.$emit('input', value)
+      }
+    },
+    // 总额
+    totalCash: function () {
+      return this.form.coin_amount.decimalMul(this.form.price)
+    },
+    // 当前coin当前cash下的市场参考价
+    marketPrice: function () {
+      return this.balance.currentRate[this.form.coin_type]
+    }
+  },
+  watch: {
+    'form.price': function (price) {
+      const form = this.form
+      form.float_rate = price.decimalDiv(this.balance.currentRate[form.coin_type]).decimalMul(100)
+
+      if (form.side === 'buy' && form.price_limit < price && Number(price) !== 0) form.price_limit = price
+      if (form.side === 'sell' && form.price_limit > price && Number(price) !== 0) form.price_limit = price
+    },
+    'form.float_rate': function(floatRate) {
+      if (this.form.pricing_type !== this.constant.PRICING_TYPE.FLOAT) return
+      this.form.price = floatRate.decimalDiv(100).decimalMul(this.balance.currentRate[this.form.coin_type])
+    }
   },
   mounted() {
-    this.$store.dispatch('fetchUserBalance')
+    this.$store.dispatch('fetchExchangeRate')
+    this.$store.dispatch('fetchOtcBalance')
+    this.$store.dispatch('fetchUserSettings').then(() => {
+      // 从用户配置中获取默认的广告配置
+      Object.assign(this.form, this.user.settings)
+      this.form.price_limit = this.form.price = this.marketPrice
+    })
   },
   methods: {
-    onShowingChange(bool) {
-      this.$emit('change', bool)
-    },
     onClickMoreSetting() {
       this.moreSettingShowing = !this.moreSettingShowing
+    },
+    onSetPrice2MarketPrice() {
+      this.form.price = this.balance.currentRate[this.form.coin_type]
+    },
+    onSetCoinAmount2All() {
+      this.form.coin_amount = this.balance.otcMap[this.form.coin_type].available
+    },
+    onPricingTypeChange(pricingType) {
+      const form = this.form
+      form.price_limit = this.marketPrice
+      form.price = this.marketPrice
+      form.float_rate = 100
+    },
+
+    doCreateItem() {
+      this.axios.item.createItem(this.form).then(res => {
+        this.$showTips('广告发布成功')
+
+        this.$emit('published', this.form)
+      })
+    },
+    onSubmit(e) {
+      e.preventDefault()
+      const form = this.form
+      if (!Number(form.price)) return this.$showTips('价格不可以为0')
+      if (!Number(form.coin_amount)) return this.$showTips('请输入交易数量')
+      this.doCreateItem()
+
+      // if (Math.abs((form.price / this.marketPrice) - 1) > 0.1) {
+      //   this.$showDialog({
+      //     title: '差价过大',
+      //     content: '当前价格偏离市价过大，将可能不会显示在首页。确认要以此价格下交易单？',
+      //     onOk: () => {
+      //       this.doCreateItem()
+      //     }
+      //   })
+      // } else {
+      //   this.doCreateItem()
+      // }
     }
   }
 }
