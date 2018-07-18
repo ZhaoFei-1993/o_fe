@@ -41,14 +41,14 @@
           <li :class="['step',{active:order.status==='created'}]"
               v-if="(order.status!=='cancel'||order.pay_time)&&order.status!=='closed'">
             <div class="message">{{stepsMessage.payCash}}</div>
-            <div class="step-time" v-if="order.pay_time">{{utils.local(order.pay_time)}}</div>
+            <div class="step-time" v-if="order.pay_time">{{order.pay_time | localTime}}</div>
             <button v-if="isBuySide&&!order.pay_time" class="btn btn-gradient-yellow btn-xs" @click="confirmPay()">
               我已付款
             </button>
           </li>
           <li :class="['step',{active:order.status==='paid'}]" v-if="order.status!=='cancel'&&order.status!=='closed'">
             <div class="message">{{stepsMessage.payCoin}}</div>
-            <div class="step-time" v-if="order.complete_time">{{utils.local(order.complete_time,true)}}</div>
+            <div class="step-time" v-if="order.complete_time">{{order.complete_time| localTime}}</div>
             <button v-if="!isBuySide&&order.status==='paid'" class="btn btn-gradient-yellow btn-xs"
                     @click="confirmReceipt()">确认收款
             </button>
@@ -56,7 +56,7 @@
           <li :class="['step',{active:order.status==='success'}]"
               v-if="order.status!=='cancel'&&order.status!=='closed'">
             <div class="message">{{stepsMessage.success}}</div>
-            <div class="step-time" v-if="order.complete_time">{{utils.local(order.complete_time,true)}}</div>
+            <div class="step-time" v-if="order.complete_time">{{order.complete_time| localTime}}</div>
           </li>
           <li :class="['step',{active:order.status==='cancel'}]" v-if="order.status==='cancel'">
             <div class="message">{{stepsMessage.cancel}}</div>
@@ -67,15 +67,28 @@
         </ol>
       </div>
       <div class="order-helper">
-        <span v-if="!order.appeal_status||order.appeal_status===''">
+        <span v-if="!appeal||appeal.status===''">
           交易出现问题？需要
-          <span class="c-brand-green" v-if="canAppeal" @click="appeal">申诉</span></span>
-        <span class="c-brand-green" v-else v-b-tooltip.hover title="买家付款30分钟后，可发起申诉。">申诉</span></span>
-        <div v-if="order.appeal_status==='processing'"><span>已发起申诉，请等待申诉专员介入</span>
-          <button class="btn btn-outline-green btn-xs">取消申诉</button>
-        </div>
-        <div v-if="order.appeal_status==='completed'" @click="cancelAppeal"><span>申诉结果TODO</span>
-        </div>
+          <span class="c-brand-green appeal-btn" v-if="canAppeal" @click="startAppeal">申诉</span>
+          <span class="c-brand-green appeal-btn" v-else v-b-tooltip.hover title="买家付款30分钟后，可发起申诉。">申诉</span>
+        </span>
+        <template v-if="appeal">
+          <div v-if="appeal.status==='created'" class="d-flex align-items-center justify-content-between">
+            <span>{{appealSide}}已发起申诉，请等待申诉专员介入</span>
+            <button class="btn btn-outline-green btn-xs" @click="cancelAppeal">取消申诉</button>
+          </div>
+          <div v-if="appeal.status==='processing'" class="d-flex align-items-center justify-content-between">
+            <span>申诉专员已经介入，请及时提供必要的信息</span>
+            <button class="btn btn-outline-green btn-xs" @click="cancelAppeal">取消申诉</button>
+          </div>
+          <div v-if="appeal.status==='cancel'">
+            <span>{{appealSide}}已取消申诉，如果仍有问题，请</span>
+            <b-link href="https://otc.coinex.com/res/support/ticket" target="_blank">提交工单</b-link>
+          </div>
+          <div v-if="appeal.status==='completed'">
+            <span>申诉结果TODO</span>
+          </div>
+        </template>
       </div>
     </div>
     <div class="sidebar">
@@ -83,6 +96,35 @@
         <UserStatsProfile :user-data="counterparty" v-if="counterparty"/>
       </CBlock>
     </div>
+    <b-modal ref="appealModal"
+             title="交易申诉"
+             @ok="submitAppeal"
+             ok-variant="yellow"
+             :ok-disabled="cannotSubmitAppeal"
+             cancel-variant="outline-green"
+             ok-title="确定"
+             cancel-title="取消"
+             button-size="sm"
+             class="text-center"
+    >
+      <div id="appeal-modal" class="text-left fz-14 c-black">
+        <p class="mb-40">提起申诉后，申诉专员将介入本次交易，直至申诉结束。恶意申诉者将被冻结账户。</p>
+        <div class="d-flex align-items-center">
+          <span class="tip">申诉原因</span>
+          <b-form-select class="appeal-input" v-model="appealReason"
+                         :options="constant.APPEAL_REASONS"></b-form-select>
+        </div>
+        <div class="d-flex align-items-start mt-20">
+          <span class="tip">申诉理由</span>
+          <textarea class="appeal-input"
+                    v-model="appealComment"
+                    placeholder="请填写十五字以上的申诉理由"
+                    rows="8">
+          </textarea>
+        </div>
+      </div>
+
+    </b-modal>
   </div>
 </template>
 <style lang="scss">
@@ -232,6 +274,9 @@
       .order-helper {
         padding: 0 30px 30px;
         font-size: 16px;
+        .appeal-btn {
+          cursor: pointer;
+        }
       }
     }
     .sidebar {
@@ -239,12 +284,34 @@
       margin-left: 20px;
     }
   }
+
+  #appeal-modal {
+    width: 560px;
+    .tip {
+      width: 80px;
+    }
+    .appeal-input {
+      width: 430px;
+      border: solid 1px #dddddd;
+      &:focus {
+        border: solid 1px $brandGreen;
+        outline: none;
+      }
+    }
+    textarea {
+      padding: 6px 12px;
+      height: 182px;
+      max-height: 182px;
+    }
+  }
+
 </style>
 <script>
   import UserStatsProfile from '~/components/user-stats-profile.vue'
-  import {ORDER_STATUS} from '~/modules/constant'
   import {mapState} from 'vuex'
 
+  const PAID_CAN_APPEAL_MIN = 30
+  const SUCCESS_CAN_APPEAL_DAY = 7
   export default {
     data() {
       return {
@@ -257,7 +324,9 @@
         selectedMethod: null,
         secondCountdown: null,
         payRemainTime: 0,
-        canAppeal: false,
+        appeal: null,
+        appealComment: null,
+        appealReason: null,
       }
     },
     components: {
@@ -266,16 +335,29 @@
     beforeDestroy() {
       clearInterval(this.secondCountdown)
     },
-    mounted() {
+    beforeMount() {
       this.getCurrentOrder(true)
     },
     computed: {
-      ...mapState(['user']),
+      ...mapState(['user', 'constant']),
       orderStatus() {
-        return Object.values(ORDER_STATUS).find(s => s.value === this.order.status).text
+        return Object.values(this.constant.ORDER_STATUS).find(s => s.value === this.order.status).text
+      },
+      cannotSubmitAppeal() {
+        return !(this.appealReason && this.appealComment && this.appealComment.length > 15)
       },
       isBuySide() {
         return this.order.user_side === 'buy' ? (this.user.id === this.order.user_id) : (this.user.id !== this.order.user_id)
+      },
+      isBuyerAppeal() {
+        return this.order.user_side === 'buy' ? (this.appeal.user_id === this.order.user_id) : (this.appeal.user_id !== this.order.user_id)
+      },
+      appealSide() {
+        return this.isBuyerAppeal ? '买家' : '卖家'
+      },
+      canAppeal() {
+        return true || (this.order.status === 'paid' && this.utils.getTimeDifference(this.order.pay_time) > 60 * 1000 * PAID_CAN_APPEAL_MIN) ||
+          (this.order.status === 'success' && this.utils.getTimeDifference(this.order.complete_time) < 24 * 3600 * 1000 * SUCCESS_CAN_APPEAL_DAY)
       },
       isMaker() {
         return this.merchant.id === this.user.id
@@ -363,6 +445,9 @@
                 }
               }, 1000)
             }
+            if (this.order.status === 'paid' || this.order.status === 'success') {
+              this.getAppeal()
+            }
             if (!withUsers) return
             // 以下订单相关用户信息只需要获取一次
             if (this.user.id === this.order.user_id) {
@@ -385,6 +470,11 @@
           }
         })
       },
+      getAppeal() {
+        this.axios.order.getAppeal(this.order.id).then(response => {
+          this.appeal = response.data.data
+        })
+      },
       refreshOrderStatus() {
         this.axios.order.refreshOrderStatus(this.id).then(response => {
           this.order = Object.assign({}, this.order, response.data)
@@ -392,14 +482,6 @@
         })
       },
       checkOrderStatus() {
-        if (
-          (this.order.status === 'paid' && (Date.now() - (new Date(this.order.pay_time)).valueOf()) > 30 * 60 * 1000) ||
-          (this.order.status === 'success' && (Date.now() - (new Date(this.order.complete_time)).valueOf()) > 7 * 24 * 3600 * 1000)
-        ) {
-          this.canAppeal = true
-        } else {
-          this.canAppeal = false
-        }
         if (this.order.status === 'created' || this.order.status === 'paid' || this.order.appeal_status !== '') {
           setTimeout(() => {
             this.refreshOrderStatus()
@@ -428,11 +510,22 @@
           }
         })
       },
-      appeal() {
-        // 等后端给申诉原因列表再做吧
+      startAppeal() {
+        this.$refs.appealModal.show()
+      },
+      submitAppeal() {
+        this.axios.order.submitAppeal(this.order.id, this.appealReason, this.appealComment).then(_ => {
+          this.getAppeal()
+        })
       },
       cancelAppeal() {
-        this.axios.order.cancelAppeal(this.order.id)
+        this.$showDialog({
+          title: '取消申诉',
+          content: (<div><p>确认取消申诉？</p><p class="c-red">取消申诉后的订单将不可再次申诉。</p></div>),
+          onOk: () => {
+            this.axios.order.cancelAppeal(this.order.id)
+          }
+        })
       }
     }
   }

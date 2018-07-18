@@ -109,7 +109,6 @@
   import { mapState } from 'vuex'
   import cBlock from '~/components/c-block'
   import Blank from '~/components/blank'
-  import { ORDER_STATUS } from '~/modules/constant'
 
   export default {
     data() {
@@ -205,7 +204,7 @@
         },
         orderTableItems: [],
         queryParams: {},
-        orderStatus: ORDER_STATUS,
+        orderStatus: this.constant.ORDER_STATUS,
       }
     },
     async asyncData({ app, query, req, error, store }) {

@@ -251,8 +251,16 @@ const utils = {
     }
     return timeText
   },
-  local(date) {
-    return (new Date(date)).toLocaleString()
+  /**
+   * 计算时间距离
+   * @param  {String} origin 起始时间
+   * @param  {String} target 目标时间（默认当前时间）
+   * @return {Number}    换算成毫秒差距返回， ('2018-08-08T08:08:08','2018-08-08T08:08:09') 将返回 1000,负数代表origin在将来
+   */
+  getTimeDifference(origin, target = null) {
+    const originTime = new Date(origin).valueOf()
+    const targetTime = target ? new Date(target).valueOf() : Date.now()
+    return targetTime - originTime
   },
 }
 

@@ -58,11 +58,11 @@ module.exports = (req, res, next) => {
     })
   }
   // 后端已经开发好的api就直接转发，没有开发好的就用本地json server
-  const backendAPI = ['/posts']
+  const backendAPI = ['/user/account']
   for (const url of backendAPI) {
     if (req.url.indexOf(url) === 0) {
       // const redirected = 'http://jsonplaceholder.typicode.com' + req.url
-      const redirected = 'http://dev.otc.coinex.com/api' + req.url
+      const redirected = 'http://120.79.223.206:8090/res' + req.url
       return req.pipe(request(redirected)).pipe(res)
     }
   }
