@@ -38,9 +38,11 @@
 <template>
   <b-input-group :append="currency.toUpperCase()" class="currency-input">
     <ExtendedInputNumber :value="value"
+                         :disabled="disabled"
+                         :placeholder="placeholder"
+                         :decimalDigit="decimalDigit"
                          @input="onInput"
-                         @focus="onFocus"
-                         :placeholder="placeholder"/>
+                         @focus="onFocus"/>
   </b-input-group>
 </template>
 
@@ -56,6 +58,8 @@ export default {
     value: [String, Number],
     placeholder: String,
     width: Number,              // 组件总宽度
+    disabled: Boolean,
+    decimalDigit: Number,
   },
   methods: {
     onInput(value) {

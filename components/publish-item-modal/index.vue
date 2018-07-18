@@ -108,22 +108,22 @@
       </b-form-group>
 
       <b-form-group label="交易价格" class="item-price-group">
-        <b-form-radio-group v-model="form.pricing_type" :options="pricingTypeOptions" class="mb-10"></b-form-radio-group>
+        <b-form-radio-group v-model="form.pricing_type" :options="pricingTypeOptions" class="mb-10" @input="onPricingTypeChange"></b-form-radio-group>
 
         <div v-if="form.pricing_type === constant.PRICING_TYPE.FLOAT" class="item-float-price-container">
           <div class="item-price-container">
             <div class="input-label">
               当前市场价格
-              <b-btn variant="plain-yellow" size="xxs" @click="onSetPrice2MarketPrice">{{balance.currentRate[form.coin_type]}}</b-btn>
+              <b-btn variant="plain-yellow" size="xxs" @click="onSetPrice2MarketPrice">{{marketPrice}}</b-btn>
             </div>
-            <CurrencyInput v-model="form.price" :currency="balance.currentCash" placeholder="请输入价格"/>
+            <CurrencyInput v-model="form.price" :currency="balance.currentCash" :disabled="true" placeholder="请输入价格"/>
           </div>
 
           <i class="iconfont icon-bothway"></i>
 
           <div class="item-float-rate-container">
             <div class="input-label">浮动比例</div>
-            <CurrencyInput currency="%" placeholder="请输入价格" v-model="form.float_rate"/>
+            <CurrencyInput v-model="form.float_rate" currency="%" placeholder="请输入价格" :decimalDigit="2"/>
           </div>
 
           <div class="item-price-limit-container">
@@ -134,9 +134,9 @@
           </div>
         </div>
         <div v-else>
-          <div class="input-label">
+          <div class="input-label" todo="todo:应该是参考价格吧？">
             当前市场价格
-            <b-btn variant="plain-yellow" size="xxs" @click="onSetPrice2MarketPrice">{{balance.currentRate[form.coin_type]}}</b-btn>
+            <b-btn variant="plain-yellow" size="xxs" @click="onSetPrice2MarketPrice">{{marketPrice}}</b-btn>
           </div>
           <CurrencyInput v-model="form.price" :currency="balance.currentCash" placeholder="请输入价格" class="col-left"/>
         </div>
@@ -151,7 +151,7 @@
           <CurrencyInput v-model="form.coin_amount" :currency="form.coin_type" class="col-left"/>
           <div class="col-right fz-22">
             <span>总金额 ≈</span>
-            <span class="c-bright-yellow ml-1"> {{form.coin_amount * form.price}} {{balance.currentCash}}</span>
+            <span class="c-bright-yellow ml-1"> {{totalCash}} {{balance.currentCash}}</span>
           </div>
         </div>
         <div class="c-6f mt-2">
@@ -217,13 +217,13 @@ export default {
     return {
       form: {
         side: 'buy',
-        float_rate: 100,
-        price: 100,
+        float_rate: 100,      // todo:所有相关的小数位数限制？
+        price: 0,
         price_limit: 100,           // 价格限制，根据买卖方向不同，表示最大限制/最小限制
-        coin_amount: 100,
-        pricing_type: 'float',
+        coin_amount: 0,
+        pricing_type: 'fixed',
         min_deal_cash_amount: 0,
-        max_deal_cash_amount: 100,
+        max_deal_cash_amount: 0,
         coin_type: 'BCH',
         auto_reply_content: '',
         counterparty_limit: [],
@@ -246,11 +246,11 @@ export default {
     pricingTypeOptions: function () {
       const PRICING_TYPE = this.constant.PRICING_TYPE
       return [{
-        value: PRICING_TYPE.FLOAT,
-        text: '浮动价格',
-      }, {
         value: PRICING_TYPE.FIXED,
         text: '固定价格'
+      }, {
+        value: PRICING_TYPE.FLOAT,
+        text: '浮动价格',
       }]
     },
     modalShowing: {
@@ -260,6 +260,27 @@ export default {
       set(value) {
         this.$emit('input', value)
       }
+    },
+    // 总额
+    totalCash: function () {
+      return this.form.coin_amount.decimalMul(this.form.price)
+    },
+    // 当前coin当前cash下的市场参考价
+    marketPrice: function () {
+      return this.balance.currentRate[this.form.coin_type]
+    }
+  },
+  watch: {
+    'form.price': function (price) {
+      const form = this.form
+      form.float_rate = price.decimalDiv(this.balance.currentRate[form.coin_type]).decimalMul(100)
+
+      if (form.side === 'buy' && form.price_limit < price && Number(price) !== 0) form.price_limit = price
+      if (form.side === 'sell' && form.price_limit > price && Number(price) !== 0) form.price_limit = price
+    },
+    'form.float_rate': function(floatRate) {
+      if (this.form.pricing_type !== this.constant.PRICING_TYPE.FLOAT) return
+      this.form.price = floatRate.decimalDiv(100).decimalMul(this.balance.currentRate[this.form.coin_type])
     }
   },
   mounted() {
@@ -268,6 +289,7 @@ export default {
     this.$store.dispatch('fetchUserSettings').then(() => {
       // 从用户配置中获取默认的广告配置
       Object.assign(this.form, this.user.settings)
+      this.form.price_limit = this.form.price = this.marketPrice
     })
   },
   methods: {
@@ -280,13 +302,38 @@ export default {
     onSetCoinAmount2All() {
       this.form.coin_amount = this.balance.otcMap[this.form.coin_type].available
     },
-    onSubmit(e) {
-      e.preventDefault()
+    onPricingTypeChange(pricingType) {
+      const form = this.form
+      form.price_limit = this.marketPrice
+      form.price = this.marketPrice
+      form.float_rate = 100
+    },
+
+    doCreateItem() {
       this.axios.item.createItem(this.form).then(res => {
         this.$showTips('广告发布成功')
 
         this.$emit('published', this.form)
       })
+    },
+    onSubmit(e) {
+      e.preventDefault()
+      const form = this.form
+      if (!Number(form.price)) return this.$showTips('价格不可以为0')
+      if (!Number(form.coin_amount)) return this.$showTips('请输入交易数量')
+      this.doCreateItem()
+
+      // if (Math.abs((form.price / this.marketPrice) - 1) > 0.1) {
+      //   this.$showDialog({
+      //     title: '差价过大',
+      //     content: '当前价格偏离市价过大，将可能不会显示在首页。确认要以此价格下交易单？',
+      //     onOk: () => {
+      //       this.doCreateItem()
+      //     }
+      //   })
+      // } else {
+      //   this.doCreateItem()
+      // }
     }
   }
 }
