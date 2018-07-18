@@ -139,7 +139,7 @@ String.prototype.formatCurrency = function(
  * @param  {[String]} charSep [每三位数字的分隔符，默认逗号]
  * @param  {[Boolean]} noZero  [小数位是否需要补0，默认true]
  * @param  {[String]} lang    [单位语言]
- * 
+ *
  * @return {[String]}         [格式化后的数字字符串]
  */
 String.prototype.formatMoney = function(c, charDec, charSep, noZero, lang) {
@@ -245,7 +245,7 @@ String.prototype.decimalMinus = function(c) {
 };
 
 // 乘
-String.prototype.decimalMul = function(c) {
+String.prototype.decimalMul = Number.prototype.decimalMul = function(c) {
   const n = ((this || "0").toString() || "0").trim();
   const m = ((c || "0").toString() || "0").trim();
 
@@ -253,7 +253,7 @@ String.prototype.decimalMul = function(c) {
 };
 
 // 除
-String.prototype.decimalDiv = function(c) {
+String.prototype.decimalDiv = Number.prototype.decimalDiv = function(c) {
   const n = ((this || "0").toString() || "0").trim();
   const m = ((c || "0").toString() || "0").trim();
 

@@ -1,14 +1,24 @@
 /**
  * 避免直接使用，统一export，然后通过store里面的constant来引用，保证单一数据来源
  */
+
+const COIN_TYPES = ['BTC', 'BCH', 'ETH', 'USDT']
+
 const PAYMENT_OPTIONS = [
   {text: '不限', value: 'ALL'},
   {text: '银行卡', value: 'bankcard', icon: 'icon-bankcard'},        // method, 服务端对方法的定义
   {text: '支付宝', value: 'alipay', icon: 'icon-alipay'},
   {text: '微信', value: 'wechat', icon: 'icon-wechat-round'},
 ]
+
 export default {
-  COIN_TYPES: ['BTC', 'BCH', 'ETH', 'USDT'],
+  COIN_TYPES,
+  COIN_TYPE_OPTIONS: COIN_TYPES.map(name => {
+    return {
+      text: name,
+      value: name
+    }
+  }),
   PAYMENT_OPTIONS,
   PAYMENT_TYPES: {
     BANKCARD: 'bankcard',
@@ -29,13 +39,13 @@ export default {
 
   COUNTERPARTY_LIMIT_OPTIONS: [{
     text: '交易方必须通过手机验证',
-    value: 0
+    value: 'bind_phone'
   }, {
     text: '交易方必须通过实名验证',
-    value: 1,
+    value: 'kyc',
   }, {
     text: '交易方必须完成过 1 次交易',
-    value: 2,
+    value: 'one_deal',
   }],
 
   VERIFY_CODE_TYPE: {
