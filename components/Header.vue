@@ -233,13 +233,13 @@
       handleUpdateName(evt) {
         // 要验证重名，避免被关闭，需要ref来调用
         evt.preventDefault()
-        this.axios.user.updateName(this.user.account.name).then(response => {
-          if (response.code === 0) {
-            this.$refs.updateNameModal.hide()
-          } else if (response.code === 72) {
+        this.axios.user.updateName(this.user.account.name).then(_ => {
+          this.$refs.updateNameModal.hide()
+        }).catch(err => {
+          if (err.code === 72) {
             this.nameDuplicated = true
           } else {
-            throw new Error('update name error')
+            onApiError(err, this)
           }
         })
       },
