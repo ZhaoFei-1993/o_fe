@@ -5,7 +5,7 @@ export default (axios) => {
      * @return {Promise<void>}
      */
     account() {
-      return Promise.resolve(require('./mock/user').account)
+      // return Promise.resolve(require('./mock/user').account)
       return axios.get('/user/account')
     },
 
@@ -86,6 +86,15 @@ export default (axios) => {
       return Promise.resolve({data: {}, code: 0})
 
       return axios.patch(`/user/payment/method`, payment)
+    },
+
+    /**
+     * 确认用户昵称
+     * @param name
+     * @return {*}
+     */
+    updateName(name) {
+      return axios.patch(`/user/account`, {name})
     },
 
     /**

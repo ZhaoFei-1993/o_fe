@@ -125,7 +125,7 @@
           <!--TODO 暂时不做-->
           <!--<b-nav-item-dropdown id="user-dropdown" text="订单">-->
 
-            <!--<b-dropdown-item v-for="order in orders">示例订单</b-dropdown-item>-->
+          <!--<b-dropdown-item v-for="order in orders">示例订单</b-dropdown-item>-->
           <!--</b-nav-item-dropdown>-->
           <span style="color: #d5d5d5">|</span>
           <button class="message-button" hidden><i class="iconfont icon-message"></i></button>
@@ -162,6 +162,21 @@
         </div>
       </form>
     </b-modal>
+
+    <b-modal id="update-name"
+             ref="updateNameModal"
+             title="确认昵称"
+             :no-close-on-esc="true"
+             :no-close-on-backdrop="true"
+             ok-variant="yellow"
+             :ok-only="true"
+             @ok="handleUpdateName">
+      <div v-if="user&&user.account">
+        <p>请确认或修改您的昵称，昵称一旦确定将无法修改。</p>
+        <p class="c-red" v-if="nameDuplicated">请确认或修改您的昵称，昵称一旦确定将无法修改。</p>
+        <b-form-input v-model="user.account.name" type="text" placeholder="您的昵称" required></b-form-input>
+      </div>
+    </b-modal>
   </div>
 </template>
 
@@ -180,6 +195,7 @@
       return {
         attentionModelShowing: null,
         attention: [],
+        nameDuplicated: false,
         activeAttentionIndex: 0,
         loginPage: `${loginPage}?redirect=${encodeURIComponent(webDomain + this.$route.fullPath)}`,
         registerPage: `${signupPage}?redirect=${encodeURIComponent(webDomain + this.$route.fullPath)}`,
@@ -206,10 +222,27 @@
     },
 
     beforeMount() {
-      this.$store.dispatch('fetchUserAccount')
+      this.$store.dispatch('fetchUserAccount').then(_ => {
+        if (this.user && this.user.account && !this.user.account.is_name_confirmed) {
+          this.$refs.updateNameModal.show()
+        }
+      })
     },
 
     methods: {
+      handleUpdateName(evt) {
+        // 要验证重名，避免被关闭，需要ref来调用
+        evt.preventDefault()
+        this.axios.user.updateName(this.user.account.name).then(_ => {
+          this.$refs.updateNameModal.hide()
+        }).catch(err => {
+          if (err.code === 72) {
+            this.nameDuplicated = true
+          } else {
+            onApiError(err, this)
+          }
+        })
+      },
       simplifyUserName(str = '') {
         if (isNaN(str)) {
           if (str.length > 10) {
