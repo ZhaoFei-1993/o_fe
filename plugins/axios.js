@@ -28,9 +28,11 @@ export default ({ app, store }) => {
   // 初始化
   inst.init = function (req) {
     if (process.client) {
-      const lang = /lang=(.*?)(;|$)/gi.exec(document.cookie)
-      if (lang && lang.length) {
-        inst.defaults.headers.common['Accept-Language'] = lang[1] || store.state.lang.lang
+      const cookieString = document.cookie
+      if (cookieString) {
+        const cookies = cookieParser.parse(cookieString)
+        inst.defaults.headers.common['Accept-Language'] = cookies.lang || store.state.lang.lang
+        inst.defaults.headers.common['Authorization'] = cookies.token
       }
       // if (token && token.length) {
       //   inst.defaults.headers.common['Authorization'] = token[1]
@@ -42,7 +44,6 @@ export default ({ app, store }) => {
       const cookieString = req.headers.cookie
       const cookies = cookieString ? cookieParser.parse(cookieString) : {}
       const lang = cookies.lang || store.state.lang.lang || req.headers['Accept-Language']
-
       // todo:感觉这种用户信息(cookie)挂载到全局的方式，会有安全隐患。
       // 用户可能会串cookie，因为每个用户的cookie都会走一遍全局，因此可能不知道什么时候因为异步的存在，就串了cookie了
       // 回来仔细研究下应该怎么做鉴权，感觉这种 init 并不是最好的方式，感觉最佳方式应该是对于每个用户都初始化一个单独的axios实例，或者cookie挂在不同的请求里面，而不是全局里面
