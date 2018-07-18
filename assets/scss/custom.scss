@@ -125,15 +125,17 @@ input.form-control {
 
 // radio 的按钮有些偏下，这里修复下
 .custom-radio {
+  font-size: 16px;
+  color: #6f6f6f;
+
   .custom-control-label {
-    &::before,
-    &::after {
-      top: 0;
+    &::before {
+      top: 3px;
     }
 
     &::after {
       box-sizing: border-box;
-      top: 1px;
+      top: 4px;
       left: -23px;
       height: 14px;
       width: 14px;
@@ -146,6 +148,7 @@ input.form-control {
     outline: none;
   }
 
+  // check状态下的样式
   .custom-control-input:checked {
     & ~ .custom-control-label {
       &::before {
@@ -160,7 +163,7 @@ input.form-control {
       }
 
       span {
-        color: $brandYellow;
+        color: $black;
       }
     }
   }

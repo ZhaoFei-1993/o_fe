@@ -2,6 +2,14 @@
  * 以下常量尽量不要直接使用，而是通过store里面的constant来使用（那边会引用），保证单一数据来源
  */
 export const COIN_TYPES = ['BTC', 'BCH', 'ETH', 'USDT']
+
+export const COIN_TYPE_OPTIONS = COIN_TYPES.map(name => {
+  return {
+    text: name,
+    value: name
+  }
+})
+
 export const PAYMENT_OPTIONS = [
   {text: '不限', value: 'ALL'},
   {text: '银行卡', value: 'bankcard', icon: 'icon-bankcard'},        // method, 服务端对方法的定义
@@ -29,13 +37,13 @@ export const PAYMENT_STATUS = {
 
 export const COUNTERPARTY_LIMIT_OPTIONS = [{
   text: '交易方必须通过手机验证',
-  value: 0
+  value: 'bind_phone'
 }, {
   text: '交易方必须通过实名验证',
-  value: 1,
+  value: 'kyc',
 }, {
   text: '交易方必须完成过 1 次交易',
-  value: 2,
+  value: 'one_deal',
 }]
 
 export const VERIFY_CODE_TYPE = {

@@ -188,7 +188,10 @@
       <div class="items-list">
         <div class="list-title">
           <span>广告列表</span>
-          <span>没有合适的？<a href="/items/create">自己发布广告&gt;</a></span>
+          <span>
+            没有合适的？
+            <b-btn variant="plain" class="c-brand-green" @click="onItemPublish">自己发布广告</b-btn>
+          </span>
         </div>
         <div class="list-header">
           <span class="col-narrow">{{selectedSide==='buy'?'卖家':'买家'}}</span>
@@ -246,6 +249,7 @@
       :balance="user.balance"
       v-model="showPlaceOrderModal"
     ></PlaceOrderModal>
+    <PublishItemModal v-model="publishModalShowing" @published="onItemPublished"/>
   </div>
 </template>
 
@@ -253,11 +257,13 @@
   import Vue from 'vue'
   import {mapState} from 'vuex'
   import PlaceOrderModal from '~/components/place-order-modal'
+  import PublishItemModal from '~/components/publish-item-modal/index.vue'
   import UserPayments from '~/components/user-payments'
 
   export default {
     components: {
       PlaceOrderModal,
+      PublishItemModal,
       UserPayments,
     },
     layout: 'fullwidth',
@@ -272,6 +278,7 @@
         selectedItem: null,
         showPlaceOrderModal: false,
         busy: false,
+        publishModalShowing: true,
       }
     },
     computed: {
@@ -357,6 +364,12 @@
             return Promise.resolve()
           }
         })
+      },
+      onItemPublish() {
+        this.publishModalShowing = true
+      },
+      onItemPublished(item) {
+        this.publishModalShowing = false
       }
     },
   }

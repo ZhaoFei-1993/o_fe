@@ -46,6 +46,10 @@
     methods: {
       onInput(evt) {
         let value = evt.target.value.setDigit(this.decimalDigit)
+
+        // 如果value为空，则直接返回，防止被转为0
+        if (value === '') return this.$emit('input', value)
+
         value = Math.min(this.max, value)
         value = Math.max(this.min, value)
         evt.target.value = value

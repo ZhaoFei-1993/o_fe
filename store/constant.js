@@ -1,5 +1,6 @@
 import {
   COIN_TYPES,
+  COIN_TYPE_OPTIONS,
   PAYMENT_OPTIONS,
   PAYMENT_STATUS,
   PAYMENT_MAP,
@@ -29,6 +30,7 @@ export default () => {
   const state = {
     PRICING_TYPE,
     COIN_TYPES, // 暂时简单的字符串，之后根据后端情况改
+    COIN_TYPE_OPTIONS,
     PAYMENT_OPTIONS,
     PAYMENT_STATUS,
     PAYMENT_MAP,
