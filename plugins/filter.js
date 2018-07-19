@@ -1,7 +1,7 @@
 import Vue from 'vue'
 
 export function formatMoney(str) {
-  return str.formatMoney(8, '.', ',', true)
+  return String(str).formatMoney(8, '.', ',', true)
 }
 
 const filters = {
