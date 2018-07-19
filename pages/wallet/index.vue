@@ -60,8 +60,20 @@
     <div class="row-header">
       <span>资产流水</span>
       <div class="float-right">
-        <div style="display: inline-block;" ><span style="font-size: 12px;">币种：</span><b-form-select style="width: 100px;" v-model="historyQueryParams.coin_type" :options="[{ text: '全部', value: null }, ...constant.COIN_TYPE_OPTIONS]"></b-form-select></div>
-        <div style="display: inline-block;margin-left: 30px;"><span style="font-size: 12px;">流水类型：</span><b-form-select style="width: 100px;" v-model="historyQueryParams.side" :options="operationOptions" ></b-form-select></div>
+        <div style="display: inline-block;" >
+          <span style="font-size: 12px;">币种：</span>
+          <b-form-select style="width: 100px;"
+            v-model="historyQueryParams.coin_type"
+            :options="[{ text: '全部', value: null }, ...constant.COIN_TYPE_OPTIONS]">
+          </b-form-select>
+        </div>
+        <div style="display: inline-block;margin-left: 30px;">
+          <span style="font-size: 12px;">流水类型：</span>
+          <b-form-select style="width: 100px;"
+            v-model="historyQueryParams.side"
+            :options="operationOptions">
+          </b-form-select>
+        </div>
       </div>
     </div>
     <c-block class="no-padding">
@@ -74,7 +86,8 @@
         </template>
       </b-table>
       <blank v-if="!assetHistoryItems.length"></blank>
-      <b-pagination v-if="assetHistoryItems.length" :total-rows="historyQueryParams.totalRows" v-model="historyQueryParams.page"
+      <b-pagination v-if="assetHistoryItems.length" :total-rows="historyQueryParams.totalRows"
+                    v-model="historyQueryParams.page"
                     :per-page="historyQueryParams.limit"></b-pagination>
     </c-block>
 
@@ -251,7 +264,7 @@
         curAssetItem: null, // 当前点击`转入``转出`的资产项目
       }
     },
-    fetch({ store }) {
+    fetch({store}) {
      return Promise.all([
        store.dispatch('fetchOtcBalance'),
        store.dispatch('fetchCoinexBalance'),
@@ -263,7 +276,7 @@
         app.axios.balance.history({ page: 1, limit }),
       ])
     },
-    async asyncData({ app, req, redirect, route }) {
+    async asyncData({app, req, redirect, route}) {
       try {
         const historyQueryParams = {
           coin_type: null,
@@ -335,7 +348,7 @@
         return []
       },
       operationOptions() {
-        return [{ text: '全部', value: null }, ...Object.keys(this.bussinessTypeMap).map(key => {
+        return [{text: '全部', value: null}, ...Object.keys(this.bussinessTypeMap).map(key => {
           return {
             text: this.bussinessTypeMap[key],
             value: key,
@@ -356,7 +369,7 @@
     },
     methods: {
       onTransfer() {
-        const { amount } = this.form
+        const {amount} = this.form
         if (amount > 0) {
           if (!this.form.submitting) {
             this.form.submitting = true
@@ -380,7 +393,7 @@
         }
       },
       fetchBalanceHistory() {
-        const { page, limit, coin_type: coinType, side } = this.historyQueryParams
+        const {page, limit, coin_type: coinType, side} = this.historyQueryParams
         const query = {
           page,
           limit,
@@ -417,7 +430,7 @@
         this.form.from = this.form.to
         this.form.to = tmp
 
-        const { coin_type: coinType } = this.curAssetItem
+        const {coin_type: coinType} = this.curAssetItem
         const fromBalance = this[`${this.form.from}Balance`].find(item => {
           return item.coin_type === coinType
         })
@@ -545,7 +558,7 @@
       font-size: 18px;
       text-align: left;
       color: #192330;
-      padding-bottom:15px;
+      padding-bottom: 15px;
     }
     .td-pl {
       padding-left: 28px;
