@@ -49,8 +49,14 @@ export default {
   }],
 
   VERIFY_CODE_TYPE: {
-    GOOGLE: 'google',
+    GOOGLE: 'totp',
     SMS: 'sms'
+  },
+
+  // 验证码的业务类型
+  VERIFY_CODE_BUSINESS: {
+    ADD_PAYMENT: 'otc_add_payment_method',
+    MODIFY_PAYMENT: 'otc_modify_payment_method',
   },
 
   KYC_STATUS: {
