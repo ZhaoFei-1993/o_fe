@@ -10,8 +10,8 @@ const MODE = process.env.MODE || 'production'
 
 // 非正式环境(pre & dev)
 if (MODE !== 'production') {
-  loginPage = '//dev.coinex.com/account/signin'
-  signupPage = '//dev.coinex.com/account/signup'
+  loginPage = '//test1.coinex.com/account/signin'
+  signupPage = '//test1.coinex.com/account/signup'
 }
 
 // pre
@@ -24,10 +24,8 @@ if (MODE === 'pre') {
 // 这个配置host到本地nginx之后就可以转发到想用的mock server了(localhost:4006)
 if (MODE === 'development') {
   webDomain = '//dev.otc.coinex.com'
-  clientApiDomain = '//test.otc.coinex.com/res'
-  serverApiDomain = '//test.otc.coinex.com/res'
-  // clientApiDomain = '//120.79.223.206:8090/res'
-  // serverApiDomain = '//120.79.223.206:8090/res'
+  clientApiDomain = '//dev.otc.coinex.com/res'
+  serverApiDomain = '//dev.otc.coinex.com/res'
 }
 
 const protocol = process.client ? window.location.protocol : 'http:'
