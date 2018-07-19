@@ -14,7 +14,7 @@ export default (axios) => {
      * @return {Promise<any>}
      */
     payments() {
-      return Promise.resolve(require('./mock/user').paymentMethods)
+      // return Promise.resolve(require('./mock/user').paymentMethods)
       return axios.get('/user/payment/method')
     },
 
@@ -70,7 +70,7 @@ export default (axios) => {
      * @param status 'on' 'off' 开启/关闭
      */
     changePaymentStatus(id, status) {
-      return Promise.resolve({data: {}, code: 0})
+      // return Promise.resolve({data: {}, code: 0})
       return axios.patch(`/user/payment/method/${id}`, {
         status
       })
@@ -83,12 +83,26 @@ export default (axios) => {
      */
     addPaymentMethod(payment) {
       // 测试环境用的代码
-      const payments = require('./mock/user').paymentMethods.data
-      payment.status = 'on'
-      payments.push(payment)
-      return Promise.resolve({data: {}, code: 0})
+      // const payments = require('./mock/user').paymentMethods.data
+      // payment.status = 'on'
+      // payments.push(payment)
+      // return Promise.resolve({data: {}, code: 0})
 
-      return axios.patch(`/user/payment/method`, payment)
+      return axios.post(`/user/payment/method`, payment)
+    },
+
+    /**
+     * 更新payment
+     * @param payment
+     * @return {*}
+     */
+    updatePaymentMethod(payment) {
+      // const payments = require('./mock/user').paymentMethods.data
+      // payments.forEach(item => {
+      //   if (item.id === payment.id) Object.assign(item, payment)
+      // })
+      // return Promise.resolve({data: {}, code: 0})
+      return axios.put(`/user/payment/method/${payment.id}`, payment)
     },
 
     /**
@@ -98,20 +112,6 @@ export default (axios) => {
      */
     updateName(name) {
       return axios.patch(`/user/account`, {name})
-    },
-
-    /**
-     * 更新payment
-     * @param payment
-     * @return {*}
-     */
-    updatePaymentMethod(payment) {
-      const payments = require('./mock/user').paymentMethods.data
-      payments.forEach(item => {
-        if (item.id === payment.id) Object.assign(item, payment)
-      })
-      return Promise.resolve({data: {}, code: 0})
-      return axios.post(`/user/payment/method/${payment.id}`, payment)
     },
 
     dynamicConstraint() {
