@@ -41,14 +41,14 @@
           <li :class="['step',{active:order.status==='created'}]"
               v-if="(order.status!=='cancel'||order.pay_time)&&order.status!=='closed'">
             <div class="message">{{stepsMessage.payCash}}</div>
-            <div class="step-time" v-if="order.pay_time">{{order.pay_time | localTime}}</div>
+            <div class="step-time" v-if="order.pay_time">{{order.pay_time | getTimeText}}</div>
             <button v-if="isBuySide&&!order.pay_time" class="btn btn-gradient-yellow btn-xs" @click="confirmPay()">
               我已付款
             </button>
           </li>
           <li :class="['step',{active:order.status==='paid'}]" v-if="order.status!=='cancel'&&order.status!=='closed'">
             <div class="message">{{stepsMessage.payCoin}}</div>
-            <div class="step-time" v-if="order.complete_time">{{order.complete_time| localTime}}</div>
+            <div class="step-time" v-if="order.complete_time">{{order.complete_time| getTimeText}}</div>
             <button v-if="!isBuySide&&order.status==='paid'" class="btn btn-gradient-yellow btn-xs"
                     @click="confirmReceipt()">确认收款
             </button>
@@ -56,7 +56,7 @@
           <li :class="['step',{active:order.status==='success'}]"
               v-if="order.status!=='cancel'&&order.status!=='closed'">
             <div class="message">{{stepsMessage.success}}</div>
-            <div class="step-time" v-if="order.complete_time">{{order.complete_time| localTime}}</div>
+            <div class="step-time" v-if="order.complete_time">{{order.complete_time| getTimeText}}</div>
           </li>
           <li :class="['step',{active:order.status==='cancel'}]" v-if="order.status==='cancel'">
             <div class="message">{{stepsMessage.cancel}}</div>
@@ -347,17 +347,17 @@
         return !(this.appealReason && this.appealComment && this.appealComment.length > 15)
       },
       isBuySide() {
-        return this.order.user_side === 'buy' ? (this.user.id === this.order.user_id) : (this.user.id !== this.order.user_id)
+        return this.order.user_side === this.constant.SIDE.BUY.value ? (this.user.id === this.order.user_id) : (this.user.id !== this.order.user_id)
       },
       isBuyerAppeal() {
-        return this.order.user_side === 'buy' ? (this.appeal.user_id === this.order.user_id) : (this.appeal.user_id !== this.order.user_id)
+        return this.order.user_side === this.constant.SIDE.BUY.value ? (this.appeal.user_id === this.order.user_id) : (this.appeal.user_id !== this.order.user_id)
       },
       appealSide() {
         return this.isBuyerAppeal ? '买家' : '卖家'
       },
       canAppeal() {
-        return true || (this.order.status === 'paid' && this.utils.getTimeDifference(this.order.pay_time) > 60 * 1000 * PAID_CAN_APPEAL_MIN) ||
-          (this.order.status === 'success' && this.utils.getTimeDifference(this.order.complete_time) < 24 * 3600 * 1000 * SUCCESS_CAN_APPEAL_DAY)
+        return true || (this.order.status === this.constant.ORDER_STATUS.PAID.value && this.utils.getTimeDifference(this.order.pay_time) > 60 * 1000 * PAID_CAN_APPEAL_MIN) ||
+          (this.order.status === this.constant.ORDER_STATUS.SUCCESS.value && this.utils.getTimeDifference(this.order.complete_time) < 24 * 3600 * 1000 * SUCCESS_CAN_APPEAL_DAY)
       },
       isMaker() {
         return this.merchant.id === this.user.id
@@ -391,33 +391,30 @@
       },
       paymentStatusMessage() {
         switch (this.order.status) {
-          case 'created':
+          case this.constant.ORDER_STATUS.CREATED.value:
             return {message: `待支付，买方需在 <span class="c-red">${Math.floor(this.payRemainTime / 60)}分${this.payRemainTime % 60}秒</span>内完成支付，付款参考号：<span class="c-red">${this.referCode}</span>`}
-          case 'paid':
+          case this.constant.ORDER_STATUS.PAID.value:
             return {
               message: `已支付，卖方需确认收款并放行数字币，付款参考号：<span class="c-red">${this.referCode}</span>`,
               warning: '请务必确认收到款项后确认收款并核实买家是否实名付款。'
             }
-          case 'success':
+          case this.constant.ORDER_STATUS.SUCCESS.value:
             return {message: `卖方已确认收款，付款参考号：<span class="c-red">${this.referCode}</span>`}
-          case 'cancel':
+          case this.constant.ORDER_STATUS.CANCEL.value:
             return {message: `买家已取消交易，无法查看支付信息。`}
-          case 'closed':
+          case this.constant.ORDER_STATUS.CLOSED.value:
             return {message: `订单超时已关闭，无法查看支付信息。`}
           default:
             return {}
         }
       },
       stepsMessage() {
-        const success = '交易完成'
-        const closed = '订单已关闭'
-        const cancel = '订单已取消'
         return {
           payCash: `买家付款`,
           payCoin: `卖家确认收款，放行数字币`,
-          success,
-          cancel,
-          closed,
+          success: '交易完成',
+          closed: '订单已关闭',
+          cancel: '订单已取消',
         }
       },
     },
@@ -435,7 +432,7 @@
             }
             // TODO 删除以上测试用代码
             if (this.order.status === 'created') {
-              this.payRemainTime = Math.floor(((new Date('2018-07-13 11:14:57').valueOf() + 15 * 60 * 1000) - Date.now()) / 1000)
+              this.payRemainTime = Math.floor(((this.order.pay_time + 15 * 60) * 1000 - Date.now()) / 1000)
               clearInterval(this.secondCountdown)
               this.secondCountdown = setInterval(() => {
                 if (this.payRemainTime > 0) {
@@ -445,7 +442,7 @@
                 }
               }, 1000)
             }
-            if (this.order.status === 'paid' || this.order.status === 'success') {
+            if (this.order.status === this.constant.ORDER_STATUS.PAID.value || this.order.status === this.constant.ORDER_STATUS.SUCCESS.value) {
               this.getAppeal()
             }
             if (!withUsers) return
@@ -482,7 +479,7 @@
         })
       },
       checkOrderStatus() {
-        if (this.order.status === 'created' || this.order.status === 'paid' || this.order.appeal_status !== '') {
+        if (this.order.status === this.constant.ORDER_STATUS.CREATED.value || this.order.status === this.constant.ORDER_STATUS.PAID.value || this.order.appeal_status !== '') {
           setTimeout(() => {
             this.refreshOrderStatus()
           }, 20000)

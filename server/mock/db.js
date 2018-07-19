@@ -11,8 +11,8 @@ module.exports = () => {
     data.users.push({
       id: i,
       name: faker.name.findName(),
-      create_time: faker.date.past(),
-      first_trade_time: faker.date.past(),
+      create_time: Math.floor(faker.date.past().getTime()/1000),
+      first_trade_time: Math.floor(faker.date.past().getTime()/1000),
       address: faker.address.country(),
       status: faker.random.arrayElement([0, 1, 2, 3]),
       email: faker.random.word() + faker.internet.email(),
@@ -47,14 +47,15 @@ module.exports = () => {
       price: faker.random.number(),
       coin_amount: faker.random.number(),
       remain_coin_amount: faker.random.number(),
+      payment_methods:['wechat','alipay','bankcard'],
       freeze_coin_amount: faker.random.number(),
       min_deal_cash_amount: faker.random.number({max: 100}),
       max_deal_cash_amount: faker.random.number({min: 101}),
-      counterparty_limit: faker.random.number(),
+      counterparty_limit: ['bind_phone', 'kyc', 'one_deal'],
       auto_reply_content: faker.lorem.sentence(),
       status: faker.random.arrayElement([0, 1]),
-      create_time: faker.date.past(),
-      update_time: faker.date.past(),
+      create_time: Math.floor(faker.date.past().getTime()/1000),
+      update_time: Math.floor(faker.date.past().getTime()/1000),
     })
     const orderStatus = faker.random.arrayElement(['success', 'created', 'paid', 'cancel', 'closed'])
     data.orders.push({
@@ -72,12 +73,12 @@ module.exports = () => {
       appeal_status: faker.random.arrayElement(['', 'processing', 'completed']),
       status: orderStatus,
       is_reopened: faker.random.boolean(),
-      create_time: faker.date.past(),
-      update_time: faker.date.past(),
-      place_time: faker.date.past(),       // 下单时间
-      pay_time: orderStatus === 'created' ? null : faker.date.past(),         // 支付时间
-      complete_time: ['success', 'cancel', 'closed'].indexOf(orderStatus) > -1 ? faker.date.past() : null,    // 完成时间，success cancel closed状态
-      appeal_time: faker.date.past(),      // 申诉时间
+      create_time: Math.floor(faker.date.past().getTime()/1000),
+      update_time: Math.floor(faker.date.past().getTime()/1000),
+      place_time: Math.floor(faker.date.past().getTime()/1000),       // 下单时间
+      pay_time: orderStatus === 'created' ? null : Math.floor(faker.date.past().getTime()/1000),         // 支付时间
+      complete_time: ['success', 'cancel', 'closed'].indexOf(orderStatus) > -1 ? Math.floor(faker.date.past().getTime()/1000) : null,    // 完成时间，success cancel closed状态
+      appeal_time: Math.floor(faker.date.past().getTime()/1000),      // 申诉时间
     })
   }
   return data

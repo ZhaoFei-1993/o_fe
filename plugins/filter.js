@@ -1,15 +1,12 @@
 import Vue from 'vue'
-
+import {getTimeText} from './utils'
 export function formatMoney(str) {
   return str.formatMoney(8, '.', ',', true)
-}
-export function localTime(date) {
-  return (new Date(date)).toLocaleString()
 }
 
 const filters = {
   formatMoney,
-  localTime,
+  getTimeText,
 }
 
 export default filters

@@ -24,8 +24,8 @@ if (MODE === 'pre') {
 // 这个配置host到本地nginx之后就可以转发到想用的mock server了(localhost:4006)
 if (MODE === 'development') {
   webDomain = '//dev.otc.coinex.com'
-  clientApiDomain = '//dev.otc.coinex.com/api'
-  serverApiDomain = '//dev.otc.coinex.com/api'
+  clientApiDomain = '//test.otc.coinex.com/res'
+  serverApiDomain = '//test.otc.coinex.com/res'
   // clientApiDomain = '//120.79.223.206:8090/res'
   // serverApiDomain = '//120.79.223.206:8090/res'
 }

@@ -26,6 +26,54 @@ const emailDomainMap = {
 
 const imgTypeArr = ['JPEG', 'TIFF', 'RAW', 'BMP', 'GIF', 'PNG', 'JPG']
 
+export const getTimeText = (timestamp, precision = 'second') => {
+  const time = new Date(timestamp * 1000)
+  let timeText = ''
+  switch (precision) {
+    case 'second':
+      timeText =
+        time.getSeconds() > 9 ? time.getSeconds() : '0' + time.getSeconds()
+    case 'minute': // eslint-disable-line no-fallthrough
+      if (precision !== 'minute') {
+        timeText = ':' + timeText
+      }
+      timeText =
+        (time.getMinutes() > 9
+          ? time.getMinutes()
+          : '0' + time.getMinutes()) + timeText
+    case 'hour': // eslint-disable-line no-fallthrough
+      if (precision !== 'hour') {
+        timeText = ':' + timeText
+      }
+      timeText =
+        (time.getHours() > 9 ? time.getHours() : '0' + time.getHours()) +
+        timeText
+    case 'day': // eslint-disable-line no-fallthrough
+      if (precision !== 'day') {
+        timeText = ' ' + timeText
+      }
+      timeText =
+        (time.getDate() > 9 ? time.getDate() : '0' + time.getDate()) +
+        timeText
+    case 'month': // eslint-disable-line no-fallthrough
+      if (precision !== 'month') {
+        timeText = '-' + timeText
+      }
+      timeText =
+        (time.getMonth() + 1 > 9
+          ? time.getMonth() + 1
+          : '0' + (time.getMonth() + 1)) + timeText
+    case 'year': // eslint-disable-line no-fallthrough
+      if (precision !== 'year') {
+        timeText = '-' + timeText
+      }
+      timeText = time.getFullYear() + timeText
+      break
+    default:
+      break
+  }
+  return timeText
+}
 const utils = {
   isImage(fileName) {
     const arr = fileName.split('.')
@@ -203,63 +251,16 @@ const utils = {
    * @param  {String} precision 精确度
    * @return {String}           格式化后的时间字符串
    */
-  getTimeText: function (timestamp, precision = 'second') {
-    const time = new Date(timestamp * 1000)
-    let timeText = ''
-    switch (precision) {
-      case 'second':
-        timeText =
-          time.getSeconds() > 9 ? time.getSeconds() : '0' + time.getSeconds()
-      case 'minute': // eslint-disable-line no-fallthrough
-        if (precision !== 'minute') {
-          timeText = ':' + timeText
-        }
-        timeText =
-          (time.getMinutes() > 9
-            ? time.getMinutes()
-            : '0' + time.getMinutes()) + timeText
-      case 'hour': // eslint-disable-line no-fallthrough
-        if (precision !== 'hour') {
-          timeText = ':' + timeText
-        }
-        timeText =
-          (time.getHours() > 9 ? time.getHours() : '0' + time.getHours()) +
-          timeText
-      case 'day': // eslint-disable-line no-fallthrough
-        if (precision !== 'day') {
-          timeText = ' ' + timeText
-        }
-        timeText =
-          (time.getDate() > 9 ? time.getDate() : '0' + time.getDate()) +
-          timeText
-      case 'month': // eslint-disable-line no-fallthrough
-        if (precision !== 'month') {
-          timeText = '-' + timeText
-        }
-        timeText =
-          (time.getMonth() + 1 > 9
-            ? time.getMonth() + 1
-            : '0' + (time.getMonth() + 1)) + timeText
-      case 'year': // eslint-disable-line no-fallthrough
-        if (precision !== 'year') {
-          timeText = '-' + timeText
-        }
-        timeText = time.getFullYear() + timeText
-        break
-      default:
-        break
-    }
-    return timeText
-  },
+  getTimeText,
   /**
    * 计算时间距离
    * @param  {String} origin 起始时间
    * @param  {String} target 目标时间（默认当前时间）
    * @return {Number}    换算成毫秒差距返回， ('2018-08-08T08:08:08','2018-08-08T08:08:09') 将返回 1000,负数代表origin在将来
    */
-  getTimeDifference(origin, target = null) {
-    const originTime = new Date(origin).valueOf()
-    const targetTime = target ? new Date(target).valueOf() : Date.now()
+  getTimeDifference(originTimeStamp, target = null) {
+    const originTime = new Date(originTimeStamp * 1000).getTime()
+    const targetTime = target ? new Date(target).getTime() : Date.now()
     return targetTime - originTime
   },
 }
