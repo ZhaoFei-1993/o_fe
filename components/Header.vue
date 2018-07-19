@@ -166,6 +166,7 @@
     <b-modal id="update-name"
              ref="updateNameModal"
              title="确认昵称"
+             :hide-header-close="true"
              :no-close-on-esc="true"
              :no-close-on-backdrop="true"
              ok-variant="yellow"

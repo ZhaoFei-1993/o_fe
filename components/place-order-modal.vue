@@ -30,7 +30,7 @@
       <div class="info-detail">
         <span>单价：<span class="emphasis">{{item.price}}</span> CNY/{{item.coin_type}}</span>
         <span>限额：<span class="emphasis">{{item.min_deal_cash_amount+ '-'+ item.max_deal_cash_amount}}</span> CNY</span>
-        <span>支付方式：<span class="emphasis">银行卡、支付宝、微信TODO</span></span>
+        <span>支付方式：<span class="emphasis">{{paymentMethods}}</span></span>
       </div>
       <div class="item-payment">
         <b-form v-if="form" @submit.prevent="onSubmit">
@@ -188,6 +188,7 @@
   import {required, minValue, maxValue} from 'vuelidate/lib/validators'
   import EMsgs from '~/components/error-message.vue'
   import ExtendedInputNumber from '~/components/extended-input-number.vue'
+  import {mapState} from 'vuex'
 
   Vue.use(Vuelidate)
   export default {
@@ -224,12 +225,20 @@
       return {form: this.validationConf.validations}
     },
     computed: {
+      ...mapState(['constant']),
       sideText() {
         return this.item.side === 'BUY' ? '购买' : '出售'
       },
       title() {
         if (!this.item) return ''
         return '确认' + this.sideText + ' ' + this.item.coin_type
+      },
+      paymentMethods() {
+        const payText = []
+        this.item.payment_methods.forEach(p => {
+          payText.push(this.constant.PAYMENT_OPTIONS.find(pay => pay.value === p).text)
+        })
+        return payText.join('，')
       },
       balanceTip() {
         return this.form.coin_amount > this.balance[this.item.coin_type] ? '余额不足，' : ''
