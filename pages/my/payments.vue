@@ -135,11 +135,14 @@
             </b-form-group>
           </div>
 
-          <VerifyCode :needGoogle="true" :needSms="true"
+          <VerifyCode :needGoogle="true" :needSms="true" :needEmail="true"
                       :sms.sync="verify.sms"
                       :google.sync="verify.google"
                       :email.sync="verify.email"
                       :codeType.sync="verify.codeType"
+                      :businessType="verify.businessType"
+                      :emailSequence.sync="verify.emailSequence"
+                      :smsSequence.sync="verify.smsSequence"
                       ref="verify-code"/>
         </div>
       </b-form>
@@ -175,10 +178,13 @@ export default {
   data() {
     return {
       verify: {
-        codeType: 'google',   // todo:默认值
+        codeType: 'sms',   // todo:默认值
         sms: '',
         google: '',
         email: '',
+        businessType: '',
+        smsSequence: 0,
+        emailSequence: 0
       },
       form: {
         method: '',
@@ -189,7 +195,7 @@ export default {
         qr_code_image: '',
       },
       modalShowing: false,
-      isPaymentEditing: false,     // 是否正在被编辑payment
+      isPaymentEditing: false,     // 是否正在被编辑payment（而不是添加）
 
       bankList: [{
         text: '中国银行',
@@ -233,28 +239,8 @@ export default {
       this.axios.user.changePaymentStatus(payment.id, status).then(res => {
         payment.status = status
         this.$showTips(status === PAYMENT_STATUS.ON ? '开启成功' : '关闭成功')
-      })
-    },
-
-    onPaymentEdit(payment) {
-      this.modalShowing = true
-      this.isPaymentEditing = true
-      this.form = payment
-    },
-
-    updatePayment() {
-      const form = this.form
-      const verify = this.verify
-      const code = verify.codeType === this.constant.VERIFY_CODE_TYPE.GOOGLE ? verify.google : verify.sms
-
-      this.axios.user.updatePaymentMethod({
-        verify_code_type: verify.codeType,
-        verify_code: code,
-        ...form,
-      }).then(res => {
-        this.$store.dispatch('fetchUserPayments')
-        this.modalShowing = false
-        this.$showTips('修改成功')
+      }).catch(err => {
+        this.axios.onError(err)
       })
     },
 
@@ -267,8 +253,37 @@ export default {
       this.form = form
     },
 
+    onPaymentEdit(payment) {
+      this.modalShowing = true
+      this.isPaymentEditing = true
+      this.form = payment
+      this.verify.businessType = this.constant.VERIFY_CODE_BUSINESS.MODIFY_PAYMENT
+    },
+
+    updatePayment() {
+      const form = this.form
+      const verify = this.verify
+      const code = verify.codeType === this.constant.VERIFY_CODE_TYPE.GOOGLE ? verify.google : verify.sms
+
+      this.axios.user.updatePaymentMethod({
+        validate_code_type: verify.codeType,
+        validate_code: code,
+        email_code: verify.email,
+        email_code_sequence: verify.emailSequence,
+        sequence: verify.smsSequence,
+        ...form,
+      }).then(res => {
+        this.$store.dispatch('fetchUserPayments')
+        this.modalShowing = false
+        this.$showTips('修改成功')
+      }).catch(err => {
+        this.axios.onError(err)
+      })
+    },
+
     onPaymentAdd() {
       this.modalShowing = true
+      this.verify.businessType = this.constant.VERIFY_CODE_BUSINESS.ADD_PAYMENT
 
       if (this.isPaymentEditing) {
         this.clearForm()
@@ -282,13 +297,18 @@ export default {
       const code = verify.codeType === this.constant.VERIFY_CODE_TYPE.GOOGLE ? verify.google : verify.sms
 
       this.axios.user.addPaymentMethod({
-        verify_code_type: verify.codeType,
-        verify_code: code,
+        validate_code_type: verify.codeType,
+        validate_code: code,
+        email_code: verify.email,
+        email_code_sequence: verify.emailSequence,
+        sequence: verify.smsSequence,
         ...form,
       }).then(res => {
         this.$store.dispatch('fetchUserPayments')
         this.modalShowing = false
         this.$showTips('添加成功')
+      }).catch(err => {
+        this.axios.onError(err)
       })
     },
 
