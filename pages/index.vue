@@ -212,20 +212,21 @@
             <div class="col-narrow">
               <div class="fz-12 c-4a">
                 {{item.user.user_stat.deal_count}}单 /
-                {{(item.user.user_stat.deal_count/item.user.user_stat.order_count)|percentage}}
+                {{item.user.user_stat.order_count?((item.user.user_stat.deal_count/item.user.user_stat.order_count)|percentage):'--'}}
               </div>
-              <div class="fz-12 c-6f">{{selectedSide===
-                constant.SIDE.BUY.value?`放行时间${item.user.user_stat.receipt_time}分钟`:`付款时间${item.user.user_stat.pay_time}分钟`}}
+              <div class="fz-12 c-6f">
+                {{selectedSide===
+                constant.SIDE.BUY.value?`放行时间${utils.formatDuration(item.user.user_stat.receipt_time)}`:`付款时间${utils.formatDuration(item.user.user_stat.pay_time)}`}}
               </div>
             </div>
-            <span class="col-narrow text-right fz-12 c-6f">{{item.coin_amount+' '+selectedCoin}}</span>
+            <span class="col-narrow text-right fz-12 c-6f">{{item.remain_coin_amount+' '+selectedCoin}}</span>
             <span class="col-wide text-right pr-60 fz-12 c-6f">{{item.min_deal_cash_amount+ '-'+ item.max_deal_cash_amount + 'CNY'}}</span>
             <span class='payment col-narrow'>
               <UserPayments :payments="item.payment_methods"></UserPayments>
             </span>
             <span :class="['sort-price col-wide pr-60 text-right',sortPrice]">{{item.price + ' CNY'}}</span>
             <span class="col-narrow">
-              <template v-if="user && user.id ===item.user_id">
+              <template v-if="user && user.id ===item.user.id">
                 <button class="btn btn-order-disabled" :id="'button-order-'+item.id" v-b-tooltip.hover title="不能与自己交易"> {{(selectedSide===constant.SIDE.BUY.value?'购买':'出售')+ selectedCoin}} </button>
               </template>
               <button
@@ -252,9 +253,8 @@
       </div>
     </div>
     <PlaceOrderModal
-      v-if="selectedItem&&user.balance"
+      v-if="selectedItem"
       :item="selectedItem"
-      :balance="user.balance"
       v-model="showPlaceOrderModal"
     ></PlaceOrderModal>
     <PublishItemModal v-model="publishModalShowing" @published="onItemPublished"/>
@@ -290,7 +290,7 @@
       }
     },
     computed: {
-      ...mapState(['constant', 'user']),
+      ...mapState(['constant', 'user', 'balance']),
     },
     async fetch({store}) {
       await store.dispatch('fetchUserQualification')
@@ -321,17 +321,17 @@
       getItems() {
         this.busy = true
         this.axios.item.getItems({
-          side: this.selectedSide,
+          side: this.selectedSide === this.constant.SIDE.BUY.value ? this.constant.SIDE.SELL.value : this.constant.SIDE.BUY.value,
           coin_type: this.selectedCoin,
           payment_method: this.selectedPayment === 'ALL' ? undefined : this.selectedPayment.toLowerCase(),
         }).then(response => {
           this.busy = false
-          this.items = response.data.data.slice(0, 30)
+          this.items = response.data
         })
       },
       placeOrder(item) {
         this.verifyDynamicConstraint(item).then(res => {
-          this.$store.dispatch('fetchUserBalance').then(_ => {
+          this.$store.dispatch('fetchOtcBalance').then(_ => {
             this.selectedItem = item
             this.showPlaceOrderModal = true
           })

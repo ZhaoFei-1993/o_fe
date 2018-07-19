@@ -114,11 +114,6 @@ export default (axios) => {
       return axios.post(`/user/payment/method/${payment.id}`, payment)
     },
 
-    // todo:balance接口需要重新设计下
-    balance() {
-      return Promise.resolve(require('./mock/user').balance)
-    },
-
     dynamicConstraint() {
       return Promise.resolve(require('./mock/user').constraint)
     },

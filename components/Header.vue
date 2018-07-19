@@ -134,7 +134,7 @@
             <b-dropdown-item to="/wallet"><i class="iconfont icon-manage-account"></i> OTC账户</b-dropdown-item>
             <b-dropdown-item to="/items"><i class="iconfont icon-manage-item"></i> 广告管理</b-dropdown-item>
             <b-dropdown-item to="/my/merchant"><i class="iconfont icon-apply-merchant"></i> 商家申请</b-dropdown-item>
-            <b-dropdown-item><i class="iconfont icon-manage-ticket"></i> 工单系统</b-dropdown-item>
+            <!--<b-dropdown-item><i class="iconfont icon-manage-ticket"></i> 工单系统</b-dropdown-item>-->
             <b-dropdown-item @click="signOut"><i class="iconfont icon-logout"></i>退出登录</b-dropdown-item>
           </b-nav-item-dropdown>
 
@@ -175,7 +175,7 @@
       <div v-if="user&&user.account">
         <p>请确认或修改您的昵称，昵称一旦确定将无法修改。</p>
         <p class="c-red" v-if="nameDuplicated">请确认或修改您的昵称，昵称一旦确定将无法修改。</p>
-        <b-form-input v-model="user.account.name" type="text" placeholder="您的昵称" required></b-form-input>
+        <b-form-input v-model="userName" type="text" placeholder="您的昵称" required></b-form-input>
       </div>
     </b-modal>
   </div>
@@ -188,7 +188,7 @@
 
   export default {
     head: {
-      link: [{rel: 'stylesheet', href: '//at.alicdn.com/t/font_739076_8a5nu4m6gas.css'}]
+      link: [{rel: 'stylesheet', href: '//at.alicdn.com/t/font_739076_b0i1ri4pur.css'}]
     },
     components: {},
 
@@ -197,6 +197,7 @@
         attentionModelShowing: null,
         attention: [],
         nameDuplicated: false,
+        userName: null,
         activeAttentionIndex: 0,
         loginPage: `${loginPage}?redirect=${encodeURIComponent(webDomain + this.$route.fullPath)}`,
         registerPage: `${signupPage}?redirect=${encodeURIComponent(webDomain + this.$route.fullPath)}`,
@@ -225,6 +226,7 @@
       // component 里面不能调用fetch和asyncData
       this.$store.dispatch('fetchUserAccount').then(_ => {
         if (this.user && this.user.account && !this.user.account.is_name_confirmed) {
+          this.userName = this.user.account.name
           this.$refs.updateNameModal.show()
         }
       })
@@ -233,7 +235,7 @@
       handleUpdateName(evt) {
         // 要验证重名，避免被关闭，需要ref来调用
         evt.preventDefault()
-        this.axios.user.updateName(this.user.account.name).then(_ => {
+        this.axios.user.updateName(this.useName).then(_ => {
           this.$refs.updateNameModal.hide()
         }).catch(err => {
           if (err.code === 72) {

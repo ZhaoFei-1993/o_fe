@@ -31,10 +31,10 @@
         <div v-if="amountLimitEditing">
           <CurrencyInput v-model="editingSettings.min_deal_cash_amount" :currency="balance.currentCash"/>
           <span class="fz-12 mx-2">—</span>
-          <CurrencyInput v-model="editingSettings.max_deal_cash_amount" :currency="balance.currentCash"/>
+          <CurrencyInput v-model="editingSettings.maxDealCashAmount" :currency="balance.currentCash"/>
         </div>
         <div v-else>
-          {{settings.min_deal_cash_amount}} {{balance.currentCash}} — {{settings.max_deal_cash_amount}}
+          {{settings.min_deal_cash_amount}} {{balance.currentCash}} — {{settings.maxDealCashAmount}}
           {{balance.currentCash}}
         </div>
       </div>

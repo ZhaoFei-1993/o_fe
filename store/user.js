@@ -27,9 +27,6 @@ export default () => {
     SET_USER_PAYMENTS(state, data) {
       state.payments = data
     },
-    SET_USER_BALANCE(state, data) {
-      state.balance = data
-    },
     SET_USER_MERCHANT(state, data) {
       state.merchant = data
     },
@@ -42,7 +39,6 @@ export default () => {
   }
   const actions = {
     fetchUserAccount({commit}) {
-      console.log('useraccount')
       return this.app.axios.user.account().then(data => {
         commit('SET_USER_ACCOUNT', data.data)
       })
@@ -57,11 +53,6 @@ export default () => {
           payment.isActive = paymentOption.status === rootState.constant.PAYMENT_STATUS.ON
         })
         commit('SET_USER_PAYMENTS', data.data)
-      })
-    },
-    fetchUserBalance({commit, state, rootState}) {
-      return this.app.axios.user.balance().then(data => {
-        commit('SET_USER_BALANCE', data.data)
       })
     },
     fetchUserMerchant({commit, state, rootState}) {

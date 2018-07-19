@@ -3,6 +3,7 @@
 
   .error-message {
     color: $red;
+    height:21px;
     margin: 4px;
   }
 </style>

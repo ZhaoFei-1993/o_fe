@@ -17,7 +17,7 @@ export default (axios) => {
         'price': item.price,                             // 单价，fixed定价类型必填
         'coin_amount': item.coin_amount,                       // 币量
         'counterparty_limit': item.counterparty_limit,
-        'max_deal_cash_amount': item.max_deal_cash_amount,           // 最大成交额
+        'max_deal_cash_amount': item.maxDealCashAmount,           // 最大成交额
         'min_deal_cash_amount': item.min_deal_cash_amount,           // 最小成交额
         'auto_reply_content': item.auto_reply_content,                     // 自动回复内容
       })
