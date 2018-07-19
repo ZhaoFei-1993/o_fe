@@ -235,7 +235,6 @@ const utils = {
 
     for (const key in validationConfig) {
       validations[key] = validationConfig[key].validation
-      console.log(validations[key], validationConfig[key])
       invalidMessages[key] = validationConfig[key].message
     }
 
@@ -263,6 +262,25 @@ const utils = {
     const targetTime = target ? new Date(target).getTime() : Date.now()
     return targetTime - originTime
   },
+  /**
+   * 显示时长
+   * @param  {Number} durationNum 时间秒数
+   * @param  {String} format 格式
+   * @return {String} 时间长度，例如 1天2小时3分钟4秒
+   */
+  formatDuration(durationNum, format=null) {
+    if (!durationNum) {
+      return '--'
+    }
+    const day = Math.floor(durationNum / 86400)
+    const hour = Math.floor((durationNum % 86400) / 3600)
+    const minute = Math.floor((durationNum % 3600) / 60)
+    const second = Math.floor(durationNum % 60)
+    if (format) {
+      return format.replace(/d/i, day).replace(/h/i, hour).replace(/m/i, minute).replace(/s/i, second)
+    }
+    return (day ? (day + '天') : '') + (hour ? (hour + '小时') : '') + (durationNum < 86400 && minute ? (minute + '分钟') : '') + (durationNum < 3600 && second ? (second + '秒') : '')
+  }
 }
 
 export default ({app, store}) => {

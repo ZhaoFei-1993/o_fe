@@ -60,6 +60,9 @@ export default (axios) => {
       return Promise.resolve(require('./mock/user').settings)
       return axios.get('/user/settings')
     },
+    signOut() {
+      return axios.post('/user/sign/out')
+    },
 
     /**
      * 更改payment开启、关闭状态
