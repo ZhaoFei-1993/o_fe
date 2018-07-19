@@ -1,16 +1,4 @@
-import {
-  COIN_TYPES,
-  COIN_TYPE_OPTIONS,
-  PAYMENT_OPTIONS,
-  PAYMENT_STATUS,
-  PAYMENT_MAP,
-  PAYMENT_TYPES,
-  COUNTERPARTY_LIMIT_OPTIONS,
-  KYC_STATUS,
-  VERIFY_CODE_TYPE,
-  PRICING_TYPE,
-  MERCHANT_STATUS,
-} from '~/modules/constant'
+import CONSTSANTS from '~/modules/constant'
 
 /**
  * 将后台给的列表转化为options格式，方便组件使用
@@ -28,17 +16,7 @@ function list2Options(data) {
 
 export default () => {
   const state = {
-    PRICING_TYPE,
-    COIN_TYPES, // 暂时简单的字符串，之后根据后端情况改
-    COIN_TYPE_OPTIONS,
-    PAYMENT_OPTIONS,
-    PAYMENT_STATUS,
-    PAYMENT_MAP,
-    PAYMENT_TYPES,
-    COUNTERPARTY_LIMIT_OPTIONS,
-    KYC_STATUS,
-    VERIFY_CODE_TYPE,
-    MERCHANT_STATUS,
+    ...CONSTSANTS,
     bankOptions: [],                    // 银行列表
     appealReasonOptions: [],            // 申诉原因列表
     cancelMerchantReasonOptions: [],    // 取消商家身份原因列表

@@ -213,7 +213,7 @@
             <span class="col-narrow text-right fz-12 c-6f">{{item.coin_amount+' '+selectedCoin}}</span>
             <span class="col-wide text-right pr-60 fz-12 c-6f">{{item.min_deal_cash_amount+ '-'+ item.max_deal_cash_amount + 'CNY'}}</span>
             <span class='payment col-narrow'>
-              <UserPayments :payments="item.payment_methods || ['wechat','alipay','bankcard']"></UserPayments>
+              <UserPayments :payments="item.payment_methods"></UserPayments>
             </span>
             <span :class="['sort-price col-wide pr-60 text-right',sortPrice]">{{item.price + ' CNY'}}</span>
             <span class="col-narrow">
@@ -286,6 +286,7 @@
     },
     beforeMount() {
       this.$store.dispatch('fetchUserQualification')
+      this.$store.dispatch('fetchUserPayments')
       this.getItems()
       this.requestItems = setInterval(() => {
         this.getItems()
@@ -319,11 +320,13 @@
         })
       },
       placeOrder(item) {
-        this.verifyDynamicConstraint().then(res => {
+        this.verifyDynamicConstraint(item).then(res => {
           this.$store.dispatch('fetchUserBalance').then(_ => {
             this.selectedItem = item
             this.showPlaceOrderModal = true
           })
+        }, rejected => {
+          // 暂不处理
         })
       },
       filterPayment(payment) {
@@ -339,25 +342,61 @@
         })
       },
       qualified(item) {
-        // TODO 后端返回每个广告的条件
-        return Math.random() > 0.5
+        for (const limit of item.counterparty_limit) {
+          if (!this.user.qualification || this.user.qualification.indexOf(limit) < 0) {
+            return false
+          }
+        }
+        return true
       },
-      verifyDynamicConstraint() {
+      verifyHasPayment(item) {
+        if (!this.user.payments) {
+          return false
+        }
+        for (const pay of item.payment_methods) {
+          if (this.user.payments.find(p => p.method === pay)) {
+            return true
+          }
+        }
+        return false
+      },
+      verifyDynamicConstraint(item) {
+        if (item.user_side === this.constant.SIDE.SELL.value) {
+          // 卖家需要有对应支付方式
+          if (!this.verifyHasPayment(item)) {
+            this.$showDialog({
+              title: '交易限制',
+              okOnly: true,
+              content:
+                <div>
+                  您尚未添加该广告支持的支付方式，无法下单。
+                  <p>
+                    <b-link href="/my/payments">添加支付方式。</b-link>
+                  </p>
+                </div>,
+            })
+            return Promise.reject(item)
+          }
+        }
         return this.axios.user.dynamicConstraint().then(response => {
           const constraint = response.data
           if (constraint.cancel || constraint.kyc_time) {
             this.$showDialog({
               title: '交易限制',
-              content: constraint.cancel ? (<div>您今天累计取消超过 3 次订单，被冻结交易功能。
-                <b-link href="#TODO">了解更多交易规则。</b-link>
-              </div>) : (<div>您今天累计取消超过 3 次订单，被冻结交易功能。
-                <b-link href="#TODO">去完成实名认证。</b-link>
-              </div>),
-              onOk: () => {
-                this.axios.order.updatePayMethod(this.order.id, this.selectedMethod).then(response => {
-                  this.axios.order.confirmPay(this.order.id)
-                })
-              }
+              okOnly: true,
+              content: constraint.cancel ? (
+                <div>
+                  您今天累计取消超过 3 次订单，被冻结交易功能。
+                  <p>
+                    <b-link href="#TODO">了解更多交易规则。</b-link>
+                  </p>
+                </div>) : (
+                <div>
+                  您尚未完成实名认证，每日限制下单次数为 3 次。
+                  <p>
+                    <b-link to="/my/merchant">去完成实名认证。</b-link>
+                  </p>
+                </div>),
             })
             return Promise.reject(constraint)
           } else {

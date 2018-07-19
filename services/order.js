@@ -30,6 +30,12 @@ export default (axios) => {
     appeal(id, title, detail) {
       return axios.post(`/orders/${id}/appeal`, {title, detail})
     },
+    getAppeal(id) {
+      return axios.get(`/orders/${id}/appeal`)
+    },
+    submitAppeal(id, title, detail) {
+      return axios.post(`/orders/${id}/appeal`, {title, detail})
+    },
     cancelAppeal(id) {
       return axios.delete(`/orders/${id}/appeal`)
     },
