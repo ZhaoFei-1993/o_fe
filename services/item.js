@@ -6,7 +6,7 @@ export default (axios) => {
       })
     },
     async createItem(item) {
-      return Promise.resolve({ data: 0, code: 0 })
+      // return Promise.resolve({ data: 0, code: 0 })
       return axios.post('/items', {
         'side': item.side,                               // 方向 buy/sell
         'coin_type': item.coin_type,                          // 币种
