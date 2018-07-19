@@ -42,6 +42,7 @@ export default () => {
   }
   const actions = {
     fetchUserAccount({commit}) {
+      console.log('useraccount')
       return this.app.axios.user.account().then(data => {
         commit('SET_USER_ACCOUNT', data.data)
       })

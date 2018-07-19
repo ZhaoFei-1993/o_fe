@@ -118,8 +118,8 @@
         return this.user.settings ? this.user.settings : {}
       }
     },
-    async fetch() {
-      await this.$store.dispatch('fetchUserSettings')
+    async fetch({store}) {
+      await store.dispatch('fetchUserSettings')
     },
     mounted() {
       this.store2Data()

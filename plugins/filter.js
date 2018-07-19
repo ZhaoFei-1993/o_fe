@@ -7,6 +7,9 @@ export function formatMoney(str) {
 const filters = {
   formatMoney,
   getTimeText,
+  percentage(num){
+    return (num * 100 + '').round(2) + '%'
+  }
 }
 
 export default filters

@@ -221,13 +221,13 @@
         return 'https://support.coinex.com/hc/' + lang
       },
     },
-    async fetch() {
-      await this.$store.dispatch('fetchUserAccount')
-    },
     mounted() {
-      if (this.user && this.user.account && !this.user.account.is_name_confirmed) {
-        this.$refs.updateNameModal.show()
-      }
+      // component 里面不能调用fetch和asyncData
+      this.$store.dispatch('fetchUserAccount').then(_ => {
+        if (this.user && this.user.account && !this.user.account.is_name_confirmed) {
+          this.$refs.updateNameModal.show()
+        }
+      })
     },
     methods: {
       handleUpdateName(evt) {

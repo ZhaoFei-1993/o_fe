@@ -53,17 +53,20 @@
             line-height: 50px;
             flex: 1;
             .coin-type {
+              font-size: 18px;
               line-height: 50px;
-              width: 80px;
+              margin: 0 20px;
               display: inline-block;
               cursor: pointer;
             }
           }
           &.active {
             .coin-type.active {
+              color: $brandYellow;
               border-bottom: 2px solid $brandYellow;
             }
             &.sell .coin-type.active {
+              color: $brandGreen;
               border-bottom: 2px solid $brandGreen;
             }
           }
@@ -167,20 +170,20 @@
     <div class="layout-content">
       <div class="trade-choices row">
         <div class="col-6">
-          <div :class="['choice-block buy', {active:'BUY'===selectedSide}]">
+          <div :class="['choice-block buy', {active:constant.SIDE.BUY.value===selectedSide}]">
             <div class="side"><i class="iconfont icon-arrow-down"></i>购买</div>
             <div class="coin-types">
               <span :class="['coin-type', {active:coin===selectedCoin}]" v-for="coin in constant.COIN_TYPES"
-                    @click="showItems('buy',coin)">{{coin}}</span>
+                    @click="showItems(constant.SIDE.BUY.value,coin)">{{coin}}</span>
             </div>
           </div>
         </div>
         <div class="col-6">
-          <div :class="['choice-block sell', {active:'sell'===selectedSide}]">
+          <div :class="['choice-block sell', {active:constant.SIDE.SELL.value===selectedSide}]">
             <div class="side"><i class="iconfont icon-arrow-up"></i>出售</div>
             <div class="coin-types">
               <span :class="['coin-type', {active:coin===selectedCoin}]" v-for="coin in constant.COIN_TYPES"
-                    @click="showItems('sell',coin)">{{coin}}</span>
+                    @click="showItems(constant.SIDE.SELL.value,coin)">{{coin}}</span>
             </div>
           </div>
         </div>
@@ -194,7 +197,7 @@
           </span>
         </div>
         <div class="list-header">
-          <span class="col-narrow">{{selectedSide==='buy'?'卖家':'买家'}}</span>
+          <span class="col-narrow">{{selectedSide=== constant.SIDE.BUY.value?'卖家':'买家'}}</span>
           <span class="col-narrow">30天成单/完成率</span>
           <span class="col-narrow">数量</span>
           <span class="col-wide">限额</span>
@@ -207,8 +210,13 @@
           <div class="item-row" v-for="item in items">
             <span class="col-narrow text-center fz-18 c-6f">{{item.user.name}}</span>
             <div class="col-narrow">
-              <div class="fz-12 c-4a">1024单/50%</div>
-              <div class="fz-12 c-6f">放行时间7分钟</div>
+              <div class="fz-12 c-4a">
+                {{item.user.user_stat.deal_count}}单 /
+                {{(item.user.user_stat.deal_count/item.user.user_stat.order_count)|percentage}}
+              </div>
+              <div class="fz-12 c-6f">{{selectedSide===
+                constant.SIDE.BUY.value?`放行时间${item.user.user_stat.receipt_time}分钟`:`付款时间${item.user.user_stat.pay_time}分钟`}}
+              </div>
             </div>
             <span class="col-narrow text-right fz-12 c-6f">{{item.coin_amount+' '+selectedCoin}}</span>
             <span class="col-wide text-right pr-60 fz-12 c-6f">{{item.min_deal_cash_amount+ '-'+ item.max_deal_cash_amount + 'CNY'}}</span>
@@ -218,17 +226,17 @@
             <span :class="['sort-price col-wide pr-60 text-right',sortPrice]">{{item.price + ' CNY'}}</span>
             <span class="col-narrow">
               <template v-if="user && user.id ===item.user_id">
-                <button class="btn btn-order-disabled" :id="'button-order-'+item.id" v-b-tooltip.hover title="不能与自己交易"> {{(selectedSide==='buy'?'购买':'出售')+ selectedCoin}} </button>
+                <button class="btn btn-order-disabled" :id="'button-order-'+item.id" v-b-tooltip.hover title="不能与自己交易"> {{(selectedSide===constant.SIDE.BUY.value?'购买':'出售')+ selectedCoin}} </button>
               </template>
               <button
                 v-else-if="qualified(item)"
-                :class="['btn btn-order',{'btn-outline-yellow':selectedSide==='buy','btn-outline-green':selectedSide==='sell'}]"
+                :class="['btn btn-order',{'btn-outline-yellow':selectedSide===constant.SIDE.BUY.value,'btn-outline-green':selectedSide===constant.SIDE.SELL.value}]"
                 @click="placeOrder(item)"
               >
-                {{(selectedSide==='buy'?'购买':'出售')+ selectedCoin}}
+                {{(selectedSide===constant.SIDE.BUY.value?'购买':'出售')+ selectedCoin}}
               </button>
               <template v-else>
-                <button class="btn btn-order-disabled" :id="'button-order-'+item.id"> {{(selectedSide==='buy'?'购买':'出售')+ selectedCoin}} </button>
+                <button class="btn btn-order-disabled" :id="'button-order-'+item.id"> {{(selectedSide===constant.SIDE.BUY.value?'购买':'出售')+ selectedCoin}} </button>
                 <b-popover triggers="hover click" :target="'button-order-'+item.id"
                            title="商家交易限制">
                   <ol>
@@ -259,6 +267,7 @@
   import PlaceOrderModal from '~/components/place-order-modal'
   import PublishItemModal from '~/components/publish-item-modal/index.vue'
   import UserPayments from '~/components/user-payments'
+
   const refreshInterval = 5000
   export default {
     components: {
@@ -269,7 +278,6 @@
     layout: 'fullwidth',
     data() {
       return {
-        message: 'Hello OTC',
         selectedCoin: this.$route.query.coin || 'BTC',
         selectedSide: this.$route.query.side || 'buy',
         selectedPayment: this.$route.query.payment || 'ALL',
@@ -284,9 +292,9 @@
     computed: {
       ...mapState(['constant', 'user']),
     },
-    async fetch() {
-      await this.$store.dispatch('fetchUserQualification')
-      await this.$store.dispatch('fetchUserPayments')
+    async fetch({store}) {
+      await store.dispatch('fetchUserQualification')
+      await store.dispatch('fetchUserPayments')
     },
     mounted() {
       this.getItems()
