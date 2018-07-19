@@ -347,10 +347,10 @@
         return !(this.appealReason && this.appealComment && this.appealComment.length > 15)
       },
       isBuySide() {
-        return this.order.user_side === this.constant.SIDE.BUY.value ? (this.user.id === this.order.user_id) : (this.user.id !== this.order.user_id)
+        return this.order.user_side === this.constant.SIDE.BUY ? (this.user.id === this.order.user_id) : (this.user.id !== this.order.user_id)
       },
       isBuyerAppeal() {
-        return this.order.user_side === this.constant.SIDE.BUY.value ? (this.appeal.user_id === this.order.user_id) : (this.appeal.user_id !== this.order.user_id)
+        return this.order.user_side === this.constant.SIDE.BUY ? (this.appeal.user_id === this.order.user_id) : (this.appeal.user_id !== this.order.user_id)
       },
       appealSide() {
         return this.isBuyerAppeal ? '买家' : '卖家'

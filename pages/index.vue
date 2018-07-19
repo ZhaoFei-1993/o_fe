@@ -170,20 +170,20 @@
     <div class="layout-content">
       <div class="trade-choices row">
         <div class="col-6">
-          <div :class="['choice-block buy', {active:constant.SIDE.BUY.value===selectedSide}]">
+          <div :class="['choice-block buy', {active:constant.SIDE.BUY===selectedSide}]">
             <div class="side"><i class="iconfont icon-arrow-down"></i>购买</div>
             <div class="coin-types">
               <span :class="['coin-type', {active:coin===selectedCoin}]" v-for="coin in constant.COIN_TYPES"
-                    @click="showItems(constant.SIDE.BUY.value,coin)">{{coin}}</span>
+                    @click="showItems(constant.SIDE.BUY,coin)">{{coin}}</span>
             </div>
           </div>
         </div>
         <div class="col-6">
-          <div :class="['choice-block sell', {active:constant.SIDE.SELL.value===selectedSide}]">
+          <div :class="['choice-block sell', {active:constant.SIDE.SELL===selectedSide}]">
             <div class="side"><i class="iconfont icon-arrow-up"></i>出售</div>
             <div class="coin-types">
               <span :class="['coin-type', {active:coin===selectedCoin}]" v-for="coin in constant.COIN_TYPES"
-                    @click="showItems(constant.SIDE.SELL.value,coin)">{{coin}}</span>
+                    @click="showItems(constant.SIDE.SELL,coin)">{{coin}}</span>
             </div>
           </div>
         </div>
@@ -197,7 +197,7 @@
           </span>
         </div>
         <div class="list-header">
-          <span class="col-narrow">{{selectedSide=== constant.SIDE.BUY.value?'卖家':'买家'}}</span>
+          <span class="col-narrow">{{selectedSide === constant.SIDE.BUY ? '卖家' : '买家'}}</span>
           <span class="col-narrow">30天成单/完成率</span>
           <span class="col-narrow">数量</span>
           <span class="col-wide">限额</span>
@@ -212,32 +212,34 @@
             <div class="col-narrow">
               <div class="fz-12 c-4a">
                 {{item.user.user_stat.deal_count}}单 /
-                {{item.user.user_stat.order_count?((item.user.user_stat.deal_count/item.user.user_stat.order_count)|percentage):'--'}}
+                {{item.user.user_stat.order_count ? ((item.user.user_stat.deal_count / item.user.user_stat.order_count) | percentage) : '--'}}
               </div>
               <div class="fz-12 c-6f">
-                {{selectedSide===
-                constant.SIDE.BUY.value?`放行时间${utils.formatDuration(item.user.user_stat.receipt_time)}`:`付款时间${utils.formatDuration(item.user.user_stat.pay_time)}`}}
+                {{selectedSide ===
+              constant.SIDE.BUY ? `放行时间${utils.formatDuration(item.user.user_stat.receipt_time)}` : `付款时间${utils.formatDuration(item.user.user_stat.pay_time)}`}}
               </div>
             </div>
-            <span class="col-narrow text-right fz-12 c-6f">{{item.remain_coin_amount+' '+selectedCoin}}</span>
-            <span class="col-wide text-right pr-60 fz-12 c-6f">{{item.min_deal_cash_amount+ '-'+ item.max_deal_cash_amount + 'CNY'}}</span>
+            <span class="col-narrow text-right fz-12 c-6f">{{item.remain_coin_amount + ' ' + selectedCoin}}</span>
+            <span
+              class="col-wide text-right pr-60 fz-12 c-6f">{{item.min_deal_cash_amount + '-' + item.max_deal_cash_amount + balance.currentCash}}</span>
             <span class='payment col-narrow'>
               <UserPayments :payments="item.payment_methods"></UserPayments>
             </span>
-            <span :class="['sort-price col-wide pr-60 text-right',sortPrice]">{{item.price + ' CNY'}}</span>
+            <span :class="['sort-price col-wide pr-60 text-right',sortPrice]">{{item.price + ' '+balance.currentCash}}</span>
             <span class="col-narrow">
               <template v-if="user && user.id ===item.user.id">
-                <button class="btn btn-order-disabled" :id="'button-order-'+item.id" v-b-tooltip.hover title="不能与自己交易"> {{(selectedSide===constant.SIDE.BUY.value?'购买':'出售')+ selectedCoin}} </button>
+                <button class="btn btn-order-disabled" :id="'button-order-'+item.id" v-b-tooltip.hover title="不能与自己交易"> {{(selectedSide === constant.SIDE.BUY ? '购买' : '出售') + selectedCoin}} </button>
               </template>
               <button
                 v-else-if="qualified(item)"
-                :class="['btn btn-order',{'btn-outline-yellow':selectedSide===constant.SIDE.BUY.value,'btn-outline-green':selectedSide===constant.SIDE.SELL.value}]"
+                :class="['btn btn-order',{'btn-outline-yellow':selectedSide===constant.SIDE.BUY,'btn-outline-green':selectedSide===constant.SIDE.SELL}]"
                 @click="placeOrder(item)"
               >
-                {{(selectedSide===constant.SIDE.BUY.value?'购买':'出售')+ selectedCoin}}
+                {{(selectedSide === constant.SIDE.BUY ? '购买' : '出售') + selectedCoin}}
               </button>
               <template v-else>
-                <button class="btn btn-order-disabled" :id="'button-order-'+item.id"> {{(selectedSide===constant.SIDE.BUY.value?'购买':'出售')+ selectedCoin}} </button>
+                <button class="btn btn-order-disabled"
+                        :id="'button-order-'+item.id"> {{(selectedSide === constant.SIDE.BUY ? '购买' : '出售') + selectedCoin}} </button>
                 <b-popover triggers="hover click" :target="'button-order-'+item.id"
                            title="商家交易限制">
                   <ol>
@@ -292,9 +294,11 @@
     computed: {
       ...mapState(['constant', 'user', 'balance']),
     },
-    async fetch({store}) {
-      await store.dispatch('fetchUserQualification')
-      await store.dispatch('fetchUserPayments')
+    fetch({store}) {
+      return Promise.all([
+        store.dispatch('fetchUserQualification'),
+        store.dispatch('fetchUserPayments'),
+      ])
     },
     mounted() {
       this.getItems()
@@ -322,7 +326,7 @@
         this.busy = true
         this.axios.item.getItems({
           // taker和maker的方向是反的
-          side: this.selectedSide === this.constant.SIDE.BUY.value ? this.constant.SIDE.SELL.value : this.constant.SIDE.BUY.value,
+          side: this.selectedSide === this.constant.SIDE.BUY ? this.constant.SIDE.SELL : this.constant.SIDE.BUY,
           coin_type: this.selectedCoin,
           payment_method: this.selectedPayment === 'ALL' ? undefined : this.selectedPayment.toLowerCase(),
         }).then(response => {
@@ -372,20 +376,23 @@
         return false
       },
       verifyDynamicConstraint(item) {
-        if (item.user_side === this.constant.SIDE.SELL.value) {
+        if (item.user_side === this.constant.SIDE.SELL) {
           // 卖家需要有对应支付方式
           if (!this.verifyHasPayment(item)) {
             this.$showDialog({
-              title: '交易限制',
-              okOnly: true,
-              content:
-                <div>
-                  您尚未添加该广告支持的支付方式，无法下单。
-                  <p>
-                    <b-link href="/my/payments">添加支付方式。</b-link>
-                  </p>
-                </div>,
-            })
+                title: '交易限制',
+                okOnly: true,
+                content:
+              < div >
+              您尚未添加该广告支持的支付方式，无法下单。
+          <
+            p >
+            < b - link
+            href = "/my/payments" > 添加支付方式。</
+            b - link >
+            < / p >
+            < / div >,
+          })
             return Promise.reject(item)
           }
         }
@@ -396,19 +403,30 @@
               title: '交易限制',
               okOnly: true,
               content: constraint.cancel ? (
-                <div>
-                  您今天累计取消超过 3 次订单，被冻结交易功能。
-                  <p>
-                    <b-link href="#TODO">了解更多交易规则。</b-link>
-                  </p>
-                </div>) : (
-                <div>
-                  您尚未完成实名认证，每日限制下单次数为 3 次。
-                  <p>
-                    <b-link to="/my/merchant">去完成实名认证。</b-link>
-                  </p>
-                </div>),
-            })
+                < div >
+                您今天累计取消超过 3 次订单，被冻结交易功能。
+          <
+            p >
+            < b - link
+            href = "#TODO" > 了解更多交易规则。</
+            b - link >
+            < / p >
+            < / div >
+          ) :
+            (
+            < div >
+            您尚未完成实名认证，每日限制下单次数为
+            3
+            次。
+          <
+            p >
+            < b - link
+            to = "/my/merchant" > 去完成实名认证。</
+            b - link >
+            < / p >
+            < / div >
+          ),
+          })
             return Promise.reject(constraint)
           } else {
             return Promise.resolve()

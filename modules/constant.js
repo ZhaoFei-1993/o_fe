@@ -99,13 +99,7 @@ export default {
   },
   APPEAL_REASONS: ['卖家未放币', '买家付款未收到', '买家付款金额错误', '其他'],
   SIDE: {
-    BUY: {
-      text: '买家',
-      value: 'buy',
-    },
-    SELL: {
-      text: '卖家',
-      value: 'sell',
-    },
+    BUY: 'buy',
+    SELL: 'sell',
   }
 }

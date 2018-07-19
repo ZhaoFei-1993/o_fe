@@ -32,21 +32,21 @@
     <div class="item-info">
       <div class="info-header">确认信息</div>
       <div class="info-detail">
-        <span>单价：<span class="emphasis">{{item.price}}</span> CNY/{{item.coin_type}}
+        <span>单价：<span class="emphasis">{{item.price}}</span> {{balance.currentCash}}/{{item.coin_type}}
           <i v-if="item.pricing_type===constant.PRICING_TYPE.FLOAT" class="iconfont icon-tooltip" v-b-tooltip.hover
              title="当前数字货币价格为系统自动计算，实际价格以发起时的价格为准。"></i> </span>
-        <span>限额：<span class="emphasis">{{item.min_deal_cash_amount + '-' + maxDealCashAmount}}</span> CNY</span>
+        <span>限额：<span class="emphasis">{{item.min_deal_cash_amount + '-' + maxDealCashAmount}}</span> {{balance.currentCash}}</span>
         <span>支付方式：<span class="emphasis">{{paymentMethods}}</span></span>
       </div>
       <div class="item-payment">
         <b-form v-if="form" @submit.prevent="onSubmit">
           <div class="price-input">
             <div class="input-container">
-              <div class="max-value">最高金额{{' '+ maxDealCashAmount+ ' '}}CNY
+              <div class="max-value">最高金额{{' '+ maxDealCashAmount+ ' '+balance.currentCash}}
                 <span class="purchase-all"
                       @click="purchaseAll">全部{{sideText}}</span>
               </div>
-              <b-input-group append="CNY">
+              <b-input-group :append="balance.currentCash">
                 <ExtendedInputNumber v-model="form.cash_amount" :name="item.id+'cash_amount'"
                                      @focus="()=>onFocus('cashAmount')"
                                      @input="cashAmountChanged"
@@ -312,7 +312,7 @@
           coin_amount: this.form.coin_amount,
           cash_amount: this.form.cash_amount,
           coin_type: this.item.coin_type,
-          cash_type: 'CNY',
+          cash_type: this.balance.currentCash,
           price: this.item.price,
         }).then(response => {
           this.$store.dispatch('fetchOtcBalance')
