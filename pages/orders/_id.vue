@@ -335,7 +335,7 @@
     beforeDestroy() {
       clearInterval(this.secondCountdown)
     },
-    beforeMount() {
+    mounted() {
       this.getCurrentOrder(true)
     },
     computed: {

@@ -222,9 +222,9 @@ export default {
       form: this.validationConf.validations
     }
   },
-  mounted() {
-    this.$store.dispatch('fetchUserPayments')
-    this.$store.dispatch('fetchSystemConstant')
+  async fetch() {
+    await this.$store.dispatch('fetchUserPayments')
+    await this.$store.dispatch('fetchSystemConstant')
   },
   methods: {
     onPaymentStatusChange(payment, checked) {

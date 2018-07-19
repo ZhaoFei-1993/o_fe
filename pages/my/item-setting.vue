@@ -34,7 +34,8 @@
           <CurrencyInput v-model="editingSettings.max_deal_cash_amount" :currency="balance.currentCash"/>
         </div>
         <div v-else>
-          {{settings.min_deal_cash_amount}} {{balance.currentCash}} — {{settings.max_deal_cash_amount}} {{balance.currentCash}}
+          {{settings.min_deal_cash_amount}} {{balance.currentCash}} — {{settings.max_deal_cash_amount}}
+          {{balance.currentCash}}
         </div>
       </div>
 
@@ -117,10 +118,11 @@
         return this.user.settings ? this.user.settings : {}
       }
     },
+    async fetch() {
+      await this.$store.dispatch('fetchUserSettings')
+    },
     mounted() {
-      this.$store.dispatch('fetchUserSettings').then(res => {
-        this.store2Data()
-      })
+      this.store2Data()
     },
     methods: {
       onEditAmountLimit() {

@@ -259,7 +259,7 @@
   import PlaceOrderModal from '~/components/place-order-modal'
   import PublishItemModal from '~/components/publish-item-modal/index.vue'
   import UserPayments from '~/components/user-payments'
-
+  const refreshInterval = 5000
   export default {
     components: {
       PlaceOrderModal,
@@ -284,13 +284,15 @@
     computed: {
       ...mapState(['constant', 'user']),
     },
-    beforeMount() {
-      this.$store.dispatch('fetchUserQualification')
-      this.$store.dispatch('fetchUserPayments')
+    async fetch() {
+      await this.$store.dispatch('fetchUserQualification')
+      await this.$store.dispatch('fetchUserPayments')
+    },
+    mounted() {
       this.getItems()
       this.requestItems = setInterval(() => {
         this.getItems()
-      }, 5000)
+      }, refreshInterval)
     },
     beforeDestroy() {
       clearInterval(this.requestItems)

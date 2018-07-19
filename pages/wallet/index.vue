@@ -259,9 +259,9 @@
         },
       }
     },
-    fetch({ store }) {
-      store.dispatch('fetchOtcBalance')
-      store.dispatch('fetchCoinexBalance')
+    async fetch({ store }) {
+      await store.dispatch('fetchOtcBalance')
+      await store.dispatch('fetchCoinexBalance')
     },
     async asyncData({ app, query, req, error, store }) {
       const [ historyData ] = await Promise.all([
@@ -287,7 +287,7 @@
           }
         })
       }
-  
+
       return {
         assetHistoryItems,
         assetHistoryPage,

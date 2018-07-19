@@ -221,15 +221,14 @@
         return 'https://support.coinex.com/hc/' + lang
       },
     },
-
-    beforeMount() {
-      this.$store.dispatch('fetchUserAccount').then(_ => {
-        if (this.user && this.user.account && !this.user.account.is_name_confirmed) {
-          this.$refs.updateNameModal.show()
-        }
-      })
+    async fetch() {
+      await this.$store.dispatch('fetchUserAccount')
     },
-
+    mounted() {
+      if (this.user && this.user.account && !this.user.account.is_name_confirmed) {
+        this.$refs.updateNameModal.show()
+      }
+    },
     methods: {
       handleUpdateName(evt) {
         // 要验证重名，避免被关闭，需要ref来调用
@@ -266,7 +265,7 @@
       },
       signOut() {
         this.axios.user.signOut().then(res => {
-          window.location.href = '/'
+          this.$router.push('/')
         }).catch(err => {
           onApiError(err, this)
         })
