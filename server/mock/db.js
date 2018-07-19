@@ -11,8 +11,8 @@ module.exports = () => {
     data.users.push({
       id: i,
       name: faker.name.findName(),
-      create_time: Math.floor(faker.date.past().getTime()/1000),
-      first_trade_time: Math.floor(faker.date.past().getTime()/1000),
+      create_time: Math.floor(faker.date.past().getTime() / 1000),
+      first_trade_time: Math.floor(faker.date.past().getTime() / 1000),
       address: faker.address.country(),
       status: faker.random.arrayElement([0, 1, 2, 3]),
       email: faker.random.word() + faker.internet.email(),
@@ -32,6 +32,12 @@ module.exports = () => {
       email_verified: faker.random.boolean(),
       phone_verified: faker.random.boolean(),
       idcard_verified: faker.random.boolean(),
+      user_stat: {                        // 统计信息
+        "deal_count": faker.random.number(),                    // 最近成交单数
+        "order_count": faker.random.number(),                   // 最近总单数
+        "pay_time": faker.random.number(),                      // 平均付款时间
+        "receipt_time": faker.random.number()                   // 平均放行时间
+      },
     })
     const randUser = data.users[faker.random.number({max: i})]
     data.items.push({
@@ -47,15 +53,15 @@ module.exports = () => {
       price: faker.random.number(),
       coin_amount: faker.random.number(),
       remain_coin_amount: faker.random.number(),
-      payment_methods:['wechat','alipay','bankcard'],
+      payment_methods: ['wechat', 'alipay', 'bankcard'],
       freeze_coin_amount: faker.random.number(),
       min_deal_cash_amount: faker.random.number({max: 100}),
       max_deal_cash_amount: faker.random.number({min: 101}),
       counterparty_limit: ['bind_phone', 'kyc', 'one_deal'],
       auto_reply_content: faker.lorem.sentence(),
       status: faker.random.arrayElement([0, 1]),
-      create_time: Math.floor(faker.date.past().getTime()/1000),
-      update_time: Math.floor(faker.date.past().getTime()/1000),
+      create_time: Math.floor(faker.date.past().getTime() / 1000),
+      update_time: Math.floor(faker.date.past().getTime() / 1000),
     })
     const orderStatus = faker.random.arrayElement(['success', 'created', 'paid', 'cancel', 'closed'])
     data.orders.push({
@@ -73,12 +79,12 @@ module.exports = () => {
       appeal_status: faker.random.arrayElement(['', 'processing', 'completed']),
       status: orderStatus,
       is_reopened: faker.random.boolean(),
-      create_time: Math.floor(faker.date.past().getTime()/1000),
-      update_time: Math.floor(faker.date.past().getTime()/1000),
-      place_time: Math.floor(faker.date.past().getTime()/1000),       // 下单时间
-      pay_time: orderStatus === 'created' ? null : Math.floor(faker.date.past().getTime()/1000),         // 支付时间
-      complete_time: ['success', 'cancel', 'closed'].indexOf(orderStatus) > -1 ? Math.floor(faker.date.past().getTime()/1000) : null,    // 完成时间，success cancel closed状态
-      appeal_time: Math.floor(faker.date.past().getTime()/1000),      // 申诉时间
+      create_time: Math.floor(faker.date.past().getTime() / 1000),
+      update_time: Math.floor(faker.date.past().getTime() / 1000),
+      place_time: Math.floor(faker.date.past().getTime() / 1000),       // 下单时间
+      pay_time: orderStatus === 'created' ? null : Math.floor(faker.date.past().getTime() / 1000),         // 支付时间
+      complete_time: ['success', 'cancel', 'closed'].indexOf(orderStatus) > -1 ? Math.floor(faker.date.past().getTime() / 1000) : null,    // 完成时间，success cancel closed状态
+      appeal_time: Math.floor(faker.date.past().getTime() / 1000),      // 申诉时间
     })
   }
   return data

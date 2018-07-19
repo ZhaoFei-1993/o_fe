@@ -24,8 +24,8 @@ if (MODE === 'pre') {
 // 这个配置host到本地nginx之后就可以转发到想用的mock server了(localhost:4006)
 if (MODE === 'development') {
   webDomain = '//dev.otc.coinex.com'
-  clientApiDomain = '//dev.otc.coinex.com/res'
-  serverApiDomain = '//dev.otc.coinex.com/res'
+  clientApiDomain = '//test.otc.coinex.com/res'
+  serverApiDomain = '//test.otc.coinex.com/res'
 }
 
 const protocol = process.client ? window.location.protocol : 'http:'

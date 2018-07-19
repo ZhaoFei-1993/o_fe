@@ -94,15 +94,6 @@ export const settings = {
   }
 }
 
-export const balance = {
-  data: {
-    usdt: '100.0',
-    eth: '90',
-    btc: '0',
-    bch: '9999.99'
-  }
-}
-
 export const constraint = {
   data: {
     cancel: faker.random.boolean(),
