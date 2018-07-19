@@ -56,7 +56,7 @@ module.exports = () => {
       payment_methods: ['wechat', 'alipay', 'bankcard'],
       freeze_coin_amount: faker.random.number(),
       min_deal_cash_amount: faker.random.number({max: 100}),
-      maxDealCashAmount: faker.random.number({min: 101}),
+      max_deal_cash_amount: faker.random.number({min: 101}),
       counterparty_limit: ['bind_phone', 'kyc', 'one_deal'],
       auto_reply_content: faker.lorem.sentence(),
       status: faker.random.arrayElement([0, 1]),

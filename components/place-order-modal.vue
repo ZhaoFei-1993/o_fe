@@ -249,7 +249,6 @@
         return ('' + this.maxDealCashAmount / this.item.price).setDigit(8)
       },
       maxDealCashAmount() {
-        console.log(this.item.remain_coin_amount * this.item.price, (this.item.max_deal_cash_amount || Number.MAX_SAFE_INTEGER), this.currentBalance * this.item.price, this.kycLimitAmount)
         return Math.min(this.item.remain_coin_amount * this.item.price, (this.item.max_deal_cash_amount || Number.MAX_SAFE_INTEGER), this.currentBalance * this.item.price, this.kycLimitAmount)
       },
       sideText() {

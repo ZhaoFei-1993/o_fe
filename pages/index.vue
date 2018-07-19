@@ -321,6 +321,7 @@
       getItems() {
         this.busy = true
         this.axios.item.getItems({
+          // taker和maker的方向是反的
           side: this.selectedSide === this.constant.SIDE.BUY.value ? this.constant.SIDE.SELL.value : this.constant.SIDE.BUY.value,
           coin_type: this.selectedCoin,
           payment_method: this.selectedPayment === 'ALL' ? undefined : this.selectedPayment.toLowerCase(),

@@ -180,7 +180,7 @@
             <Language text="最高金额[p][/p]元" class="input-label" tag="div">
               <span slot="p">1,000,000</span>
             </Language>
-            <CurrencyInput v-model="form.maxDealCashAmount" :currency="balance.currentCash" placeholder="最高单笔金额"/>
+            <CurrencyInput v-model="form.max_deal_cash_amount" :currency="balance.currentCash" placeholder="最高单笔金额"/>
           </div>
         </b-form-group>
         <b-form-group label="自动回复">
