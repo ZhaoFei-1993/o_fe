@@ -3,7 +3,9 @@
     <c-block>
       <header class="header">订单管理</header>
       <div class="filter-wapper">
-        <div @click="onClickFilter(index)" v-for="(item, index) in filterOptions" class="filter-item" :class="{'filter-active': item.active}">{{ item.text }}</div>
+        <div @click="onClickFilter(index)" v-for="(item, index) in filterOptions" class="filter-item"
+             :class="{'filter-active': item.active}">{{ item.text }}
+        </div>
       </div>
       <div class="order-table">
         <b-table :fields="orderTableFields" :items="orderTableItems">
@@ -23,8 +25,10 @@
             {{ item.cash_amount | formatMoney }}
           </template>
           <template slot="status" slot-scope="{ item, detailsShowing, toggleDetails }">
-            {{ orderStatus[item.status.toUpperCase()].text }}
-            <span @click.stop="toggleDetails" v-if="item.status === 'created'" class="detail" :class="[ detailsShowing ? 'show-detail' : 'hidden-detail' ]"><i class="iconfont icon-detail"></i></span>
+            {{ constant?constant.ORDER_STATUS[item.status.toUpperCase()].text:'' }}
+            <span @click.stop="toggleDetails" v-if="item.status === 'created'" class="detail"
+                  :class="[ detailsShowing ? 'show-detail' : 'hidden-detail' ]"><i
+              class="iconfont icon-detail"></i></span>
           </template>
           <template slot="row-details" slot-scope="{ item }">
             <div class="detail-wrapper">
@@ -34,7 +38,8 @@
                   <span>购买 {{ item.coin_type }}</span>
                 </div>
                 <div class="detail-h2">
-                  向<b-link>{{ item.pay_method.accouont_no }}</b-link>
+                  向
+                  <b-link>{{ item.pay_method.accouont_no }}</b-link>
                 </div>
               </div>
               <div class="col2">
@@ -66,11 +71,12 @@
                 <div class="detail-text">
                   {{ item._payment_method.account_no }}
                   <b-popover :target="`qr-${item.id}`"
-                    placement="top"
-                    triggers="hover focus">
+                             placement="top"
+                             triggers="hover focus">
                     <img style="display: block;width: 120px;height: 120px;" :src="item._payment_method.qr_code_image">
                   </b-popover>
-                  <span :id="`qr-${item.id}`" style="cursor: pointer;" v-show="item._payment_method.method !== 'bankcard'"><i class="iconfont icon-qrcode"></i></span>
+                  <span :id="`qr-${item.id}`" style="cursor: pointer;"
+                        v-show="item._payment_method.method !== 'bankcard'"><i class="iconfont icon-qrcode"></i></span>
                 </div>
                 <div v-if="item._payment_method.method === 'bankcard'" class="detail-text">
                   {{ item._payment_method.bank }}，{{ item._payment_method.branch }}
@@ -106,10 +112,9 @@
 </template>
 
 <script>
-  import { mapState } from 'vuex'
+  import {mapState} from 'vuex'
   import cBlock from '~/components/c-block'
   import Blank from '~/components/blank'
-  import { ORDER_STATUS } from '~/modules/constant'
 
   export default {
     data() {
@@ -137,16 +142,16 @@
               width: '120px',
               paddingLeft: '30px',
             },
-            thClass: [ 'text-left' ],
-            tdClass: [ 'text-center' ],
+            thClass: ['text-left'],
+            tdClass: ['text-center'],
           },
           _order_type: {
             label: '类型',
             thStyle: {
               width: '80px',
             },
-            thClass: [ 'text-right' ],
-            tdClass: [ 'text-right' ],
+            thClass: ['text-right'],
+            tdClass: ['text-right'],
             sortable: false,
           },
           coin_type: {
@@ -154,8 +159,8 @@
             thStyle: {
               width: '120px',
             },
-            thClass: [ 'text-right' ],
-            tdClass: [ 'text-right' ],
+            thClass: ['text-right'],
+            tdClass: ['text-right'],
             sortable: false,
           },
           coin_amount: {
@@ -163,14 +168,14 @@
             thStyle: {
               width: '160px',
             },
-            thClass: [ 'text-right' ],
-            tdClass: [ 'text-right' ],
+            thClass: ['text-right'],
+            tdClass: ['text-right'],
             sortable: false,
           },
           price: {
             label: '单价',
-            thClass: [ 'text-right' ],
-            tdClass: [ 'text-right' ],
+            thClass: ['text-right'],
+            tdClass: ['text-right'],
             thStyle: {
               width: '160px',
             },
@@ -178,8 +183,8 @@
           },
           cash_amount: {
             label: '总价',
-            thClass: [ 'text-right' ],
-            tdClass: [ 'text-right' ],
+            thClass: ['text-right'],
+            tdClass: ['text-right'],
             thStyle: {
               width: '180px',
             },
@@ -187,8 +192,8 @@
           },
           place_time: {
             label: '下单时间',
-            thClass: [ 'text-right' ],
-            tdClass: [ 'text-right' ],
+            thClass: ['text-right'],
+            tdClass: ['text-right'],
             thStyle: {
               width: '160px',
             },
@@ -196,7 +201,7 @@
           },
           status: {
             label: '状态',
-            tdClass: [ 'text-center' ],
+            tdClass: ['text-center'],
             thStyle: {
               textAlign: 'center',
             },
@@ -205,13 +210,12 @@
         },
         orderTableItems: [],
         queryParams: {},
-        orderStatus: ORDER_STATUS,
       }
     },
-    async asyncData({ app, query, req, error, store }) {
+    async asyncData({app, query, req, error, store}) {
       // const { user = {} } = store.state
-      const user = { id: 1 }
-      const merchant = { id: 111 }
+      const user = {id: 1}
+      const merchant = {id: 111}
       const queryParams = {
         status: 'processing',
         side: '',
@@ -258,7 +262,7 @@
       Blank,
     },
     computed: {
-      ...mapState(['user']),
+      ...mapState(['user', 'constant']),
     },
     methods: {
       confirmPay(item) {
