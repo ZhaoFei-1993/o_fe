@@ -58,7 +58,7 @@ module.exports = (req, res, next) => {
     })
   }
   // 后端已经开发好的api就直接转发，没有开发好的就用本地json server
-  const backendAPI = ['/user/account']
+  const backendAPI = ['/user/account', '/user/payment']
   for (const url of backendAPI) {
     if (req.url.indexOf(url) === 0) {
       // const redirected = 'http://jsonplaceholder.typicode.com' + req.url

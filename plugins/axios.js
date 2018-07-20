@@ -88,7 +88,7 @@ export default ({ app, store }) => {
 
   inst.needAuth = function (err, redirect, path = '/') {
     if (err.code && (err.code === 401 || err.code === 403)) {
-      const loginUrl = `${loginPage}?next=${encodeURIComponent(webDomain + path)}`
+      const loginUrl = `${loginPage}?redirect=${encodeURIComponent(webDomain + path)}`
       try {
         // nuxt的redirect在客户端使用了 window.location.replace，会导致无法回到之前页面，这里处理下
         if (process.client) {
