@@ -417,7 +417,7 @@
           cancel: '订单已取消',
         }
       },
-      appealResult(){
+      appealResult() {
         // TODO
         return ''
       }

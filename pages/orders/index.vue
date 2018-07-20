@@ -18,6 +18,9 @@
               {{ item._order_type === 'buy' ? '买' : '卖' }}
             </span>
           </template>
+          <template slot="place_time" slot-scope="{ item }">
+            {{ item.place_time | getTimeText }}
+          </template>
           <template slot="coin_amount" slot-scope="{ item }">
             {{ item.coin_amount | formatMoney }}
           </template>
@@ -33,13 +36,12 @@
           <template slot="row-details" slot-scope="{ item }">
             <div class="detail-wrapper">
               <div class="col1">
-                <div class="detail-h1">
-                  <i class="iconfont icon-arrow-up"></i>
+                <div class="detail-h1 detail-flex">
+                  <span :class="['arrow-icon', item._order_type === 'buy' ? 'buy-arrow-icon' : 'sell-arrow-icon']"></span>
                   <span>购买 {{ item.coin_type }}</span>
                 </div>
                 <div class="detail-h2">
-                  向
-                  <b-link>{{ item.pay_method.accouont_no }}</b-link>
+                  向<b-link>{{ item.merchant.name }}</b-link>
                 </div>
               </div>
               <div class="col2">
@@ -52,11 +54,11 @@
               </div>
               <div class="col3">
                 <div class="payment-method">
-                  <i v-if="item._payment_method.method === 'wechat'" class="iconfont icon-wechat-round"></i>
-                  <i v-if="item._payment_method.method === 'bankcard'" class="iconfont icon-bankcard"></i>
-                  <i v-if="item._payment_method.method === 'alipay'" class="iconfont icon-alipay"></i>
-                  <select v-model="item._payment_method">
-                    <option v-for="payment in item.merchantPaymentMethods" :value="payment">
+                  <i v-if="item._selected_payment_method.method === 'wechat'" class="iconfont icon-wechat-round"></i>
+                  <i v-if="item._selected_payment_method.method === 'bankcard'" class="iconfont icon-bankcard"></i>
+                  <i v-if="item._selected_payment_method.method === 'alipay'" class="iconfont icon-alipay"></i>
+                  <select v-model="item._selected_payment_method">
+                    <option v-for="payment in item.payment_methods" :value="payment">
                       <span v-if="payment.method === 'bankcard'">银行转帐</span>
                       <span v-if="payment.method === 'wechat'">微信支付</span>
                       <span v-if="payment.method === 'alipay'">支付宝支付</span>
@@ -66,20 +68,20 @@
               </div>
               <div class="col4">
                 <div class="detail-text">
-                  {{ item._payment_method.account_name }}
+                  {{ item._selected_payment_method.account_name }}
                 </div>
                 <div class="detail-text">
-                  {{ item._payment_method.account_no }}
+                  {{ item._selected_payment_method.account_no }}
                   <b-popover :target="`qr-${item.id}`"
                              placement="top"
                              triggers="hover focus">
-                    <img style="display: block;width: 120px;height: 120px;" :src="item._payment_method.qr_code_image">
+                    <img style="display: block;width: 120px;height: 120px;" :src="item._selected_payment_method.qr_code_image">
                   </b-popover>
                   <span :id="`qr-${item.id}`" style="cursor: pointer;"
-                        v-show="item._payment_method.method !== 'bankcard'"><i class="iconfont icon-qrcode"></i></span>
+                        v-show="item._selected_payment_method.method !== 'bankcard'"><i class="iconfont icon-qrcode"></i></span>
                 </div>
-                <div v-if="item._payment_method.method === 'bankcard'" class="detail-text">
-                  {{ item._payment_method.bank }}，{{ item._payment_method.branch }}
+                <div v-if="item._selected_payment_method.method === 'bankcard'" class="detail-text">
+                  {{ item._selected_payment_method.bank }}，{{ item._selected_payment_method.branch }}
                 </div>
                 <div class="detail-text">
                   备注参考号：<span class="detail-code">{{ `${item.id}`.substr(`${item.id}`.length - 6) }}</span>
@@ -90,7 +92,7 @@
               </div>
               <div class="col5">
                 <div class="detail-text detail-timer">
-                  还剩11分10秒
+                  还剩{{ item._remaining_time }}
                 </div>
                 <div class="message-btn">
                   <i class="iconfont icon-message"></i>
@@ -116,10 +118,13 @@
   import cBlock from '~/components/c-block'
   import Blank from '~/components/blank'
 
+  const LIMIT = 10
+  const ORDER_PAY_TIME = 15 // 订单可付款时间
+
   export default {
     data() {
       return {
-        selectedPaymentMethod: {},
+        timer: null, // 定时器
         paymentMethods: [],
         filterOptions: [{
           text: '进行中',
@@ -212,55 +217,58 @@
         queryParams: {},
       }
     },
-    async asyncData({ app, req, redirect, route }) {
+    async asyncData({ app, req, redirect, route, store }) {
       try {
-        const user = { id: 1 }
-        const merchant = { id: 111 }
+        const { user } = store.state
+        const isMaker = (order) => { // 用户id=商家id: maker
+          return order.merchant_id === user.id
+        }
+        if (!user.account) {
+          // 没有用户信息需要现获取
+          await store.dispatch('fetchUserAccount')
+        }
         const queryParams = {
           status: 'processing',
           page: 1,
-          limit: 30,
+          limit: LIMIT,
         }
         app.axios.init(req)
-        const [orderData, paymentData] = await Promise.all([
-          app.axios.order.getOrderList(queryParams),
-          app.axios.user.payments(merchant.id),
-        ])
-        console.log(orderData)
+        const orderData = await app.axios.order.getOrderList(queryParams)
         let orderTableItems = []
-        let paymentMethods = []
-        let selectedPaymentMethod = {}
-        if (paymentData.code === 0 && paymentData.data) {
-          paymentMethods = paymentData.data
-          selectedPaymentMethod = paymentMethods[0]
-        }
         if (orderData.code === 0 && orderData.data) {
           orderTableItems = orderData.data.data.map(item => {
             let orderType
-            if (user.id === item.user_id) { // taker
-              orderType = item.user_side
-            } else if (user.id === item.merchant_id) {
+            if (isMaker(item)) { // maker
               orderType = item.merchant_side
+            } else {
+              orderType = item.user_side
+            }
+            let selectedPaymentMethod = {}
+            if (item.payment_methods && item.payment_methods.length) {
+              selectedPaymentMethod = { ...item.payment_methods[0] }
             }
             return {
               ...item,
-              _order_type: orderType,
-              _payment_method: selectedPaymentMethod,
-              merchantPaymentMethods: require('../../services/mock/user').paymentMethods.data,
-              place_time: app.utils.getTimeText(item.place_time),
+              _order_type: orderType, // 订单类型
+              _selected_payment_method: selectedPaymentMethod, // 用户选中的支付方式
+              _finish_time: item.create_time * 1000 + ORDER_PAY_TIME * 60 * 1000, // 订单付款截止时间 = 创建时间 + 可付款时间
+              _remaining_time: 0, // 倒计时
             }
           })
         }
         return {
           queryParams,
           orderTableItems,
-          paymentMethods,
-          selectedPaymentMethod,
         }
       } catch (err) {
-        console.log(err)
-        // app.axios.needAuth(err, redirect, route.fullPath)
+        app.axios.needAuth(err, redirect, route.fullPath)
       }
+    },
+    destroyed() {
+      clearTimeout(this.timer) // 清除定时器
+    },
+    mounted() {
+      this.startTimer()
     },
     components: {
       cBlock,
@@ -270,14 +278,39 @@
       ...mapState(['user', 'constant']),
     },
     methods: {
+      startTimer() {
+        clearTimeout(this.timer) // 切换到其它tab需要清除定时器
+        if (this.queryParams.status === 'processing') {
+          // 进行中的订单启动定时器
+          const timerHandler = () => {
+            const now = Date.now()
+            for (let i = 0, len = this.orderTableItems.length; i < len; i++) {
+              const item = this.orderTableItems[i]
+              if (item._showDetails) {
+                // 展开查看订单详情
+                item._remaining_time = item._finish_time - now
+                if (item._remaining_time <= 0) {
+                  item._remaining_time = 0
+                }
+              } else {
+                item._remaining_time = 0
+              }
+            }
+            this.timer = setTimeout(timerHandler, 1000)
+          }
+          timerHandler()
+        }
+      },
       confirmPay(item) {
         this.$showDialog({
           hideHeader: true,
           title: '确认付款',
           content: (<div>确认您已向买方付款？<span class="c-red">未付款点击“我已付款”将被冻结账户。</span></div>),
           onOk: () => {
-            this.axios.order.updatePayMethod(item.id, item._payment_method).then(response => {
-              this.axios.order.confirmPay(item.id)
+            this.axios.order.confirmPay(item.id).then(res => {
+              if (res.code === 0) {
+                this.renderOrderList()
+              }
             })
           }
         })
@@ -288,8 +321,10 @@
           title: '取消订单',
           content: (<div>确认取消订单？<span class="c-red">如您已向卖家付款，取消订单您将会损失付款资金。</span></div>),
           onOk: () => {
-            this.axios.order.cancelOrder(item.id).then(response => {
-              console.log(response)
+            this.axios.order.cancelOrder(item.id).then(res => {
+              if (res.code === 0) {
+                this.renderOrderList()
+              }
             })
           }
         })
@@ -300,8 +335,10 @@
           title: '确认收款',
           content: (<div>确认已收到该笔款项？<span class="c-red">如您没有收到买家付款，确认收款后，放行的数字货币将无法追回。</span></div>),
           onOk: () => {
-            this.axios.order.confirmReceipt(item.id).then(response => {
-              console.log(response)
+            this.axios.order.confirmReceipt(item.id).then(res => {
+              if (res.code === 0) {
+                this.renderOrderList()
+              }
             })
           }
         })
@@ -329,6 +366,7 @@
             this.renderOrderList()
           }
         }
+        this.startTimer()
       },
     }
   }
@@ -417,7 +455,7 @@
         display: flex;
         justify-content: space-between;
         .col1 {
-          flex: 1;
+          flex: 2;
           padding-left: 30px;
           text-align: left;
         }
@@ -476,6 +514,23 @@
         }
         .detail-btn-wrapper {
           margin-top: 16px;
+        }
+        .detail-flex {
+          display: flex;
+          align-items: center;
+        }
+        .arrow-icon {
+          display: inline-block;
+          width: 18px;
+          height: 18px;
+          background-size: conver;
+          margin-right: 6px;
+        }
+        .buy-arrow-icon {
+          background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAASCAMAAACKJ8VmAAAAflBMVEUAAAD/zz7/1k3/0kj/ugP/4Gv/3F7/yzD/vxD/wRb/3mX/2l//11n/1lL/xSD/zDT/yCf/0UD//2b/32z/0D//uQP/zz3/ugT/vQn/uwL/5oD/0UT/00r/2Fj/zz3/zTf/yjD/yCn/xiP/wxz/wRX/vw//vAj/22D/1lH/1lIYey49AAAAG3RSTlMAgD70zD4+sLCI9PT09LCIiHQF6djMxI2IbQrE6Zy3AAAAeUlEQVQY01XNWRKCMBRE0U6QqAwqOM+zSfa/QWkK6r2cr6770+jtJ53tEWL2o4MuX5rr8iFdFm9KyotWENMnJeVBS13uNJS2McZsbrTrVtMCNjuLzAJMlxED2TrEEEKMNUPPVVeqnHy50ntfOih54YscJGnNkDiN4w+x8Ay6E4hABAAAAABJRU5ErkJggg==)
+        }
+        .sell-arrow-icon {
+          background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAASCAMAAACKJ8VmAAAAY1BMVEUAAAAp6MwU18IAw9Ia374e47sHyssExs0JzMgP08QN0McV18IW2sEY278U18IAxtIz/8wV18Ij5roCw84T1sMa3r0V2cAGyMoKzcgO0cUX278DxcwR1MMT1sEe4rsCw84Bws0sJ7b3AAAAFXRSTlMAC+YzwcGIsLCwiPbBwacfBeaMiIgIvV4AAAAAZUlEQVQY033IVw6AIBAAUXbtvXcF7n9KXaKhJb6vybAX9MAsEPEInMGtBeFEQnCGXlDtnwrUKGetfFZbI2JxkQKxq1umZCcZmZZtJP896Ur8E5tnIeZJ/HMQ6wghhRyM0wSkUX0DO0cKFxu0yBIAAAAASUVORK5CYII=)
         }
       }
     }
