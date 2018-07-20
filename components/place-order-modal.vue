@@ -251,7 +251,7 @@
         return parseFloat(this.balance.otcBalance.find(b => b.coin_type === this.item.coin_type).available)
       },
       maxDealCoinAmount() {
-        return ('' + this.maxDealCashAmount / this.item.price).setDigit(8)
+        return `${this.maxDealCashAmount / this.item.price}`.setDigit(8)
       },
       validAmount() {
         return this.maxDealCashAmount > this.item.min_deal_cash_amount
@@ -261,6 +261,7 @@
         return this.item.side === this.constant.SIDE.SELL ? Number.MAX_SAFE_INTEGER : this.currentBalance * this.item.price
       },
       maxDealCashAmount() {
+        // 取以下各项的最小值（广告剩余量、广告限制最大额、如果是卖家则考虑余额、未实名验证的限额）
         return Math.min(this.item.remain_coin_amount * this.item.price, (this.item.max_deal_cash_amount || Number.MAX_SAFE_INTEGER), this.sideMaxCash, this.kycLimitAmount)
       },
       sideText() {

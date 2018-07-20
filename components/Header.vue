@@ -199,7 +199,7 @@
     data() {
       return {
         publishModalShowing: false,
-        attentionModelShowing: null,
+        attentionModelShowing: false,
         attention: [],
         nameDuplicated: false,
         userName: null,

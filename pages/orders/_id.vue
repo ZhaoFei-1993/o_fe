@@ -326,8 +326,8 @@
   import UserStatsProfile from '~/components/user-stats-profile.vue'
   import {mapState} from 'vuex'
 
-  const PAID_CAN_APPEAL_MIN = 30
-  const SUCCESS_CAN_APPEAL_DAY = 7
+  const PAID_CAN_APPEAL = 30 * 60 * 1000 // 三十分钟
+  const SUCCESS_CAN_APPEAL = 7 * 24 * 3600 * 1000 // 七天
   const REFRESH_ORDER_INTERVAL = 5000
   export default {
     data() {
@@ -375,11 +375,16 @@
         return this.isBuyerAppeal ? '买家' : '卖家'
       },
       canAppeal() {
-        return true || (this.order.status === this.constant.ORDER_STATUS.PAID.value && this.utils.getTimeDifference(this.order.pay_time) > 60 * 1000 * PAID_CAN_APPEAL_MIN) ||
-          (this.order.status === this.constant.ORDER_STATUS.SUCCESS.value && this.utils.getTimeDifference(this.order.complete_time) < 24 * 3600 * 1000 * SUCCESS_CAN_APPEAL_DAY)
+        // 支付后三十分钟以后 和 完成后七天内可以申诉
+        const paid = this.order.status === this.constant.ORDER_STATUS.PAID.value
+        const success = this.order.status === this.constant.ORDER_STATUS.SUCCESS.value
+        return (paid && this.utils.getTimeDifference(this.order.pay_time) > PAID_CAN_APPEAL) ||
+          (success && this.utils.getTimeDifference(this.order.complete_time) < SUCCESS_CAN_APPEAL)
       },
       showPayment() {
-        return this.selectedMethod && this.order.status !== this.constant.ORDER_STATUS.CANCEL.value && this.order.status !== this.constant.ORDER_STATUS.CLOSED.value
+        const notCancel = this.order.status !== this.constant.ORDER_STATUS.CANCEL.value
+        const notClosed = this.order.status !== this.constant.ORDER_STATUS.CLOSED.value
+        return this.selectedMethod && notClosed && notCancel
       },
       tradeText() {
         if (!this.counterparty) return {}
@@ -411,7 +416,13 @@
       paymentStatusMessage() {
         switch (this.order.status) {
           case this.constant.ORDER_STATUS.CREATED.value:
-            return {message: `待支付，买方需在 <span class="c-red">${Math.floor(this.payRemainTime / 60)}分${this.payRemainTime % 60}秒</span>内完成支付，付款参考号：<span class="c-red">${this.referCode}</span>`}
+            return {
+              message: `
+                    待支付，买方需在
+                    <span class="c-red">${Math.floor(this.payRemainTime / 60)}分${this.payRemainTime % 60}秒</span>
+                    内完成支付，付款参考号：<span class="c-red">${this.referCode}</span>
+                    `
+            }
           case this.constant.ORDER_STATUS.PAID.value:
             return {
               message: `已支付，卖方需确认收款并放行数字币，付款参考号：<span class="c-red">${this.referCode}</span>`,

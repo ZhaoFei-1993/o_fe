@@ -14,13 +14,13 @@
 
       <SidebarInfoItem title="平均付款时间">
         <Language text="[t][/t]分钟">
-          <span slot="t" class="c-brand-yellow">{{userData.pay_time}} </span> <!--空格勿删-->
+          <span slot="t" class="c-brand-yellow">{{utils.formatDuration(userData.pay_time)}} </span> <!--空格勿删-->
         </Language>
       </SidebarInfoItem>
 
       <SidebarInfoItem title="平均放行时间">
         <Language text="[t][/t]分钟">
-          <span slot="t" class="c-brand-yellow">{{userData.receipt_time}} </span>
+          <span slot="t" class="c-brand-yellow">{{utils.formatDuration(userData.receipt_time)}} </span>
         </Language>
       </SidebarInfoItem>
     </div>
