@@ -79,7 +79,7 @@
   const COUNTDOWN = 60
 
   export default {
-    name: 'verify-password',
+    name: 'verify-code',
     components: {
       EMsgs
     },
@@ -109,6 +109,9 @@
       },
       // sms google 二选一
       codeType: String,
+      businessType: String,
+      smsSequence: Number,
+      emailSequence: Number,
     },
     data() {
       return {
@@ -200,8 +203,9 @@
       onSendEmailCode() {
         if (this.emailTimer) return
 
-        this.axios.misc.sendEmailCode().then(data => {
+        this.axios.misc.sendEmailCode(this.businessType).then(data => {
           this.$showTips('邮箱验证码发送成功')
+          this.$emit('update:emailSequence', data.data.sequence)
 
           this.emailCountdown = COUNTDOWN
           this.emailTimer = setInterval(() => {
@@ -219,8 +223,9 @@
       onSendSmsCode() {
         if (this.smsTimer) return
 
-        this.axios.misc.sendSmsCode().then(data => {
+        this.axios.misc.sendSmsCode(this.businessType).then(data => {
           this.$showTips('短信验证码发送成功')
+          this.$emit('update:smsSequence', data.data.sequence)
 
           this.smsCountdown = COUNTDOWN
           this.smsTimer = setInterval(() => {
