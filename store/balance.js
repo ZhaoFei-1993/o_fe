@@ -12,7 +12,6 @@ export default () => {
   const mutations = {
     SET_OTC_BALANCE(state, data) {
       state.otcBalance = data
-
       state.otcMap = data.reduce((reduced, coin) => {
         reduced[coin.coin_type] = coin
         return reduced

@@ -1,7 +1,7 @@
-
+const MISSING_PAY_METHODS = 71      // 发广告缺少支付方式
 // 所有已知错误的map
 export const ERROR_CODE = {
-
+  MISSING_PAY_METHODS,
 }
 
 // 由于后台现在错误信息有多语言，因此如果不是特殊情况，前端就不用展示自己的错误信息了

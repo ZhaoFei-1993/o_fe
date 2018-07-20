@@ -84,6 +84,9 @@
         <template slot="total" slot-scope="{ item }">
           {{ item.total | formatMoney }}
         </template>
+        <template slot="create_time" slot-scope="{ item }">
+          {{ item.create_time | getTimeText }}
+        </template>
       </b-table>
       <blank v-if="!assetHistoryItems.length"></blank>
       <b-pagination v-if="assetHistoryItems.length" :total-rows="historyQueryParams.totalRows" v-model="historyQueryParams.page" :per-page="historyQueryParams.limit"></b-pagination>
@@ -288,12 +291,7 @@
           historyQueryParams.page = currentPage
           historyQueryParams.totalRows = totalRows
 
-          assetHistoryItems = data.map(item => {
-            return {
-              ...item,
-              create_time: app.utils.getTimeText(item.create_time),
-            }
-          })
+          assetHistoryItems = data
         }
   
         return {
@@ -397,12 +395,7 @@
             const { data, curr_page: currentPage, total: totalRows } = historyData.data
             this.historyQueryParams.page = currentPage
             this.historyQueryParams.totalRows = totalRows
-            this.assetHistoryItems = data.map(item => {
-              return {
-                ...item,
-                create_time: this.utils.getTimeText(item.create_time),
-              }
-            })
+            this.assetHistoryItems = data
           }
         })
       },
