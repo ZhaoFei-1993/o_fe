@@ -38,7 +38,7 @@
     <div class="row-header">
       <span>资产结构</span>
     </div>
-    <c-block class="no-padding">
+    <c-block class="p-0">
       <b-table :fields="assetsTableFields" :items="otcBalance">
         <template slot="available" slot-scope="{ item }">
           {{ item.available | formatMoney }}
@@ -76,7 +76,7 @@
         </div>
       </div>
     </div>
-    <c-block class="no-padding">
+    <c-block class="p-0">
       <b-table :fields="assetsHistoryFields" :items="assetHistoryItems">
         <template slot="amount" slot-scope="{ item }">
           {{ item.amount | formatMoney }}
@@ -561,9 +561,6 @@
     .amount-available {
       font-size: 14px;
       color: #192330;
-    }
-    .no-padding {
-      padding: 0;
     }
     .rate {
       font-size: 14px;
