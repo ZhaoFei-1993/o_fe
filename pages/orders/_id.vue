@@ -417,9 +417,11 @@
           cancel: '订单已取消',
         }
       },
-      appealResult(){
-        // TODO
-        return ''
+      appealResult() {
+        if (!this.appeal) {
+          return ''
+        }
+        return this.constant.APPEAL_RESULT_MAP[this.appeal.result].text + ' 订单处理：' + this.constant.ORDER_RESULT_MAP[this.appeal.order_result].text
       }
     },
     methods: {
