@@ -369,15 +369,14 @@
             })
               .then(res => {
                 if (res.code === 0) {
+                  this.form.submitting = false
                   this.$successTips('划转成功')
                   this.showTransferModal = false
                 }
               })
               .catch(err => {
-                this.$errorTips(`划转失败${err}`)
-              })
-              .finally(() => {
                 this.form.submitting = false
+                this.$errorTips(`划转失败${err}`)
               })
           }
         }
