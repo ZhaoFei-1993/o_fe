@@ -187,7 +187,7 @@
   import {mapState} from 'vuex'
   import {loginPage, webDomain, signupPage} from '~/modules/variables'
   import {onApiError} from '~/modules/error-code'
-  import PublishItemModal from '~/components/publish-item-modal/index.vue'
+  import PublishItemModal from '~/components/publish-item-modal'
 
   export default {
     head: {
