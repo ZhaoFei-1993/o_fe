@@ -3,7 +3,7 @@
     <c-block style="min-height: 240px;">
       <div class="float-left asset-info">
         <p class="total">总资产估值</p>
-        <p class="total-tips" >
+        <p class="total-tips">
           <span style="font-size:24px;">
             {{ totalBalance | formatMoney }} CNY
           </span>
@@ -89,7 +89,11 @@
         </template>
       </b-table>
       <blank v-if="!assetHistoryItems.length"></blank>
-      <b-pagination v-if="assetHistoryItems.length" :total-rows="historyQueryParams.totalRows" v-model="historyQueryParams.page" :per-page="historyQueryParams.limit"></b-pagination>
+      <b-pagination v-if="assetHistoryItems.length"
+        :total-rows="historyQueryParams.totalRows"
+        v-model="historyQueryParams.page"
+        :per-page="historyQueryParams.limit">
+      </b-pagination>
     </c-block>
 
     <b-modal title="资金划转" v-model="showTransferModal" hide-footer no-close-on-backdrop>
@@ -271,7 +275,7 @@
         store.dispatch('fetchExchangeRate'),
       ])
     },
-    async asyncData({ app, req, redirect, route }) {
+    async asyncData({app, req, redirect, route}) {
       try {
         const historyQueryParams = {
           coin_type: null,
@@ -286,14 +290,14 @@
         let assetHistoryItems = []
 
         if (historyData.code === 0 && historyData.data) {
-          const { data, curr_page: currentPage, total: totalRows } = historyData.data
+          const {data, curr_page: currentPage, total: totalRows} = historyData.data
 
           historyQueryParams.page = currentPage
           historyQueryParams.totalRows = totalRows
 
           assetHistoryItems = data
         }
-  
+
         return {
           historyQueryParams,
           assetHistoryItems,
@@ -338,7 +342,7 @@
         return []
       },
       operationOptions() {
-        return [{ text: '全部', value: null }, ...Object.keys(this.bussinessTypeMap).map(key => {
+        return [{text: '全部', value: null}, ...Object.keys(this.bussinessTypeMap).map(key => {
           return {
             text: this.bussinessTypeMap[key],
             value: key,
@@ -359,7 +363,7 @@
     },
     methods: {
       onTransfer() {
-        const { amount } = this.form
+        const {amount} = this.form
         if (amount > 0) {
           if (!this.form.submitting) {
             this.form.submitting = true
@@ -382,13 +386,13 @@
         }
       },
       fetchBalanceHistory() {
-        const { page, limit, coin_type: coinType, side } = this.historyQueryParams
+        const {page, limit, coin_type: coinType, side} = this.historyQueryParams
         const query = {
           page,
           limit,
-          coin_type: coinType,
-          side,
-        }
+        coin_type: coinType,
+      side,
+       }
         this.axios.balance.history(query).then(historyData => {
           if (historyData.code === 0 && historyData.data) {
             const { data, curr_page: currentPage, total: totalRows } = historyData.data
@@ -414,7 +418,7 @@
         this.form.from = this.form.to
         this.form.to = tmp
 
-        const { coin_type: coinType } = this.curAssetItem
+        const {coin_type: coinType} = this.curAssetItem
         const fromBalance = this[`${this.form.from}Balance`].find(item => {
           return item.coin_type === coinType
         })
@@ -542,7 +546,7 @@
       font-size: 18px;
       text-align: left;
       color: #192330;
-      padding-bottom:15px;
+      padding-bottom: 15px;
     }
     .td-pl {
       padding-left: 28px;
