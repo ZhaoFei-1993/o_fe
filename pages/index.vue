@@ -209,7 +209,7 @@
         <div :class="['list',selectedSide.toLowerCase()]">
           <div class="item-row" v-for="item in items">
             <span class="col-narrow text-center fz-18 c-6f">{{item.user.name}}</span>
-            <div class="col-narrow">
+            <div class="col-narrow" v-if="item.user && item.user.user_stat">
               <div class="fz-12 c-4a" v-if="item.user.user_stat.order_count">
                 {{item.user.user_stat.deal_count}}单 /
                 {{(item.user.user_stat.deal_count / item.user.user_stat.order_count) | percentage}}

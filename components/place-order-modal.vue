@@ -14,8 +14,8 @@
         </div>
         <div class="stats-item">
           <span>30天完成率:</span>
-          <span v-if="item.user.user_stat.order_count"
-            class="c-brand-yellow">{{(item.user.user_stat.deal_count/item.user.user_stat.order_count)|percentage}} </span>
+          <span v-if="item.user.user_stat && item.user.user_stat.order_count"
+            class="c-brand-yellow">{{(item.user.user_stat.deal_count / item.user.user_stat.order_count) | percentage}} </span>
           <span v-else
             class="c-brand-yellow"> -- </span>
         </div>
