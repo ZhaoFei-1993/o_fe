@@ -409,11 +409,11 @@
         }
         return this.axios.user.dynamicConstraint().then(response => {
           const constraint = response.data
-          if (constraint.cancel || constraint.kyc_time) {
+          if (!constraint.can_place_order || !constraint.can_trade) {
             this.$showDialog({
               title: '交易限制',
               okOnly: true,
-              content: constraint.cancel ? (
+              content: !constraint.can_place_order ? (
                 <div>
                   您今天累计取消超过 3 次订单，被冻结交易功能。
                   <p>

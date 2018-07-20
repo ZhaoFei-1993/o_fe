@@ -115,7 +115,7 @@ export default (axios) => {
     },
 
     dynamicConstraint() {
-      return Promise.resolve(require('./mock/user').constraint)
+      return axios.get('/user/today/limit')
     },
 
     /**
