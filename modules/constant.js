@@ -107,5 +107,11 @@ export default {
       text: '卖家',
       value: 'sell',
     },
+  },
+  // 用户的密码难度等级
+  PASSWORD_LEVEL: {
+    HIGH: 'high',
+    MIDDLE: 'middle',
+    LOW: 'low',
   }
 }
