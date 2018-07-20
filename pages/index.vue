@@ -340,7 +340,7 @@
           payment_method: this.selectedPayment === 'ALL' ? undefined : this.selectedPayment.toLowerCase(),
         }).then(response => {
           this.busy = false
-          this.items = response.data
+          this.items = response.data.data
         })
       },
       placeOrder(item) {
