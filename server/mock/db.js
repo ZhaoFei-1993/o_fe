@@ -33,10 +33,10 @@ module.exports = () => {
       phone_verified: faker.random.boolean(),
       idcard_verified: faker.random.boolean(),
       user_stat: {                        // 统计信息
-        "deal_count": faker.random.number(),                    // 最近成交单数
-        "order_count": faker.random.number(),                   // 最近总单数
-        "pay_time": faker.random.number(),                      // 平均付款时间
-        "receipt_time": faker.random.number()                   // 平均放行时间
+        'deal_count': faker.random.number(),                    // 最近成交单数
+        'order_count': faker.random.number(),                   // 最近总单数
+        'pay_time': faker.random.number(),                      // 平均付款时间
+        'receipt_time': faker.random.number()                   // 平均放行时间
       },
     })
     const randUser = data.users[faker.random.number({max: i})]

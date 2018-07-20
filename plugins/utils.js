@@ -268,7 +268,7 @@ const utils = {
    * @param  {String} format 格式
    * @return {String} 时间长度，例如 1天2小时3分钟4秒
    */
-  formatDuration(durationNum, format=null) {
+  formatDuration(durationNum, format = null) {
     if (!durationNum) {
       return '--'
     }
