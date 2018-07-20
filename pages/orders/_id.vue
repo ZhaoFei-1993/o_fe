@@ -86,7 +86,7 @@
             <b-link href="https://otc.coinex.com/res/support/ticket" target="_blank">提交工单</b-link>
           </div>
           <div v-if="appeal.status==='completed'">
-            <span>申诉结果TODO</span>
+            <span>申诉裁决：{{appealResult}}</span>
           </div>
         </template>
       </div>
@@ -417,6 +417,10 @@
           cancel: '订单已取消',
         }
       },
+      appealResult(){
+        // TODO
+        return ''
+      }
     },
     methods: {
       getCurrentOrder(withUsers) {
