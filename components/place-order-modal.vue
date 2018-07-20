@@ -15,9 +15,9 @@
         <div class="stats-item">
           <span>30天完成率:</span>
           <span v-if="item.user.user_stat && item.user.user_stat.order_count"
-            class="c-brand-yellow">{{(item.user.user_stat.deal_count / item.user.user_stat.order_count) | percentage}} </span>
+                class="c-brand-yellow">{{(item.user.user_stat.deal_count / item.user.user_stat.order_count) | percentage}} </span>
           <span v-else
-            class="c-brand-yellow"> -- </span>
+                class="c-brand-yellow"> -- </span>
         </div>
       </div>
       <div class="stats">
@@ -254,7 +254,8 @@
         return Math.min(this.item.remain_coin_amount * this.item.price, (this.item.max_deal_cash_amount || Number.MAX_SAFE_INTEGER), this.currentBalance * this.item.price, this.kycLimitAmount)
       },
       sideText() {
-        return this.item.side === 'BUY' ? '购买' : '出售'
+        // user看到的是与merchant反的
+        return this.item.side === this.constant.SIDE.BUY ? '出售' : '购买'
       },
       title() {
         if (!this.item) return ''
