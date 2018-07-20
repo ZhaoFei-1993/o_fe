@@ -51,7 +51,9 @@ export default ({ app, store }) => {
       // 防止用户之间串cookie
       if (cookieString) {
         inst.defaults.headers.cookie = cookieString
-        inst.defaults.headers.common['Authorization'] = cookies.token
+        if (cookies && cookies.token) {
+          inst.defaults.headers.common['Authorization'] = cookies.token
+        }
       } else {
         delete inst.defaults.headers.cookie
       }

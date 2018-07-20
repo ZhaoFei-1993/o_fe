@@ -305,9 +305,8 @@
       return Promise.all([
         store.dispatch('fetchUserQualification'),
         store.dispatch('fetchUserPayments'),
-      ]).catch(error => {
-        // 未登录情况返回401，但不影响查看广告
-        console.log(error)
+      ]).catch(err => {
+        console.log(err)
       })
     },
     mounted() {

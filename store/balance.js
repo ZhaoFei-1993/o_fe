@@ -40,7 +40,7 @@ export default () => {
       })
     },
     fetchCoinexBalance({ commit }) {
-      return this.app.axios.balance.otcBalance().then(res => {
+      return this.app.axios.balance.coinexBalance().then(res => {
         commit('SET_COINEX_BALANCE', res.data)
       })
     },
