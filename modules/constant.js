@@ -15,7 +15,6 @@ const APPEAL_RESULTS = [
   {text: '平局', value: 'draw'},
   {text: '买家胜诉', value: 'buyer_win'},
   {text: '卖家胜诉', value: 'seller_win'},
-  {text: '微信', value: 'wechat'},
 ]
 
 const ORDER_RESULTS = [
