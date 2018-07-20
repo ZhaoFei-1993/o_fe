@@ -145,8 +145,8 @@ String.prototype.formatCurrency = function(
 String.prototype.formatMoney = function(c, charDec, charSep, noZero, lang) {
   let n = this || "0";
   let prefix = "";
-  if (n[0] === "-") {
-    prefix = "-";
+  if (n[0] === "-" || n[0] === '+') {
+    prefix = n[0];
     n = n.substring(1);
   }
   let rounded = n.toString().round(c);

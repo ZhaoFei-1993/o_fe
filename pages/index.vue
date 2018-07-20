@@ -301,7 +301,9 @@
       return Promise.all([
         store.dispatch('fetchUserQualification'),
         store.dispatch('fetchUserPayments'),
-      ])
+      ]).catch(err => {
+        console.log(err)
+      })
     },
     mounted() {
       this.getItems()
