@@ -209,11 +209,13 @@
         <div :class="['list',selectedSide.toLowerCase()]">
           <div class="item-row" v-for="item in items">
             <span class="col-narrow text-center fz-18 c-6f">{{item.user.name}}</span>
-            <div class="col-narrow">
-              <div class="fz-12 c-4a">
+            <div class="col-narrow" v-if="item.user && item.user.user_stat">
+              <div class="fz-12 c-4a" v-if="item.user.user_stat.order_count">
                 {{item.user.user_stat.deal_count}}单 /
-                {{item.user.user_stat.order_count ? ((item.user.user_stat.deal_count / item.user.user_stat.order_count)
-                | percentage) : '--'}}
+                {{(item.user.user_stat.deal_count / item.user.user_stat.order_count) | percentage}}
+              </div>
+              <div class="fz-12 c-4a" v-else>
+                0单 / --
               </div>
               <div class="fz-12 c-6f">
                 {{selectedSide ===
@@ -258,7 +260,7 @@
       </div>
     </div>
     <PlaceOrderModal
-      v-if="selectedItem"
+      v-if="selectedItem&&user.account"
       :item="selectedItem"
       v-model="showPlaceOrderModal"
     ></PlaceOrderModal>
@@ -269,6 +271,7 @@
 <script>
   import Vue from 'vue'
   import {mapState} from 'vuex'
+  import {loginPage, webDomain} from '~/modules/variables'
   import PlaceOrderModal from '~/components/place-order-modal'
   import PublishItemModal from '~/components/publish-item-modal/index.vue'
   import UserPayments from '~/components/user-payments'
@@ -283,6 +286,7 @@
     layout: 'fullwidth',
     data() {
       return {
+        loginPage: `${loginPage}?redirect=${encodeURIComponent(webDomain + this.$route.fullPath)}`,
         selectedCoin: this.$route.query.coin || 'BTC',
         selectedSide: this.$route.query.side || 'buy',
         selectedPayment: this.$route.query.payment || 'ALL',
@@ -340,6 +344,10 @@
         })
       },
       placeOrder(item) {
+        if (!this.user.account) {
+          window.location.href = loginPage
+          return
+        }
         this.verifyDynamicConstraint(item).then(res => {
           this.$store.dispatch('fetchOtcBalance').then(_ => {
             this.selectedItem = item
@@ -400,11 +408,11 @@
         }
         return this.axios.user.dynamicConstraint().then(response => {
           const constraint = response.data
-          if (constraint.cancel || constraint.kyc_time) {
+          if (!constraint.can_place_order || !constraint.can_trade) {
             this.$showDialog({
               title: '交易限制',
               okOnly: true,
-              content: constraint.cancel ? (
+              content: !constraint.can_place_order ? (
                 <div>
                   您今天累计取消超过 3 次订单，被冻结交易功能。
                   <p>

@@ -52,6 +52,7 @@
         a.dropdown-item {
           padding: 12px 20px 12px 0;
           display: flex;
+          font-size: 14px;
           justify-content: center;
           &:not(:last-child) {
             border-bottom: 1px solid #eeeeee;
