@@ -121,5 +121,10 @@ export default {
   SIDE: {
     BUY: 'buy',
     SELL: 'sell',
-  }
+  },
+  QUALIFICATIONS: {
+    KYC: 'kyc',
+    BIND_PHONE: 'bind_phone',
+    ONE_DEAL: 'one_deal',
+  },
 }

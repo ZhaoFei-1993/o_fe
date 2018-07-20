@@ -52,7 +52,6 @@ export default (axios) => {
     },
 
     qualification() {
-      return Promise.resolve(require('./mock/user').qualification)
       return axios.get('/user/qualification')
     },
 
@@ -123,7 +122,7 @@ export default (axios) => {
      * @param id
      */
     otherUserInfo(id) {
-      return axios.get(`users/${id}`)
+      return axios.get(`/users/${id}`)
       // return Promise.resolve(require('./mock/user').otherUser)
     },
   }

@@ -247,10 +247,11 @@
                         :id="'button-order-'+item.id"> {{(selectedSide === constant.SIDE.BUY ? '购买' : '出售') + selectedCoin}} </button>
                 <b-popover triggers="hover click" :target="'button-order-'+item.id"
                            title="商家交易限制">
-                  <ol>
-                    <li v-if="true||item.qualification">交易方必须完成过1次交易</li>
-                    <li v-if="true||item.qualification">交易方必须通过手机认证</li>
-                    <li v-if="true||item.qualification">交易方必须通过实名认证</li>
+                  <ol v-if="user && user.qualification">
+                    ces
+                    <li v-if="checkQualification(item,constant.QUALIFICATIONS.ONE_DEAL)">交易方必须完成过1次交易</li>
+                    <li v-if="checkQualification(item,constant.QUALIFICATIONS.BIND_PHONE)">交易方必须通过手机认证</li>
+                    <li v-if="checkQualification(item,constant.QUALIFICATIONS.KYC)">交易方必须通过实名认证</li>
                   </ol>
                 </b-popover>
               </template>
@@ -301,7 +302,8 @@
     computed: {
       ...mapState(['constant', 'user', 'balance']),
     },
-    fetch({store}) {
+    fetch({store, app, req}) {
+      app.axios.init(req)
       return Promise.all([
         store.dispatch('fetchUserQualification'),
         store.dispatch('fetchUserPayments'),
@@ -389,7 +391,7 @@
         return false
       },
       verifyDynamicConstraint(item) {
-        if (item.user_side === this.constant.SIDE.SELL) {
+        if (item.side === this.constant.SIDE.BUY) {
           // 卖家需要有对应支付方式
           if (!this.verifyHasPayment(item)) {
             this.$showDialog({
@@ -437,6 +439,9 @@
       },
       onItemPublished(item) {
         this.publishModalShowing = false
+      },
+      checkQualification(item, qualification) {
+        return item.qualification.indexOf(qualification) >= 0 && this.user.qualification.indexOf(qualification) < 0
       }
     },
   }
