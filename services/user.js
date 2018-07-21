@@ -65,9 +65,9 @@ export default (axios) => {
       return axios.get('/user/qualification')
     },
 
-    setSettings() {
+    setSettings(settings) {
       // return Promise.resolve(require('./mock/user').settings)
-      return axios.get('/user/settings')
+      return axios.post('/user/settings', settings)
     },
     signOut() {
       return axios.post('/user/sign/out')

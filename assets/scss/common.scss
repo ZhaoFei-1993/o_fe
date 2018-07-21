@@ -74,6 +74,10 @@ $pxSizeList: 0 5 10 15 20 25 30 40 50 60 90 100;
   .p-#{$size} {
     padding: #{$size}px !important;
   }
+
+  .r-#{$size} {
+    right: #{$size}px !important;
+  }
 }
 
 .ml-a {
