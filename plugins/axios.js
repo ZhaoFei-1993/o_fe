@@ -142,12 +142,12 @@ export default ({app, store}) => {
   // 401/403
   inst.interceptors.response.use(
     function (response) {
-      const url = response.request ? response.request.responseURL : ''
-      console.log(`请求url：${url}`)
       const data = response.data
 
       // code 不为 0，即为后台报错
       if (data && data.code) {
+        const url = response.request ? response.request.responseURL : ''
+        console.log(`请求url：${url}`)
         const err = new Error(data.message)
         err.code = data.code
         err.data = data.data
