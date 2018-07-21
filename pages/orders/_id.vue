@@ -365,11 +365,11 @@
       cannotSubmitAppeal() {
         return !(this.appealReason && this.appealComment && this.appealComment.length > 15)
       },
-      isMaker() {
+      isMerchant() {
         return this.order.merchant_id === this.user.account.id
       },
       isBuySide() {
-        return this.order.merchant_side === this.constant.SIDE.BUY && this.isMaker
+        return this.order.merchant_side === this.constant.SIDE.BUY ? this.isMerchant : !this.isMerchant
       },
       isBuyerAppeal() {
         return this.order.user_side === this.constant.SIDE.BUY && this.appeal.user_id === this.order.user_id

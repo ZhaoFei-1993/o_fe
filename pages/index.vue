@@ -151,6 +151,15 @@
           flex: 1;
           padding: 0 16px;
         }
+        .col-name {
+          padding-left: 0;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          .icon-certificated-merchant {
+            color: #7dd322;
+            margin-right: 4px;
+          }
+        }
       }
     }
   }
@@ -208,7 +217,9 @@
         </div>
         <div :class="['list',selectedSide.toLowerCase()]">
           <div class="item-row" v-for="item in items">
-            <span class="col-narrow text-center fz-18 c-6f"><span><i class="iconfont icon-certificated-merchant"></i></span>{{item.user.name}}</span>
+            <span class="col-narrow col-name text-center fz-18 c-6f">
+              <span v-b-tooltip.hover title="认证商家"><i class="iconfont icon-certificated-merchant"></i></span>{{item.user.name}}
+            </span>
             <div class="col-narrow" v-if="item.user && item.user.user_stat">
               <div class="fz-12 c-4a" v-if="item.user.user_stat.order_count">
                 {{item.user.user_stat.deal_count}}单 /
