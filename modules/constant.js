@@ -76,7 +76,7 @@ export default {
   VERIFY_CODE_BUSINESS: {
     ADD_PAYMENT: 'otc_add_payment_method',
     MODIFY_PAYMENT: 'otc_modify_payment_method',
-    CONFIRM_RECEIPT: 'otc_confirm_receipt_method',
+    CONFIRM_RECEIPT: 'otc_receipt_order',
   },
 
   KYC_STATUS: {
