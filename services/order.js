@@ -24,8 +24,8 @@ export default (axios) => {
     confirmPay(id) {
       return axios.post(`/orders/${id}/pay`)
     },
-    confirmReceipt(id) {
-      return axios.post(`/orders/${id}/receipt`)
+    confirmReceipt(id, payload) {
+      return axios.post(`/orders/${id}/receipt`, payload)
     },
     appeal(id, title, detail) {
       return axios.post(`/orders/${id}/appeal`, {title, detail})

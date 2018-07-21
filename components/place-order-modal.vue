@@ -2,7 +2,7 @@
   <b-modal v-if="item" :visible="value" @hide="hideModal" centered class="place-order-modal"
            hide-footer
            :title="title">
-    <div class="merchant-info" v-if="item.user">
+    <div class="merchant-info" hidden v-if="item.user">
       <div class="profile d-flex align-items-center">
         <UserAvatar :username="item.user.name" :online="true"></UserAvatar>
         <span class="ml-10">{{item.user.name}}</span>

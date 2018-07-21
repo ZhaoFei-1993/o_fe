@@ -16,7 +16,7 @@
       <div class="payment-info">
         <div class="payment-method" v-if="showPayment">
           <template v-if="order.status ===constant.ORDER_STATUS.CREATED.value">
-            <span v-if="!isMaker">
+            <span v-if="isBuySide">
               <i v-if="selectedMethod.method === constant.PAYMENT_TYPES.WECHAT" class="iconfont icon-wechat-round"></i>
               <i v-if="selectedMethod.method === constant.PAYMENT_TYPES.BANKCARD" class="iconfont icon-bank"></i>
               <i v-if="selectedMethod.method === constant.PAYMENT_TYPES.ALIPAY" class="iconfont icon-alipay"></i>
@@ -107,7 +107,7 @@
     <b-modal ref="appealModal"
              title="交易申诉"
              @ok="submitAppeal"
-             ok-variant="yellow"
+             ok-variant="gradient-yellow"
              :ok-disabled="cannotSubmitAppeal"
              cancel-variant="outline-green"
              ok-title="确定"
@@ -131,8 +131,8 @@
           </textarea>
         </div>
       </div>
-
     </b-modal>
+    <ConfirmReceipt :orderId="order.id" :show-confirm-receipt-modal="showConfirmReceiptModal"/>
   </div>
 </template>
 <style lang="scss">
@@ -324,6 +324,7 @@
 </style>
 <script>
   import UserStatsProfile from '~/components/user-stats-profile.vue'
+  import ConfirmReceipt from './_c/confirm-receipt'
   import {mapState} from 'vuex'
 
   const PAID_CAN_APPEAL = 30 * 60 * 1000 // 三十分钟
@@ -343,10 +344,12 @@
         appeal: null,
         appealComment: null,
         appealReason: null,
+        showConfirmReceiptModal: false,
       }
     },
     components: {
       UserStatsProfile,
+      ConfirmReceipt,
     },
     beforeDestroy() {
       clearInterval(this.secondCountdown)
@@ -363,7 +366,7 @@
         return !(this.appealReason && this.appealComment && this.appealComment.length > 15)
       },
       isMaker() {
-        return this.order.merchant_id === this.user.id
+        return this.order.merchant_id === this.user.account.id
       },
       isBuySide() {
         return this.order.merchant_side === this.constant.SIDE.BUY && this.isMaker
@@ -460,13 +463,13 @@
           if (response.code === 0) {
             this.order = response.data
             this.selectedMethod = this.order.payment_methods[0]
-            this.counterparty = this.user.id === this.order.user_id ? this.order.merchant : this.order.user
+            this.counterparty = this.user.account.id === this.order.user_id ? this.order.merchant : this.order.user
             this.checkOrderStatus()
             // 随机测试maker,taker
             if (Math.random() < 0.5) {
-              this.order.merchant_id = this.user.id
+              this.order.merchant_id = this.user.account.id
             } else {
-              this.order.user_id = this.user.id
+              this.order.user_id = this.user.account.id
             }
             // TODO 删除以上测试用代码
             if (this.order.status === 'created') {
@@ -525,17 +528,6 @@
           }
         })
       },
-      confirmReceipt() {
-        this.$showDialog({
-          title: '确认收款',
-          content: (<div>确认已收到该笔款项？<span class="c-red">如您没有收到买家付款，确认收款后，放行的数字货币将无法追回。</span></div>),
-          onOk: () => {
-            this.axios.order.confirmReceipt(this.order.id).then(response => {
-              this.refreshOrderStatus()
-            })
-          }
-        })
-      },
       startAppeal() {
         this.$refs.appealModal.show()
       },
@@ -560,6 +552,9 @@
           okOnly: true,
         })
       },
+      confirmReceipt() {
+        this.showConfirmReceiptModal = true
+      }
     }
   }
 </script>

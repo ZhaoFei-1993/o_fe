@@ -208,7 +208,7 @@
         </div>
         <div :class="['list',selectedSide.toLowerCase()]">
           <div class="item-row" v-for="item in items">
-            <span class="col-narrow text-center fz-18 c-6f">{{item.user.name}}</span>
+            <span class="col-narrow text-center fz-18 c-6f"><span><i class="iconfont icon-certificated-merchant"></i></span>{{item.user.name}}</span>
             <div class="col-narrow" v-if="item.user && item.user.user_stat">
               <div class="fz-12 c-4a" v-if="item.user.user_stat.order_count">
                 {{item.user.user_stat.deal_count}}单 /
@@ -267,14 +267,16 @@
     <PublishItemModal v-model="publishModalShowing" @published="onItemPublished"/>
     <b-modal id="no-payment-modal" :ok-only="true"
              v-model="showConstraintModal" title="交易限制"
-             ok-variant="yellow"
+             ok-variant="gradient-yellow"
              ok-title="确认"
              button-size="sm"
              class="text-center">
       <div>
         {{currentConstraint.content}}
         <p>
-          <b-link :to="currentConstraint.link">{{currentConstraint.linkText}}</b-link>
+          <b-link v-if="currentConstraint.outLink" :to="currentConstraint.outLink">{{currentConstraint.linkText}}
+          </b-link>
+          <b-link v-else :href="currentConstraint.link">{{currentConstraint.linkText}}</b-link>
         </p>
       </div>
     </b-modal>
@@ -312,6 +314,7 @@
           content: '',
           linkText: '',
           link: '',
+          outLink: null,
         },
         busy: false,
         publishModalShowing: true,
@@ -431,11 +434,11 @@
             this.currentConstraint = constraint.can_place_order ? {
               content: '您尚未完成实名认证，每日限制下单次数为 3 次。',
               linkText: '去完成实名认证',
-              link: '# TODO',
+              outLink: '//www.coinex.com/my/info/security',
             } : {
               content: '您今天累计取消超过 3 次订单，被冻结交易功能。',
               linkText: '了解更多交易规则',
-              link: '# TODO',
+              outLink: '//support.coinex.com',
             }
             this.showConstraintModal = true
             return Promise.reject(constraint)

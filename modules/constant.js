@@ -76,6 +76,7 @@ export default {
   VERIFY_CODE_BUSINESS: {
     ADD_PAYMENT: 'otc_add_payment_method',
     MODIFY_PAYMENT: 'otc_modify_payment_method',
+    CONFIRM_RECEIPT: 'otc_receipt_order',
   },
 
   KYC_STATUS: {
@@ -125,5 +126,23 @@ export default {
     KYC: 'kyc',
     BIND_PHONE: 'bind_phone',
     ONE_DEAL: 'one_deal',
+  },
+  // 用户的密码难度等级
+  PASSWORD_LEVEL: {
+    HIGH: 'high',
+    MIDDLE: 'middle',
+    LOW: 'low',
+  },
+
+  // 广告状态
+  ITEM_STATUS: {
+    ONLINE: 'on',
+    OFFLINE: 'off',
+  },
+  // 交易需要验证的频率
+  TRADE_VALIDATE_FREQUENCY: {
+    NEVER: 'never',
+    EACH_TIME: 'each_time',
+    EACH_TWO_HOURS: 'each_two_hours',
   },
 }

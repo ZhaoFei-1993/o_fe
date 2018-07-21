@@ -22,5 +22,35 @@ export default (axios) => {
         'auto_reply_content': item.auto_reply_content,                     // 自动回复内容
       })
     },
+
+    /**
+     * 获取我的广告列表
+     * @param {ITEM_STATUS} status
+     */
+    async userItems(status) {
+      // return Promise.resolve(require('./mock/item').userItems)
+      return axios.get('/me/items', {
+        params: {
+          status
+        }
+      })
+    },
+
+    /**
+     * 下架广告
+     * @param id
+     */
+    async offline(id) {
+      return axios.post(`/items/${id}/off`)
+    },
+
+    async online(id, amount) {
+      return axios.post(`/items/${id}/on`, {
+        'coin_amount': amount                        // 币量
+      })
+    },
+    async delete(id) {
+      return axios.post(`/items/${id}`)
+    }
   }
 }

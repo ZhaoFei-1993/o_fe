@@ -16,14 +16,24 @@ export default () => {
   const initialState = {
     account: null,
     payments: null,       // 用户的支付手段 Array<Payment>
-    balance: null,        // todo:balance需要重新设计
     merchant: null,       // 用户的商家信息
     settings: null,       // 用户的广告设置
     qualification: [],
   }
   const state = Object.assign({}, initialState)
   const mutations = {
-    SET_USER_ACCOUNT(state, data) {
+    SET_USER_ACCOUNT(state, {data, constant}) {
+      // 根据用户账户，计算用户安全等级
+      let securityLevel = 0
+      ;['is_have_totp_auth', 'mobile', 'email'].forEach(key => {
+        if (data[key]) securityLevel++
+      })
+
+      if (data.kyc_status === constant.KYC_STATUS.PASS) securityLevel++
+      if (data.login_password_level === constant.PASSWORD_LEVEL.HIGH || data.login_password_level === constant.PASSWORD_LEVEL.MIDDLE) securityLevel++
+
+      data.securityLevel = securityLevel
+
       state.account = data
     },
     SET_USER_PAYMENTS(state, data) {
@@ -44,9 +54,12 @@ export default () => {
     },
   }
   const actions = {
-    fetchUserAccount({commit}) {
+    fetchUserAccount({commit, rootState}) {
       return this.app.axios.user.account().then(data => {
-        commit('SET_USER_ACCOUNT', data.data)
+        commit('SET_USER_ACCOUNT', {
+          data: data.data,
+          constant: rootState.constant
+        })
       })
     },
     fetchUserPayments({commit, state, rootState}) {
