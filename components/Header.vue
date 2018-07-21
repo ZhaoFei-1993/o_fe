@@ -271,11 +271,7 @@
       shutdown() {
       },
       signOut() {
-        this.axios.user.signOut().then(res => {
-          this.$router.push('/')
-        }).catch(err => {
-          onApiError(err, this)
-        })
+        this.$store.dispatch('signOut')
       },
       onItemPublish() {
         this.publishModalShowing = true

@@ -441,7 +441,9 @@
         this.publishModalShowing = false
       },
       checkQualification(item, qualification) {
-        return item.qualification.indexOf(qualification) >= 0 && this.user.qualification.indexOf(qualification) < 0
+        if (!item.counterparty_limit) return true
+        if (!this.user || !this.user.qualification) return false
+        return item.counterparty_limit.indexOf(qualification) >= 0 && this.user.qualification.indexOf(qualification) < 0
       }
     },
   }
