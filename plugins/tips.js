@@ -55,6 +55,10 @@ export default ({app, store}) => {
     }
 
     app.$showTips = Vue.prototype.$showTips = $showTips
+    app.$successTips = Vue.prototype.$successTips = $showTips
+    app.$errorTips = Vue.prototype.$errorTips = function (content) {
+      $showTips(content, 'error')
+    }
 
     // 测试用代码
     // $showTips('fdfdfdfd', 'error')

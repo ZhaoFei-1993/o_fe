@@ -1,5 +1,5 @@
 <template>
-  <div v-if="order&&merchant" class="page-order-detail">
+  <div v-if="order" class="page-order-detail">
     <div class="main-content">
       <div class="order-basic-info">
         <div class="info-header">
@@ -14,24 +14,32 @@
         </div>
       </div>
       <div class="payment-info">
-        <div class="payment-method" v-if="!isMaker && selectedMethod">
-          <i v-if="selectedMethod.method === 'wechat'" class="iconfont icon-wechat-round"></i>
-          <i v-if="selectedMethod.method === 'bankcard'" class="iconfont icon-bank"></i>
-          <i v-if="selectedMethod.method === 'alipay'" class="iconfont icon-alipay"></i>
-          <select v-model="selectedMethod">
-            <option v-for="payment in paymentMethods" :value="payment" :class="payment.method">
-              <span v-if="payment.method === 'bankcard'">银行转帐</span>
-              <span v-if="payment.method === 'wechat'">微信支付</span>
-              <span v-if="payment.method === 'alipay'">支付宝支付</span>
-            </option>
-          </select>
+        <div class="payment-method" v-if="showPayment">
+          <template v-if="order.status ===constant.ORDER_STATUS.CREATED.value">
+            <span v-if="!isMaker">
+              <i v-if="selectedMethod.method === constant.PAYMENT_TYPES.WECHAT" class="iconfont icon-wechat-round"></i>
+              <i v-if="selectedMethod.method === constant.PAYMENT_TYPES.BANKCARD" class="iconfont icon-bank"></i>
+              <i v-if="selectedMethod.method === constant.PAYMENT_TYPES.ALIPAY" class="iconfont icon-alipay"></i>
+              <select v-model="selectedMethod">
+                <option v-for="payment in order.payment_methods" :value="payment" :class="payment.method">
+                  <span v-if="payment.method === constant.PAYMENT_TYPES.BANKCARD">银行转帐</span>
+                  <span v-if="payment.method === constant.PAYMENT_TYPES.WECHAT">微信支付</span>
+                  <span v-if="payment.method === constant.PAYMENT_TYPES.ALIPAY">支付宝支付</span>
+                </option>
+              </select>
+            </span>
+          </template>
+          <template v-else>
+            <span v-if="selectedMethod.method === 'bankcard'">
+            <i class="iconfont icon-bank"></i>银行转帐</span>
+            <span v-if="selectedMethod.method === 'wechat'"><i
+              class="iconfont icon-wechat-round"></i>微信支付</span>
+            <span v-if="selectedMethod.method === 'alipay'"><i
+              class="iconfont icon-wechat-round"></i>支付宝支付</span>
+          </template>
           <span class="payment-account">{{selectedMethod.account_name + ' '+ selectedMethod.account_no}}</span>
-          <span class="qr-code-button" v-if="selectedMethod.qr_code_image">支付二维码</span>
-        </div>
-        <div class="payment-method" v-if="order.pay_method">
-          <span v-if="order.pay_method === 'bankcard'"><i class="iconfont icon-bank"></i>银行转帐</span>
-          <span v-if="order.pay_method === 'wechat'"><i class="iconfont icon-wechat-round"></i>微信支付</span>
-          <span v-if="order.pay_method === 'alipay'"><i class="iconfont icon-wechat-round"></i>支付宝支付</span>
+          <span class="qr-code-button" v-if="selectedMethod.qr_code_image"
+                @click="showQrCode(selectedMethod.qr_code_image)">查看支付二维码</span>
         </div>
         <div class="payment-status" v-html="paymentStatusMessage.message"></div>
         <div class="payment-warning">{{paymentStatusMessage.warning}}</div>
@@ -86,7 +94,7 @@
             <b-link href="https://otc.coinex.com/res/support/ticket" target="_blank">提交工单</b-link>
           </div>
           <div v-if="appeal.status==='completed'">
-            <span>申诉结果TODO</span>
+            <span>申诉裁决：{{appealResult}}</span>
           </div>
         </template>
       </div>
@@ -283,35 +291,44 @@
       width: 400px;
       margin-left: 20px;
     }
-  }
-
-  #appeal-modal {
-    width: 560px;
-    .tip {
-      width: 80px;
-    }
-    .appeal-input {
-      width: 430px;
-      border: solid 1px #dddddd;
-      &:focus {
-        border: solid 1px $brandGreen;
-        outline: none;
+    #appeal-modal {
+      width: 560px;
+      .tip {
+        width: 80px;
+      }
+      .appeal-input {
+        width: 430px;
+        border: solid 1px #dddddd;
+        &:focus {
+          border: solid 1px $brandGreen;
+          outline: none;
+        }
+      }
+      textarea {
+        padding: 6px 12px;
+        height: 182px;
+        max-height: 182px;
       }
     }
-    textarea {
-      padding: 6px 12px;
-      height: 182px;
-      max-height: 182px;
+    .user-stats-profile {
+      .username {
+        max-width: 300px;
+      }
+      .sidebar-info-item-title {
+        width: 160px;
+      }
     }
   }
+
 
 </style>
 <script>
   import UserStatsProfile from '~/components/user-stats-profile.vue'
   import {mapState} from 'vuex'
 
-  const PAID_CAN_APPEAL_MIN = 30
-  const SUCCESS_CAN_APPEAL_DAY = 7
+  const PAID_CAN_APPEAL = 30 * 60 * 1000 // 三十分钟
+  const SUCCESS_CAN_APPEAL = 7 * 24 * 3600 * 1000 // 七天
+  // const REFRESH_ORDER_INTERVAL = 5000
   export default {
     data() {
       return {
@@ -320,7 +337,6 @@
         merchant: null,
         counterpartyId: null,
         order: null,
-        paymentMethods: null,
         selectedMethod: null,
         secondCountdown: null,
         payRemainTime: 0,
@@ -335,8 +351,8 @@
     beforeDestroy() {
       clearInterval(this.secondCountdown)
     },
-    beforeMount() {
-      this.getCurrentOrder(true)
+    mounted() {
+      this.getCurrentOrder()
     },
     computed: {
       ...mapState(['user', 'constant']),
@@ -346,21 +362,29 @@
       cannotSubmitAppeal() {
         return !(this.appealReason && this.appealComment && this.appealComment.length > 15)
       },
+      isMaker() {
+        return this.order.merchant_id === this.user.id
+      },
       isBuySide() {
-        return this.order.user_side === this.constant.SIDE.BUY.value ? (this.user.id === this.order.user_id) : (this.user.id !== this.order.user_id)
+        return this.order.merchant_side === this.constant.SIDE.BUY && this.isMaker
       },
       isBuyerAppeal() {
-        return this.order.user_side === this.constant.SIDE.BUY.value ? (this.appeal.user_id === this.order.user_id) : (this.appeal.user_id !== this.order.user_id)
+        return this.order.user_side === this.constant.SIDE.BUY && this.appeal.user_id === this.order.user_id
       },
       appealSide() {
         return this.isBuyerAppeal ? '买家' : '卖家'
       },
       canAppeal() {
-        return true || (this.order.status === this.constant.ORDER_STATUS.PAID.value && this.utils.getTimeDifference(this.order.pay_time) > 60 * 1000 * PAID_CAN_APPEAL_MIN) ||
-          (this.order.status === this.constant.ORDER_STATUS.SUCCESS.value && this.utils.getTimeDifference(this.order.complete_time) < 24 * 3600 * 1000 * SUCCESS_CAN_APPEAL_DAY)
+        // 支付后三十分钟以后 和 完成后七天内可以申诉
+        const paid = this.order.status === this.constant.ORDER_STATUS.PAID.value
+        const success = this.order.status === this.constant.ORDER_STATUS.SUCCESS.value
+        return (paid && this.utils.getTimeDifference(this.order.pay_time) > PAID_CAN_APPEAL) ||
+          (success && this.utils.getTimeDifference(this.order.complete_time) < SUCCESS_CAN_APPEAL)
       },
-      isMaker() {
-        return this.merchant.id === this.user.id
+      showPayment() {
+        const notCancel = this.order.status !== this.constant.ORDER_STATUS.CANCEL.value
+        const notClosed = this.order.status !== this.constant.ORDER_STATUS.CLOSED.value
+        return this.selectedMethod && notClosed && notCancel
       },
       tradeText() {
         if (!this.counterparty) return {}
@@ -392,7 +416,13 @@
       paymentStatusMessage() {
         switch (this.order.status) {
           case this.constant.ORDER_STATUS.CREATED.value:
-            return {message: `待支付，买方需在 <span class="c-red">${Math.floor(this.payRemainTime / 60)}分${this.payRemainTime % 60}秒</span>内完成支付，付款参考号：<span class="c-red">${this.referCode}</span>`}
+            return {
+              message: `
+                    待支付，买方需在
+                    <span class="c-red">${Math.floor(this.payRemainTime / 60)}分${this.payRemainTime % 60}秒</span>
+                    内完成支付，付款参考号：<span class="c-red">${this.referCode}</span>
+                    `
+            }
           case this.constant.ORDER_STATUS.PAID.value:
             return {
               message: `已支付，卖方需确认收款并放行数字币，付款参考号：<span class="c-red">${this.referCode}</span>`,
@@ -417,12 +447,20 @@
           cancel: '订单已取消',
         }
       },
+      appealResult() {
+        if (!this.appeal) {
+          return ''
+        }
+        return this.constant.APPEAL_RESULT_MAP[this.appeal.result].text + ' 订单处理：' + this.constant.ORDER_RESULT_MAP[this.appeal.order_result].text
+      }
     },
     methods: {
-      getCurrentOrder(withUsers) {
+      getCurrentOrder() {
         this.axios.order.getOrderById(this.id).then(response => {
           if (response.code === 0) {
             this.order = response.data
+            this.selectedMethod = this.order.payment_methods[0]
+            this.counterparty = this.user.id === this.order.user_id ? this.order.merchant : this.order.user
             this.checkOrderStatus()
             // 随机测试maker,taker
             if (Math.random() < 0.5) {
@@ -432,7 +470,10 @@
             }
             // TODO 删除以上测试用代码
             if (this.order.status === 'created') {
-              this.payRemainTime = Math.floor(((this.order.pay_time + 15 * 60) * 1000 - Date.now()) / 1000)
+              this.payRemainTime = Math.floor(((this.order.place_time + 15 * 60) * 1000 - Date.now()) / 1000)
+              if (this.payRemainTime <= 0) {
+                this.order.status = this.constant.ORDER_STATUS.CLOSED.value
+              }
               clearInterval(this.secondCountdown)
               this.secondCountdown = setInterval(() => {
                 if (this.payRemainTime > 0) {
@@ -445,25 +486,12 @@
             if (this.order.status === this.constant.ORDER_STATUS.PAID.value || this.order.status === this.constant.ORDER_STATUS.SUCCESS.value) {
               this.getAppeal()
             }
-            if (!withUsers) return
-            // 以下订单相关用户信息只需要获取一次
-            if (this.user.id === this.order.user_id) {
-              this.counterpartyId = this.order.merchant_id
-              this.axios.user.otherUserInfo(this.counterpartyId).then(res => {
-                this.counterparty = res.data
-                this.merchant = this.counterparty
-                this.axios.user.payments(this.merchant.id).then(methods => {
-                  this.paymentMethods = methods.data
-                  this.selectedMethod = this.paymentMethods[0]
-                })
-              })
-            } else {
-              this.counterpartyId = this.order.user_id
-              this.axios.user.otherUserInfo(this.counterpartyId).then(res => {
-                this.counterparty = res.data
-                this.merchant = this.user
-              })
-            }
+          }
+        }).catch(err => {
+          if (err.code === 401) {
+            this.axios.needAuth(err, this.$router.push, this.$route.fullPath)
+          } else {
+            this.$router.push('/')
           }
         })
       },
@@ -480,9 +508,10 @@
       },
       checkOrderStatus() {
         if (this.order.status === this.constant.ORDER_STATUS.CREATED.value || this.order.status === this.constant.ORDER_STATUS.PAID.value || this.order.appeal_status !== '') {
-          setTimeout(() => {
-            this.refreshOrderStatus()
-          }, 20000)
+          // TODO 开发时暂不开启自动刷新
+          // setTimeout(() => {
+          //   this.refreshOrderStatus()
+          // }, REFRESH_ORDER_INTERVAL)
         }
       },
       confirmPay() {
@@ -523,7 +552,14 @@
             this.axios.order.cancelAppeal(this.order.id)
           }
         })
-      }
+      },
+      showQrCode(codeImg) {
+        this.$showDialog({
+          title: '支付二维码',
+          content: (<div><img src={codeImg}/></div>),
+          okOnly: true,
+        })
+      },
     }
   }
 </script>

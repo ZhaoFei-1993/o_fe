@@ -1,6 +1,7 @@
 <!--支付方式-->
 <style lang="scss">
   @import "~assets/scss/variables.scss";
+
   .page-my-payments {
     .layout-my-title {
       display: flex;
@@ -53,27 +54,28 @@
     <p class="layout-my-desc">被激活的支付方式将在交易时向买方展示，最多激活3种</p>
 
     <MyInfoItem v-for="(payment, index) in user.payments" :key="index">
-        <div slot="title">
-          <i class="iconfont fz-18" :class="payment.icon"></i>
-          {{payment.title}}
-        </div>
+      <div slot="title">
+        <i class="iconfont fz-18" :class="payment.icon"></i>
+        {{payment.title}}
+      </div>
 
-        <p slot="content">
-          {{payment.accouont_no}}
-          {{payment.account_name}}
-          <template v-if="payment.method === constant.PAYMENT_TYPES.BANKCARD">
-            {{payment.bank}}
-            {{payment.branch}}
-          </template>
-        </p>
+      <p slot="content">
+        {{payment.accouont_no}}
+        {{payment.account_name}}
+        <template v-if="payment.method === constant.PAYMENT_TYPES.BANKCARD">
+          {{payment.bank}}
+          {{payment.branch}}
+        </template>
+      </p>
 
-        <div slot="action" class="payment-action">
-          <b-btn size="xxs" variant="plain" class="c-brand-green" @click="onPaymentEdit(payment)">修改</b-btn>
-          <div class="payment-status">
-            {{payment.status.toUpperCase()}}
-            <ToggleButton class="ml-2" :value="payment.status === constant.PAYMENT_STATUS.ON" @change="(checked) => onPaymentStatusChange(payment, checked)"/>
-          </div>
+      <div slot="action" class="payment-action">
+        <b-btn size="xxs" variant="plain" class="c-brand-green" @click="onPaymentEdit(payment)">修改</b-btn>
+        <div class="payment-status">
+          {{payment.status.toUpperCase()}}
+          <ToggleButton class="ml-2" :value="payment.status === constant.PAYMENT_STATUS.ON"
+                        @change="(checked) => onPaymentStatusChange(payment, checked)"/>
         </div>
+      </div>
     </MyInfoItem>
 
     <b-modal class="payment-modal"
@@ -151,180 +153,182 @@
 </template>
 
 <script>
-import Vue from 'vue'
-import {mapState} from 'vuex'
-import MySidebar from '~/components/my-sidebar.vue'
-import My2Column from '~/components/my-2column.vue'
-import MyInfoItem from './_c/my-info-item.vue'
-import ToggleButton from '~/components/toggle-button.vue'
-import VerifyCode from '~/components/verify-code.vue'
-import Vuelidate from 'vuelidate'
-import getPaymentFormConfig from './payment-form-config'
-import EMsgs from '~/components/error-message.vue'
+  import Vue from 'vue'
+  import {mapState} from 'vuex'
+  import MySidebar from '~/components/my-sidebar.vue'
+  import My2Column from '~/components/my-2column.vue'
+  import MyInfoItem from './_c/my-info-item.vue'
+  import ToggleButton from '~/components/toggle-button.vue'
+  import VerifyCode from '~/components/verify-code.vue'
+  import Vuelidate from 'vuelidate'
+  import getPaymentFormConfig from './payment-form-config'
+  import EMsgs from '~/components/error-message.vue'
 
-Vue.use(Vuelidate)
+  Vue.use(Vuelidate)
 
-export default {
-  name: 'page-my-payments',
-  components: {
-    MySidebar,
-    My2Column,
-    MyInfoItem,
-    ToggleButton,
-    VerifyCode,
-    EMsgs,
-  },
-  layout: 'my',
-  data() {
-    return {
-      verify: {
-        codeType: 'sms',   // todo:默认值
-        sms: '',
-        google: '',
-        email: '',
-        businessType: '',
-        smsSequence: 0,
-        emailSequence: 0
-      },
-      form: {
-        method: '',
-        account_name: '',
-        bank: '',
-        branch: '',
-        account_no: '',
-        qr_code_image: '',
-      },
-      modalShowing: false,
-      isPaymentEditing: false,     // 是否正在被编辑payment（而不是添加）
+  export default {
+    name: 'page-my-payments',
+    components: {
+      MySidebar,
+      My2Column,
+      MyInfoItem,
+      ToggleButton,
+      VerifyCode,
+      EMsgs,
+    },
+    layout: 'my',
+    data() {
+      return {
+        verify: {
+          codeType: 'sms',   // todo:默认值
+          sms: '',
+          google: '',
+          email: '',
+          businessType: '',
+          smsSequence: 0,
+          emailSequence: 0
+        },
+        form: {
+          method: '',
+          account_name: '',
+          bank: '',
+          branch: '',
+          account_no: '',
+          qr_code_image: '',
+        },
+        modalShowing: false,
+        isPaymentEditing: false,     // 是否正在被编辑payment（而不是添加）
 
-      bankList: [{
-        text: '中国银行',
-        value: '11'
-      }, {
-        text: '华夏银行',
-        value: '22'
-      }]
-    }
-  },
-  computed: {
-    ...mapState(['constant', 'user']),
-    // 根据当前状态生成的校验数据
-    validationConf: function () {
-      const PAYMENT_TYPES = this.constant.PAYMENT_TYPES
-
-      const {baseValidations, qrcodeValidations, bankValidations} = getPaymentFormConfig(this.$t, this.$tt)
-
-      if (this.form.method === PAYMENT_TYPES.ALIPAY || this.form.method === PAYMENT_TYPES.WECHAT) {
-        return this.utils.processValidationConfig(Object.assign(baseValidations, qrcodeValidations))
-      } else if (this.form.method === PAYMENT_TYPES.BANKCARD) {
-        return this.utils.processValidationConfig(Object.assign(baseValidations, bankValidations))
-      } else {
-        return this.utils.processValidationConfig(baseValidations)
+        bankList: [{
+          text: '中国银行',
+          value: '11'
+        }, {
+          text: '华夏银行',
+          value: '22'
+        }]
       }
-    }
-  },
-  validations() {
-    return {
-      form: this.validationConf.validations
-    }
-  },
-  mounted() {
-    this.$store.dispatch('fetchUserPayments')
-    this.$store.dispatch('fetchSystemConstant')
-  },
-  methods: {
-    onPaymentStatusChange(payment, checked) {
-      const PAYMENT_STATUS = this.constant.PAYMENT_STATUS
-      const status = checked ? PAYMENT_STATUS.ON : PAYMENT_STATUS.OFF
-      this.axios.user.changePaymentStatus(payment.id, status).then(res => {
-        payment.status = status
-        this.$showTips(status === PAYMENT_STATUS.ON ? '开启成功' : '关闭成功')
-      }).catch(err => {
-        this.axios.onError(err)
-      })
     },
+    computed: {
+      ...mapState(['constant', 'user']),
+      // 根据当前状态生成的校验数据
+      validationConf: function () {
+        const PAYMENT_TYPES = this.constant.PAYMENT_TYPES
 
-    clearForm() {
-      // 清空之前的值
-      const form = Object.assign({}, this.form)
-      ;['method', 'account_name', 'bank', 'branch', 'account_no', 'qr_code_image'].forEach((key) => {
-        form[key] = ''
-      })
-      this.form = form
-    },
+        const {baseValidations, qrcodeValidations, bankValidations} = getPaymentFormConfig(this.$t, this.$tt)
 
-    onPaymentEdit(payment) {
-      this.modalShowing = true
-      this.isPaymentEditing = true
-      this.form = payment
-      this.verify.businessType = this.constant.VERIFY_CODE_BUSINESS.MODIFY_PAYMENT
-    },
-
-    updatePayment() {
-      const form = this.form
-      const verify = this.verify
-      const code = verify.codeType === this.constant.VERIFY_CODE_TYPE.GOOGLE ? verify.google : verify.sms
-
-      this.axios.user.updatePaymentMethod({
-        validate_code_type: verify.codeType,
-        validate_code: code,
-        email_code: verify.email,
-        email_code_sequence: verify.emailSequence,
-        sequence: verify.smsSequence,
-        ...form,
-      }).then(res => {
-        this.$store.dispatch('fetchUserPayments')
-        this.modalShowing = false
-        this.$showTips('修改成功')
-      }).catch(err => {
-        this.axios.onError(err)
-      })
-    },
-
-    onPaymentAdd() {
-      this.modalShowing = true
-      this.verify.businessType = this.constant.VERIFY_CODE_BUSINESS.ADD_PAYMENT
-
-      if (this.isPaymentEditing) {
-        this.clearForm()
+        if (this.form.method === PAYMENT_TYPES.ALIPAY || this.form.method === PAYMENT_TYPES.WECHAT) {
+          return this.utils.processValidationConfig(Object.assign(baseValidations, qrcodeValidations))
+        } else if (this.form.method === PAYMENT_TYPES.BANKCARD) {
+          return this.utils.processValidationConfig(Object.assign(baseValidations, bankValidations))
+        } else {
+          return this.utils.processValidationConfig(baseValidations)
+        }
       }
-      this.isPaymentEditing = false
     },
-
-    addPayment() {
-      const form = this.form
-      const verify = this.verify
-      const code = verify.codeType === this.constant.VERIFY_CODE_TYPE.GOOGLE ? verify.google : verify.sms
-
-      this.axios.user.addPaymentMethod({
-        validate_code_type: verify.codeType,
-        validate_code: code,
-        email_code: verify.email,
-        email_code_sequence: verify.emailSequence,
-        sequence: verify.smsSequence,
-        ...form,
-      }).then(res => {
-        this.$store.dispatch('fetchUserPayments')
-        this.modalShowing = false
-        this.$showTips('添加成功')
-      }).catch(err => {
-        this.axios.onError(err)
-      })
+    validations() {
+      return {
+        form: this.validationConf.validations
+      }
     },
+    fetch({store}) {
+      return Promise.all([
+        store.dispatch('fetchUserPayments'),
+        store.dispatch('fetchSystemConstant'),
+      ])
+    },
+    methods: {
+      onPaymentStatusChange(payment, checked) {
+        const PAYMENT_STATUS = this.constant.PAYMENT_STATUS
+        const status = checked ? PAYMENT_STATUS.ON : PAYMENT_STATUS.OFF
+        this.axios.user.changePaymentStatus(payment.id, status).then(res => {
+          payment.status = status
+          this.$showTips(status === PAYMENT_STATUS.ON ? '开启成功' : '关闭成功')
+        }).catch(err => {
+          this.axios.onError(err)
+        })
+      },
 
-    onFormSubmit(e) {
-      e.preventDefault()
+      clearForm() {
+        // 清空之前的值
+        const form = Object.assign({}, this.form)
+        ;['method', 'account_name', 'bank', 'branch', 'account_no', 'qr_code_image'].forEach((key) => {
+          form[key] = ''
+        })
+        this.form = form
+      },
 
-      this.$nextTick(() => {
-        this.$v.form.$touch()
-        this.$refs['verify-code'].verify()
+      onPaymentEdit(payment) {
+        this.modalShowing = true
+        this.isPaymentEditing = true
+        this.form = payment
+        this.verify.businessType = this.constant.VERIFY_CODE_BUSINESS.MODIFY_PAYMENT
+      },
 
-        if (this.$v.form.$invalid) return
-        if (this.$refs['verify-code'].$v.$invalid) return
+      updatePayment() {
+        const form = this.form
+        const verify = this.verify
+        const code = verify.codeType === this.constant.VERIFY_CODE_TYPE.GOOGLE ? verify.google : verify.sms
 
-        this.isPaymentEditing ? this.updatePayment() : this.addPayment()
-      })
+        this.axios.user.updatePaymentMethod({
+          validate_code_type: verify.codeType,
+          validate_code: code,
+          email_code: verify.email,
+          email_code_sequence: verify.emailSequence,
+          sequence: verify.smsSequence,
+          ...form,
+        }).then(res => {
+          this.$store.dispatch('fetchUserPayments')
+          this.modalShowing = false
+          this.$showTips('修改成功')
+        }).catch(err => {
+          this.axios.onError(err)
+        })
+      },
+
+      onPaymentAdd() {
+        this.modalShowing = true
+        this.verify.businessType = this.constant.VERIFY_CODE_BUSINESS.ADD_PAYMENT
+
+        if (this.isPaymentEditing) {
+          this.clearForm()
+        }
+        this.isPaymentEditing = false
+      },
+
+      addPayment() {
+        const form = this.form
+        const verify = this.verify
+        const code = verify.codeType === this.constant.VERIFY_CODE_TYPE.GOOGLE ? verify.google : verify.sms
+
+        this.axios.user.addPaymentMethod({
+          validate_code_type: verify.codeType,
+          validate_code: code,
+          email_code: verify.email,
+          email_code_sequence: verify.emailSequence,
+          sequence: verify.smsSequence,
+          ...form,
+        }).then(res => {
+          this.$store.dispatch('fetchUserPayments')
+          this.modalShowing = false
+          this.$showTips('添加成功')
+        }).catch(err => {
+          this.axios.onError(err)
+        })
+      },
+
+      onFormSubmit(e) {
+        e.preventDefault()
+
+        this.$nextTick(() => {
+          this.$v.form.$touch()
+          this.$refs['verify-code'].verify()
+
+          if (this.$v.form.$invalid) return
+          if (this.$refs['verify-code'].$v.$invalid) return
+
+          this.isPaymentEditing ? this.updatePayment() : this.addPayment()
+        })
+      }
     }
   }
-}
 </script>

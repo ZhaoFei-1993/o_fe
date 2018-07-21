@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import axios from 'axios'
-import { serverApiDomain, clientApiDomain, loginPage, webDomain } from '../modules/variables'
+import {serverApiDomain, clientApiDomain, loginPage, webDomain} from '../modules/variables'
 import cookieParser from '~/plugins/cookies'
 import injectServices from '../services/index'
 import {onApiError} from '~/modules/error-code'
@@ -13,7 +13,7 @@ function sleep(ms = 100) {
   })
 }
 
-export default ({ app, store }) => {
+export default ({app, store}) => {
   const options = {
     baseURL: process.client ? clientApiDomain : serverApiDomain,
   }
@@ -53,7 +53,9 @@ export default ({ app, store }) => {
       // 防止用户之间串cookie
       if (cookieString) {
         inst.defaults.headers.cookie = cookieString
-        inst.defaults.headers.common['Authorization'] = cookies.token
+        if (cookies && cookies.token) {
+          inst.defaults.headers.common['Authorization'] = cookies.token
+        }
       } else {
         delete inst.defaults.headers.cookie
       }
@@ -90,7 +92,7 @@ export default ({ app, store }) => {
 
   inst.needAuth = function (err, redirect, path = '/') {
     if (err.code && (err.code === 401 || err.code === 403)) {
-      const loginUrl = `${loginPage}?next=${encodeURIComponent(webDomain + path)}`
+      const loginUrl = `${loginPage}?redirect=${encodeURIComponent(webDomain + path)}`
       try {
         // nuxt的redirect在客户端使用了 window.location.replace，会导致无法回到之前页面，这里处理下
         if (process.client) {
@@ -146,6 +148,8 @@ export default ({ app, store }) => {
 
       // code 不为 0，即为后台报错
       if (data && data.code) {
+        const url = response.request ? response.request.responseURL : ''
+        console.log(`请求url：${url}`)
         const err = new Error(data.message)
         err.code = data.code
         err.data = data.data

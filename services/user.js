@@ -29,8 +29,8 @@ export default (axios) => {
      * @return {*}
      */
     applyMerchant({wechat}) {
-      require('./mock/user').merchant.data.status = 'created'
-      return Promise.resolve(require('./mock/user').merchant)
+      // require('./mock/user').merchant.data.status = 'created'
+      // return Promise.resolve(require('./mock/user').merchant)
       return axios.post('/user/merchant', {
         wechat
       })
@@ -41,8 +41,8 @@ export default (axios) => {
      * 暂时后台只做了取消认证申请 jeff 20180716
      */
     cancelMerchant() {
-      require('./mock/user').merchant.data.status = 'cancel'
-      return Promise.resolve({data: {}, code: 0})
+      // require('./mock/user').merchant.data.status = 'cancel'
+      // return Promise.resolve({data: {}, code: 0})
       return axios.delete('/user/merchant')
     },
 
@@ -57,18 +57,20 @@ export default (axios) => {
       })
     },
     settings() {
-      return Promise.resolve(require('./mock/user').settings)
+      // return Promise.resolve(require('./mock/user').settings)
       return axios.get('/user/settings')
     },
 
     qualification() {
-      return Promise.resolve(require('./mock/user').qualification)
       return axios.get('/user/qualification')
     },
 
     setSettings() {
-      return Promise.resolve(require('./mock/user').settings)
+      // return Promise.resolve(require('./mock/user').settings)
       return axios.get('/user/settings')
+    },
+    signOut() {
+      return axios.post('/user/sign/out')
     },
 
     /**
@@ -122,7 +124,7 @@ export default (axios) => {
     },
 
     dynamicConstraint() {
-      return Promise.resolve(require('./mock/user').constraint)
+      return axios.get('/user/today/limit')
     },
 
     /**
@@ -130,7 +132,7 @@ export default (axios) => {
      * @param id
      */
     otherUserInfo(id) {
-      return axios.get(`users/${id}`)
+      return axios.get(`/users/${id}`)
       // return Promise.resolve(require('./mock/user').otherUser)
     },
   }

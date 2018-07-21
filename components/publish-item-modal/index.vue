@@ -279,7 +279,7 @@ export default {
       if (form.side === 'buy' && form.price_limit < price && Number(price) !== 0) form.price_limit = price
       if (form.side === 'sell' && form.price_limit > price && Number(price) !== 0) form.price_limit = price
     },
-    'form.float_rate': function(floatRate) {
+    'form.float_rate': function (floatRate) {
       if (this.form.pricing_type !== this.constant.PRICING_TYPE.FLOAT) return
       this.form.price = floatRate.decimalDiv(100).decimalMul(this.balance.currentRate[this.form.coin_type])
     }
@@ -320,8 +320,7 @@ export default {
         const ERROR_CODE = this.constant.ERROR_CODE
         if (err.code === ERROR_CODE.MISSING_PAY_METHODS) {
           this.$showTips('缺少支付方式，请先添加支付方式')   // todo:可能需要在点击之前就提示
-        }
-        else {
+        } else {
           this.axios.onError(err)
         }
       })

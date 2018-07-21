@@ -11,6 +11,18 @@ const PAYMENT_OPTIONS = [
   {text: '微信', value: 'wechat', icon: 'icon-wechat-round'},
 ]
 
+const APPEAL_RESULTS = [
+  {text: '平局', value: 'draw'},
+  {text: '买家胜诉', value: 'buyer_win'},
+  {text: '卖家胜诉', value: 'seller_win'},
+]
+
+const ORDER_RESULTS = [
+  {text: '双方协商处理', value: 'none'},
+  {text: '订单成交', value: 'receipt_order'},
+  {text: '订单取消', value: 'cancel_order'},
+]
+
 export default {
   COIN_TYPES,
   COIN_TYPE_OPTIONS: COIN_TYPES.map(name => {
@@ -36,7 +48,14 @@ export default {
     ON: 'on',
     OFF: 'off'
   },
-
+  ORDER_RESULT_MAP: ORDER_RESULTS.reduce((map, option) => {
+    map[option.value] = option
+    return map
+  }, {}),
+  APPEAL_RESULT_MAP: APPEAL_RESULTS.reduce((map, option) => {
+    map[option.value] = option
+    return map
+  }, {}),
   COUNTERPARTY_LIMIT_OPTIONS: [{
     text: '交易方必须通过手机验证',
     value: 'bind_phone'
@@ -99,14 +118,13 @@ export default {
   },
   APPEAL_REASONS: ['卖家未放币', '买家付款未收到', '买家付款金额错误', '其他'],
   SIDE: {
-    BUY: {
-      text: '买家',
-      value: 'buy',
-    },
-    SELL: {
-      text: '卖家',
-      value: 'sell',
-    },
+    BUY: 'buy',
+    SELL: 'sell',
+  },
+  QUALIFICATIONS: {
+    KYC: 'kyc',
+    BIND_PHONE: 'bind_phone',
+    ONE_DEAL: 'one_deal',
   },
   // 用户的密码难度等级
   PASSWORD_LEVEL: {
@@ -119,5 +137,5 @@ export default {
   ITEM_STATUS: {
     ONLINE: 'on',
     OFFLINE: 'off',
-  }
+  },
 }

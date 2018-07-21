@@ -13,12 +13,14 @@
 //   icon: 'icon-bankcard'
 // }
 export default () => {
-  const state = {
+  const initialState = {
     account: null,
     payments: null,       // 用户的支付手段 Array<Payment>
     merchant: null,       // 用户的商家信息
     settings: null,       // 用户的广告设置
+    qualification: [],
   }
+  const state = Object.assign({}, initialState)
   const mutations = {
     SET_USER_ACCOUNT(state, {data, constant}) {
       // 根据用户账户，计算用户安全等级
@@ -45,6 +47,10 @@ export default () => {
     },
     SET_USER_QUALIFICATION(state, data) {
       state.qualification = data
+    },
+    SIGN_OUT(state) {
+      // 恢复初始状态
+      Object.assign(state, initialState)
     },
   }
   const actions = {
@@ -81,6 +87,12 @@ export default () => {
     fetchUserQualification({commit, state, rootState}) {
       return this.app.axios.user.qualification().then(data => {
         commit('SET_USER_QUALIFICATION', data.data)
+      })
+    },
+    signOut({commit}) {
+      return this.app.axios.user.signOut().then(res => {
+        commit('SIGN_OUT')
+        this.$router.push('/')
       })
     },
   }
