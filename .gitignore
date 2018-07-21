@@ -63,4 +63,4 @@ typings/
 .DS_Store
 
 # i18n
-locales/**
+locales/*.json
