@@ -84,9 +84,9 @@
         </div>
       </template>
     </b-table>
-    <CBlock v-show="isItemAmountEdit" class="item-coin-amount-container" ref="coin-amount" x="20" y="20">
+    <CBlock v-show="isItemAmountEditing" class="item-coin-amount-container" ref="coin-amount" x="20" y="20">
       <div class="item-coin-amount-confirm">
-        <CurrencyInput v-model="editingItemCoinAmount" class="item-coin-amount-confirm-input" :currency="editingItem.cash_type"/>
+        <CurrencyInput v-model="onlineItemCoinAmount" class="item-coin-amount-confirm-input" :currency="editingItem.cash_type"/>
         <b-btn variant="plain-green" size="xs" class="mx-20" @click="onItemOnlineConfirm">确定</b-btn>
         <b-btn variant="plain" size="xs" @click="onItemOnlineCancel">取消</b-btn>
       </div>
@@ -96,6 +96,7 @@
       </Language>
     </CBlock>
     <PublishItemModal v-model="publishModalShowing" @published="onItemPublished"/>
+    <PublishItemModal v-model="isItemEditing" :item="editingItem" :editing="isItemEditing" @edited="onItemEdited"/>
   </CBlock>
 </template>
 
@@ -118,8 +119,9 @@ export default {
       items: [],
       itemStatus: '',
       editingItem: {},        // 正在编辑or上架的广告
-      editingItemCoinAmount: 0, // 正在上架的广告的数量
-      isItemAmountEdit: false,
+      onlineItemCoinAmount: 0, // 正在上架的广告的数量
+      isItemAmountEditing: false,   // 正在上架的广告的币量，是否在编辑
+      isItemEditing: false,   // 是否在编辑广告
     }
   },
   computed: {
@@ -229,32 +231,31 @@ export default {
         this.axios.onError(err)
       })
     },
-    onItemEdit(item) {
-      console.log('todo')
-    },
+
     onItemOnline(item, e) {
       this.editingItem = item
-      this.isItemAmountEdit = true
-      this.editingItemCoinAmount = item.remain_coin_amount
+      this.isItemAmountEditing = true
+      this.onlineItemCoinAmount = item.remain_coin_amount
 
       const rect = e.target.getBoundingClientRect()
       this.$refs['coin-amount'].$el.style.left = rect.left - 420 + 'px'
       this.$refs['coin-amount'].$el.style.top = rect.top + window.scrollY - 30 + 'px'
     },
     onItemOnlineConfirm() {
-      this.axios.item.online(this.editingItem.id, this.editingItemCoinAmount).then(res => {
+      this.axios.item.online(this.editingItem.id, this.onlineItemCoinAmount).then(res => {
         this.getItems()
-        this.isItemAmountEdit = false
+        this.isItemAmountEditing = false
       }).catch(err => {
         this.axios.onError(err)
       })
     },
     onItemOnlineCancel() {
-      this.isItemAmountEdit = false
+      this.isItemAmountEditing = false
     },
     onItemDelete(item) {
       this.axios.item.delete(item.id).then(res => {
         this.getItems()
+        this.$showTips('删除成功')
       }).catch(err => {
         this.axios.onError(err)
       })
@@ -265,6 +266,17 @@ export default {
     onItemPublished() {
       this.publishModalShowing = false
       this.itemStatus === this.constant.ITEM_STATUS.ONLINE && this.getItems()
+    },
+
+    onItemEdit(item) {
+      this.isItemEditing = true
+      this.editingItem = item
+    },
+
+    onItemEdited() {
+      this.isItemEditing = false
+      this.getItems()
+      this.$showTips('编辑成功')
     }
   }
 

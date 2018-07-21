@@ -99,12 +99,18 @@
 </style>
 
 <template>
-  <b-modal class="publish-item-modal" v-model="modalShowing" size="lg" title="发布广告" ok-variant="gradient-yellow" cancel-variant="outline-green" button-size="lg" ok-title="确定" cancel-title="取消" @ok="onSubmit">
+  <b-modal class="publish-item-modal"
+           v-model="modalShowing"
+           size="lg" ok-variant="gradient-yellow" cancel-variant="outline-green" button-size="lg"
+           :title="editing ? '编辑广告' : '发布广告'"
+           :okTitle="editing ? '保存' : '确定'"
+           cancelTitle="取消"
+           @ok="onSubmit">
     <b-form v-if="balance.currentRate">
       <!--<TabButtons :tabs="tradeSideOptions" v-model="form.side"/>-->
       <b-form-group label="我想" class="group-purpose">
-        <b-form-select v-model="form.side" class="col-left" :options="tradeSideOptions"></b-form-select>
-        <b-form-select v-model="form.coin_type" class="col-right" :options="constant.COIN_TYPE_OPTIONS" @input="onCoinTypeChange"></b-form-select>
+        <b-form-select v-model="form.side" :disabled="editing" class="col-left" :options="tradeSideOptions"></b-form-select>
+        <b-form-select v-model="form.coin_type" :disabled="editing" class="col-right" :options="constant.COIN_TYPE_OPTIONS" @input="onCoinTypeChange"></b-form-select>
       </b-form-group>
 
       <b-form-group label="交易价格" class="item-price-group">
@@ -211,7 +217,9 @@ export default {
     value: {
       type: Boolean,
       default: true
-    }
+    },
+    editing: Boolean,     // 当前是否编辑广告
+    item: Object,         // 被编辑的广告
   },
   data() {
     return {
@@ -282,6 +290,11 @@ export default {
     'form.float_rate': function (floatRate) {
       if (this.form.pricing_type !== this.constant.PRICING_TYPE.FLOAT) return
       this.form.price = floatRate.decimalDiv(100).decimalMul(this.balance.currentRate[this.form.coin_type])
+    },
+    item: function (newValue) {
+      Object.assign(this.form, newValue, {
+        coin_amount: newValue.remain_coin_amount // 一个现有的广告，其amount是 remain_coin_amount
+      })
     }
   },
   mounted() {
@@ -325,12 +338,29 @@ export default {
         }
       })
     },
+
+    doEditItem() {
+      this.axios.item.editItem(this.form).then(res => {
+        this.$showTips('广告编辑成功')
+
+        this.$emit('edited', this.form)
+      }).catch(err => {
+        const ERROR_CODE = this.constant.ERROR_CODE
+        if (err.code === ERROR_CODE.MISSING_PAY_METHODS) {
+          this.$showTips('缺少支付方式，请先添加支付方式')   // todo:可能需要在点击之前就提示
+        } else {
+          this.axios.onError(err)
+        }
+      })
+    },
+
     onSubmit(e) {
       e.preventDefault()
       const form = this.form
       if (!Number(form.price)) return this.$showTips('价格不可以为0')
       if (!Number(form.coin_amount)) return this.$showTips('请输入交易数量')
-      this.doCreateItem()
+
+      this.editing ? this.doEditItem() : this.doCreateItem()
 
       // if (Math.abs((form.price / this.marketPrice) - 1) > 0.1) {
       //   this.$showDialog({
