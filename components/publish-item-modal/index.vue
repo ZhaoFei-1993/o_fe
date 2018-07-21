@@ -104,7 +104,7 @@
       <!--<TabButtons :tabs="tradeSideOptions" v-model="form.side"/>-->
       <b-form-group label="我想" class="group-purpose">
         <b-form-select v-model="form.side" class="col-left" :options="tradeSideOptions"></b-form-select>
-        <b-form-select v-model="form.coin_type" class="col-right" :options="constant.COIN_TYPE_OPTIONS"></b-form-select>
+        <b-form-select v-model="form.coin_type" class="col-right" :options="constant.COIN_TYPE_OPTIONS" @input="onCoinTypeChange"></b-form-select>
       </b-form-group>
 
       <b-form-group label="交易价格" class="item-price-group">
@@ -343,6 +343,9 @@ export default {
       // } else {
       //   this.doCreateItem()
       // }
+    },
+    onCoinTypeChange() {
+      this.form.price = this.balance.currentRate[this.form.coin_type]
     }
   }
 }

@@ -5,8 +5,8 @@ export default () => {
     otcMap: null,           // 键值对形式的balance
     coinexMap: null,
     currentCash: 'CNY',     // 当前的定价货币（法币）
-    allRate: null,             // 汇率
-    currentRate: null,      // 当前法币对应的汇率
+    allRate: null,             // 所有coin对所有法币的汇率
+    currentRate: null,      // 当前法币对应的coin的汇率
   }
 
   const mutations = {

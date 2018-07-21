@@ -40,7 +40,7 @@
         <span v-else class="c-gray fz-12">暂停接单</span>
       </span>
 
-      <b-btn size="xs" variant="gradient-yellow" @click="">发布广告</b-btn>
+      <b-btn size="xs" variant="gradient-yellow" @click="onItemPublish">发布广告</b-btn>
     </h2>
 
     <div class="mt-30">
@@ -95,7 +95,7 @@
         <span slot="c">{{editingItem.coin_type}}</span>
       </Language>
     </CBlock>
-    <PublishItemModal v-model="publishModalShowing"/>
+    <PublishItemModal v-model="publishModalShowing" @published="onItemPublished"/>
   </CBlock>
 </template>
 
@@ -258,6 +258,13 @@ export default {
       }).catch(err => {
         this.axios.onError(err)
       })
+    },
+    onItemPublish() {
+      this.publishModalShowing = true
+    },
+    onItemPublished() {
+      this.publishModalShowing = false
+      this.itemStatus === this.constant.ITEM_STATUS.ONLINE && this.getItems()
     }
   }
 
