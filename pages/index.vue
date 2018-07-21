@@ -208,7 +208,7 @@
         </div>
         <div :class="['list',selectedSide.toLowerCase()]">
           <div class="item-row" v-for="item in items">
-            <span class="col-narrow text-center fz-18 c-6f">{{item.user.name}}</span>
+            <span class="col-narrow text-center fz-18 c-6f"><span><i class="iconfont icon-certificated-merchant"></i></span>{{item.user.name}}</span>
             <div class="col-narrow" v-if="item.user && item.user.user_stat">
               <div class="fz-12 c-4a" v-if="item.user.user_stat.order_count">
                 {{item.user.user_stat.deal_count}}单 /

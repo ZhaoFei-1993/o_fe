@@ -16,7 +16,7 @@
       <div class="payment-info">
         <div class="payment-method" v-if="showPayment">
           <template v-if="order.status ===constant.ORDER_STATUS.CREATED.value">
-            <span v-if="!isMaker">
+            <span v-if="isBuySide">
               <i v-if="selectedMethod.method === constant.PAYMENT_TYPES.WECHAT" class="iconfont icon-wechat-round"></i>
               <i v-if="selectedMethod.method === constant.PAYMENT_TYPES.BANKCARD" class="iconfont icon-bank"></i>
               <i v-if="selectedMethod.method === constant.PAYMENT_TYPES.ALIPAY" class="iconfont icon-alipay"></i>
@@ -363,7 +363,7 @@
         return !(this.appealReason && this.appealComment && this.appealComment.length > 15)
       },
       isMaker() {
-        return this.order.merchant_id === this.user.id
+        return this.order.merchant_id === this.user.account.id
       },
       isBuySide() {
         return this.order.merchant_side === this.constant.SIDE.BUY && this.isMaker
@@ -460,13 +460,13 @@
           if (response.code === 0) {
             this.order = response.data
             this.selectedMethod = this.order.payment_methods[0]
-            this.counterparty = this.user.id === this.order.user_id ? this.order.merchant : this.order.user
+            this.counterparty = this.user.account.id === this.order.user_id ? this.order.merchant : this.order.user
             this.checkOrderStatus()
             // 随机测试maker,taker
             if (Math.random() < 0.5) {
-              this.order.merchant_id = this.user.id
+              this.order.merchant_id = this.user.account.id
             } else {
-              this.order.user_id = this.user.id
+              this.order.user_id = this.user.account.id
             }
             // TODO 删除以上测试用代码
             if (this.order.status === 'created') {
