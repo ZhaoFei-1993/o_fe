@@ -9,11 +9,32 @@
       </div>
       <div class="order-table">
         <b-table :fields="orderTableFields" :items="orderTableItems">
+          <template slot="HEAD__order_type" slot-scope="{ item }">
+            <div>
+              <span>类型</span>
+              <b-dropdown variant="block" no-caret class="filter-dropdown" menu-class="filter-menu">
+                <template slot="button-content">
+                  <i class="iconfont icon-filter"></i>
+                </template>
+                <b-dropdown-item-button @click="onClickHeadFilter({ key: 'side', value: option.value })" v-for="(option, index) in orderTypeFilterOptions" :key="index">{{ option.text }}</b-dropdown-item-button>
+              </b-dropdown>
+            </div>
+          </template>
+          <template slot="HEAD_coin_type" slot-scope="{ item }">
+            <div>
+              <span>币种</span>
+              <b-dropdown variant="block" no-caret class="filter-dropdown" menu-class="filter-menu">
+                <template slot="button-content">
+                  <i class="iconfont icon-filter"></i>
+                </template>
+                <b-dropdown-item-button @click="onClickHeadFilter({ key: 'coin_type', value: option.value })" v-for="(option, index) in coinTypeFilterOptions" :key="index">{{ option.text }}</b-dropdown-item-button>
+              </b-dropdown>
+            </div>
+          </template>
           <template slot="id" slot-scope="{ item }">
             <b-link :to="`/orders/${item.id}`">{{ item.id }}</b-link>
           </template>
           <template slot="_order_type" slot-scope="{ item }">
-            <!-- 自定义的属性 -->
             <span :class="['order-type', item._order_type === 'buy' ? 'order-type-buy' : 'order-type-sell']">
               {{ item._order_type === 'buy' ? '买' : '卖' }}
             </span>
@@ -155,6 +176,9 @@
         </b-pagination>
       </div>
     </c-block>
+    <div class="bottom-tips">
+      温馨提示：每日取消订单超过三笔，将被冻结当天下单权限。
+    </div>
   </div>
 </template>
 
@@ -169,7 +193,17 @@
   export default {
     data() {
       return {
-        timer: null, // 定时器
+        timer: null, // 剩余时间定时器
+        orderTypeFilterOptions: [{
+          text: '全部',
+          value: null,
+        }, {
+          text: '买',
+          value: 'buy',
+        }, {
+          text: '卖',
+          value: 'sell',
+        }],
         paymentMethods: [],
         filterOptions: [{
           text: '进行中',
@@ -236,7 +270,7 @@
             thClass: ['text-right'],
             tdClass: ['text-right'],
             thStyle: {
-              width: '180px',
+              width: '160px',
             },
             sortable: false,
           },
@@ -245,7 +279,7 @@
             thClass: ['text-right'],
             tdClass: ['text-right'],
             thStyle: {
-              width: '160px',
+              width: '180px',
             },
             sortable: false,
           },
@@ -260,14 +294,18 @@
         },
         orderTableItems: [],
         queryParams: {
+          coin_type: null,
+          side: null,
           status: 'processing',
           page: 1,
           limit: LIMIT,
         },
       }
     },
-    fetch({ store }) {
-      return store.dispatch('fetchUserAccount')
+    fetch({ store, app, redirect, route }) {
+      return store.dispatch('fetchUserAccount').catch(err => {
+        app.axios.needAuth(err, redirect, route.fullPath)
+      })
     },
     created() {
       this.fetchOrderList()
@@ -282,6 +320,9 @@
     },
     computed: {
       ...mapState(['user', 'constant']),
+      coinTypeFilterOptions() {
+        return [{ text: '全部', value: null }, ...this.constant.COIN_TYPE_OPTIONS]
+      },
     },
     watch: {
       'queryParams.page'() {
@@ -289,6 +330,10 @@
       },
     },
     methods: {
+      onClickHeadFilter(data) {
+        this.queryParams[data.key] = data.value
+        this.fetchOrderList()
+      },
       isMaker(order) {
         return order.merchant_id === this.user.account.id
       },
@@ -296,8 +341,10 @@
         return order.merchant_side === this.constant.SIDE.BUY && this.isMaker(order)
       },
       fetchOrderList() {
-        const { status, page, limit } = this.queryParams
+        const { status, page, limit, coin_type: coinType, side } = this.queryParams
         this.axios.order.getOrderList({
+          coin_type: coinType,
+          side,
           status,
           page,
           limit,
@@ -325,6 +372,7 @@
             }
           })
           .catch(err => {
+            console.log(err)
             this.axios.onError(err)
           })
       },
@@ -412,6 +460,8 @@
           } else if (this.queryParams.status !== this.filterOptions[i].value) {
             this.filterOptions[i].active = true
             this.queryParams.status = this.filterOptions[i].value
+            this.queryParams.coin_type = null
+            this.queryParams.side = null
             this.fetchOrderList()
           }
         }
@@ -448,8 +498,32 @@
       border: solid 1px #52cbca;
       color: #52cbca;
     }
+    .bottom-tips {
+      font-size: 14px;
+      color: #6f6f6f;
+      margin-top: 10px;
+    }
     .order-table {
       margin: 20px -30px 0;
+      .filter-menu {
+        width: 100px;
+        min-width: 0;
+        .dropdown-item {
+          height: 25px;
+          line-height: 25px;
+        }
+      }
+      .btn-block {
+        padding: 0;
+        border: 0;
+        background-color: #f9f9f9;
+      }
+      .filter-dropdown {
+        display: inline-block;
+        .iconfont {
+          color: #27313e;
+        }
+      }
       .table thead th {
         background: #f9f9f9;
       }
