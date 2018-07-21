@@ -19,6 +19,7 @@ export default () => {
     balance: null,        // todo:balance需要重新设计
     merchant: null,       // 用户的商家信息
     settings: null,       // 用户的广告设置
+    qualification: [],
   }
   const state = Object.assign({}, initialState)
   const mutations = {
@@ -39,9 +40,7 @@ export default () => {
     },
     SIGN_OUT(state) {
       // 恢复初始状态
-      Object.keys(state).forEach(key => {
-        state[key] = initialState[key]
-      })
+      Object.assign(state, initialState)
     },
   }
   const actions = {
