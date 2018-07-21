@@ -19,7 +19,7 @@ export default (axios) => {
     },
 
     merchant() {
-      return Promise.resolve(require('./mock/user').merchant)
+      // return Promise.resolve(require('./mock/user').merchant)
       return axios.get('/user/merchant')
     },
 
@@ -29,8 +29,8 @@ export default (axios) => {
      * @return {*}
      */
     applyMerchant({wechat}) {
-      require('./mock/user').merchant.data.status = 'created'
-      return Promise.resolve(require('./mock/user').merchant)
+      // require('./mock/user').merchant.data.status = 'created'
+      // return Promise.resolve(require('./mock/user').merchant)
       return axios.post('/user/merchant', {
         wechat
       })
@@ -41,13 +41,13 @@ export default (axios) => {
      * 暂时后台只做了取消认证申请 jeff 20180716
      */
     cancelMerchant() {
-      require('./mock/user').merchant.data.status = 'cancel'
-      return Promise.resolve({data: {}, code: 0})
+      // require('./mock/user').merchant.data.status = 'cancel'
+      // return Promise.resolve({data: {}, code: 0})
       return axios.delete('/user/merchant')
     },
 
     settings() {
-      return Promise.resolve(require('./mock/user').settings)
+      // return Promise.resolve(require('./mock/user').settings)
       return axios.get('/user/settings')
     },
 
@@ -56,7 +56,7 @@ export default (axios) => {
     },
 
     setSettings() {
-      return Promise.resolve(require('./mock/user').settings)
+      // return Promise.resolve(require('./mock/user').settings)
       return axios.get('/user/settings')
     },
     signOut() {
