@@ -1,6 +1,6 @@
 // 默认都是正式环境的变量
-let serverApiDomain = '//otc.coinex.com/api'
-let clientApiDomain = '//otc.coinex.com/api'
+let serverApiDomain = '//otc.coinex.com/res'
+let clientApiDomain = '//otc.coinex.com/res'
 
 let loginPage = '//www.coinex.com/account/signin'
 let signupPage = '//www.coinex.com/account/signup'
