@@ -120,15 +120,20 @@
   <CBlock class="page-merchant" x="0" y="0">
     <h3 class="layout-my-title">商家认证</h3>
     <p class="layout-my-desc">成为认证商家，尊享更多时权益</p>
-    <template v-if="merchant">
-      <MyInfoItem v-if="merchant.status === constant.MERCHANT_STATUS.PASS" title="商家认证">
+    <template v-if="merchant && !formEditing">
+      <MyInfoItem v-if="merchant.auth_status === constant.MERCHANT_AUTH_STATUS.PASS" title="商家认证">
         <p slot="content" class="c-brand-green">已成为认证商家</p>
       </MyInfoItem>
 
-      <MyInfoItem v-else-if="merchant.status === constant.MERCHANT_STATUS.CREATED" title="商家认证">
+      <MyInfoItem v-else-if="merchant.auth_status === constant.MERCHANT_AUTH_STATUS.CREATED" title="商家认证">
         <p slot="content" class="c-brand-green">信息已提交，审核中</p>
         <!--暂时不做取消申请 jeff 20180716-->
         <!--<b-btn slot="action" variant="outline-green" size="xs" @click="onCancelApply">取消申请</b-btn>-->
+      </MyInfoItem>
+      <MyInfoItem v-else-if="merchant.auth_status === constant.MERCHANT_AUTH_STATUS.NO" title="商家认证">
+        <p slot="content" class="c-brand-green" data-todo="文案">审核未通过，请核查资料后重新提交</p>
+
+        <b-btn slot="action" variant="outline-green" size="xs" @click="onReSubmit">重新提交</b-btn>
       </MyInfoItem>
     </template>
     <template v-else>
@@ -282,7 +287,8 @@
           cet: 1000,
         },  // todo:用store里面的balance
         MERCHANT_REQUIRED_CET_AMOUNT: 10000,
-        VERIFY_EMAIL: 'bd@coinex.com',
+        VERIFY_EMAIL: 'bd@coinex.com', // todo:是这个？
+        formEditing: false,
       }
     },
     computed: {
@@ -294,11 +300,13 @@
     },
 
     fetch({app, store, route, redirect, req}) {
+      app.axios.init(req)
+
       return Promise.all([
         store.dispatch('fetchUserAccount'),
         store.dispatch('fetchUserMerchant'),
       ]).catch(err => {
-        console.log(err)
+        app.axios.needAuth(err, redirect, route.fullPath)
       })
     },
     mounted() {
@@ -315,6 +323,9 @@
           this.$showTips('提交申请成功')
           this.$store.dispatch('fetchUserMerchant')
         })
+      },
+      onReSubmit() {
+        this.formEditing = true
       },
       onCancelApply() {
         this.axios.user.cancelMerchant().then(res => {

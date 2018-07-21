@@ -79,7 +79,8 @@ export const merchant = {
     'guaranty_amount': '10000.00000000',    // 已缴纳保证金，单位CET
     'is_online': true,                      // 是否在线
     'is_available': true,                   // 是否接受交易
-    'status': 'created',                        // 认证状态 created: 已提交, yes: 已通过, no: 未通过, cancel: 已取消
+    'auth_status': 'no',                        // 认证状态 created: 已提交, yes: 已通过, no: 未通过, cancel: 已取消
+    'status': 'normal',
     'auth_time': 1531232482
   }
 }
