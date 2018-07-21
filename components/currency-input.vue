@@ -36,7 +36,7 @@
 </style>
 
 <template>
-  <b-input-group :append="currency.toUpperCase()" class="currency-input">
+  <b-input-group :append="currency" class="currency-input">
     <ExtendedInputNumber :value="value"
                          :disabled="disabled"
                          :placeholder="placeholder"

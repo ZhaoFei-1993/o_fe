@@ -44,7 +44,10 @@ export default {
     }
   },
   props: {
-    username: String,
+    username: {
+      type: String,
+      default: ''
+    },
     online: Boolean,
 
     size: {
