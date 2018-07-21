@@ -470,7 +470,7 @@
             }
             // TODO 删除以上测试用代码
             if (this.order.status === 'created') {
-              this.payRemainTime = Math.floor(((this.order.create_time + 15 * 60) * 1000 - Date.now()) / 1000)
+              this.payRemainTime = Math.floor(((this.order.place_time + 15 * 60) * 1000 - Date.now()) / 1000)
               if (this.payRemainTime <= 0) {
                 this.order.status = this.constant.ORDER_STATUS.CLOSED.value
               }
@@ -486,6 +486,12 @@
             if (this.order.status === this.constant.ORDER_STATUS.PAID.value || this.order.status === this.constant.ORDER_STATUS.SUCCESS.value) {
               this.getAppeal()
             }
+          }
+        }).catch(err => {
+          if (err.code === 401) {
+            this.axios.needAuth(err, this.$router.push, this.$route.fullPath)
+          } else {
+            this.$router.push('/')
           }
         })
       },

@@ -179,7 +179,7 @@
         <b-form-input v-model="userName" type="text" placeholder="您的昵称" required></b-form-input>
       </div>
     </b-modal>
-    <PublishItemModal v-model="publishModalShowing" @published="onItemPublished"/>
+    <PublishItemModal v-if="publishModalShowing" v-model="publishModalShowing" @published="onItemPublished"/>
   </div>
 </template>
 
