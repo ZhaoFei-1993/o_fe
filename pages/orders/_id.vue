@@ -328,7 +328,7 @@
 
   const PAID_CAN_APPEAL = 30 * 60 * 1000 // 三十分钟
   const SUCCESS_CAN_APPEAL = 7 * 24 * 3600 * 1000 // 七天
-  const REFRESH_ORDER_INTERVAL = 5000
+  // const REFRESH_ORDER_INTERVAL = 5000
   export default {
     data() {
       return {

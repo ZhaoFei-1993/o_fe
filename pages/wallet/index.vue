@@ -390,9 +390,9 @@
         const query = {
           page,
           limit,
-        coin_type: coinType,
-      side,
-       }
+          coin_type: coinType,
+          side,
+        }
         this.axios.balance.history(query).then(historyData => {
           if (historyData.code === 0 && historyData.data) {
             const { data, curr_page: currentPage, total: totalRows } = historyData.data
