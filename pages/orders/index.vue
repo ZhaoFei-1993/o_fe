@@ -133,7 +133,7 @@
                       <i class="iconfont icon-message"></i>
                     </div>
                     <div class="detail-btn-wrapper">
-                      <b-btn size="xs" variant="gradient-yellow" class="detail-btn" @click="confirmPay(item)">确认收款</b-btn>
+                      <b-btn size="xs" variant="gradient-yellow" class="detail-btn" @click="confirmReceipt(item)">确认收款</b-btn>
                     </div>
                   </template>
                 </template>
@@ -179,6 +179,7 @@
     <div class="bottom-tips">
       温馨提示：每日取消订单超过三笔，将被冻结当天下单权限。
     </div>
+    <ConfirmReceipt :orderId="curReceiptOrderId" :show-confirm-receipt-modal="showConfirmReceiptModal"/>
   </div>
 </template>
 
@@ -186,6 +187,7 @@
   import {mapState} from 'vuex'
   import cBlock from '~/components/c-block'
   import Blank from '~/components/blank'
+  import ConfirmReceipt from './_c/confirm-receipt'
 
   const LIMIT = 10
   const ORDER_PAY_TIME = 15 // 订单可付款时间
@@ -193,6 +195,8 @@
   export default {
     data() {
       return {
+        curReceiptOrderId: null, // 当前选中的确认收款item
+        showConfirmReceiptModal: false,
         timer: null, // 剩余时间定时器
         orderTypeFilterOptions: [{
           text: '全部',
@@ -317,6 +321,7 @@
     components: {
       cBlock,
       Blank,
+      ConfirmReceipt,
     },
     computed: {
       ...mapState(['user', 'constant']),
@@ -334,11 +339,8 @@
         this.queryParams[data.key] = data.value
         this.fetchOrderList()
       },
-      isMaker(order) {
+      isMerchant(order) { // 是否商家
         return order.merchant_id === this.user.account.id
-      },
-      isBuySide(order) { // 是否买家
-        return order.merchant_side === this.constant.SIDE.BUY && this.isMaker(order)
       },
       fetchOrderList() {
         const { status, page, limit, coin_type: coinType, side } = this.queryParams
@@ -355,7 +357,12 @@
               this.queryParams.page = currentPage
               this.queryParams.totalRows = totalRows
               this.orderTableItems = data.map(item => {
-                const orderType = this.isBuySide(item) ? 'buy' : 'sell'
+                let orderType
+                if (this.isMerchant(item)) { // 商家
+                  orderType = item.merchant_side
+                } else { // 普通用户
+                  orderType = item.user_side
+                }
                 let selectedPaymentMethod = {}
                 if (item.payment_methods && item.payment_methods.length) {
                   selectedPaymentMethod = { ...item.payment_methods[0] }
@@ -440,18 +447,8 @@
         })
       },
       confirmReceipt(item) {
-        this.$showDialog({
-          hideHeader: true,
-          title: '确认收款',
-          content: (<div>确认已收到该笔款项？<span class="c-red">如您没有收到买家付款，确认收款后，放行的数字货币将无法追回。</span></div>),
-          onOk: () => {
-            this.axios.order.confirmReceipt(item.id).then(res => {
-              if (res.code === 0) {
-                this.fetchOrderList()
-              }
-            })
-          }
-        })
+        this.curReceiptOrderId = item.id
+        this.showConfirmReceiptModal = true
       },
       onClickFilter(index) {
         for (let i = 0; i < this.filterOptions.length; i++) {

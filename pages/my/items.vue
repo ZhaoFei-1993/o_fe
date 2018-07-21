@@ -193,7 +193,7 @@ export default {
     app.axios.init(req)
     return Promise.all([
       store.dispatch('fetchUserMerchant'),
-      store.dispatch('fetchOtcBalance')
+      store.dispatch('fetchOtcBalance'),
     ]).catch(err => {
       app.axios.needAuth(err, redirect, route.fullPath)
     })
