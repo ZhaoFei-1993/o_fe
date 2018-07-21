@@ -181,14 +181,19 @@
       </ProgressItem>
 
       <ProgressItem title="缴纳保证金">
-        <p class="c-6f">申请成为CoinEx认证商家，需要同意冻结您交易所账户中 100,000 CET作为商家保证金，钱包中冻结的保证金依然享有分红权益，但是不
-          可交易和体现。什么是 CET？</p>
-        <InfoItem title="账户余额">
-          {{balance.cet}}
-          <span v-if="balance.cet < MERCHANT_REQUIRED_CET_AMOUNT">
+        <p class="c-6f">申请成为CoinEx认证商家，需要同意冻结您交易所账户中 {{MERCHANT_REQUIRED_CET_AMOUNT|formatMoney}}
+          CET作为商家保证金，钱包中冻结的保证金依然享有分红权益，但是不
+          可交易和提现。取消商家认证后，商家保证金将继续冻结三个月后解冻。
+          <b-link href="https://www.coinex.com/token">什么是 CET？</b-link>
+        </p>
+        <InfoItem title="账户可用余额" v-if="balance && balance.coinexBalance">
+          {{cetAvailable}}
+          <span v-if="cetAvailable < MERCHANT_REQUIRED_CET_AMOUNT">
             <span class="c-red mr-20">余额不足</span>
             请先进行
             <b-link href="//www.coinex.com/my/wallet/deposit?type=cet">充值</b-link>
+            或
+            <b-link href="//www.coinex.com/exchange?currency=bch&dest=cet">交易</b-link>
           </span>
         </InfoItem>
       </ProgressItem>
@@ -198,7 +203,7 @@
         <b-form-checkbox v-model="isContractRead" class="c-6f">
           我已阅读并同意
           <b-link>《认证商家服务协议》</b-link>
-          ，并冻结100,000 CET作为商家保证金。
+          ，并冻结{{MERCHANT_REQUIRED_CET_AMOUNT|formatMoney}} CET作为商家保证金。
         </b-form-checkbox>
       </ProgressItem>
 
@@ -283,10 +288,7 @@
         },
         isVideoSent: false,
         isContractRead: false,
-        balance: {
-          cet: 1000,
-        },  // todo:用store里面的balance
-        MERCHANT_REQUIRED_CET_AMOUNT: 10000,
+        MERCHANT_REQUIRED_CET_AMOUNT: 50000,
         VERIFY_EMAIL: 'bd@coinex.com', // todo:是这个？
         formEditing: false,
       }
@@ -296,7 +298,18 @@
         account: state => state.user.account,
         merchant: state => state.user.merchant,
         constant: state => state.constant,
-      })
+        balance: state => state.balance,
+      }),
+      cetAvailable() {
+        if (!this.balance || !this.balance.coinexBalance) {
+          return '--'
+        }
+        const cet = this.balance.coinexBalance.find(b => b.coin_type === 'CET')
+        if (!cet) {
+          return 0
+        }
+        return cet.available
+      },
     },
 
     fetch({app, store, route, redirect, req}) {
@@ -305,6 +318,7 @@
       return Promise.all([
         store.dispatch('fetchUserAccount'),
         store.dispatch('fetchUserMerchant'),
+        store.dispatch('fetchCoinexBalance'),
       ]).catch(err => {
         app.axios.needAuth(err, redirect, route.fullPath)
       })
