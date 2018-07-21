@@ -166,7 +166,8 @@
           <p>手持身份证正面，进行视频录制，保持录制过程中声音和影像都清晰</p>
         </InfoItem>
         <InfoItem title="视频诵读范本">
-          <p class="info-item-content-example">本人（姓名），身份证号（身份证号码），我申请成为CoinEx认证商家，我的资金来源合法可靠，自愿交易比特币等数字资产，本人充分了解数字货币及潜在风险，本人具有抗风险的能力并愿意承担一切风险！</p>
+          <p class="info-item-content-example">
+            本人（姓名），身份证号（身份证号码），我申请成为CoinEx认证商家，我的资金来源合法可靠，自愿交易比特币等数字资产，本人充分了解数字货币及潜在风险，本人具有抗风险的能力并愿意承担一切风险！</p>
         </InfoItem>
         <InfoItem title="提交认证视频" :required="true">
           <p class="c-6f">请将视频资料发送邮至 bd@coinex.com，邮件主题为"申请成为CoinEx认证商家+CoinEx账户（注册邮箱或手机）"</p>
@@ -190,7 +191,9 @@
       <ProgressItem title="资料审核">
         <p class="c-6f">我们将在3个工作日内对您的商家申请资料进行审核。请保持通讯畅通，我们会主动与您取得联系。审核通过后，您即可在OTC平台发布广告。</p>
         <b-form-checkbox v-model="isContractRead" class="c-6f">
-          我已阅读并同意 <b-link>《认证商家服务协议》</b-link>，并冻结100,000 CET作为商家保证金。
+          我已阅读并同意
+          <b-link>《认证商家服务协议》</b-link>
+          ，并冻结100,000 CET作为商家保证金。
         </b-form-checkbox>
       </ProgressItem>
 
@@ -248,7 +251,7 @@
     render() {
       return (
         <div class="contact-item">
-          <div class="contact-item-icon"><i class={`iconfont ${this.icon} ${this.active && '_active'}` }/></div>
+          <div class="contact-item-icon"><i class={`iconfont ${this.icon} ${this.active && '_active'}`}/></div>
           <div class={`contact-item-title ${this.required && '_required'}`}>{this.title}</div>
           <div class="contact-item-content">{this.$slots['default']}</div>
         </div>
@@ -294,7 +297,9 @@
       return Promise.all([
         store.dispatch('fetchUserAccount'),
         store.dispatch('fetchUserMerchant'),
-      ])
+      ]).catch(err => {
+        console.log(err)
+      })
     },
     mounted() {
       this.form.wechat = this.merchant.wechat

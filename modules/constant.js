@@ -11,6 +11,18 @@ const PAYMENT_OPTIONS = [
   {text: '微信', value: 'wechat', icon: 'icon-wechat-round'},
 ]
 
+const APPEAL_RESULTS = [
+  {text: '平局', value: 'draw'},
+  {text: '买家胜诉', value: 'buyer_win'},
+  {text: '卖家胜诉', value: 'seller_win'},
+]
+
+const ORDER_RESULTS = [
+  {text: '双方协商处理', value: 'none'},
+  {text: '订单成交', value: 'receipt_order'},
+  {text: '订单取消', value: 'cancel_order'},
+]
+
 export default {
   COIN_TYPES,
   COIN_TYPE_OPTIONS: COIN_TYPES.map(name => {
@@ -36,7 +48,14 @@ export default {
     ON: 'on',
     OFF: 'off'
   },
-
+  ORDER_RESULT_MAP: ORDER_RESULTS.reduce((map, option) => {
+    map[option.value] = option
+    return map
+  }, {}),
+  APPEAL_RESULT_MAP: APPEAL_RESULTS.reduce((map, option) => {
+    map[option.value] = option
+    return map
+  }, {}),
   COUNTERPARTY_LIMIT_OPTIONS: [{
     text: '交易方必须通过手机验证',
     value: 'bind_phone'
@@ -101,5 +120,10 @@ export default {
   SIDE: {
     BUY: 'buy',
     SELL: 'sell',
-  }
+  },
+  QUALIFICATIONS: {
+    KYC: 'kyc',
+    BIND_PHONE: 'bind_phone',
+    ONE_DEAL: 'one_deal',
+  },
 }

@@ -247,10 +247,10 @@
                         :id="'button-order-'+item.id"> {{(selectedSide === constant.SIDE.BUY ? '购买' : '出售') + selectedCoin}} </button>
                 <b-popover triggers="hover click" :target="'button-order-'+item.id"
                            title="商家交易限制">
-                  <ol>
-                    <li v-if="true||item.qualification">交易方必须完成过1次交易</li>
-                    <li v-if="true||item.qualification">交易方必须通过手机认证</li>
-                    <li v-if="true||item.qualification">交易方必须通过实名认证</li>
+                  <ol v-if="user && user.qualification">
+                    <li v-if="checkQualification(item,constant.QUALIFICATIONS.ONE_DEAL)">交易方必须完成过1次交易</li>
+                    <li v-if="checkQualification(item,constant.QUALIFICATIONS.BIND_PHONE)">交易方必须通过手机认证</li>
+                    <li v-if="checkQualification(item,constant.QUALIFICATIONS.KYC)">交易方必须通过实名认证</li>
                   </ol>
                 </b-popover>
               </template>
@@ -265,6 +265,19 @@
       v-model="showPlaceOrderModal"
     ></PlaceOrderModal>
     <PublishItemModal v-model="publishModalShowing" @published="onItemPublished"/>
+    <b-modal id="no-payment-modal" :ok-only="true"
+             v-model="showConstraintModal" title="交易限制"
+             ok-variant="yellow"
+             ok-title="确认"
+             button-size="sm"
+             class="text-center">
+      <div>
+        {{currentConstraint.content}}
+        <p>
+          <b-link :to="currentConstraint.link">{{currentConstraint.linkText}}</b-link>
+        </p>
+      </div>
+    </b-modal>
   </div>
 </template>
 
@@ -273,7 +286,7 @@
   import {mapState} from 'vuex'
   import {loginPage, webDomain} from '~/modules/variables'
   import PlaceOrderModal from '~/components/place-order-modal'
-  import PublishItemModal from '~/components/publish-item-modal/index.vue'
+  import PublishItemModal from '~/components/publish-item-modal'
   import UserPayments from '~/components/user-payments'
 
   const refreshInterval = 5000
@@ -294,6 +307,12 @@
         items: [],
         selectedItem: null,
         showPlaceOrderModal: false,
+        showConstraintModal: false,
+        currentConstraint: {
+          content: '',
+          linkText: '',
+          link: '',
+        },
         busy: false,
         publishModalShowing: true,
       }
@@ -301,7 +320,8 @@
     computed: {
       ...mapState(['constant', 'user', 'balance']),
     },
-    fetch({store}) {
+    fetch({store, app, req}) {
+      app.axios.init(req)
       return Promise.all([
         store.dispatch('fetchUserQualification'),
         store.dispatch('fetchUserPayments'),
@@ -389,46 +409,36 @@
         return false
       },
       verifyDynamicConstraint(item) {
-        if (item.user_side === this.constant.SIDE.SELL) {
+        if (item.side === this.constant.SIDE.BUY) {
           // 卖家需要有对应支付方式
           if (!this.verifyHasPayment(item)) {
-            this.$showDialog({
-              title: '交易限制',
-              okOnly: true,
-              content:
-                <div>
-                  您尚未添加该广告支持的支付方式，无法下单。
-                  <p>
-                    <b-link href="/my/payments">添加支付方式。</b-link>
-                  </p>
-                </div>,
-            })
+            this.currentConstraint = {
+              content: '您尚未添加该广告支持的支付方式，无法下单。',
+              linkText: '添加支付方式',
+              link: '/my/payments',
+            }
+            this.showConstraintModal = true
             return Promise.reject(item)
+          } else {
+            return Promise.resolve()
           }
         }
         return this.axios.user.dynamicConstraint().then(response => {
           const constraint = response.data
-          if (!constraint.can_place_order || !constraint.can_trade) {
-            this.$showDialog({
-              title: '交易限制',
-              okOnly: true,
-              content: !constraint.can_place_order ? (
-                <div>
-                  您今天累计取消超过 3 次订单，被冻结交易功能。
-                  <p>
-                    <b-link href="#TODO">了解更多交易规则。</b-link>
-                  </p>
-                </div>) : (
-                <div>
-                  您尚未完成实名认证，每日限制下单次数为 3 次。
-                  <p>
-                    <b-link to="/my/merchant">去完成实名认证。</b-link>
-                  </p>
-                </div>),
-            })
-            return Promise.reject(constraint)
-          } else {
+          if (constraint.can_place_order && constraint.can_trade) {
             return Promise.resolve()
+          } else {
+            this.currentConstraint = constraint.can_place_order ? {
+              content: '您尚未完成实名认证，每日限制下单次数为 3 次。',
+              linkText: '去完成实名认证',
+              link: '# TODO',
+            } : {
+              content: '您今天累计取消超过 3 次订单，被冻结交易功能。',
+              linkText: '了解更多交易规则',
+              link: '# TODO',
+            }
+            this.showConstraintModal = true
+            return Promise.reject(constraint)
           }
         })
       },
@@ -437,6 +447,11 @@
       },
       onItemPublished(item) {
         this.publishModalShowing = false
+      },
+      checkQualification(item, qualification) {
+        if (!item.counterparty_limit) return true
+        if (!this.user || !this.user.qualification) return false
+        return item.counterparty_limit.indexOf(qualification) >= 0 && this.user.qualification.indexOf(qualification) < 0
       }
     },
   }

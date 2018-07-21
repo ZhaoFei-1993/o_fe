@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import axios from 'axios'
-import { serverApiDomain, clientApiDomain, loginPage, webDomain } from '../modules/variables'
+import {serverApiDomain, clientApiDomain, loginPage, webDomain} from '../modules/variables'
 import cookieParser from '~/plugins/cookies'
 import injectServices from '../services/index'
 import {onApiError} from '~/modules/error-code'
@@ -13,7 +13,7 @@ function sleep(ms = 100) {
   })
 }
 
-export default ({ app, store }) => {
+export default ({app, store}) => {
   const options = {
     baseURL: process.client ? clientApiDomain : serverApiDomain,
   }
@@ -146,6 +146,8 @@ export default ({ app, store }) => {
 
       // code 不为 0，即为后台报错
       if (data && data.code) {
+        const url = response.request ? response.request.responseURL : ''
+        console.log(`请求url：${url}`)
         const err = new Error(data.message)
         err.code = data.code
         err.data = data.data
