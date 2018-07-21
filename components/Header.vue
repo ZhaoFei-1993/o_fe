@@ -170,13 +170,19 @@
              :hide-header-close="true"
              :no-close-on-esc="true"
              :no-close-on-backdrop="true"
-             ok-variant="yellow"
+             :ok-disabled="invalidName"
+             ok-title="确认"
+             cancel-variant="outline-green"
+             ok-variant="gradient-yellow"
+             button-size="sm"
+             class="text-center"
              :ok-only="true"
              @ok="handleUpdateName">
       <div v-if="user&&user.account">
         <p>请确认或修改您的昵称，昵称一旦确定将无法修改。</p>
-        <p class="c-red" v-if="nameDuplicated">请确认或修改您的昵称，昵称一旦确定将无法修改。</p>
         <b-form-input v-model="userName" type="text" placeholder="您的昵称" required></b-form-input>
+        <p class="c-red" v-if="invalidName">请输入2-30个字符的昵称。</p>
+        <p class="c-red" v-if="nameDuplicated">该昵称已被占用，请使用其他昵称。</p>
       </div>
     </b-modal>
     <PublishItemModal v-if="publishModalShowing" v-model="publishModalShowing" @published="onItemPublished"/>
@@ -191,7 +197,7 @@
 
   export default {
     head: {
-      link: [{rel: 'stylesheet', href: '//at.alicdn.com/t/font_739076_b0i1ri4pur.css'}]
+      link: [{rel: 'stylesheet', href: '//at.alicdn.com/t/font_739076_lv1gd6vgx4g.css'}]
     },
     components: {
       PublishItemModal,
@@ -225,6 +231,9 @@
             break
         }
         return 'https://support.coinex.com/hc/' + lang
+      },
+      invalidName() {
+        return !this.userName || this.userName.length < 2 || this.userName.length > 30
       },
     },
     mounted() {
