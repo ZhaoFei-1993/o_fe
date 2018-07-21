@@ -248,7 +248,6 @@
                 <b-popover triggers="hover click" :target="'button-order-'+item.id"
                            title="商家交易限制">
                   <ol v-if="user && user.qualification">
-                    ces
                     <li v-if="checkQualification(item,constant.QUALIFICATIONS.ONE_DEAL)">交易方必须完成过1次交易</li>
                     <li v-if="checkQualification(item,constant.QUALIFICATIONS.BIND_PHONE)">交易方必须通过手机认证</li>
                     <li v-if="checkQualification(item,constant.QUALIFICATIONS.KYC)">交易方必须通过实名认证</li>
