@@ -107,7 +107,7 @@
     <b-modal ref="appealModal"
              title="交易申诉"
              @ok="submitAppeal"
-             ok-variant="yellow"
+             ok-variant="gradient-yellow"
              :ok-disabled="cannotSubmitAppeal"
              cancel-variant="outline-green"
              ok-title="确定"
@@ -131,8 +131,8 @@
           </textarea>
         </div>
       </div>
-
     </b-modal>
+    <ConfirmReceipt :orderId="order.id" :show-confirm-receipt-modal="showConfirmReceiptModal"/>
   </div>
 </template>
 <style lang="scss">
@@ -324,6 +324,7 @@
 </style>
 <script>
   import UserStatsProfile from '~/components/user-stats-profile.vue'
+  import ConfirmReceipt from './_c/confirm-receipt'
   import {mapState} from 'vuex'
 
   const PAID_CAN_APPEAL = 30 * 60 * 1000 // 三十分钟
@@ -343,10 +344,12 @@
         appeal: null,
         appealComment: null,
         appealReason: null,
+        showConfirmReceiptModal: false,
       }
     },
     components: {
       UserStatsProfile,
+      ConfirmReceipt,
     },
     beforeDestroy() {
       clearInterval(this.secondCountdown)
@@ -525,17 +528,6 @@
           }
         })
       },
-      confirmReceipt() {
-        this.$showDialog({
-          title: '确认收款',
-          content: (<div>确认已收到该笔款项？<span class="c-red">如您没有收到买家付款，确认收款后，放行的数字货币将无法追回。</span></div>),
-          onOk: () => {
-            this.axios.order.confirmReceipt(this.order.id).then(response => {
-              this.refreshOrderStatus()
-            })
-          }
-        })
-      },
       startAppeal() {
         this.$refs.appealModal.show()
       },
@@ -560,6 +552,9 @@
           okOnly: true,
         })
       },
+      confirmReceipt() {
+        this.showConfirmReceiptModal = true
+      }
     }
   }
 </script>

@@ -267,7 +267,7 @@
     <PublishItemModal v-model="publishModalShowing" @published="onItemPublished"/>
     <b-modal id="no-payment-modal" :ok-only="true"
              v-model="showConstraintModal" title="交易限制"
-             ok-variant="yellow"
+             ok-variant="gradient-yellow"
              ok-title="确认"
              button-size="sm"
              class="text-center">
