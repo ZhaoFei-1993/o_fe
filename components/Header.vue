@@ -114,7 +114,7 @@
       </b-navbar-brand>
       <b-navbar-nav class="ml-30">
         <b-nav-item to="/" exact>法币交易</b-nav-item>
-        <b-nav-item to="/items/create">发布广告</b-nav-item>
+        <b-nav-item @click="onItemPublish">发布广告</b-nav-item>
         <b-nav-item to="/wallet">OTC钱包</b-nav-item>
         <b-nav-item :href="helpLink" target="_blank">帮助</b-nav-item>
         <span style="color: #d5d5d5">|</span>
@@ -179,6 +179,7 @@
         <b-form-input v-model="userName" type="text" placeholder="您的昵称" required></b-form-input>
       </div>
     </b-modal>
+    <PublishItemModal v-if="publishModalShowing" v-model="publishModalShowing" @published="onItemPublished"/>
   </div>
 </template>
 
@@ -186,16 +187,19 @@
   import {mapState} from 'vuex'
   import {loginPage, webDomain, signupPage} from '~/modules/variables'
   import {onApiError} from '~/modules/error-code'
+  import PublishItemModal from '~/components/publish-item-modal'
 
   export default {
     head: {
       link: [{rel: 'stylesheet', href: '//at.alicdn.com/t/font_739076_b0i1ri4pur.css'}]
     },
-    components: {},
-
+    components: {
+      PublishItemModal,
+    },
     data() {
       return {
-        attentionModelShowing: null,
+        publishModalShowing: false,
+        attentionModelShowing: false,
         attention: [],
         nameDuplicated: false,
         userName: null,
@@ -267,12 +271,14 @@
       shutdown() {
       },
       signOut() {
-        this.axios.user.signOut().then(res => {
-          this.$router.push('/')
-        }).catch(err => {
-          onApiError(err, this)
-        })
-      }
+        this.$store.dispatch('signOut')
+      },
+      onItemPublish() {
+        this.publishModalShowing = true
+      },
+      onItemPublished() {
+        this.publishModalShowing = false
+      },
     }
   }
 </script>

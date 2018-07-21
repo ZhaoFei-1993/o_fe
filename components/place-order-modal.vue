@@ -31,13 +31,13 @@
         </div>
       </div>
     </div>
-    <div class="item-info">
+    <div class="item-info" v-if="validAmount">
       <div class="info-header">确认信息</div>
       <div class="info-detail">
         <span>单价：<span class="emphasis">{{item.price}}</span> {{balance.currentCash}}/{{item.coin_type}}
           <i v-if="item.pricing_type===constant.PRICING_TYPE.FLOAT" class="iconfont icon-tooltip" v-b-tooltip.hover
              title="当前数字货币价格为系统自动计算，实际价格以发起时的价格为准。"></i> </span>
-        <span>限额：<span class="emphasis">{{item.min_deal_cash_amount + '-' + maxDealCashAmount}}</span> {{balance.currentCash}}</span>
+        <span>限额：<span class="emphasis">{{item.min_deal_cash_amount + '-' + item.max_deal_cash_amount}}</span> {{balance.currentCash}}</span>
         <span>支付方式：<span class="emphasis">{{paymentMethods}}</span></span>
       </div>
       <div class="item-payment">
@@ -86,7 +86,10 @@
         </b-form>
       </div>
     </div>
-
+    <div class="item-info" v-else>
+      <p>当前交易限定最低下单金额{{item.min_deal_cash_amount}}，您的账户不符合交易条件。</p>
+      <p>请检查您的账户余额或者进行实名认证</p>
+    </div>
   </b-modal>
 </template>
 <style lang="scss">
@@ -248,10 +251,18 @@
         return parseFloat(this.balance.otcBalance.find(b => b.coin_type === this.item.coin_type).available)
       },
       maxDealCoinAmount() {
-        return ('' + this.maxDealCashAmount / this.item.price).setDigit(8)
+        return `${this.maxDealCashAmount / this.item.price}`.setDigit(8)
+      },
+      validAmount() {
+        return this.maxDealCashAmount > this.item.min_deal_cash_amount
+      },
+      sideMaxCash() {
+        // 用户买单和balance无关，卖单需要有足够余额
+        return this.item.side === this.constant.SIDE.SELL ? Number.MAX_SAFE_INTEGER : this.currentBalance * this.item.price
       },
       maxDealCashAmount() {
-        return Math.min(this.item.remain_coin_amount * this.item.price, (this.item.max_deal_cash_amount || Number.MAX_SAFE_INTEGER), this.currentBalance * this.item.price, this.kycLimitAmount)
+        // 取以下各项的最小值（广告剩余量、广告限制最大额、如果是卖家则考虑余额、未实名验证的限额）
+        return Math.min(this.item.remain_coin_amount * this.item.price, (this.item.max_deal_cash_amount || Number.MAX_SAFE_INTEGER), this.sideMaxCash, this.kycLimitAmount)
       },
       sideText() {
         // user看到的是与merchant反的
