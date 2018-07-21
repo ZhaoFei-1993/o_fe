@@ -40,7 +40,7 @@ export default (axios) => {
       return axios.delete(`/orders/${id}/appeal`)
     },
     cancelOrder(id) {
-      return axios.delete(`/order/${id}/cancel`)
+      return axios.post(`/orders/${id}/cancel`)
     }
   }
 }
