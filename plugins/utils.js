@@ -26,6 +26,12 @@ const emailDomainMap = {
 
 const imgTypeArr = ['JPEG', 'TIFF', 'RAW', 'BMP', 'GIF', 'PNG', 'JPG']
 
+/**
+ * 格式化时间
+ * @param  {Number} timestamp 时间戳，秒为单位
+ * @param  {String} precision 精确度
+ * @return {String}           格式化后的时间字符串
+ */
 export const getTimeText = (timestamp, precision = 'second') => {
   const time = new Date(timestamp * 1000)
   let timeText = ''
@@ -74,7 +80,30 @@ export const getTimeText = (timestamp, precision = 'second') => {
   }
   return timeText
 }
+
+/**
+ * 显示时长
+ * @param  {Number} durationNum 时间秒数
+ * @param  {String} format 格式
+ * @return {String} 时间长度，例如 1天2小时3分钟4秒
+ */
+export const formatDuration = (durationNum, format = null) => {
+  if (!durationNum) {
+    return '--'
+  }
+  const day = Math.floor(durationNum / 86400)
+  const hour = Math.floor((durationNum % 86400) / 3600)
+  const minute = Math.floor((durationNum % 3600) / 60)
+  const second = Math.floor(durationNum % 60)
+  if (format) {
+    return format.replace(/d/i, day).replace(/h/i, hour).replace(/m/i, minute).replace(/s/i, second)
+  }
+  return (day ? (day + '天') : '') + (hour ? (hour + '小时') : '') + (durationNum < 86400 && minute ? (minute + '分钟') : '') + (durationNum < 3600 && second ? (second + '秒') : '')
+}
+
 const utils = {
+  getTimeText,
+  formatDuration,
   isImage(fileName) {
     const arr = fileName.split('.')
     if (!arr.length) return false
@@ -245,13 +274,6 @@ const utils = {
     }
   },
   /**
-   * 格式化时间
-   * @param  {Number} timestamp 时间戳，秒为单位
-   * @param  {String} precision 精确度
-   * @return {String}           格式化后的时间字符串
-   */
-  getTimeText,
-  /**
    * 计算时间距离
    * @param  {String} origin 起始时间
    * @param  {String} target 目标时间（默认当前时间）
@@ -262,25 +284,6 @@ const utils = {
     const targetTime = target ? new Date(target).getTime() : Date.now()
     return targetTime - originTime
   },
-  /**
-   * 显示时长
-   * @param  {Number} durationNum 时间秒数
-   * @param  {String} format 格式
-   * @return {String} 时间长度，例如 1天2小时3分钟4秒
-   */
-  formatDuration(durationNum, format = null) {
-    if (!durationNum) {
-      return '--'
-    }
-    const day = Math.floor(durationNum / 86400)
-    const hour = Math.floor((durationNum % 86400) / 3600)
-    const minute = Math.floor((durationNum % 3600) / 60)
-    const second = Math.floor(durationNum % 60)
-    if (format) {
-      return format.replace(/d/i, day).replace(/h/i, hour).replace(/m/i, minute).replace(/s/i, second)
-    }
-    return (day ? (day + '天') : '') + (hour ? (hour + '小时') : '') + (durationNum < 86400 && minute ? (minute + '分钟') : '') + (durationNum < 3600 && second ? (second + '秒') : '')
-  }
 }
 
 export default ({app, store}) => {
