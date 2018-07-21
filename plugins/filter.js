@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import { getTimeText, formatDuration } from './utils'
 
-export function formatMoney(str) {
+export function formatMoney(str = '') {
   return `${str}`.formatMoney(8, '.', ',', true)
 }
 
@@ -20,4 +20,10 @@ export default filters
 
 Object.keys(filters).forEach(key => {
   Vue.filter(key, filters[key])
+})
+
+Vue.mixin({
+  methods: {
+    formatMoney
+  }
 })

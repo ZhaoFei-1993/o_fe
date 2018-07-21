@@ -126,4 +126,16 @@ export default {
     BIND_PHONE: 'bind_phone',
     ONE_DEAL: 'one_deal',
   },
+  // 用户的密码难度等级
+  PASSWORD_LEVEL: {
+    HIGH: 'high',
+    MIDDLE: 'middle',
+    LOW: 'low',
+  },
+
+  // 广告状态
+  ITEM_STATUS: {
+    ONLINE: 'on',
+    OFFLINE: 'off',
+  },
 }
