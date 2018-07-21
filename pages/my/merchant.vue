@@ -120,22 +120,22 @@
   <CBlock class="page-merchant" x="0" y="0">
     <h3 class="layout-my-title">商家认证</h3>
     <p class="layout-my-desc">成为认证商家，尊享更多时权益</p>
+    <template v-if="merchant">
+      <MyInfoItem v-if="merchant.status === constant.MERCHANT_STATUS.PASS" title="商家认证">
+        <p slot="content" class="c-brand-green">已成为认证商家</p>
+      </MyInfoItem>
 
-    <MyInfoItem v-if="merchant.status === constant.MERCHANT_STATUS.PASS" title="商家认证">
-      <p slot="content" class="c-brand-green">已成为认证商家</p>
-    </MyInfoItem>
-
-    <MyInfoItem v-else-if="merchant.status === constant.MERCHANT_STATUS.CREATED" title="商家认证">
-      <p slot="content" class="c-brand-green">信息已提交，审核中</p>
-      <!--暂时不做取消申请 jeff 20180716-->
-      <!--<b-btn slot="action" variant="outline-green" size="xs" @click="onCancelApply">取消申请</b-btn>-->
-    </MyInfoItem>
-
+      <MyInfoItem v-else-if="merchant.status === constant.MERCHANT_STATUS.CREATED" title="商家认证">
+        <p slot="content" class="c-brand-green">信息已提交，审核中</p>
+        <!--暂时不做取消申请 jeff 20180716-->
+        <!--<b-btn slot="action" variant="outline-green" size="xs" @click="onCancelApply">取消申请</b-btn>-->
+      </MyInfoItem>
+    </template>
     <template v-else>
       <ProgressIndicator :active="-1"/>
 
       <ProgressItem title="完善信息">
-        <div class="d-flex">
+        <div class="d-flex" v-if="account">
           <ContactItem title="手机认证" icon="icon-mobile" :active="true" :required="true">
             <div v-if="account.mobile" class="c-6f">
               <p class="mt-10">已认证</p>
@@ -302,7 +302,9 @@
       })
     },
     mounted() {
-      this.form.wechat = this.merchant.wechat
+      if (this.merchant) {
+        this.form.wechat = this.merchant.wechat
+      }
     },
     methods: {
       onSubmit() {

@@ -274,7 +274,9 @@
       <div>
         {{currentConstraint.content}}
         <p>
-          <b-link :to="currentConstraint.link">{{currentConstraint.linkText}}</b-link>
+          <b-link v-if="currentConstraint.outLink" :to="currentConstraint.outLink">{{currentConstraint.linkText}}
+          </b-link>
+          <b-link v-else :href="currentConstraint.link">{{currentConstraint.linkText}}</b-link>
         </p>
       </div>
     </b-modal>
@@ -312,6 +314,7 @@
           content: '',
           linkText: '',
           link: '',
+          outLink: null,
         },
         busy: false,
         publishModalShowing: true,
@@ -431,11 +434,11 @@
             this.currentConstraint = constraint.can_place_order ? {
               content: '您尚未完成实名认证，每日限制下单次数为 3 次。',
               linkText: '去完成实名认证',
-              link: '# TODO',
+              outLink: '//www.coinex.com/my/info/security',
             } : {
               content: '您今天累计取消超过 3 次订单，被冻结交易功能。',
               linkText: '了解更多交易规则',
-              link: '# TODO',
+              outLink: '//support.coinex.com',
             }
             this.showConstraintModal = true
             return Promise.reject(constraint)
