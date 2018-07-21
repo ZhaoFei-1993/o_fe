@@ -19,7 +19,7 @@ export default (axios) => {
     },
 
     merchant() {
-      return Promise.resolve(require('./mock/user').merchant)
+      // return Promise.resolve(require('./mock/user').merchant)
       return axios.get('/user/merchant')
     },
 
@@ -46,6 +46,16 @@ export default (axios) => {
       return axios.delete('/user/merchant')
     },
 
+    /**
+     * 更改用户的接单状态
+     * @param bool
+     */
+    changeMerchantAvailable(bool) {
+      // return Promise.resolve({data: {}, code: 0})
+      return axios.post('/user/merchant/enable', {
+        'is_available': bool
+      })
+    },
     settings() {
       return Promise.resolve(require('./mock/user').settings)
       return axios.get('/user/settings')

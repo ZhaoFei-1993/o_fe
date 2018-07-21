@@ -1,25 +1,6 @@
 export default (axios) => {
   return {
     otcBalance() {
-      return Promise.resolve({
-        code: 0,
-        data: [{
-          coin_type: 'BTC',
-          available: '1113452111.00042442',
-          frozen: '342354.44543544',
-          total: '34265543.4532',
-        }, {
-          coin_type: 'BCH',
-          available: '1113452111.00042442',
-          frozen: '342354.44543544',
-          total: '1546453',
-        }, {
-          coin_type: 'CET',
-          available: '1113452111.00042442',
-          frozen: '342354.44543544',
-          total: '34216543',
-        }]
-      })
       return axios.get('/balance/otc')
     },
 

@@ -40,6 +40,8 @@ export default ({ app, store }) => {
       //   console.log('delete Authorization')
       //   delete inst.defaults.headers.common['Authorization']
       // }
+
+      return inst
     } else {
       const cookieString = req.headers.cookie
       const cookies = cookieString ? cookieParser.parse(cookieString) : {}

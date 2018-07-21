@@ -113,5 +113,11 @@ export default {
     HIGH: 'high',
     MIDDLE: 'middle',
     LOW: 'low',
+  },
+
+  // 广告状态
+  ITEM_STATUS: {
+    ONLINE: 'on',
+    OFFLINE: 'off',
   }
 }
