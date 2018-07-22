@@ -63,7 +63,7 @@
           this.$refs.confirmReceiptModal.hide()
           this.needVerify = false
           this.refreshOrderStatus()
-        }).catch(err => {
+        }).catch(() => {
           this.needVerify = true
         })
       },

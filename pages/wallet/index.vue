@@ -132,8 +132,8 @@
   import FundPie from './_c/fund-pie'
   import { mapState } from 'vuex'
 
-  // 每页条数
-  const limit = 10
+  const P_LIMIT = 10 // 每页条数, P_前缀表示页面组件全局常量
+  const P_INTERVAL = 5000 // 资产轮询时间
 
   export default {
     data() {
@@ -237,7 +237,7 @@
             tdClass: [ 'text-right' ],
             sortable: false,
           },
-          operation_type: {
+          business_type: {
             label: '流水类型',
             thStyle: {
               width: '250px',
@@ -264,8 +264,15 @@
             sortable: false,
           },
         },
-        historyQueryParams: {}, // 流水接口请求参数
+        historyQueryParams: {
+          coin_type: null,
+          side: null,
+          page: 1,
+          total: 0,
+          limit: P_LIMIT,
+        }, // 流水接口请求参数
         curAssetItem: null, // 当前点击`转入``转出`的资产项目
+        timer: null,
       }
     },
     fetch({ store }) {
@@ -275,36 +282,16 @@
         store.dispatch('fetchExchangeRate'),
       ])
     },
-    async asyncData({app, req, redirect, route}) {
-      try {
-        const historyQueryParams = {
-          coin_type: null,
-          side: null,
-          page: 1,
-          total: 0,
-          limit,
-        }
-        app.axios.init(req)
-        // 获取资产流水
-        const historyData = await app.axios.balance.history(historyQueryParams)
-        let assetHistoryItems = []
-
-        if (historyData.code === 0 && historyData.data) {
-          const {data, curr_page: currentPage, total: totalRows} = historyData.data
-
-          historyQueryParams.page = currentPage
-          historyQueryParams.totalRows = totalRows
-
-          assetHistoryItems = data
-        }
-
-        return {
-          historyQueryParams,
-          assetHistoryItems,
-        }
-      } catch (err) {
-        app.axios.needAuth(err, redirect, route.fullPath)
-      }
+    created() {
+      this.fetchBalanceHistory()
+      this.timer = setInterval(() => {
+        this.$store.dispatch('fetchOtcBalance') // otc资产
+        this.$store.dispatch('fetchCoinexBalance') // coinex资产
+        this.$store.dispatch('fetchExchangeRate') // 汇率
+      }, P_INTERVAL)
+    },
+    beforeDestroy() {
+      clearInterval(this.timer)
     },
     components: {
       cBlock,
@@ -398,7 +385,13 @@
             const { data, curr_page: currentPage, total: totalRows } = historyData.data
             this.historyQueryParams.page = currentPage
             this.historyQueryParams.totalRows = totalRows
-            this.assetHistoryItems = data
+            this.assetHistoryItems = data.map(item => {
+              const { business_type: bussType } = item
+              return {
+                ...item,
+                business_type: this.bussinessTypeMap[bussType] || bussType,
+              }
+            })
           }
         })
       },

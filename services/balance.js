@@ -30,7 +30,7 @@ export default (axios) => {
      */
     exchangeRate() {
       return Promise.resolve(require('./mock/balance').exchangeRate)
-      return axios.get('/system/price')
+      return axios.get('/system/market/price')
     }
   }
 }
