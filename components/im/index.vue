@@ -1,32 +1,38 @@
 <template>
   <div class="chat">
-    <div class="title">
-      <span>{{ conversation ? `${conversation.members.join(',')} 聊天中` : '' }}</span>
-      <div style="position: absolute;right: 0;top: 0;">
-        <b-btn @click="onJoin">{{ hadJoined ? '退出' : '加入' }}聊天</b-btn>
-      </div>
-    </div>
     <div class="content" ref="chatbox">
       <div v-for="item in msgLog">
         <div v-if="item.from === myClientId">
+          <div class="msg-time">
+            {{ item.time | getTimeText }}
+          </div>
           <div class="msg-box-right">
-            <div class="msg-text">{{ item._lctext }}</div>
-            <div class="avatar">{{ item.from }}</div>
+            <div class="msg-detail-wrapper">
+              <div class="msg-username username-right">{{ item.from }}</div>
+              <div class="msg-text">{{ item._lctext }}</div>
+            </div>
+            <UserAvatar :username="item.from" color="#c5f0f0" :online="false" :size="40"></UserAvatar>
           </div>
         </div>
         <div v-else>
+          <div class="msg-time">
+            {{ item.time | getTimeText }}
+          </div>
           <div class="msg-box-left">
-            <div class="avatar">{{ item.from }}</div>
-            <div class="msg-text">{{ item._lctext }}</div>
+            <UserAvatar :username="item.from" color="#c5f0f0" :online="false" :size="40"></UserAvatar>
+            <div class="msg-detail-wrapper">
+              <div class="msg-username username-left">{{ item.from }}</div>
+              <div class="msg-text">{{ item._lctext }}</div>
+            </div>
           </div>
         </div>
       </div>
     </div>
     <div class="input-box">
-      <b-input-group style="height: 100%;">
-        <b-form-input type="text" style="height: 100%;" v-model="message" @keyup.enter.native="onSendMsg"></b-form-input>
+      <b-input-group style="height: 100%;border-top: solid 1px #dddddd;">
+        <b-form-input placeholder="输入信息，回车发送" type="text" style="height: 100%;border: 0;" v-model="message" @keyup.enter.native="onSendMsg"></b-form-input>
         <b-input-group-append>
-          <b-btn @click="onSendMsg">发送</b-btn>
+          <b-btn @click="onSendMsg" style="background-color: #fff;border: 0;"></b-btn>
         </b-input-group-append>
       </b-input-group>
     </div>
@@ -34,27 +40,72 @@
 </template>
 
 <script>
+  import UserAvatar from '~/components/user-avatar.vue'
   import { Realtime, TextMessage, Event } from 'leancloud-realtime'
 
   export default {
     data() {
       return {
-        myClientId: '',
-        yourClientId: '',
+        myClientId: 'leo',
+        yourClientId: 'jeff',
         message: '',
         myClient: null,
         conversation: null,
         limit: 20,
         messageIterator: null,
-        msgLog: [],
+        msgLog: [{
+          _lctext: 'fadfasfasf飞机啊方法和规范哈算法舒服哈市法拉伐法是否好看',
+          from: 'leo',
+          time: parseInt(Date.now() / 1000),
+        }, {
+          _lctext: 'hfksgsafa',
+          from: 'jeff',
+          time: parseInt(Date.now() / 1000),
+        }, {
+          _lctext: 'fadfasfasf',
+          from: 'leo',
+          time: parseInt(Date.now() / 1000),
+        }, {
+          _lctext: 'hfksgsafa',
+          from: 'jeff',
+          time: parseInt(Date.now() / 1000),
+        }, {
+          _lctext: 'fadfasfasf',
+          from: 'leo',
+          time: parseInt(Date.now() / 1000),
+        }, {
+          _lctext: 'hfksgsafa',
+          from: 'jeff',
+          time: parseInt(Date.now() / 1000),
+        }, {
+          _lctext: 'fadfasfasf',
+          from: 'leo',
+          time: parseInt(Date.now() / 1000),
+        }, {
+          _lctext: 'hfksgsafa',
+          from: 'jeff',
+          time: parseInt(Date.now() / 1000),
+        }, {
+          _lctext: 'fadfasfasf',
+          from: 'leo',
+          time: parseInt(Date.now() / 1000),
+        }, {
+          _lctext: 'hfksgsafa',
+          from: 'jeff',
+          time: parseInt(Date.now() / 1000),
+        }],
         hadJoined: false,
       }
+    },
+    components: {
+      UserAvatar,
     },
     beforeMount() {
       this.myClientId = window.localStorage.getItem('me') || 'leo'
       this.yourClientId = window.localStorage.getItem('you') || 'jeff'
     },
     mounted() {
+      return;
       const realtime = new Realtime({
         appId: 'OibOYNHFsWoqChdhAlebT7rS-gzGzoHsz',
         appKey: 'IEIfsx2I6LkRajvtP2jcoCIW',
@@ -192,7 +243,7 @@
 <style lang="scss">
   .chat {
     width: 400px;
-    height: 800px;
+    height: 480px;
     background-color: #fff;
     margin: 0 auto;
     position: relative;
@@ -210,58 +261,100 @@
     .content {
       overflow-y: scroll;
       flex: 10;
-      padding: 10px 5px;
+      padding: 10px 30px;
     }
     .input-box {
       flex: 1;
       width: 100%;
     }
+    .msg-username {
+      font-size: 12px;
+      color: #9b9b9b;
+    }
+    .msg-time {
+      text-align: center;
+      color: #9b9b9b;
+      font-size: 12px;
+    }
     .msg-box-left {
       display: flex;
       justify-content: flex-start;
-      margin-top: 15px;
-      .avatar {
-        width: 44px;
-        height: 44px;
-        border-radius: 100px;
-        background-color: #ccc;
-        font-size: 18px;
-        line-height: 44px;
-        text-align: center;
-        overflow: hidden;
-      }
-      .msg-text {
-        margin-left: 10px;
-        height: fit-content;
-        max-width: 200px;
-        padding: 5px;
-        border: solid 1px #ccc;
-        border-radius: 5px;
-        word-wrap: break-word;
+      margin-bottom: 20px;
+      .msg-detail-wrapper {
+        padding-left: 10px;
+        .username-left {
+          text-align: left;
+        }
+        .msg-text {
+          position: relative;
+          margin-top: 7px;
+          float: left;
+          width: fit-content;
+          height: fit-content;
+          max-width: 250px;
+          padding: 5px;
+          border-radius: 4px;
+          word-wrap: break-word;
+          background-color: #f9f9f9;
+          &::after {
+            content: "";
+            position: absolute;
+            display: block;
+            border-style: solid;
+            border-color: #f9f9f9 transparent transparent;
+            border-right-color: #f9f9f9;
+            border-width: 8px;
+            border-left-color: transparent;
+            border-left-width: 0;
+            border-top-color: transparent;
+            margin: -8px 0 0;
+            top: 15px;
+            left: -8px;
+            right: auto;
+            bottom: auto;
+          }
+        }
       }
     }
     .msg-box-right {
       display: flex;
       justify-content: flex-end;
-      margin-top: 15px;
-      .avatar {
-        width: 44px;
-        height: 44px;
-        border-radius: 100px;
-        background-color: #ccc;
-        font-size: 18px;
-        line-height: 44px;
-        text-align: center;
-        overflow: hidden;
-      }
-      .msg-text {
-        margin-right: 10px;
-        height: fit-content;
-        max-width: 200px;
-        padding: 5px;
-        border: solid 1px #ccc;
-        border-radius: 5px;
-        word-wrap: break-word;
+      margin-bottom: 20px;
+      .msg-detail-wrapper {
+        padding-right: 10px;
+        .username-right {
+          text-align: right;
+        }
+        .msg-text {
+          position: relative;
+          margin-top: 7px;
+          float: right;
+          padding-right: 10px;
+          width: fit-content;
+          height: fit-content;
+          max-width: 250px;
+          padding: 5px;
+          border-radius: 4px;
+          word-wrap: break-word;
+          background-color: #f9f9f9;
+          &::after {
+            content: "";
+            position: absolute;
+            display: block;
+            border-style: solid;
+            border-color: #f9f9f9 transparent transparent;
+            border-left-color: #f9f9f9;
+            border-width: 8px;
+            border-right-color: transparent;
+            border-right-width: 0;
+            border-top-color: transparent;
+            margin: -8px 0 0;
+            top: 15px;
+            right: -8px;
+            left: auto;
+            bottom: auto;
+          }
+        }
       }
     }
   }
