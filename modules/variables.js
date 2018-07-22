@@ -1,6 +1,6 @@
 // 默认都是正式环境的变量
-let serverApiDomain = '//otc.coinex.com/api'
-let clientApiDomain = '//otc.coinex.com/api'
+let serverApiDomain = '//otc.coinex.com/res'
+let clientApiDomain = '//otc.coinex.com/res'
 
 let loginPage = '//www.coinex.com/account/signin'
 let signupPage = '//www.coinex.com/account/signup'
@@ -24,8 +24,8 @@ if (MODE === 'pre') {
 // 这个配置host到本地nginx之后就可以转发到想用的mock server了(localhost:4006)
 if (MODE === 'development') {
   webDomain = '//dev.otc.coinex.com'
-  clientApiDomain = '//dev.otc.coinex.com/res'
-  serverApiDomain = '//dev.otc.coinex.com/res'
+  clientApiDomain = '//test.otc.coinex.com/res'
+  serverApiDomain = '//test.otc.coinex.com/res'
 }
 
 const protocol = process.client ? window.location.protocol : 'http:'

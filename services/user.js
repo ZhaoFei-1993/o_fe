@@ -14,12 +14,12 @@ export default (axios) => {
      * @return {Promise<any>}
      */
     payments() {
-      return Promise.resolve(require('./mock/user').paymentMethods)
+      // return Promise.resolve(require('./mock/user').paymentMethods)
       return axios.get('/user/payment/method')
     },
 
     merchant() {
-      return Promise.resolve(require('./mock/user').merchant)
+      // return Promise.resolve(require('./mock/user').merchant)
       return axios.get('/user/merchant')
     },
 
@@ -29,8 +29,8 @@ export default (axios) => {
      * @return {*}
      */
     applyMerchant({wechat}) {
-      require('./mock/user').merchant.data.status = 'created'
-      return Promise.resolve(require('./mock/user').merchant)
+      // require('./mock/user').merchant.data.status = 'created'
+      // return Promise.resolve(require('./mock/user').merchant)
       return axios.post('/user/merchant', {
         wechat
       })
@@ -41,24 +41,36 @@ export default (axios) => {
      * 暂时后台只做了取消认证申请 jeff 20180716
      */
     cancelMerchant() {
-      require('./mock/user').merchant.data.status = 'cancel'
-      return Promise.resolve({data: {}, code: 0})
+      // require('./mock/user').merchant.data.status = 'cancel'
+      // return Promise.resolve({data: {}, code: 0})
       return axios.delete('/user/merchant')
     },
 
+    /**
+     * 更改用户的接单状态
+     * @param bool
+     */
+    changeMerchantAvailable(bool) {
+      // return Promise.resolve({data: {}, code: 0})
+      return axios.post('/user/merchant/enable', {
+        'is_available': bool
+      })
+    },
     settings() {
-      return Promise.resolve(require('./mock/user').settings)
+      // return Promise.resolve(require('./mock/user').settings)
       return axios.get('/user/settings')
     },
 
     qualification() {
-      return Promise.resolve(require('./mock/user').qualification)
       return axios.get('/user/qualification')
     },
 
     setSettings() {
-      return Promise.resolve(require('./mock/user').settings)
+      // return Promise.resolve(require('./mock/user').settings)
       return axios.get('/user/settings')
+    },
+    signOut() {
+      return axios.post('/user/sign/out')
     },
 
     /**
@@ -67,7 +79,7 @@ export default (axios) => {
      * @param status 'on' 'off' 开启/关闭
      */
     changePaymentStatus(id, status) {
-      return Promise.resolve({data: {}, code: 0})
+      // return Promise.resolve({data: {}, code: 0})
       return axios.patch(`/user/payment/method/${id}`, {
         status
       })
@@ -80,12 +92,26 @@ export default (axios) => {
      */
     addPaymentMethod(payment) {
       // 测试环境用的代码
-      const payments = require('./mock/user').paymentMethods.data
-      payment.status = 'on'
-      payments.push(payment)
-      return Promise.resolve({data: {}, code: 0})
+      // const payments = require('./mock/user').paymentMethods.data
+      // payment.status = 'on'
+      // payments.push(payment)
+      // return Promise.resolve({data: {}, code: 0})
 
-      return axios.patch(`/user/payment/method`, payment)
+      return axios.post(`/user/payment/method`, payment)
+    },
+
+    /**
+     * 更新payment
+     * @param payment
+     * @return {*}
+     */
+    updatePaymentMethod(payment) {
+      // const payments = require('./mock/user').paymentMethods.data
+      // payments.forEach(item => {
+      //   if (item.id === payment.id) Object.assign(item, payment)
+      // })
+      // return Promise.resolve({data: {}, code: 0})
+      return axios.put(`/user/payment/method/${payment.id}`, payment)
     },
 
     /**
@@ -97,27 +123,8 @@ export default (axios) => {
       return axios.patch(`/user/account`, {name})
     },
 
-    /**
-     * 更新payment
-     * @param payment
-     * @return {*}
-     */
-    updatePaymentMethod(payment) {
-      const payments = require('./mock/user').paymentMethods.data
-      payments.forEach(item => {
-        if (item.id === payment.id) Object.assign(item, payment)
-      })
-      return Promise.resolve({data: {}, code: 0})
-      return axios.post(`/user/payment/method/${payment.id}`, payment)
-    },
-
-    // todo:balance接口需要重新设计下
-    balance() {
-      return Promise.resolve(require('./mock/user').balance)
-    },
-
     dynamicConstraint() {
-      return Promise.resolve(require('./mock/user').constraint)
+      return axios.get('/user/today/limit')
     },
 
     /**
@@ -125,7 +132,7 @@ export default (axios) => {
      * @param id
      */
     otherUserInfo(id) {
-      return axios.get(`users/${id}`)
+      return axios.get(`/users/${id}`)
       // return Promise.resolve(require('./mock/user').otherUser)
     },
   }

@@ -12,7 +12,6 @@ export default () => {
   const mutations = {
     SET_OTC_BALANCE(state, data) {
       state.otcBalance = data
-
       state.otcMap = data.reduce((reduced, coin) => {
         reduced[coin.coin_type] = coin
         return reduced
@@ -41,7 +40,7 @@ export default () => {
       })
     },
     fetchCoinexBalance({ commit }) {
-      return this.app.axios.balance.otcBalance().then(res => {
+      return this.app.axios.balance.coinexBalance().then(res => {
         commit('SET_COINEX_BALANCE', res.data)
       })
     },

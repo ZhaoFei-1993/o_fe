@@ -4,6 +4,7 @@
   $slider-width:22px;
 
   .switch {
+    position: relative;
     width: $total-width;
     height: $total-height;
     border-radius: $total-height;
@@ -18,7 +19,8 @@
 
   .switch-handle {
     display: inline-block;
-    position: relative;
+    position: absolute;
+    top: 0;
     width: 100%;
     height: 100%;
     margin: 0;
@@ -56,19 +58,13 @@
 
 <template>
   <label class="switch">
-    <input class="switch-input" type="checkbox" @change.stop="toggle" @click.stop="click" :checked="isChecked" :disabled="disabled">
-    <span :class="['switch-handle',{'checked':isChecked},disabled?'disabled':'']"></span>
+    <input class="switch-input" type="checkbox" @change.stop="toggle" @click.stop="click" :checked="value" :disabled="disabled">
+    <span :class="['switch-handle',{'checked':value},disabled?'disabled':'']"></span>
   </label>
 </template>
 
 <script>
 export default {
-  data() {
-    return {
-      isChecked: this.value
-    }
-  },
-
   props: {
     value: {
       type: Boolean
@@ -79,19 +75,14 @@ export default {
     }
   },
 
-  watch: {
-    value(val) {
-      this.isChecked = val
-    }
-  },
-
   methods: {
     click(event) {
-      this.$emit('beforeChange', event.target.checked, event)
+      this.$emit('beforeChange', !this.value, event)
     },
     toggle(event) {
-      this.$emit('change', event.target.checked, event)
-      this.$emit('input', event.target.checked, event)
+      event.preventDefault()
+      this.$emit('change', !this.value, event)
+      this.$emit('input', !this.value, event)
     }
   }
 }

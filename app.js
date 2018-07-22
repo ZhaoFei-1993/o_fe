@@ -54,10 +54,9 @@ if (config.dev) { // 本地开发mock接口
     return middleware(req, res, next)
   })
   router.render = (req, res) => {
-    const length = res.locals.data.length
-    // 转换成后端使用的数据结构
+    // 转换成后端使用的数据结构(暂时不考虑翻页）
     res.jsonp({
-      data: length ? {data: res.locals.data, total: res.locals.data.length} : res.locals.data,
+      data: res.locals.data,
       code: 0,
       message: 'ok',
     })

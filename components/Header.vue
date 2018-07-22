@@ -52,6 +52,7 @@
         a.dropdown-item {
           padding: 12px 20px 12px 0;
           display: flex;
+          font-size: 14px;
           justify-content: center;
           &:not(:last-child) {
             border-bottom: 1px solid #eeeeee;
@@ -113,7 +114,7 @@
       </b-navbar-brand>
       <b-navbar-nav class="ml-30">
         <b-nav-item to="/" exact>法币交易</b-nav-item>
-        <b-nav-item to="/items/create">发布广告</b-nav-item>
+        <b-nav-item @click="onItemPublish">发布广告</b-nav-item>
         <b-nav-item to="/wallet">OTC钱包</b-nav-item>
         <b-nav-item :href="helpLink" target="_blank">帮助</b-nav-item>
         <span style="color: #d5d5d5">|</span>
@@ -134,7 +135,7 @@
             <b-dropdown-item to="/wallet"><i class="iconfont icon-manage-account"></i> OTC账户</b-dropdown-item>
             <b-dropdown-item to="/items"><i class="iconfont icon-manage-item"></i> 广告管理</b-dropdown-item>
             <b-dropdown-item to="/my/merchant"><i class="iconfont icon-apply-merchant"></i> 商家申请</b-dropdown-item>
-            <b-dropdown-item><i class="iconfont icon-manage-ticket"></i> 工单系统</b-dropdown-item>
+            <!--<b-dropdown-item><i class="iconfont icon-manage-ticket"></i> 工单系统</b-dropdown-item>-->
             <b-dropdown-item @click="signOut"><i class="iconfont icon-logout"></i>退出登录</b-dropdown-item>
           </b-nav-item-dropdown>
 
@@ -169,15 +170,22 @@
              :hide-header-close="true"
              :no-close-on-esc="true"
              :no-close-on-backdrop="true"
-             ok-variant="yellow"
+             :ok-disabled="invalidName"
+             ok-title="确认"
+             cancel-variant="outline-green"
+             ok-variant="gradient-yellow"
+             button-size="sm"
+             class="text-center"
              :ok-only="true"
              @ok="handleUpdateName">
       <div v-if="user&&user.account">
         <p>请确认或修改您的昵称，昵称一旦确定将无法修改。</p>
-        <p class="c-red" v-if="nameDuplicated">请确认或修改您的昵称，昵称一旦确定将无法修改。</p>
-        <b-form-input v-model="user.account.name" type="text" placeholder="您的昵称" required></b-form-input>
+        <b-form-input v-model="userName" type="text" placeholder="您的昵称" required></b-form-input>
+        <p class="c-red" v-if="invalidName">请输入2-30个字符的昵称。</p>
+        <p class="c-red" v-if="nameDuplicated">该昵称已被占用，请使用其他昵称。</p>
       </div>
     </b-modal>
+    <PublishItemModal v-if="publishModalShowing" v-model="publishModalShowing" @published="onItemPublished"/>
   </div>
 </template>
 
@@ -185,18 +193,22 @@
   import {mapState} from 'vuex'
   import {loginPage, webDomain, signupPage} from '~/modules/variables'
   import {onApiError} from '~/modules/error-code'
+  import PublishItemModal from '~/components/publish-item-modal'
 
   export default {
     head: {
-      link: [{rel: 'stylesheet', href: '//at.alicdn.com/t/font_739076_8a5nu4m6gas.css'}]
+      link: [{rel: 'stylesheet', href: '//at.alicdn.com/t/font_739076_lv1gd6vgx4g.css'}]
     },
-    components: {},
-
+    components: {
+      PublishItemModal,
+    },
     data() {
       return {
-        attentionModelShowing: null,
+        publishModalShowing: false,
+        attentionModelShowing: false,
         attention: [],
         nameDuplicated: false,
+        userName: null,
         activeAttentionIndex: 0,
         loginPage: `${loginPage}?redirect=${encodeURIComponent(webDomain + this.$route.fullPath)}`,
         registerPage: `${signupPage}?redirect=${encodeURIComponent(webDomain + this.$route.fullPath)}`,
@@ -220,21 +232,24 @@
         }
         return 'https://support.coinex.com/hc/' + lang
       },
+      invalidName() {
+        return !this.userName || this.userName.length < 2 || this.userName.length > 30
+      },
     },
-
-    beforeMount() {
+    mounted() {
+      // component 里面不能调用fetch和asyncData
       this.$store.dispatch('fetchUserAccount').then(_ => {
         if (this.user && this.user.account && !this.user.account.is_name_confirmed) {
+          this.userName = this.user.account.name
           this.$refs.updateNameModal.show()
         }
       })
     },
-
     methods: {
       handleUpdateName(evt) {
         // 要验证重名，避免被关闭，需要ref来调用
         evt.preventDefault()
-        this.axios.user.updateName(this.user.account.name).then(_ => {
+        this.axios.user.updateName(this.useName).then(_ => {
           this.$refs.updateNameModal.hide()
         }).catch(err => {
           if (err.code === 72) {
@@ -265,12 +280,14 @@
       shutdown() {
       },
       signOut() {
-        this.axios.user.signOut().then(res => {
-          window.location.href = '/'
-        }).catch(err => {
-          onApiError(err, this)
-        })
-      }
+        this.$store.dispatch('signOut')
+      },
+      onItemPublish() {
+        this.publishModalShowing = true
+      },
+      onItemPublished() {
+        this.publishModalShowing = false
+      },
     }
   }
 </script>

@@ -120,22 +120,22 @@
   <CBlock class="page-merchant" x="0" y="0">
     <h3 class="layout-my-title">商家认证</h3>
     <p class="layout-my-desc">成为认证商家，尊享更多时权益</p>
+    <template v-if="merchant">
+      <MyInfoItem v-if="merchant.status === constant.MERCHANT_STATUS.PASS" title="商家认证">
+        <p slot="content" class="c-brand-green">已成为认证商家</p>
+      </MyInfoItem>
 
-    <MyInfoItem v-if="merchant.status === constant.MERCHANT_STATUS.PASS" title="商家认证">
-      <p slot="content" class="c-brand-green">已成为认证商家</p>
-    </MyInfoItem>
-
-    <MyInfoItem v-else-if="merchant.status === constant.MERCHANT_STATUS.CREATED" title="商家认证">
-      <p slot="content" class="c-brand-green">信息已提交，审核中</p>
-      <!--暂时不做取消申请 jeff 20180716-->
-      <!--<b-btn slot="action" variant="outline-green" size="xs" @click="onCancelApply">取消申请</b-btn>-->
-    </MyInfoItem>
-
+      <MyInfoItem v-else-if="merchant.status === constant.MERCHANT_STATUS.CREATED" title="商家认证">
+        <p slot="content" class="c-brand-green">信息已提交，审核中</p>
+        <!--暂时不做取消申请 jeff 20180716-->
+        <!--<b-btn slot="action" variant="outline-green" size="xs" @click="onCancelApply">取消申请</b-btn>-->
+      </MyInfoItem>
+    </template>
     <template v-else>
       <ProgressIndicator :active="-1"/>
 
       <ProgressItem title="完善信息">
-        <div class="d-flex">
+        <div class="d-flex" v-if="account">
           <ContactItem title="手机认证" icon="icon-mobile" :active="true" :required="true">
             <div v-if="account.mobile" class="c-6f">
               <p class="mt-10">已认证</p>
@@ -166,7 +166,8 @@
           <p>手持身份证正面，进行视频录制，保持录制过程中声音和影像都清晰</p>
         </InfoItem>
         <InfoItem title="视频诵读范本">
-          <p class="info-item-content-example">本人（姓名），身份证号（身份证号码），我申请成为CoinEx认证商家，我的资金来源合法可靠，自愿交易比特币等数字资产，本人充分了解数字货币及潜在风险，本人具有抗风险的能力并愿意承担一切风险！</p>
+          <p class="info-item-content-example">
+            本人（姓名），身份证号（身份证号码），我申请成为CoinEx认证商家，我的资金来源合法可靠，自愿交易比特币等数字资产，本人充分了解数字货币及潜在风险，本人具有抗风险的能力并愿意承担一切风险！</p>
         </InfoItem>
         <InfoItem title="提交认证视频" :required="true">
           <p class="c-6f">请将视频资料发送邮至 bd@coinex.com，邮件主题为"申请成为CoinEx认证商家+CoinEx账户（注册邮箱或手机）"</p>
@@ -175,14 +176,19 @@
       </ProgressItem>
 
       <ProgressItem title="缴纳保证金">
-        <p class="c-6f">申请成为CoinEx认证商家，需要同意冻结您交易所账户中 100,000 CET作为商家保证金，钱包中冻结的保证金依然享有分红权益，但是不
-          可交易和体现。什么是 CET？</p>
-        <InfoItem title="账户余额">
-          {{balance.cet}}
-          <span v-if="balance.cet < MERCHANT_REQUIRED_CET_AMOUNT">
+        <p class="c-6f">申请成为CoinEx认证商家，需要同意冻结您交易所账户中 {{MERCHANT_REQUIRED_CET_AMOUNT|formatMoney}}
+          CET作为商家保证金，钱包中冻结的保证金依然享有分红权益，但是不
+          可交易和提现。取消商家认证后，商家保证金将继续冻结三个月后解冻。
+          <b-link href="https://www.coinex.com/token">什么是 CET？</b-link>
+        </p>
+        <InfoItem title="账户可用余额" v-if="balance && balance.coinexBalance">
+          {{cetAvailable}}
+          <span v-if="cetAvailable < MERCHANT_REQUIRED_CET_AMOUNT">
             <span class="c-red mr-20">余额不足</span>
             请先进行
             <b-link href="//www.coinex.com/my/wallet/deposit?type=cet">充值</b-link>
+            或
+            <b-link href="//www.coinex.com/exchange?currency=bch&dest=cet">交易</b-link>
           </span>
         </InfoItem>
       </ProgressItem>
@@ -190,7 +196,9 @@
       <ProgressItem title="资料审核">
         <p class="c-6f">我们将在3个工作日内对您的商家申请资料进行审核。请保持通讯畅通，我们会主动与您取得联系。审核通过后，您即可在OTC平台发布广告。</p>
         <b-form-checkbox v-model="isContractRead" class="c-6f">
-          我已阅读并同意 <b-link>《认证商家服务协议》</b-link>，并冻结100,000 CET作为商家保证金。
+          我已阅读并同意
+          <b-link>《认证商家服务协议》</b-link>
+          ，并冻结{{MERCHANT_REQUIRED_CET_AMOUNT|formatMoney}} CET作为商家保证金。
         </b-form-checkbox>
       </ProgressItem>
 
@@ -248,7 +256,7 @@
     render() {
       return (
         <div class="contact-item">
-          <div class="contact-item-icon"><i class={`iconfont ${this.icon} ${this.active && '_active'}` }/></div>
+          <div class="contact-item-icon"><i class={`iconfont ${this.icon} ${this.active && '_active'}`}/></div>
           <div class={`contact-item-title ${this.required && '_required'}`}>{this.title}</div>
           <div class="contact-item-content">{this.$slots['default']}</div>
         </div>
@@ -275,10 +283,7 @@
         },
         isVideoSent: false,
         isContractRead: false,
-        balance: {
-          cet: 1000,
-        },  // todo:用store里面的balance
-        MERCHANT_REQUIRED_CET_AMOUNT: 10000,
+        MERCHANT_REQUIRED_CET_AMOUNT: 50000,
         VERIFY_EMAIL: 'bd@coinex.com',
       }
     },
@@ -287,17 +292,33 @@
         account: state => state.user.account,
         merchant: state => state.user.merchant,
         constant: state => state.constant,
-      })
+        balance: state => state.balance,
+      }),
+      cetAvailable() {
+        if (!this.balance || !this.balance.coinexBalance) {
+          return '--'
+        }
+        const cet = this.balance.coinexBalance.find(b => b.coin_type === 'CET')
+        if (!cet) {
+          return 0
+        }
+        return cet.available
+      },
     },
 
     fetch({app, store, route, redirect, req}) {
       return Promise.all([
         store.dispatch('fetchUserAccount'),
         store.dispatch('fetchUserMerchant'),
-      ])
+        store.dispatch('fetchCoinexBalance'),
+      ]).catch(err => {
+        console.log(err)
+      })
     },
     mounted() {
-      this.form.wechat = this.merchant.wechat
+      if (this.merchant) {
+        this.form.wechat = this.merchant.wechat
+      }
     },
     methods: {
       onSubmit() {

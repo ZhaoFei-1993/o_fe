@@ -13,22 +13,31 @@
 //   icon: 'icon-bankcard'
 // }
 export default () => {
-  const state = {
+  const initialState = {
     account: null,
     payments: null,       // 用户的支付手段 Array<Payment>
-    balance: null,        // todo:balance需要重新设计
     merchant: null,       // 用户的商家信息
     settings: null,       // 用户的广告设置
+    qualification: [],
   }
+  const state = Object.assign({}, initialState)
   const mutations = {
-    SET_USER_ACCOUNT(state, data) {
+    SET_USER_ACCOUNT(state, {data, constant}) {
+      // 根据用户账户，计算用户安全等级
+      let securityLevel = 0
+      ;['is_have_totp_auth', 'mobile', 'email'].forEach(key => {
+        if (data[key]) securityLevel++
+      })
+
+      if (data.kyc_status === constant.KYC_STATUS.PASS) securityLevel++
+      if (data.login_password_level === constant.PASSWORD_LEVEL.HIGH || data.login_password_level === constant.PASSWORD_LEVEL.MIDDLE) securityLevel++
+
+      data.securityLevel = securityLevel
+
       state.account = data
     },
     SET_USER_PAYMENTS(state, data) {
       state.payments = data
-    },
-    SET_USER_BALANCE(state, data) {
-      state.balance = data
     },
     SET_USER_MERCHANT(state, data) {
       state.merchant = data
@@ -39,11 +48,18 @@ export default () => {
     SET_USER_QUALIFICATION(state, data) {
       state.qualification = data
     },
+    SIGN_OUT(state) {
+      // 恢复初始状态
+      Object.assign(state, initialState)
+    },
   }
   const actions = {
-    fetchUserAccount({commit}) {
+    fetchUserAccount({commit, rootState}) {
       return this.app.axios.user.account().then(data => {
-        commit('SET_USER_ACCOUNT', data.data)
+        commit('SET_USER_ACCOUNT', {
+          data: data.data,
+          constant: rootState.constant
+        })
       })
     },
     fetchUserPayments({commit, state, rootState}) {
@@ -56,11 +72,6 @@ export default () => {
           payment.isActive = paymentOption.status === rootState.constant.PAYMENT_STATUS.ON
         })
         commit('SET_USER_PAYMENTS', data.data)
-      })
-    },
-    fetchUserBalance({commit, state, rootState}) {
-      return this.app.axios.user.balance().then(data => {
-        commit('SET_USER_BALANCE', data.data)
       })
     },
     fetchUserMerchant({commit, state, rootState}) {
@@ -76,6 +87,12 @@ export default () => {
     fetchUserQualification({commit, state, rootState}) {
       return this.app.axios.user.qualification().then(data => {
         commit('SET_USER_QUALIFICATION', data.data)
+      })
+    },
+    signOut({commit}) {
+      return this.app.axios.user.signOut().then(res => {
+        commit('SIGN_OUT')
+        this.$router.push('/')
       })
     },
   }
