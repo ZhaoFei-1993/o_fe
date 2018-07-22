@@ -249,7 +249,7 @@
       handleUpdateName(evt) {
         // 要验证重名，避免被关闭，需要ref来调用
         evt.preventDefault()
-        this.axios.user.updateName(this.useName).then(_ => {
+        this.axios.user.updateName(this.userName).then(_ => {
           this.$refs.updateNameModal.hide()
         }).catch(err => {
           if (err.code === 72) {
