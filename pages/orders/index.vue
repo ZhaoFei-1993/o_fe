@@ -35,8 +35,8 @@
             <b-link :to="`/orders/${item.id}`">{{ item.id }}</b-link>
           </template>
           <template slot="_order_type" slot-scope="{ item }">
-            <span :class="['order-type', item._order_type === 'buy' ? 'order-type-buy' : 'order-type-sell']">
-              {{ item._order_type === 'buy' ? '买' : '卖' }}
+            <span :class="['order-type', item._order_type === constant.SIDE.BUY ? 'order-type-buy' : 'order-type-sell']">
+              {{ item._order_type === constant.SIDE.BUY ? '买' : '卖' }}
             </span>
           </template>
           <template slot="place_time" slot-scope="{ item }">
@@ -58,7 +58,7 @@
             <div class="detail-wrapper">
               <div class="col1">
                 <div class="detail-h1 detail-flex">
-                  <span :class="['arrow-icon', item._order_type === 'buy' ? 'buy-arrow-icon' : 'sell-arrow-icon']"></span>
+                  <span :class="['arrow-icon', item._order_type === constant.SIDE.BUY ? 'buy-arrow-icon' : 'sell-arrow-icon']"></span>
                   <span>购买 {{ item.coin_type }}</span>
                 </div>
                 <div class="detail-h2">
@@ -116,7 +116,7 @@
                 </div>
               </div>
               <div class="col5">
-                <template v-if="item._order_type === 'buy'">
+                <template v-if="item._order_type === constant.SIDE.BUY">
                   <template v-if="item.status === constant.ORDER_STATUS.CREATED.value">
                     <div class="detail-text detail-timer">
                       还剩{{ item._remaining_time | formatDuration }}
@@ -137,7 +137,7 @@
                     </div>
                   </template>
                 </template>
-                <template v-if="item._order_type === 'sell'">
+                <template v-if="item._order_type === constant.SIDE.SELL">
                   <template v-if="item.status === constant.ORDER_STATUS.CREATED.value">
                     <div class="detail-text detail-timer">
                       还剩{{ item._remaining_time | formatDuration }}
