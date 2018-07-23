@@ -116,6 +116,7 @@
              ok-variant="gradient-yellow"
              cancel-variant="outline-green"
              button-size="lg"
+             :okDisabled="submitting"
              @ok="onFormSubmit">
       <b-form>
         <h4 class="payment-modal-title">
@@ -239,10 +240,11 @@
           branch: '',
           account_no: '',
           qr_code_image: '',
-          qrCodeImage: '',          // {url, blob, id}
+          qrCodeImage: '',          // {url, blob, file, id}
         },
         modalShowing: false,
         isPaymentEditing: false,     // 是否正在被编辑payment（而不是添加）
+        submitting: false,        // 正在上传支付方式
 
         bankList: [{
           text: '中国银行',
@@ -339,16 +341,24 @@
         const verify = this.verify
         const code = verify.codeType === this.constant.VERIFY_CODE_TYPE.GOOGLE ? verify.google : verify.sms
 
-        // todo: 联调
-        let imageData
-        if (form.qrCodeImage && form.qrCodeImage.blob) {
-          imageData = (await this.axios.misc.upload(this.form.qrCodeImage.blob)).data
+        this.submitting = true
 
-          form.qrCodeImage.id = form.qr_code_image = imageData.file_key
-          form.qrCodeImage.url = imageData.file_url
-          delete form.qrCodeImage.blob
+        if (form.qrCodeImage && form.qrCodeImage.file) {
+          try {
+            this.$showTips('正在上传图片...')
+            const imageData = (await this.axios.misc.upload(this.form.qrCodeImage.file)).data
+
+            form.qrCodeImage.id = form.qr_code_image = imageData.file_key
+            form.qrCodeImage.url = imageData.file_url
+            delete form.qrCodeImage.file
+          } catch (e) {
+            this.submitting = false
+            this.$errorTips('上传图片失败: ' + e.message + e.code)
+            return
+          }
         }
 
+        this.$showTips('正在上传数据...')
         return paymentApi({
           validate_code_type: verify.codeType,
           validate_code: code,
@@ -357,10 +367,12 @@
           sequence: verify.smsSequence,
           ...form,
         }).then(res => {
+          this.submitting = false
           this.$store.dispatch('fetchUserPayments')
           this.modalShowing = false
           this.$showTips(this.isPaymentEditing ? '修改成功' : '添加成功')
         }).catch(err => {
+          this.submitting = false
           this.axios.onError(err)
         })
       },

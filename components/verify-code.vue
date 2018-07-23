@@ -41,7 +41,7 @@
       <b-input-group class="code-input-group">
         <b-form-input class="code-input" :value="google" @input="onGoogleInput" size="lg" placeholder="6位Google验证码"></b-form-input>
       </b-input-group>
-      <EMsgs :result="$v" :msgs="invalidMessages" keyName="google"/>
+      <EMsgs :result="$v" :msgs="invalidMessages" keyName="google" class="ps-a"/>
     </b-form-group>
 
     <b-form-group v-if="needSms && codeType === constant.VERIFY_CODE_TYPE.SMS"
