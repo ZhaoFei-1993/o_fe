@@ -3,6 +3,15 @@
   @import "~assets/scss/variables.scss";
 
   .page-my-payments {
+    // 覆盖默认的
+    .form-group {
+      margin-bottom: 0;
+    }
+
+    .error-message {
+      margin-top: 0;
+    }
+
     .layout-my-title {
       display: flex;
       align-items: center;
@@ -12,7 +21,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      width: 200px;
+      width: 220px;
     }
 
     .payment-status {
@@ -31,8 +40,14 @@
         max-width: 680px;
       }
 
+      .payment-modal-title {
+        text-align: center;
+        padding-left: 60px;
+        margin-bottom: 40px;
+      }
+
       .modal-body {
-        padding-left: 20px;
+        padding-left: 30px;
         padding-right: 90px;
       }
 
@@ -51,7 +66,7 @@
       支付方式
       <b-btn @click="onPaymentAdd" variant="plain" size="xs" class="ml-15 c-brand-green">+ 添加支付方式</b-btn>
     </h3>
-    <p class="layout-my-desc">被激活的支付方式将在交易时向买方展示，最多激活3种</p>
+    <p class="layout-my-desc" data-todo="同类最多激活一种吧？">被激活的支付方式将在交易时向买方展示，最多激活3种</p>
 
     <MyInfoItem v-for="(payment, index) in user.payments" :key="index">
       <div slot="title">
@@ -69,18 +84,17 @@
       </p>
 
       <div slot="action" class="payment-action">
-        <b-btn size="xxs" variant="plain" class="c-brand-green" @click="onPaymentEdit(payment)">修改</b-btn>
         <div class="payment-status">
           {{payment.status.toUpperCase()}}
           <ToggleButton class="ml-2" :value="payment.status === constant.PAYMENT_STATUS.ON"
                         @change="(checked) => onPaymentStatusChange(payment, checked)"/>
         </div>
+        <b-btn size="xs" variant="outline-green" class="c-brand-green ml-30" @click="onPaymentEdit(payment)">修改</b-btn>
       </div>
     </MyInfoItem>
 
     <b-modal class="payment-modal"
              v-model="modalShowing"
-             title="添加支付方式"
              ok-title="确定"
              cancel-title="取消"
              ok-variant="gradient-yellow"
@@ -88,7 +102,15 @@
              button-size="lg"
              @ok="onFormSubmit">
       <b-form>
-        <b-form-group label="类型:" horizontal>
+        <h4 class="payment-modal-title">
+          <span v-if="isPaymentEditing">
+            修改支付方式
+            <b-btn variant="plain-green" size="xxs" class="float-right" @click="onPaymentDelete">删除该条</b-btn>
+          </span>
+          <span v-else>添加支付方式</span>
+        </h4>
+
+        <b-form-group label="类型:" horizontal class="mb-25">
           <b-form-select v-model="form.method" :options="constant.PAYMENT_OPTIONS" size="lg"></b-form-select>
         </b-form-group>
 
@@ -280,6 +302,17 @@
           this.$store.dispatch('fetchUserPayments')
           this.modalShowing = false
           this.$showTips('修改成功')
+        }).catch(err => {
+          this.axios.onError(err)
+        })
+      },
+
+      onPaymentDelete() {
+        this.axios.user.deletePaymentMethod(this.form.id).then(res => {
+          this.$showTips('删除成功')
+          this.modalShowing = false
+          this.isPaymentEditing = false
+          this.$store.dispatch('fetchUserPayments')
         }).catch(err => {
           this.axios.onError(err)
         })

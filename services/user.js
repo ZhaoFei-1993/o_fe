@@ -114,6 +114,10 @@ export default (axios) => {
       return axios.put(`/user/payment/method/${payment.id}`, payment)
     },
 
+    deletePaymentMethod(id) {
+      return axios.delete(`/user/payment/method/${id}`)
+    },
+
     /**
      * 确认用户昵称
      * @param name
