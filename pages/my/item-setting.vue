@@ -29,13 +29,13 @@
     <MyInfoItem title="交易限额">
       <div slot="content">
         <div v-if="amountLimitEditing">
-          <CurrencyInput v-model="editingSettings.min_deal_cash_amount" :currency="balance.currentCash"/>
+          <CurrencyInput v-model="editingSettings.min_deal_cash_amount" :currency="settings.cash_type"/>
           <span class="fz-12 mx-2">—</span>
-          <CurrencyInput v-model="editingSettings.max_deal_cash_amount" :currency="balance.currentCash"/>
+          <CurrencyInput v-model="editingSettings.max_deal_cash_amount" :currency="settings.cash_type"/>
         </div>
         <div v-else>
-          {{settings.min_deal_cash_amount}} {{balance.currentCash}} — {{settings.max_deal_cash_amount}}
-          {{balance.currentCash}}
+          {{settings.min_deal_cash_amount}} {{settings.cash_type}} — {{settings.max_deal_cash_amount}}
+          {{settings.cash_type}}
         </div>
       </div>
 
@@ -53,8 +53,9 @@
         <div slot="content" v-if="autoReplyEditing">
           <b-form-textarea v-model="editingSettings.auto_reply_content" rows="3"></b-form-textarea>
           <p class="text-right">20-140字</p>
+          <EMsgs :result="$v.editingSettings" :msgs="errorMessages" keyName="auto_reply_content" style="margin-top: -20px;"/>
         </div>
-        <p v-else>{{settings.auto_reply_content}}</p>
+        <p v-else>{{settings.auto_reply_content ? settings.auto_reply_content : '无'}}</p>
       </template>
 
       <div slot="action" class="setting-button-group">
@@ -89,11 +90,17 @@
 </template>
 
 <script>
+  import Vue from 'vue'
   import {mapState} from 'vuex'
   import MySidebar from '~/components/my-sidebar.vue'
   import My2Column from '~/components/my-2column.vue'
   import MyInfoItem from './_c/my-info-item.vue'
   import CurrencyInput from '~/components/currency-input.vue'
+  import EMsgs from '~/components/error-message.vue'
+  import Vuelidate from 'vuelidate'
+  import {minLength, maxLength} from 'vuelidate/lib/validators'
+
+  Vue.use(Vuelidate)
 
   export default {
     name: 'page-item-setting',
@@ -102,6 +109,7 @@
       My2Column,
       MyInfoItem,
       CurrencyInput,
+      EMsgs,
     },
     data() {
       return {
@@ -113,9 +121,25 @@
     },
     layout: 'my',
     computed: {
-      ...mapState(['constant', 'balance', 'user']),
+      ...mapState(['constant', 'user']),
       settings: function () {
         return this.user.settings ? this.user.settings : {}
+      },
+      errorMessages: function () {
+        return {
+          auto_reply_content: {
+            minLength: '最小长度为20',
+            maxLength: '最大长度为140',
+          }
+        }
+      }
+    },
+    validations: {
+      editingSettings: {
+        auto_reply_content: {
+          minLength: minLength(20),
+          maxLength: maxLength(140),
+        }
       }
     },
     async fetch({store}) {
@@ -130,7 +154,10 @@
         this.store2Data()
       },
       onEditAmountLimitConfirm() {
-        this.onEditConfirm().then(res => {
+        this.onEditConfirm({
+          min_deal_cash_amount: this.editingSettings.min_deal_cash_amount,
+          max_deal_cash_amount: this.editingSettings.max_deal_cash_amount
+        }).then(res => {
           this.amountLimitEditing = false
         })
       },
@@ -143,7 +170,12 @@
         this.store2Data()
       },
       onEditAutoReplyConfirm() {
-        this.onEditConfirm().then(res => {
+        this.$v.$touch()
+        if (this.$v.$invalid) return
+
+        this.onEditConfirm({
+          auto_reply_content: this.editingSettings.auto_reply_content
+        }).then(res => {
           this.autoReplyEditing = false
         })
       },
@@ -156,7 +188,9 @@
         this.counterpartyLimitEditing = true
       },
       onEditCounterpartyLimitConfirm() {
-        this.onEditConfirm().then(res => {
+        this.onEditConfirm({
+          counterparty_limit: this.editingSettings.counterparty_limit
+        }).then(res => {
           this.counterpartyLimitEditing = false
         })
       },
@@ -168,9 +202,14 @@
       store2Data() {
         this.$set(this, 'editingSettings', JSON.parse(JSON.stringify(this.settings)))
       },
-      onEditConfirm() {
-        return this.axios.user.setSettings(this.editingSettings).then(res => {
-          this.$store.commit('SET_USER_SETTINGS', this.editingSettings)
+
+      /**
+       * 修改配置
+       * @param {Object} data 将要被修改的配置
+       */
+      onEditConfirm(data) {
+        return this.$store.dispatch('setUserSettings', Object.assign({}, this.settings, data)).then(() => {
+          this.store2Data()
         })
       }
     }

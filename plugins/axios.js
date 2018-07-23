@@ -16,6 +16,10 @@ function sleep(ms = 100) {
 export default ({app, store}) => {
   const options = {
     baseURL: process.client ? clientApiDomain : serverApiDomain,
+    // proxy: {
+    //   host: '127.0.0.1',
+    //   port: '80'
+    // }
   }
   const inst = axios.create(options)
 
@@ -43,6 +47,7 @@ export default ({app, store}) => {
 
       return inst
     } else {
+      if (!req) throw new Error('没有传入 req 参数')
       const cookieString = req.headers.cookie
       const cookies = cookieString ? cookieParser.parse(cookieString) : {}
       const lang = cookies.lang || store.state.lang.lang || req.headers['Accept-Language']

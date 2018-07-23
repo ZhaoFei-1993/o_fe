@@ -111,7 +111,7 @@ export default {
     FIXED: 'fixed'
   },
   // 商家认证状态
-  MERCHANT_STATUS: {
+  MERCHANT_AUTH_STATUS: {
     CREATED: 'created',
     PASS: 'pass',
     NO: 'no',

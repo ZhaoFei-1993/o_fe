@@ -133,7 +133,7 @@
           <b-nav-item-dropdown id="user-dropdown" :text="'Hi, '+simplifyUserName(user.account.name)">
             <!--<b-dropdown-item :href="accountSetting">账户设置</b-dropdown-item>-->
             <b-dropdown-item to="/wallet"><i class="iconfont icon-manage-account"></i> OTC账户</b-dropdown-item>
-            <b-dropdown-item to="/items"><i class="iconfont icon-manage-item"></i> 广告管理</b-dropdown-item>
+            <b-dropdown-item to="/my/items"><i class="iconfont icon-manage-item"></i> 广告管理</b-dropdown-item>
             <b-dropdown-item to="/my/merchant"><i class="iconfont icon-apply-merchant"></i> 商家申请</b-dropdown-item>
             <!--<b-dropdown-item><i class="iconfont icon-manage-ticket"></i> 工单系统</b-dropdown-item>-->
             <b-dropdown-item @click="signOut"><i class="iconfont icon-logout"></i>退出登录</b-dropdown-item>
@@ -197,7 +197,7 @@
 
   export default {
     head: {
-      link: [{rel: 'stylesheet', href: '//at.alicdn.com/t/font_739076_lv1gd6vgx4g.css'}]
+      link: [{rel: 'stylesheet', href: '//at.alicdn.com/t/font_739076_oy1tmb8d14.css'}]
     },
     components: {
       PublishItemModal,
@@ -249,7 +249,7 @@
       handleUpdateName(evt) {
         // 要验证重名，避免被关闭，需要ref来调用
         evt.preventDefault()
-        this.axios.user.updateName(this.useName).then(_ => {
+        this.axios.user.updateName(this.userName).then(_ => {
           this.$refs.updateNameModal.hide()
         }).catch(err => {
           if (err.code === 72) {

@@ -17,10 +17,8 @@
       </defs>
     </svg>
 
-    <input type="hidden" v-model="rate" :required="required">
-
     <template v-for="n in length">
-      <button :class="{'star-button': true, 'hover': n <= hoverRate, 'filled': n <= rate}"
+      <button :class="{'star-button': true, 'hover': n <= hoverRate, 'filled': n <= value}"
               type="button" :key="n" :disabled="disabled"
               @click="setRate(n)" @mouseover="onOver(n)" @mouseout="onOut()" @keyup="onOver(n)" @keyup.enter="setRate(n)">
         <svg class="star-icon" v-show="isFilled(n)" :height="size" :width="size">
@@ -66,14 +64,21 @@
     data() {
       return {
         hoverRate: 0,      // 当前悬浮的star对应的评分
-        rate: 0,      // 实际的rate
       }
     },
     watch: {
       value: function (newValue) {
-        this.rate = newValue
         this.hoverRate = newValue
       }
+    },
+    created() {
+      let value = this.value
+      if (this.value >= this.length) {
+        value = this.length
+      } else if (this.value < 0) {
+        value = 0
+      }
+      this.hoverRate = value
     },
     methods: {
       onOver(index) {
@@ -84,15 +89,14 @@
       onOut() {
         if (this.readonly) return
 
-        this.hoverRate = this.rate
+        this.hoverRate = this.value
       },
       setRate(index) {
         if (this.readonly) return
 
-        this.$emit('beforeRate', this.rate)
-        this.rate = index
-        this.$emit('input', this.rate)
-        this.$emit('afterRate', this.rate)
+        this.$emit('beforeRate', index)
+        this.$emit('input', index)
+        this.$emit('afterRate', index)
       },
       isFilled(index) {
         return index <= this.hoverRate
@@ -100,16 +104,6 @@
       isEmpty(index) {
         return index > this.hoverRate || (!this.value && !this.hoverRate)
       },
-    },
-    created() {
-      let value
-      if (this.value >= this.length) {
-        value = this.length
-      } else if (this.value < 0) {
-        value = 0
-      }
-      this.hoverRate = value
-      this.rate = value
     },
   }
 </script>

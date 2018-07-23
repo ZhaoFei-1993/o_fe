@@ -23,6 +23,10 @@ export default (axios) => {
       })
     },
 
+    async editItem(item) {
+      return axios.put(`/items/${item.id}`, item)
+    },
+
     /**
      * 获取我的广告列表
      * @param {ITEM_STATUS} status
@@ -50,7 +54,7 @@ export default (axios) => {
       })
     },
     async delete(id) {
-      return axios.post(`/items/${id}`)
+      return axios.delete(`/items/${id}`)
     }
   }
 }

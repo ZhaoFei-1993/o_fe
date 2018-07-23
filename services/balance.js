@@ -29,7 +29,7 @@ export default (axios) => {
      * 获取汇率
      */
     exchangeRate() {
-      return Promise.resolve(require('./mock/balance').exchangeRate)
+      // return Promise.resolve(require('./mock/balance').exchangeRate)
       return axios.get('/system/market/price')
     }
   }

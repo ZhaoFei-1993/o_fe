@@ -84,6 +84,11 @@ export default () => {
         commit('SET_USER_SETTINGS', data.data)
       })
     },
+    setUserSettings({commit}, settings) {
+      return this.app.axios.user.setSettings(settings).then(res => {
+        commit('SET_USER_SETTINGS', settings)
+      })
+    },
     fetchUserQualification({commit, state, rootState}) {
       return this.app.axios.user.qualification().then(data => {
         commit('SET_USER_QUALIFICATION', data.data)

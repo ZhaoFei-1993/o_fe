@@ -24,20 +24,20 @@
       账户安全
       <span class="my-security-level">
         安全等级:
-        <StarRate :length="5" :value="userAccount.securityLevel" :readonly="true"/>
+        <StarRate :length="5" :value="user.account.securityLevel" :readonly="true"/>
       </span>
     </h3>
     <p class="layout-my-desc">互联网账号存在被盗风险，建议您提高账户安全等级</p>
     <MyInfoItem title="邮箱">
-      <p slot="content">已绑定 <span> {{userAccount.email}}</span></p>
+      <p slot="content">已绑定 <span> {{user.account.email}}</span></p>
       <b-btn slot="action" variant="outline-green" size="xs" href="//www.coinex.com/my/info/basic" target="_blank">修改</b-btn>
     </MyInfoItem>
     <MyInfoItem title="手机">
-      <p slot="content">已绑定 <span> {{userAccount.mobile}}</span></p>
+      <p slot="content">已绑定 <span> {{user.account.mobile}}</span></p>
       <b-btn slot="action" variant="outline-green" size="xs" href="//www.coinex.com/my/info/security" target="_blank">设置</b-btn>
     </MyInfoItem>
     <MyInfoItem title="谷歌验证码">
-      <p slot="content">{{userAccount.is_have_totp_auth ? '已绑定' : '未绑定'}}</p>
+      <p slot="content">{{user.account.is_have_totp_auth ? '已绑定' : '未绑定'}}</p>
       <b-btn slot="action" variant="outline-green" size="xs" href="//www.coinex.com/my/info/security" target="_blank">设置</b-btn>
     </MyInfoItem>
     <MyInfoItem title="登录密码">
@@ -45,8 +45,8 @@
       <b-btn slot="action" variant="outline-green" size="xs" href="//www.coinex.com/my/info/security" target="_blank">设置</b-btn>
     </MyInfoItem>
     <MyInfoItem title="实名认证">
-      <p slot="content">{{userAccount.kyc_status === constant.KYC_STATUS.PASS ? '已认证' : '未认证'}}</p>
-      <b-btn slot="action" v-if="userAccount.kyc_status !== constant.KYC_STATUS.PASS" variant="outline-green" size="xs" href="//www.coinex.com/my/info/auth/realname" target="_blank">认证</b-btn>
+      <p slot="content">{{user.account.kyc_status === constant.KYC_STATUS.PASS ? '已认证' : '未认证'}}</p>
+      <b-btn slot="action" v-if="user.account.kyc_status !== constant.KYC_STATUS.PASS" variant="outline-green" size="xs" href="//www.coinex.com/my/info/auth/realname" target="_blank">认证</b-btn>
     </MyInfoItem>
   </CBlock>
 </template>
@@ -70,11 +70,14 @@
     data() {
       return {}
     },
+    fetch({app, store, req, redirect, route}) {
+      app.axios.init(req)
+      return store.dispatch('fetchUserAccount').catch(err => {
+        app.axios.needAuth(err, redirect, route.fullPath)
+      })
+    },
     computed: {
-      ...mapState(['user', 'constant']),
-      userAccount: function () {
-        return this.user.account ? this.user.account : {}
-      }
+      ...mapState(['user', 'constant'])
     }
   }
 </script>
