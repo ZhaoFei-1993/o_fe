@@ -64,6 +64,7 @@
           this.needVerify = false
           this.refreshOrderStatus()
         }).catch(err => {
+          this.$errorTips(`提交失败${err}`)
           this.needVerify = true
         })
       },

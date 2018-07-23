@@ -4,8 +4,10 @@ export default (axios) => {
       return axios.post('/orders', payload)
     },
     getOrderList(query) {
-      return Promise.resolve(require('./mock/order').orderList)
-      return axios.get('/orders', query)
+      // return Promise.resolve(require('./mock/order').orderList)
+      return axios.get('/orders', {
+        params: query,
+      })
     },
     getOrderById(id) {
       return axios.get(`/orders/${id}`)
@@ -19,8 +21,8 @@ export default (axios) => {
     updatePayMethod(id, method) {
       return axios.post(`/orders/${id}`, {method})
     },
-    confirmPay(id) {
-      return axios.post(`/orders/${id}/pay`)
+    confirmPay(id, payload) {
+      return axios.post(`/orders/${id}/pay`, payload)
     },
     confirmReceipt(id, payload) {
       return axios.post(`/orders/${id}/receipt`, payload)
@@ -38,7 +40,7 @@ export default (axios) => {
       return axios.delete(`/orders/${id}/appeal`)
     },
     cancelOrder(id) {
-      return axios.delete(`/order/${id}/cancel`)
+      return axios.post(`/orders/${id}/cancel`)
     }
   }
 }

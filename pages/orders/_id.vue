@@ -329,7 +329,9 @@
 
   const PAID_CAN_APPEAL = 30 * 60 * 1000 // 三十分钟
   const SUCCESS_CAN_APPEAL = 7 * 24 * 3600 * 1000 // 七天
-  // const REFRESH_ORDER_INTERVAL = 5000
+  const ORDER_PAY_TIME = 15 // 15分钟（未换算）
+  const REFRESH_ORDER_INTERVAL = 5000
+
   export default {
     data() {
       return {
@@ -365,11 +367,11 @@
       cannotSubmitAppeal() {
         return !(this.appealReason && this.appealComment && this.appealComment.length > 15)
       },
-      isMaker() {
+      isMerchant() {
         return this.order.merchant_id === this.user.account.id
       },
       isBuySide() {
-        return this.order.merchant_side === this.constant.SIDE.BUY && this.isMaker
+        return this.order.merchant_side === this.constant.SIDE.BUY ? this.isMerchant : !this.isMerchant
       },
       isBuyerAppeal() {
         return this.order.user_side === this.constant.SIDE.BUY && this.appeal.user_id === this.order.user_id
@@ -465,27 +467,6 @@
             this.selectedMethod = this.order.payment_methods[0]
             this.counterparty = this.user.account.id === this.order.user_id ? this.order.merchant : this.order.user
             this.checkOrderStatus()
-            // 随机测试maker,taker
-            if (Math.random() < 0.5) {
-              this.order.merchant_id = this.user.account.id
-            } else {
-              this.order.user_id = this.user.account.id
-            }
-            // TODO 删除以上测试用代码
-            if (this.order.status === 'created') {
-              this.payRemainTime = Math.floor(((this.order.place_time + 15 * 60) * 1000 - Date.now()) / 1000)
-              if (this.payRemainTime <= 0) {
-                this.order.status = this.constant.ORDER_STATUS.CLOSED.value
-              }
-              clearInterval(this.secondCountdown)
-              this.secondCountdown = setInterval(() => {
-                if (this.payRemainTime > 0) {
-                  this.payRemainTime--
-                } else {
-                  clearInterval(this.secondCountdown)
-                }
-              }, 1000)
-            }
             if (this.order.status === this.constant.ORDER_STATUS.PAID.value || this.order.status === this.constant.ORDER_STATUS.SUCCESS.value) {
               this.getAppeal()
             }
@@ -511,10 +492,23 @@
       },
       checkOrderStatus() {
         if (this.order.status === this.constant.ORDER_STATUS.CREATED.value || this.order.status === this.constant.ORDER_STATUS.PAID.value || this.order.appeal_status !== '') {
-          // TODO 开发时暂不开启自动刷新
-          // setTimeout(() => {
-          //   this.refreshOrderStatus()
-          // }, REFRESH_ORDER_INTERVAL)
+          if (this.order.status === this.constant.ORDER_STATUS.CREATED.value) {
+            this.payRemainTime = Math.floor(((this.order.place_time + ORDER_PAY_TIME * 60) * 1000 - Date.now()) / 1000)
+            if (this.payRemainTime <= 0) {
+              this.order.status = this.constant.ORDER_STATUS.CLOSED.value
+            }
+            clearInterval(this.secondCountdown)
+            this.secondCountdown = setInterval(() => {
+              if (this.payRemainTime > 0) {
+                this.payRemainTime--
+              } else {
+                clearInterval(this.secondCountdown)
+              }
+            }, 1000)
+          }
+          setTimeout(() => {
+            this.refreshOrderStatus()
+          }, REFRESH_ORDER_INTERVAL)
         }
       },
       confirmPay() {
@@ -522,9 +516,7 @@
           title: '确认付款',
           content: (<div>确认您已向买方付款？<span class="c-red">未付款点击“我已付款”将被冻结账户。</span></div>),
           onOk: () => {
-            this.axios.order.updatePayMethod(this.order.id, this.selectedMethod).then(response => {
-              this.axios.order.confirmPay(this.order.id)
-            })
+            this.axios.order.confirmPay(this.order.id, this.selectedMethod)
           }
         })
       },
