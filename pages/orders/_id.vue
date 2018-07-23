@@ -354,11 +354,14 @@
       UserStatsProfile,
       ConfirmReceipt,
     },
-    fetch({store}) {
+    fetch({store, app, req, redirect, route}) {
+      app.axios.init(req)
       return Promise.all([
         store.dispatch('fetchUserAccount'),
         store.dispatch('fetchSystemConstant'),
-      ])
+      ]).catch(err => {
+        app.axios.needAuth(err, redirect, route.fullPath)
+      })
     },
     beforeDestroy() {
       clearInterval(this.secondCountdown)

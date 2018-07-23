@@ -53,7 +53,8 @@
         <div slot="content" v-if="autoReplyEditing">
           <b-form-textarea v-model="editingSettings.auto_reply_content" rows="3"></b-form-textarea>
           <p class="text-right">20-140字</p>
-          <EMsgs :result="$v.editingSettings" :msgs="errorMessages" keyName="auto_reply_content" style="margin-top: -20px;"/>
+          <EMsgs :result="$v.editingSettings" :msgs="errorMessages" keyName="auto_reply_content"
+                 style="margin-top: -20px;"/>
         </div>
         <p v-else>{{settings.auto_reply_content ? settings.auto_reply_content : '无'}}</p>
       </template>
@@ -142,8 +143,11 @@
         }
       }
     },
-    async fetch({store}) {
-      await store.dispatch('fetchUserSettings')
+    async fetch({store, app, req, redirect, route}) {
+      app.axios.init(req)
+      await store.dispatch('fetchUserSettings').catch(err => {
+        app.axios.needAuth(err, redirect, route.fullPath)
+      })
     },
     mounted() {
       this.store2Data()

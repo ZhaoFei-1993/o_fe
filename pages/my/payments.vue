@@ -230,11 +230,14 @@
         form: this.validationConf.validations
       }
     },
-    fetch({store}) {
+    fetch({store, app, req, redirect, route}) {
+      app.axios.init(req)
       return Promise.all([
         store.dispatch('fetchUserPayments'),
         store.dispatch('fetchSystemConstant'),
-      ])
+      ]).catch(err => {
+        app.axios.needAuth(err, redirect, route.fullPath)
+      })
     },
     methods: {
       onPaymentStatusChange(payment, checked) {

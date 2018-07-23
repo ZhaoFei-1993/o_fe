@@ -60,18 +60,18 @@
     <div class="row-header">
       <span>资产流水</span>
       <div class="float-right">
-        <div style="display: inline-block;" >
+        <div style="display: inline-block;">
           <span style="font-size: 12px;">币种：</span>
           <b-form-select style="width: 100px;"
-            v-model="historyQueryParams.coin_type"
-            :options="[{ text: '全部', value: null }, ...constant.COIN_TYPE_OPTIONS]">
+                         v-model="historyQueryParams.coin_type"
+                         :options="[{ text: '全部', value: null }, ...constant.COIN_TYPE_OPTIONS]">
           </b-form-select>
         </div>
         <div style="display: inline-block;margin-left: 30px;">
           <span style="font-size: 12px;">流水类型：</span>
           <b-form-select style="width: 100px;"
-            v-model="historyQueryParams.side"
-            :options="operationOptions">
+                         v-model="historyQueryParams.side"
+                         :options="operationOptions">
           </b-form-select>
         </div>
       </div>
@@ -90,9 +90,9 @@
       </b-table>
       <blank v-if="!assetHistoryItems.length"></blank>
       <b-pagination v-if="assetHistoryItems.length"
-        :total-rows="historyQueryParams.totalRows"
-        v-model="historyQueryParams.page"
-        :per-page="historyQueryParams.limit">
+                    :total-rows="historyQueryParams.totalRows"
+                    v-model="historyQueryParams.page"
+                    :per-page="historyQueryParams.limit">
       </b-pagination>
     </c-block>
 
@@ -108,7 +108,7 @@
           <b-form-select v-model="form.to" :options="walletOptions" @change="onSwap"></b-form-select>
         </b-form-group>
         <b-form-group label="划转数量" horizontal>
-            <ExtendedInputNumber v-model="form.amount" :min="0" :max="+availableAmount" class="amount-input" />
+          <ExtendedInputNumber v-model="form.amount" :min="0" :max="+availableAmount" class="amount-input"/>
         </b-form-group>
         <b-form-group horizontal>
           <div class="amount-available">
@@ -130,7 +130,7 @@
   import cBlock from '~/components/c-block'
   import Blank from '~/components/blank'
   import FundPie from './_c/fund-pie'
-  import { mapState } from 'vuex'
+  import {mapState} from 'vuex'
 
   const P_LIMIT = 10 // 每页条数, P_前缀表示页面组件全局常量
   const P_INTERVAL = 5000 // 资产轮询时间
@@ -177,16 +177,16 @@
               width: '110px',
               paddingLeft: '28px',
             },
-            thClass: [ 'text-left' ],
-            tdClass: [ 'text-left', 'td-pl' ],
+            thClass: ['text-left'],
+            tdClass: ['text-left', 'td-pl'],
           },
           total: {
             label: '总额',
             thStyle: {
               width: '250px',
             },
-            thClass: [ 'text-right' ],
-            tdClass: [ 'text-right' ],
+            thClass: ['text-right'],
+            tdClass: ['text-right'],
             sortable: false,
           },
           frozen: {
@@ -194,8 +194,8 @@
             thStyle: {
               width: '250px',
             },
-            thClass: [ 'text-right' ],
-            tdClass: [ 'text-right' ],
+            thClass: ['text-right'],
+            tdClass: ['text-right'],
             sortable: false,
           },
           available: {
@@ -203,13 +203,13 @@
             thStyle: {
               width: '250px',
             },
-            thClass: [ 'text-right' ],
-            tdClass: [ 'text-right' ],
+            thClass: ['text-right'],
+            tdClass: ['text-right'],
             sortable: false,
           },
           action: {
             label: '与主站资金划转',
-            tdClass: [ 'text-center' ],
+            tdClass: ['text-center'],
             thStyle: {
               textAlign: 'center',
             },
@@ -225,16 +225,16 @@
               width: '110px',
               paddingLeft: '28px',
             },
-            thClass: [ 'text-left' ],
-            tdClass: [ 'text-left', 'td-pl' ],
+            thClass: ['text-left'],
+            tdClass: ['text-left', 'td-pl'],
           },
           create_time: {
             label: '时间',
             thStyle: {
               width: '250px',
             },
-            thClass: [ 'text-right' ],
-            tdClass: [ 'text-right' ],
+            thClass: ['text-right'],
+            tdClass: ['text-right'],
             sortable: false,
           },
           business_type: {
@@ -242,8 +242,8 @@
             thStyle: {
               width: '250px',
             },
-            thClass: [ 'text-right' ],
-            tdClass: [ 'text-right' ],
+            thClass: ['text-right'],
+            tdClass: ['text-right'],
             sortable: false,
           },
           amount: {
@@ -251,13 +251,13 @@
             thStyle: {
               width: '250px',
             },
-            thClass: [ 'text-right' ],
-            tdClass: [ 'text-right' ],
+            thClass: ['text-right'],
+            tdClass: ['text-right'],
             sortable: false,
           },
           total: {
             label: '余额',
-            tdClass: [ 'text-center' ],
+            tdClass: ['text-center'],
             thStyle: {
               textAlign: 'center',
             },
@@ -275,12 +275,15 @@
         timer: null,
       }
     },
-    fetch({ store }) {
+    fetch({store, app, req, redirect, route}) {
+      app.axios.init(req)
       return Promise.all([
         store.dispatch('fetchOtcBalance'),
         store.dispatch('fetchCoinexBalance'),
         store.dispatch('fetchExchangeRate'),
-      ])
+      ]).catch(err => {
+        app.axios.needAuth(err, redirect, route.fullPath)
+      })
     },
     created() {
       this.fetchBalanceHistory()
@@ -384,11 +387,11 @@
         }
         this.axios.balance.history(query).then(historyData => {
           if (historyData.code === 0 && historyData.data) {
-            const { data, curr_page: currentPage, total: totalRows } = historyData.data
+            const {data, curr_page: currentPage, total: totalRows} = historyData.data
             this.historyQueryParams.page = currentPage
             this.historyQueryParams.totalRows = totalRows
             this.assetHistoryItems = data.map(item => {
-              const { business_type: bussType } = item
+              const {business_type: bussType} = item
               return {
                 ...item,
                 business_type: this.bussinessTypeMap[bussType] || bussType,
@@ -422,7 +425,7 @@
         this.form.amount = 0
       },
       onShowTransferModal(type, item) {
-        const { coin_type: coinType } = item
+        const {coin_type: coinType} = item
         if (type === 'in') {
           this.form.from = 'coinex'
           this.form.to = 'otc'
@@ -464,17 +467,17 @@
       display: inline-block;
       position: relative;
       user-select: none;
-      .menu-container{
+      .menu-container {
         position: absolute;
         top: -20px;
         left: 22px;
         padding-top: 30px;
 
-        &.en_US{
+        &.en_US {
           left: 0px;
         }
       }
-      .list-menu{
+      .list-menu {
         transform: translate3d(-31px, 14px, 0px);
         z-index: 9999;
         will-change: transform;
@@ -496,7 +499,7 @@
 
       .menu-select-wrapper {
         cursor: pointer;
-        &::after{
+        &::after {
           display: inline-block;
           width: 0;
           height: 0;
