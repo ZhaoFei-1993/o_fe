@@ -9,14 +9,38 @@
       </div>
       <div class="order-table">
         <b-table :fields="orderTableFields" :items="orderTableItems">
+          <template slot="HEAD__order_type" slot-scope="{ item }">
+            <div>
+              <span>类型</span>
+              <b-dropdown variant="block" no-caret class="filter-dropdown" menu-class="filter-menu">
+                <template slot="button-content">
+                  <i class="iconfont icon-filter"></i>
+                </template>
+                <b-dropdown-item-button @click="onClickHeadFilter({ key: 'side', value: option.value })" v-for="(option, index) in orderTypeFilterOptions" :key="index">{{ option.text }}</b-dropdown-item-button>
+              </b-dropdown>
+            </div>
+          </template>
+          <template slot="HEAD_coin_type" slot-scope="{ item }">
+            <div>
+              <span>币种</span>
+              <b-dropdown variant="block" no-caret class="filter-dropdown" menu-class="filter-menu">
+                <template slot="button-content">
+                  <i class="iconfont icon-filter"></i>
+                </template>
+                <b-dropdown-item-button @click="onClickHeadFilter({ key: 'coin_type', value: option.value })" v-for="(option, index) in coinTypeFilterOptions" :key="index">{{ option.text }}</b-dropdown-item-button>
+              </b-dropdown>
+            </div>
+          </template>
           <template slot="id" slot-scope="{ item }">
-            <b-link>{{ item.id }}</b-link>
+            <b-link :to="`/orders/${item.id}`">{{ item.id }}</b-link>
           </template>
           <template slot="_order_type" slot-scope="{ item }">
-            <!-- 自定义的属性 -->
-            <span :class="['order-type', item._order_type === 'buy' ? 'order-type-buy' : 'order-type-sell']">
-              {{ item._order_type === 'buy' ? '买' : '卖' }}
+            <span :class="['order-type', item._order_type === constant.SIDE.BUY ? 'order-type-buy' : 'order-type-sell']">
+              {{ item._order_type === constant.SIDE.BUY ? '买' : '卖' }}
             </span>
+          </template>
+          <template slot="place_time" slot-scope="{ item }">
+            {{ item.place_time | getTimeText }}
           </template>
           <template slot="coin_amount" slot-scope="{ item }">
             {{ item.coin_amount | formatMoney }}
@@ -26,20 +50,19 @@
           </template>
           <template slot="status" slot-scope="{ item, detailsShowing, toggleDetails }">
             {{ constant?constant.ORDER_STATUS[item.status.toUpperCase()].text:'' }}
-            <span @click.stop="toggleDetails" v-if="item.status === 'created'" class="detail"
+            <span @click.stop="toggleDetails" v-if="item.status === constant.ORDER_STATUS.CREATED.value || item.status === constant.ORDER_STATUS.PAID.value" class="detail"
                   :class="[ detailsShowing ? 'show-detail' : 'hidden-detail' ]"><i
               class="iconfont icon-detail"></i></span>
           </template>
           <template slot="row-details" slot-scope="{ item }">
             <div class="detail-wrapper">
               <div class="col1">
-                <div class="detail-h1">
-                  <i class="iconfont icon-arrow-up"></i>
+                <div class="detail-h1 detail-flex">
+                  <span :class="['arrow-icon', item._order_type === constant.SIDE.BUY ? 'buy-arrow-icon' : 'sell-arrow-icon']"></span>
                   <span>购买 {{ item.coin_type }}</span>
                 </div>
                 <div class="detail-h2">
-                  向
-                  <b-link>{{ item.pay_method.accouont_no }}</b-link>
+                  向<b-link>{{ item.merchant.name }}</b-link>
                 </div>
               </div>
               <div class="col2">
@@ -51,35 +74,39 @@
                 </div>
               </div>
               <div class="col3">
-                <div class="payment-method">
-                  <i v-if="item._payment_method.method === 'wechat'" class="iconfont icon-wechat-round"></i>
-                  <i v-if="item._payment_method.method === 'bankcard'" class="iconfont icon-bankcard"></i>
-                  <i v-if="item._payment_method.method === 'alipay'" class="iconfont icon-alipay"></i>
-                  <select v-model="item._payment_method">
-                    <option v-for="payment in item.merchantPaymentMethods" :value="payment">
-                      <span v-if="payment.method === 'bankcard'">银行转帐</span>
-                      <span v-if="payment.method === 'wechat'">微信支付</span>
-                      <span v-if="payment.method === 'alipay'">支付宝支付</span>
-                    </option>
-                  </select>
+                <div class="payment-method"
+                  v-if="item.status !== constant.ORDER_STATUS.CANCEL.value
+                  && item.status !== constant.ORDER_STATUS.CLOSED.value">
+                  <template v-if="item.status === constant.ORDER_STATUS.CREATED.value">
+                    <i v-if="item._selected_payment_method.method === constant.PAYMENT_TYPES.BANKCARD" class="iconfont icon-bankcard"></i>
+                    <i v-if="item._selected_payment_method.method === constant.PAYMENT_TYPES.WECHAT" class="iconfont icon-wechat-round"></i>
+                    <i v-if="item._selected_payment_method.method === constant.PAYMENT_TYPES.ALIPAY" class="iconfont icon-alipay"></i>
+                    <select v-model="item._selected_payment_method">
+                      <option v-for="payment in item.payment_methods" :value="payment">
+                        <span v-if="payment.method === constant.PAYMENT_TYPES.BANKCARD">银行转帐</span>
+                        <span v-if="payment.method === constant.PAYMENT_TYPES.WECHAT">微信支付</span>
+                        <span v-if="payment.method === constant.PAYMENT_TYPES.ALIPAY">支付宝支付</span>
+                      </option>
+                    </select>
+                  </template>
                 </div>
               </div>
               <div class="col4">
                 <div class="detail-text">
-                  {{ item._payment_method.account_name }}
+                  {{ item._selected_payment_method.account_name }}
                 </div>
                 <div class="detail-text">
-                  {{ item._payment_method.account_no }}
+                  {{ item._selected_payment_method.account_no }}
                   <b-popover :target="`qr-${item.id}`"
                              placement="top"
                              triggers="hover focus">
-                    <img style="display: block;width: 120px;height: 120px;" :src="item._payment_method.qr_code_image">
+                    <img style="display: block;width: 120px;height: 120px;" :src="item._selected_payment_method.qr_code_image">
                   </b-popover>
                   <span :id="`qr-${item.id}`" style="cursor: pointer;"
-                        v-show="item._payment_method.method !== 'bankcard'"><i class="iconfont icon-qrcode"></i></span>
+                        v-show="item._selected_payment_method.method !== 'bankcard'"><i class="iconfont icon-qrcode"></i></span>
                 </div>
-                <div v-if="item._payment_method.method === 'bankcard'" class="detail-text">
-                  {{ item._payment_method.bank }}，{{ item._payment_method.branch }}
+                <div v-if="item._selected_payment_method.method === 'bankcard'" class="detail-text">
+                  {{ item._selected_payment_method.bank }}，{{ item._selected_payment_method.branch }}
                 </div>
                 <div class="detail-text">
                   备注参考号：<span class="detail-code">{{ `${item.id}`.substr(`${item.id}`.length - 6) }}</span>
@@ -89,25 +116,70 @@
                 </div>
               </div>
               <div class="col5">
-                <div class="detail-text detail-timer">
-                  还剩11分10秒
-                </div>
-                <div class="message-btn">
-                  <i class="iconfont icon-message"></i>
-                </div>
-                <div class="detail-btn-wrapper">
-                  <b-btn size="xs" variant="gradient-yellow" class="detail-btn" @click="confirmPay(item)">我已付款</b-btn>
-                </div>
-                <div class="detail-btn-wrapper">
-                  <b-btn size="xs" variant="outline-green" class="detail-btn" @click="cancelOrder(item)">取消订单</b-btn>
-                </div>
+                <template v-if="item._order_type === constant.SIDE.BUY">
+                  <template v-if="item.status === constant.ORDER_STATUS.CREATED.value">
+                    <div class="detail-text detail-timer">
+                      还剩{{ item._remaining_time | formatDuration }}
+                    </div>
+                    <div class="message-btn">
+                      <i class="iconfont icon-message"></i>
+                    </div>
+                    <div class="detail-btn-wrapper detail-waiting">
+                      等待买家付款
+                    </div>
+                  </template>
+                  <template v-if="item.status === constant.ORDER_STATUS.PAID.value">
+                    <div class="message-btn">
+                      <i class="iconfont icon-message"></i>
+                    </div>
+                    <div class="detail-btn-wrapper">
+                      <b-btn size="xs" variant="gradient-yellow" class="detail-btn" @click="confirmReceipt(item)">确认收款</b-btn>
+                    </div>
+                  </template>
+                </template>
+                <template v-if="item._order_type === constant.SIDE.SELL">
+                  <template v-if="item.status === constant.ORDER_STATUS.CREATED.value">
+                    <div class="detail-text detail-timer">
+                      还剩{{ item._remaining_time | formatDuration }}
+                    </div>
+                    <div class="message-btn">
+                      <i class="iconfont icon-message"></i>
+                    </div>
+                    <div class="detail-btn-wrapper">
+                      <b-btn size="xs" variant="gradient-yellow" class="detail-btn" @click="confirmPay(item)">我已付款</b-btn>
+                    </div>
+                    <div class="detail-btn-wrapper">
+                      <b-btn size="xs" variant="outline-green" class="detail-btn" @click="cancelOrder(item)">取消订单</b-btn>
+                    </div>
+                  </template>
+                  <template v-if="item.status === constant.ORDER_STATUS.PAID.value">
+                    <div class="message-btn">
+                      <i class="iconfont icon-message"></i>
+                    </div>
+                    <div class="detail-btn-wrapper detail-waiting">
+                      等待卖家收款
+                    </div>
+                    <div class="detail-btn-wrapper">
+                      <b-btn size="xs" variant="outline-green" class="detail-btn" @click="cancelOrder(item)">取消订单</b-btn>
+                    </div>
+                  </template>
+                </template>
               </div>
             </div>
           </template>
         </b-table>
         <blank v-if="!orderTableItems.length"></blank>
+        <b-pagination v-if="orderTableItems.length"
+          :total-rows="queryParams.totalRows"
+          v-model="queryParams.page"
+          :per-page="queryParams.limit">
+        </b-pagination>
       </div>
     </c-block>
+    <div class="bottom-tips">
+      温馨提示：每日取消订单超过三笔，将被冻结当天下单权限。
+    </div>
+    <ConfirmReceipt :orderId="curReceiptOrderId" :show-confirm-receipt-modal="showConfirmReceiptModal"/>
   </div>
 </template>
 
@@ -115,11 +187,27 @@
   import {mapState} from 'vuex'
   import cBlock from '~/components/c-block'
   import Blank from '~/components/blank'
+  import ConfirmReceipt from './_c/confirm-receipt'
+
+  const LIMIT = 10
+  const ORDER_PAY_TIME = 15 // 订单可付款时间
 
   export default {
     data() {
       return {
-        selectedPaymentMethod: {},
+        curReceiptOrderId: null, // 当前选中的确认收款item
+        showConfirmReceiptModal: false,
+        timer: null, // 剩余时间定时器
+        orderTypeFilterOptions: [{
+          text: '全部',
+          value: null,
+        }, {
+          text: '买',
+          value: 'buy',
+        }, {
+          text: '卖',
+          value: 'sell',
+        }],
         paymentMethods: [],
         filterOptions: [{
           text: '进行中',
@@ -186,7 +274,7 @@
             thClass: ['text-right'],
             tdClass: ['text-right'],
             thStyle: {
-              width: '180px',
+              width: '160px',
             },
             sortable: false,
           },
@@ -195,7 +283,7 @@
             thClass: ['text-right'],
             tdClass: ['text-right'],
             thStyle: {
-              width: '160px',
+              width: '180px',
             },
             sortable: false,
           },
@@ -209,70 +297,133 @@
           },
         },
         orderTableItems: [],
-        queryParams: {},
+        queryParams: {
+          coin_type: null,
+          side: null,
+          status: 'processing',
+          page: 1,
+          limit: LIMIT,
+        },
       }
     },
-    async asyncData({app, query, req, error, store}) {
-      // const { user = {} } = store.state
-      const user = {id: 1}
-      const merchant = {id: 111}
-      const queryParams = {
-        status: 'processing',
-        side: '',
-        coin_type: '',
-        page: 1,
-        limit: 30,
-      }
-      const [orderData, paymentData] = await Promise.all([
-        app.axios.order.getOrderList(queryParams),
-        app.axios.user.payments(merchant.id),
-      ])
-      let orderTableItems = []
-      let paymentMethods = []
-      let selectedPaymentMethod = {}
-      if (paymentData.code === 0 && paymentData.data) {
-        paymentMethods = paymentData.data
-        selectedPaymentMethod = paymentMethods[0]
-      }
-      if (orderData.code === 0 && orderData.data) {
-        orderTableItems = orderData.data.data.map(item => {
-          let orderType
-          if (user.id === item.user_id) { // taker
-            orderType = item.user_side
-          } else if (user.id === item.merchant_id) {
-            orderType = item.merchant_side
-          }
-          return {
-            ...item,
-            _order_type: orderType,
-            _payment_method: selectedPaymentMethod,
-            merchantPaymentMethods: require('../../services/mock/user').paymentMethods.data,
-            place_time: app.utils.getTimeText(item.place_time),
-          }
-        })
-      }
-      return {
-        orderTableItems,
-        paymentMethods,
-        selectedPaymentMethod,
-      }
+    fetch({ store, app, redirect, route }) {
+      return store.dispatch('fetchUserAccount').catch(err => {
+        app.axios.needAuth(err, redirect, route.fullPath)
+      })
+    },
+    created() {
+      this.fetchOrderList()
+      this.startTimer()
+    },
+    destroyed() {
+      clearInterval(this.timer) // 清除定时器
     },
     components: {
       cBlock,
       Blank,
+      ConfirmReceipt,
     },
     computed: {
       ...mapState(['user', 'constant']),
+      coinTypeFilterOptions() {
+        return [{ text: '全部', value: null }, ...this.constant.COIN_TYPE_OPTIONS]
+      },
+    },
+    watch: {
+      'queryParams.page'() {
+        this.fetchOrderList()
+      },
     },
     methods: {
+      onClickHeadFilter(data) {
+        this.queryParams[data.key] = data.value
+        this.fetchOrderList()
+      },
+      isMerchant(order) { // 是否商家
+        return order.merchant_id === this.user.account.id
+      },
+      fetchOrderList() {
+        const { status, page, limit, coin_type: coinType, side } = this.queryParams
+        this.axios.order.getOrderList({
+          coin_type: coinType,
+          side,
+          status,
+          page,
+          limit,
+        })
+          .then((res) => {
+            if (res.code === 0 && res.data) {
+              const { data, curr_page: currentPage, total: totalRows } = res.data
+              this.queryParams.page = currentPage
+              this.queryParams.totalRows = totalRows
+              this.orderTableItems = data.map(item => {
+                let orderType
+                if (this.isMerchant(item)) { // 商家
+                  orderType = item.merchant_side
+                } else { // 普通用户
+                  orderType = item.user_side
+                }
+                let selectedPaymentMethod = {}
+                if (item.payment_methods && item.payment_methods.length) {
+                  selectedPaymentMethod = { ...item.payment_methods[0] }
+                }
+                return {
+                  ...item,
+                  _order_type: orderType, // 下划线前缀均为自定义属性（下同）订单类型
+                  _selected_payment_method: selectedPaymentMethod, // 用户选中的支付方式
+                  _remaining_time: parseInt((item.place_time * 1000 + ORDER_PAY_TIME * 60000 - Date.now()) / 1000), // 倒计时, 订单付款截止时间 = 创建时间 + 可付款时间
+                }
+              })
+            } else {
+              this.orderTableItems = []
+            }
+          })
+          .catch(err => {
+            console.log(err)
+            this.axios.onError(err)
+          })
+      },
+      startTimer() {
+        clearInterval(this.timer) // 切换到其它tab需要清除定时器
+        if (this.queryParams.status === 'processing') {
+          // 进行中的订单启动定时器
+          this.timer = setInterval(() => {
+            if (!this.orderTableItems.length) { // 数组为空不需要定时器
+              clearInterval(this.timer)
+            } else {
+              for (let i = 0; i < this.orderTableItems.length; i++) {
+                const item = this.orderTableItems[i]
+                const { status } = item
+                let { _remaining_time: remainingTime } = item // 先创建_remaining_time临时变量，防止下面逻辑频繁修改数据导致页面频繁更新
+                const { CREATED, PAID } = this.constant.ORDER_STATUS
+                if (status === CREATED.value || status === PAID.value) { // 针对待付款和已付款订单
+                  remainingTime -= 1 // 剩余时间，单位：秒
+                  if (remainingTime < 0) {
+                    this.orderTableItems.splice(i, 1) // 倒计时结束后数组里删除该条目
+                    i -= 1
+                  } else {
+                    item._remaining_time = remainingTime
+                  }
+                }
+              }
+            }
+          }, 1000)
+        }
+      },
       confirmPay(item) {
         this.$showDialog({
           hideHeader: true,
           title: '确认付款',
           content: (<div>确认您已向买方付款？<span class="c-red">未付款点击“我已付款”将被冻结账户。</span></div>),
           onOk: () => {
-            this.axios.order.updatePayMethod(item.id, item._payment_method).then(response => {
-              this.axios.order.confirmPay(item.id)
+            this.axios.order.confirmPay(item.id).then(res => {
+              if (res.code === 0) { // 成功后跳转到`已结束`
+                this.onClickFilter(1)
+              } else {
+                this.$errorTips(`提交失败code=${res.code}`)
+              }
+            }).catch(err => {
+              this.$errorTips(`提交失败${err}`)
             })
           }
         })
@@ -283,47 +434,35 @@
           title: '取消订单',
           content: (<div>确认取消订单？<span class="c-red">如您已向卖家付款，取消订单您将会损失付款资金。</span></div>),
           onOk: () => {
-            this.axios.order.cancelOrder(item.id).then(response => {
-              console.log(response)
+            this.axios.order.cancelOrder(item.id).then(res => {
+              if (res.code === 0) { // 成功后跳转到`已结束`
+                this.onClickFilter(1)
+              } else {
+                this.$errorTips(`提交失败code=${res.code}`)
+              }
+            }).catch(err => {
+              this.$errorTips(`提交失败${err}`)
             })
           }
         })
       },
       confirmReceipt(item) {
-        this.$showDialog({
-          hideHeader: true,
-          title: '确认收款',
-          content: (<div>确认已收到该笔款项？<span class="c-red">如您没有收到买家付款，确认收款后，放行的数字货币将无法追回。</span></div>),
-          onOk: () => {
-            this.axios.order.confirmReceipt(item.id).then(response => {
-              console.log(response)
-            })
-          }
-        })
-      },
-      renderOrderList() {
-        this.axios.order.getOrderList(this.queryParams)
-          .then((res) => {
-            if (res.code === 0 && res.data) {
-              this.orderTableItems = res.data.data
-            } else {
-              this.orderTableItems = []
-            }
-          })
-          .catch(err => {
-            this.axios.onError(err)
-          })
+        this.curReceiptOrderId = item.id
+        this.showConfirmReceiptModal = true
       },
       onClickFilter(index) {
         for (let i = 0; i < this.filterOptions.length; i++) {
           if (i !== index) {
             this.filterOptions[i].active = false
-          } else {
+          } else if (this.queryParams.status !== this.filterOptions[i].value) {
             this.filterOptions[i].active = true
             this.queryParams.status = this.filterOptions[i].value
-            this.renderOrderList()
+            this.queryParams.coin_type = null
+            this.queryParams.side = null
+            this.fetchOrderList()
           }
         }
+        this.startTimer()
       },
     }
   }
@@ -356,8 +495,32 @@
       border: solid 1px #52cbca;
       color: #52cbca;
     }
+    .bottom-tips {
+      font-size: 14px;
+      color: #6f6f6f;
+      margin-top: 10px;
+    }
     .order-table {
       margin: 20px -30px 0;
+      .filter-menu {
+        width: 100px;
+        min-width: 0;
+        .dropdown-item {
+          height: 25px;
+          line-height: 25px;
+        }
+      }
+      .btn-block {
+        padding: 0;
+        border: 0;
+        background-color: #f9f9f9;
+      }
+      .filter-dropdown {
+        display: inline-block;
+        .iconfont {
+          color: #27313e;
+        }
+      }
       .table thead th {
         background: #f9f9f9;
       }
@@ -412,7 +575,7 @@
         display: flex;
         justify-content: space-between;
         .col1 {
-          flex: 1;
+          flex: 2;
           padding-left: 30px;
           text-align: left;
         }
@@ -429,7 +592,7 @@
           text-align: left;
         }
         .col5 {
-          flex: 1;
+          flex: 1.5;
           text-align: right;
           padding-right: 30px;
         }
@@ -471,6 +634,27 @@
         }
         .detail-btn-wrapper {
           margin-top: 16px;
+        }
+        .detail-flex {
+          display: flex;
+          align-items: center;
+        }
+        .arrow-icon {
+          display: inline-block;
+          width: 18px;
+          height: 18px;
+          background-size: conver;
+          margin-right: 6px;
+        }
+        .buy-arrow-icon {
+          background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAASCAMAAACKJ8VmAAAAflBMVEUAAAD/zz7/1k3/0kj/ugP/4Gv/3F7/yzD/vxD/wRb/3mX/2l//11n/1lL/xSD/zDT/yCf/0UD//2b/32z/0D//uQP/zz3/ugT/vQn/uwL/5oD/0UT/00r/2Fj/zz3/zTf/yjD/yCn/xiP/wxz/wRX/vw//vAj/22D/1lH/1lIYey49AAAAG3RSTlMAgD70zD4+sLCI9PT09LCIiHQF6djMxI2IbQrE6Zy3AAAAeUlEQVQY01XNWRKCMBRE0U6QqAwqOM+zSfa/QWkK6r2cr6770+jtJ53tEWL2o4MuX5rr8iFdFm9KyotWENMnJeVBS13uNJS2McZsbrTrVtMCNjuLzAJMlxED2TrEEEKMNUPPVVeqnHy50ntfOih54YscJGnNkDiN4w+x8Ay6E4hABAAAAABJRU5ErkJggg==)
+        }
+        .sell-arrow-icon {
+          background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAASCAMAAACKJ8VmAAAAY1BMVEUAAAAp6MwU18IAw9Ia374e47sHyssExs0JzMgP08QN0McV18IW2sEY278U18IAxtIz/8wV18Ij5roCw84T1sMa3r0V2cAGyMoKzcgO0cUX278DxcwR1MMT1sEe4rsCw84Bws0sJ7b3AAAAFXRSTlMAC+YzwcGIsLCwiPbBwacfBeaMiIgIvV4AAAAAZUlEQVQY033IVw6AIBAAUXbtvXcF7n9KXaKhJb6vybAX9MAsEPEInMGtBeFEQnCGXlDtnwrUKGetfFZbI2JxkQKxq1umZCcZmZZtJP896Ur8E5tnIeZJ/HMQ6wghhRyM0wSkUX0DO0cKFxu0yBIAAAAASUVORK5CYII=)
+        }
+        .detail-waiting {
+          font-size: 18px;
+          color: #27313e;
         }
       }
     }
