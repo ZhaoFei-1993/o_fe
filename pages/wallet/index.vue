@@ -9,7 +9,7 @@
           </span>
         </p>
         <div class="total-coin">
-          <span> ≈ {{ totalCoin }}</span>
+          <span> ≈ {{ totalCoin | formatMoney }}</span>
           <div class="order-menu" @mouseover="toggleDropdown(true)" @mouseout="toggleDropdown(false)">
             <div class="menu-select-wrapper">
               <span class="menu-select-label">{{ selectedCoin }}</span>
@@ -317,7 +317,9 @@
             }
           })
           this.pieDatas = pieDatas
-          this.totalBalance = `${totalBalance}`
+          this.totalBalance = totalBalance
+          const rate = this.balance.currentRate[this.selectedCoin] // 币种汇率
+          this.totalCoin = rate ? this.totalBalance / rate : 0
           return this.balance.otcBalance
         }
         return []
@@ -399,7 +401,8 @@
         this.showCoinDropdown = !!val
       },
       onChangePriceCoin(index) {
-        this.totalCoin = 1234235
+        const rate = this.balance.currentRate[this.selectedCoin] // 币种汇率
+        this.totalCoin = rate ? this.totalBalance / rate : 0
         this.selectedCoin = this.priceCoins[index]
         this.showCoinDropdown = false
       },
