@@ -146,8 +146,11 @@
         }
       }
     },
-    async fetch({store}) {
-      await store.dispatch('fetchUserSettings')
+    async fetch({store, app, req, redirect, route}) {
+      app.axios.init(req)
+      await store.dispatch('fetchUserSettings').catch(err => {
+        app.axios.needAuth(err, redirect, route.fullPath)
+      })
     },
     mounted() {
       this.store2Data()

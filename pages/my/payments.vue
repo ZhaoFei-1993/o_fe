@@ -180,7 +180,8 @@
             </b-form-group>
           </div>
 
-          <VerifyCode :needGoogle="true" :needSms="true" :needEmail="true"
+          <VerifyCode v-if="user&&user.account"
+                      :needGoogle="user.account.is_have_totp_auth" :needSms="user.account.mobile" :needEmail="true"
                       :sms.sync="verify.sms"
                       :google.sync="verify.google"
                       :email.sync="verify.email"
@@ -277,11 +278,14 @@
         form: this.validationConf.validations
       }
     },
-    fetch({store}) {
+    fetch({store, app, req, redirect, route}) {
+      app.axios.init(req)
       return Promise.all([
         store.dispatch('fetchUserPayments'),
         store.dispatch('fetchSystemConstant'),
-      ])
+      ]).catch(err => {
+        app.axios.needAuth(err, redirect, route.fullPath)
+      })
     },
     methods: {
       onPaymentStatusChange(payment, checked) {

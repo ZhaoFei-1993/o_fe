@@ -153,6 +153,7 @@
         }
         .col-name {
           padding-left: 0;
+          width: 180px;
           overflow: hidden;
           text-overflow: ellipsis;
           .icon-certificated-merchant {
@@ -206,7 +207,7 @@
           </span>
         </div>
         <div class="list-header">
-          <span class="col-narrow">{{selectedSide === constant.SIDE.BUY ? '卖家' : '买家'}}</span>
+          <span class="col-narrow col-name">{{selectedSide === constant.SIDE.BUY ? '卖家' : '买家'}}</span>
           <span class="col-narrow">30天成单/完成率</span>
           <span class="col-narrow">数量</span>
           <span class="col-wide">限额</span>

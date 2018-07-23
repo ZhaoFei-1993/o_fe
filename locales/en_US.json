@@ -440,12 +440,12 @@
         "全部": "全部",
         "提交失败code_f0bb": "提交失败code=",
         "提交失败": "提交失败",
-        "全部****DEPRECATED****": "全部",
-        "提交失败code_f0bb****DEPRECATED****": "提交失败code=",
-        "提交失败****DEPRECATED****": "提交失败",
         "还剩11分10秒****DEPRECATED****": "还剩11分10秒",
         "确认已收到该笔款_e452****DEPRECATED****": "确认已收到该笔款项？",
-        "如您没有收到买家_e210****DEPRECATED****": "如您没有收到买家付款，确认收款后，放行的数字货币将无法追回。"
+        "如您没有收到买家_e210****DEPRECATED****": "如您没有收到买家付款，确认收款后，放行的数字货币将无法追回。",
+        "全部****DEPRECATED****": "全部",
+        "提交失败code_f0bb****DEPRECATED****": "提交失败code=",
+        "提交失败****DEPRECATED****": "提交失败"
     },
     "pages_wallet__c_fund-pie_vue": {},
     "pages_wallet_index_vue": {

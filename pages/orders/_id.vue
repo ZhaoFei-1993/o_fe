@@ -120,7 +120,7 @@
         <div class="d-flex align-items-center">
           <span class="tip">申诉原因</span>
           <b-form-select class="appeal-input" v-model="appealReason"
-                         :options="constant.APPEAL_REASONS"></b-form-select>
+                         :options="constant.appealReasonOptions"></b-form-select>
         </div>
         <div class="d-flex align-items-start mt-20">
           <span class="tip">申诉理由</span>
@@ -347,14 +347,25 @@
         appealComment: null,
         appealReason: null,
         showConfirmReceiptModal: false,
+        refreshOrderTimeout: null,
       }
     },
     components: {
       UserStatsProfile,
       ConfirmReceipt,
     },
+    fetch({store, app, req, redirect, route}) {
+      app.axios.init(req)
+      return Promise.all([
+        store.dispatch('fetchUserAccount'),
+        store.dispatch('fetchSystemConstant'),
+      ]).catch(err => {
+        app.axios.needAuth(err, redirect, route.fullPath)
+      })
+    },
     beforeDestroy() {
       clearInterval(this.secondCountdown)
+      clearTimeout(this.refreshOrderTimeout)
     },
     mounted() {
       this.getCurrentOrder()
@@ -506,7 +517,7 @@
               }
             }, 1000)
           }
-          setTimeout(() => {
+          this.refreshOrderTimeout = setTimeout(() => {
             this.refreshOrderStatus()
           }, REFRESH_ORDER_INTERVAL)
         }
