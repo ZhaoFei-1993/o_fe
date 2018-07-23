@@ -135,6 +135,16 @@
 
         <b-btn slot="action" variant="outline-green" size="xs" @click="onReSubmit">重新提交</b-btn>
       </MyInfoItem>
+      <MyInfoItem v-else-if="merchant.auth_status === constant.MERCHANT_AUTH_STATUS.CANCEL" title="商家认证">
+        <p slot="content" class="c-brand-green" data-todo="文案">审核申请已取消</p>
+
+        <b-btn slot="action" variant="outline-green" size="xs" @click="onReSubmit">重新提交</b-btn>
+      </MyInfoItem>
+      <MyInfoItem v-else title="商家认证">
+        <p slot="content" class="c-brand-green" data-todo="文案">未认证</p>
+
+        <b-btn slot="action" variant="outline-green" size="xs" @click="onReSubmit">提交认证信息</b-btn>
+      </MyInfoItem>
     </template>
     <template v-else>
       <ProgressIndicator :active="-1"/>
@@ -176,7 +186,7 @@
         </InfoItem>
         <InfoItem title="提交认证视频" :required="true">
           <p class="c-6f">请将视频资料发送邮至 bd@coinex.com，邮件主题为"申请成为CoinEx认证商家+CoinEx账户（注册邮箱或手机）"</p>
-          <b-form-checkbox v-model="isVideoSent">我已发送认证视频道 bd@coinex.com 邮箱。</b-form-checkbox>
+          <b-form-checkbox v-model="isVideoSent" id="video-checkbox">我已发送认证视频道 bd@coinex.com 邮箱。</b-form-checkbox>
         </InfoItem>
       </ProgressItem>
 
@@ -200,7 +210,7 @@
 
       <ProgressItem title="资料审核">
         <p class="c-6f">我们将在3个工作日内对您的商家申请资料进行审核。请保持通讯畅通，我们会主动与您取得联系。审核通过后，您即可在OTC平台发布广告。</p>
-        <b-form-checkbox v-model="isContractRead" class="c-6f">
+        <b-form-checkbox v-model="isContractRead" class="c-6f" id="contract-checkbox">
           我已阅读并同意
           <b-link>《认证商家服务协议》</b-link>
           ，并冻结{{MERCHANT_REQUIRED_CET_AMOUNT|formatMoney}} CET作为商家保证金。
