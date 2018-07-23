@@ -132,9 +132,13 @@
           <button class="message-button" hidden><i class="iconfont icon-message"></i></button>
           <b-nav-item-dropdown id="user-dropdown" :text="'Hi, '+simplifyUserName(user.account.name)">
             <!--<b-dropdown-item :href="accountSetting">账户设置</b-dropdown-item>-->
-            <b-dropdown-item to="/wallet"><i class="iconfont icon-manage-account"></i> OTC账户</b-dropdown-item>
-            <b-dropdown-item to="/my/items"><i class="iconfont icon-manage-item"></i> 广告管理</b-dropdown-item>
-            <b-dropdown-item to="/my/merchant"><i class="iconfont icon-apply-merchant"></i> 商家申请</b-dropdown-item>
+            <b-dropdown-item to="/my/security"><i class="iconfont icon-manage-account"></i> 个人中心</b-dropdown-item>
+            <b-dropdown-item v-if="user.merchant && user.merchant.auth_status === constant.MERCHANT_AUTH_STATUS.PASS"
+                             to="/my/items">
+              <i class="iconfont icon-apply-merchant"></i>
+              广告管理
+            </b-dropdown-item>
+            <b-dropdown-item v-else to="/my/merchant"><i class="iconfont icon-apply-merchant"></i> 商家认证</b-dropdown-item>
             <!--<b-dropdown-item><i class="iconfont icon-manage-ticket"></i> 工单系统</b-dropdown-item>-->
             <b-dropdown-item @click="signOut"><i class="iconfont icon-logout"></i>退出登录</b-dropdown-item>
           </b-nav-item-dropdown>
@@ -216,7 +220,7 @@
     },
 
     computed: {
-      ...mapState(['lang', 'user', 'messages']),
+      ...mapState(['lang', 'user', 'messages', 'constant']),
       helpLink() {
         let lang = 'en-us'
         switch (this.lang.lang) {
