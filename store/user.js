@@ -70,6 +70,15 @@ export default () => {
           payment.title = paymentOption.text
           payment.icon = paymentOption.icon
           payment.isActive = paymentOption.status === rootState.constant.PAYMENT_STATUS.ON
+
+          // 这里是在支付方式的管理页面有用到
+          if (payment.qr_code_image) {
+            payment.qrCodeImage = {
+              id: payment.qr_code_image,
+              url: payment.qr_code_image_url,
+              blob: '',
+            }
+          }
         })
         commit('SET_USER_PAYMENTS', data.data)
       })

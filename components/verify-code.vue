@@ -2,7 +2,6 @@
 <style lang="scss">
   .verify-code {
     .error-message {
-      width: 500px;
       margin: 4px auto 0 auto;
     }
 
@@ -29,7 +28,7 @@
   <div class="verify-code">
     <b-form-group v-if="needEmail" class="email-group" label="邮箱验证码:" horizontal>
       <b-input-group class="code-input-group">
-        <b-form-input class="code-input" :value="email" @input="onEmailInput" size="lg"></b-form-input>
+        <b-form-input class="code-input" :value="email" @input="onEmailInput" size="lg" placeholder="6位邮箱验证码"></b-form-input>
         <b-btn slot="append" variant="plain" class="c-brand-green" :disabled="!!emailTimer" @click="onSendEmailCode">
           <span>发送验证码</span> {{emailTimer ? `(${emailCountdown})` : ''}}
         </b-btn>
@@ -40,7 +39,7 @@
     <b-form-group v-if="needGoogle && codeType === constant.VERIFY_CODE_TYPE.GOOGLE"
                   class="google-group" label="Google 验证码:" horizontal>
       <b-input-group class="code-input-group">
-        <b-form-input class="code-input" :value="google" @input="onGoogleInput" size="lg"></b-form-input>
+        <b-form-input class="code-input" :value="google" @input="onGoogleInput" size="lg" placeholder="6位Google验证码"></b-form-input>
       </b-input-group>
       <EMsgs :result="$v" :msgs="invalidMessages" keyName="google"/>
     </b-form-group>
@@ -48,12 +47,12 @@
     <b-form-group v-if="needSms && codeType === constant.VERIFY_CODE_TYPE.SMS"
                   class="sms-group" label="短信验证码:" horizontal>
       <b-input-group class="code-input-group">
-        <b-form-input class="code-input" :value="sms" @input="onSmsInput" size="lg"></b-form-input>
+        <b-form-input class="code-input" :value="sms" @input="onSmsInput" size="lg" placeholder="6位短信验证码"></b-form-input>
         <b-btn slot="append" variant="plain" class="c-brand-green" :disabled="!!smsTimer" @click="onSendSmsCode">
           <span>发送验证码</span> {{smsTimer ? `(${smsCountdown})` : ''}}
         </b-btn>
       </b-input-group>
-      <EMsgs :result="$v" :msgs="invalidMessages" keyName="sms"/>
+      <EMsgs :result="$v" :msgs="invalidMessages" keyName="sms" class="ps-a"/>
     </b-form-group>
 
     <!--sms、google都存在的情况下才可以切换-->

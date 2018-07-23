@@ -31,6 +31,18 @@ export default (axios) => {
     async systemConstant() {
       // return Promise.resolve(require('./mock/misc').constant)
       return axios.get('/system/constant')
-    }
+    },
+
+    upload(file) {
+      const fd = new FormData()
+      fd.append('my_file', file)
+
+      return axios.post('/user/file', fd, {
+        timeout: 20000,
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      })
+    },
   }
 }

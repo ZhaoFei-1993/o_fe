@@ -197,7 +197,7 @@
 
   export default {
     head: {
-      link: [{rel: 'stylesheet', href: '//at.alicdn.com/t/font_739076_oy1tmb8d14.css'}]
+      link: [{rel: 'stylesheet', href: '//at.alicdn.com/t/font_739076_5b3ei22ua03.css'}]
     },
     components: {
       PublishItemModal,
