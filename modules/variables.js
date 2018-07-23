@@ -10,8 +10,8 @@ const MODE = process.env.MODE || 'production'
 
 // 非正式环境(pre & dev)
 if (MODE !== 'production') {
-  loginPage = '//test1.coinex.com/account/signin'
-  signupPage = '//test1.coinex.com/account/signup'
+  loginPage = '//test2.coinex.com/account/signin'
+  signupPage = '//test2.coinex.com/account/signup'
 }
 
 // pre
