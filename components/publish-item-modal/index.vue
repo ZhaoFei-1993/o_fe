@@ -254,13 +254,23 @@ export default {
     },
     pricingTypeOptions: function () {
       const PRICING_TYPE = this.constant.PRICING_TYPE
-      return [{
-        value: PRICING_TYPE.FIXED,
-        text: '固定价格'
-      }, {
-        value: PRICING_TYPE.FLOAT,
-        text: '浮动价格',
-      }]
+      // usdt没有浮动定价
+      if (this.form.coin_type === 'USDT') {
+        return [{
+          value: PRICING_TYPE.FIXED,
+          text: '固定价格'
+        }]
+      } else {
+        return [{
+          value: PRICING_TYPE.FIXED,
+          text: '固定价格'
+        }, {
+          value: PRICING_TYPE.FLOAT,
+          text: '浮动价格',
+        }]
+
+      }
+
     },
     modalShowing: {
       get() {
@@ -376,6 +386,10 @@ export default {
     },
     onCoinTypeChange() {
       this.form.price = this.balance.currentRate[this.form.coin_type]
+      // usdt没有浮动定价
+      if (this.form.coin_type === 'USDT') {
+        this.form.pricing_type = this.constant.PRICING_TYPE.FIXED
+      }
     }
   }
 }

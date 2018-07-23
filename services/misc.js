@@ -29,7 +29,7 @@ export default (axios) => {
     },
 
     async systemConstant() {
-      return Promise.resolve(require('./mock/misc').constant)
+      // return Promise.resolve(require('./mock/misc').constant)
       return axios.get('/system/constant')
     }
   }
