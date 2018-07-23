@@ -275,6 +275,7 @@
       :item="selectedItem"
       v-model="showPlaceOrderModal"
     ></PlaceOrderModal>
+    <!--todo: 根据现在状态发布币种、方向-->
     <PublishItemModal v-model="publishModalShowing" @published="onItemPublished"/>
     <b-modal id="no-payment-modal" :ok-only="true"
              v-model="showConstraintModal" title="交易限制"

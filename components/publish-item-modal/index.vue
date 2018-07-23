@@ -343,32 +343,17 @@ export default {
       form.float_rate = 100
     },
 
-    doCreateItem() {
-      this.form.cash_type = this.balance.currentCash
+    doCreateOrUpdateItem(isEdit) {
       this.axios.item.createItem(this.form).then(res => {
-        this.$showTips('广告发布成功')
+        this.$showTips(isEdit ? '广告编辑成功' : '广告发布成功')
 
-        this.$emit('published', this.form)
+        this.$emit(isEdit ? 'edited' : 'published', this.form)
       }).catch(err => {
         const ERROR_CODE = this.constant.ERROR_CODE
         if (err.code === ERROR_CODE.MISSING_PAY_METHODS) {
           this.$showTips('缺少支付方式，请先添加支付方式')   // todo:可能需要在点击之前就提示
-        } else {
-          this.axios.onError(err)
         }
-      })
-    },
-
-    doEditItem() {
-      this.axios.item.editItem(this.form).then(res => {
-        this.$showTips('广告编辑成功')
-
-        this.$emit('edited', this.form)
-      }).catch(err => {
-        const ERROR_CODE = this.constant.ERROR_CODE
-        if (err.code === ERROR_CODE.MISSING_PAY_METHODS) {
-          this.$showTips('缺少支付方式，请先添加支付方式')   // todo:可能需要在点击之前就提示
-        } else {
+        else {
           this.axios.onError(err)
         }
       })
@@ -380,7 +365,12 @@ export default {
       if (!Number(form.price)) return this.$showTips('价格不可以为0')
       if (!Number(form.coin_amount)) return this.$showTips('请输入交易数量')
 
-      this.editing ? this.doEditItem() : this.doCreateItem()
+      if (this.editingItem) {
+        this.doCreateOrUpdateItem(true)
+      } else {
+        this.form.cash_type = this.balance.currentCash
+        this.doCreateOrUpdateItem(false)
+      }
 
       // if (Math.abs((form.price / this.marketPrice) - 1) > 0.1) {
       //   this.$showDialog({

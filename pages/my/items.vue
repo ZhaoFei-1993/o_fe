@@ -90,7 +90,7 @@
         <b-btn variant="plain-green" size="xs" class="mx-20" @click="onItemOnlineConfirm">确定</b-btn>
         <b-btn variant="plain" size="xs" @click="onItemOnlineCancel">取消</b-btn>
       </div>
-      <Language v-if="editingItem.coin_type" text="最多可售[a][/a][c][/c]" class="c-red mt-1" tag="div">
+      <Language v-if="editingItem.coin_type && editingItem.side === constant.SIDE.SELL" text="最多可售[a][/a][c][/c]" class="c-red mt-1" tag="div">
         <span slot="a"> {{balance.otcMap[editingItem.coin_type].available}} </span>
         <span slot="c">{{editingItem.coin_type}}</span>
       </Language>

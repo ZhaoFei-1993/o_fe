@@ -122,7 +122,10 @@
     <p class="layout-my-desc">成为认证商家，尊享更多时权益</p>
     <template v-if="merchant && !formEditing">
       <MyInfoItem v-if="merchant.auth_status === constant.MERCHANT_AUTH_STATUS.PASS" title="商家认证">
-        <p slot="content" class="c-brand-green">已成为认证商家</p>
+        <template slot="content">
+          <p class="c-brand-green">您已通过商家认证审核，现在可以发布广告了</p>
+          <p class="c-brand-green">商家认证已锁定 100,000 CET</p>
+        </template>
       </MyInfoItem>
 
       <MyInfoItem v-else-if="merchant.auth_status === constant.MERCHANT_AUTH_STATUS.CREATED" title="商家认证">
@@ -131,8 +134,8 @@
         <!--<b-btn slot="action" variant="outline-green" size="xs" @click="onCancelApply">取消申请</b-btn>-->
       </MyInfoItem>
       <MyInfoItem v-else-if="merchant.auth_status === constant.MERCHANT_AUTH_STATUS.NO" title="商家认证">
-        <p slot="content" class="c-brand-green" data-todo="文案">审核未通过，请核查资料后重新提交</p>
-
+        <p slot="content" class="c-brand-green" data-todo="文案">您未通过商家认证审核。</p>
+        <!--<p data-todo="原因">驳回原因：</p>-->
         <b-btn slot="action" variant="outline-green" size="xs" @click="onReSubmit">重新提交</b-btn>
       </MyInfoItem>
       <MyInfoItem v-else-if="merchant.auth_status === constant.MERCHANT_AUTH_STATUS.CANCEL" title="商家认证">
@@ -212,7 +215,7 @@
         <p class="c-6f">我们将在3个工作日内对您的商家申请资料进行审核。请保持通讯畅通，我们会主动与您取得联系。审核通过后，您即可在OTC平台发布广告。</p>
         <b-form-checkbox v-model="isContractRead" class="c-6f" id="contract-checkbox">
           我已阅读并同意
-          <b-link>《认证商家服务协议》</b-link>
+          <b-link href="todo">《认证商家服务协议》</b-link>
           ，并冻结{{MERCHANT_REQUIRED_CET_AMOUNT|formatMoney}} CET作为商家保证金。
         </b-form-checkbox>
       </ProgressItem>
@@ -318,7 +321,7 @@
         if (!cet) {
           return 0
         }
-        return cet.available
+        return cet.available.scientificToDecimal()
       },
     },
 

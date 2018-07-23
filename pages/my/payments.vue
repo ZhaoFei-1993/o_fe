@@ -82,7 +82,7 @@
         添加支付方式
       </b-btn>
     </h3>
-    <p class="layout-my-desc" data-todo="同类最多激活一种吧？">被激活的支付方式将在交易时向买方展示，最多激活3种</p>
+    <p class="layout-my-desc" data-todo="同类最多激活一种吧？">必须使用您本人的实名账户，被开启的支付方式将在交易时向买方展示，最多开启3种</p>
 
     <MyInfoItem v-for="(payment, index) in user.payments" :key="index">
       <div slot="title">
@@ -291,7 +291,11 @@
           payment.status = status
           this.$showTips(status === PAYMENT_STATUS.ON ? '开启成功' : '关闭成功')
         }).catch(err => {
-          this.axios.onError(err)
+          if (err.code === this.constant.ERROR_CODE.ATLEAST_ONE_PAYMENT_METHOD) {
+            this.$errorTips('您有上架中的出售广告或未完成的出售订单，至少需要开启一种支付方式。')
+          } else {
+            this.axios.onError(err)
+          }
         })
       },
 
@@ -312,6 +316,9 @@
       },
 
       onPaymentDelete() {
+        if (this.form.status === this.constant.PAYMENT_STATUS.ON) {
+          return this.$errorTips('该条支付方式开启中，不可删除')
+        }
         this.axios.user.deletePaymentMethod(this.form.id).then(res => {
           this.$showTips('删除成功')
           this.modalShowing = false
