@@ -425,7 +425,8 @@
         this.form.amount = 0
       },
       onShowTransferModal(type, item) {
-        const {coin_type: coinType} = item
+        const { coin_type: coinType } = item
+        this.form.coinType = coinType // 设置划转币种
         if (type === 'in') {
           this.form.from = 'coinex'
           this.form.to = 'otc'

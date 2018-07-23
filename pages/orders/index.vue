@@ -70,8 +70,7 @@
                   <span>购买 {{ item.coin_type }}</span>
                 </div>
                 <div class="detail-h2">
-                  向
-                  <b-link>{{ item.merchant.name }}</b-link>
+                  向{{ item.merchant.name }}
                 </div>
               </div>
               <div class="col2">
@@ -138,17 +137,30 @@
                     <div class="message-btn">
                       <i class="iconfont icon-message"></i>
                     </div>
-                    <div class="detail-btn-wrapper detail-waiting">
-                      等待买家付款
+                    <div class="detail-btn-wrapper">
+                      <b-btn size="xs" variant="gradient-yellow" class="detail-btn" @click="confirmPay(item)">我已付款</b-btn>
+                    </div>
+                    <div class="detail-btn-wrapper">
+                      <b-btn size="xs" variant="outline-green" class="detail-btn" @click="cancelOrder(item)">取消订单</b-btn>
                     </div>
                   </template>
                   <template v-if="item.status === constant.ORDER_STATUS.PAID.value">
                     <div class="message-btn">
                       <i class="iconfont icon-message"></i>
                     </div>
+                    <div class="detail-btn-wrapper detail-waiting">
+                      等待卖家收款
+                    </div>
                     <div class="detail-btn-wrapper">
-                      <b-btn size="xs" variant="gradient-yellow" class="detail-btn" @click="confirmReceipt(item)">确认收款
-                      </b-btn>
+                      <b-btn size="xs" variant="outline-green" class="detail-btn" @click="cancelOrder(item)">取消订单</b-btn>
+                    </div>
+                  </template>
+                  <template v-if="item.status === constant.ORDER_STATUS.CLOSED.value">
+                    <div class="message-btn">
+                      <i class="iconfont icon-message"></i>
+                    </div>
+                    <div class="detail-btn-wrapper detail-waiting">
+                      已结束
                     </div>
                   </template>
                 </template>
@@ -160,25 +172,16 @@
                     <div class="message-btn">
                       <i class="iconfont icon-message"></i>
                     </div>
-                    <div class="detail-btn-wrapper">
-                      <b-btn size="xs" variant="gradient-yellow" class="detail-btn" @click="confirmPay(item)">我已付款
-                      </b-btn>
-                    </div>
-                    <div class="detail-btn-wrapper">
-                      <b-btn size="xs" variant="outline-green" class="detail-btn" @click="cancelOrder(item)">取消订单
-                      </b-btn>
+                    <div class="detail-btn-wrapper detail-waiting">
+                      等待买家付款
                     </div>
                   </template>
                   <template v-if="item.status === constant.ORDER_STATUS.PAID.value">
                     <div class="message-btn">
                       <i class="iconfont icon-message"></i>
                     </div>
-                    <div class="detail-btn-wrapper detail-waiting">
-                      等待卖家收款
-                    </div>
                     <div class="detail-btn-wrapper">
-                      <b-btn size="xs" variant="outline-green" class="detail-btn" @click="cancelOrder(item)">取消订单
-                      </b-btn>
+                      <b-btn size="xs" variant="gradient-yellow" class="detail-btn" @click="confirmReceipt(item)">确认收款</b-btn>
                     </div>
                   </template>
                 </template>
@@ -412,14 +415,13 @@
             } else {
               for (let i = 0; i < this.orderTableItems.length; i++) {
                 const item = this.orderTableItems[i]
-                const {status} = item
-                let {_remaining_time: remainingTime} = item // 先创建_remaining_time临时变量，防止下面逻辑频繁修改数据导致页面频繁更新
-                const {CREATED, PAID} = this.constant.ORDER_STATUS
+                const { status } = item
+                let { _remaining_time: remainingTime } = item // 先创建_remaining_time临时变量，防止下面逻辑频繁修改数据导致页面频繁更新
+                const { CREATED, PAID, CLOSED } = this.constant.ORDER_STATUS
                 if (status === CREATED.value || status === PAID.value) { // 针对待付款和已付款订单
                   remainingTime -= 1 // 剩余时间，单位：秒
                   if (remainingTime < 0) {
-                    this.orderTableItems.splice(i, 1) // 倒计时结束后数组里删除该条目
-                    i -= 1
+                    item.status = CLOSED.value
                   } else {
                     item._remaining_time = remainingTime
                   }
