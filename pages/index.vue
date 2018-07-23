@@ -345,9 +345,10 @@
     },
     mounted() {
       this.getItems()
-      this.requestItems = setInterval(() => {
-        this.getItems()
-      }, refreshInterval)
+      // TODO 正式环境打开刷新
+      // this.requestItems = setInterval(() => {
+      //   this.getItems()
+      // }, refreshInterval)
     },
     beforeDestroy() {
       clearInterval(this.requestItems)

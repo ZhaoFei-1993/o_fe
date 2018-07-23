@@ -21,8 +21,8 @@ export default (axios) => {
     updatePayMethod(id, method) {
       return axios.post(`/orders/${id}`, {method})
     },
-    confirmPay(id) {
-      return axios.post(`/orders/${id}/pay`)
+    confirmPay(id, payload) {
+      return axios.post(`/orders/${id}/pay`, payload)
     },
     confirmReceipt(id, payload) {
       return axios.post(`/orders/${id}/receipt`, payload)
