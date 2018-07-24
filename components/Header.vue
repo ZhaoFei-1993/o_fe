@@ -133,12 +133,14 @@
           <b-nav-item-dropdown id="user-dropdown" :text="'Hi, '+simplifyUserName(user.account.name)">
             <!--<b-dropdown-item :href="accountSetting">账户设置</b-dropdown-item>-->
             <b-dropdown-item to="/my/security"><i class="iconfont icon-manage-account"></i> 个人中心</b-dropdown-item>
+            <b-dropdown-item to="/wallet"><i class="iconfont icon-wallet"></i> OTC钱包</b-dropdown-item>
             <b-dropdown-item v-if="user.merchant && user.merchant.auth_status === constant.MERCHANT_AUTH_STATUS.PASS"
                              to="/my/items">
               <i class="iconfont icon-apply-merchant"></i>
               广告管理
             </b-dropdown-item>
-            <b-dropdown-item v-else to="/my/merchant"><i class="iconfont icon-apply-merchant"></i> 商家认证
+            <b-dropdown-item v-else to="/my/merchant">
+              <i class="iconfont icon-apply-merchant"></i> 商家认证
             </b-dropdown-item>
             <!--<b-dropdown-item><i class="iconfont icon-manage-ticket"></i> 工单系统</b-dropdown-item>-->
             <b-dropdown-item @click="signOut"><i class="iconfont icon-logout"></i>退出登录</b-dropdown-item>
@@ -202,7 +204,7 @@
 
   export default {
     head: {
-      link: [{rel: 'stylesheet', href: '//at.alicdn.com/t/font_739076_5b3ei22ua03.css'}]
+      link: [{rel: 'stylesheet', href: '//at.alicdn.com/t/font_739076_x6i5224yel.css'}]
     },
     components: {
       PublishItemModal,
