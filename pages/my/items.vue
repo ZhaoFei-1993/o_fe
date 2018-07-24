@@ -253,11 +253,17 @@ export default {
       this.isItemAmountEditing = false
     },
     onItemDelete(item) {
-      this.axios.item.delete(item.id).then(res => {
-        this.getItems()
-        this.$showTips('删除成功')
-      }).catch(err => {
-        this.axios.onError(err)
+      this.$showDialog({
+        title: '确认删除广告',
+        content: '删除的广告将不可恢复，确定删除？',
+        onOk: () => {
+          this.axios.item.delete(item.id).then(res => {
+            this.getItems()
+            this.$showTips('删除成功')
+          }).catch(err => {
+            this.axios.onError(err)
+          })
+        }
       })
     },
     onItemPublish() {
