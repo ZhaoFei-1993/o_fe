@@ -304,7 +304,7 @@
   import PublishItemModal from '~/components/publish-item-modal'
   import UserPayments from '~/components/user-payments'
 
-  const refreshInterval = 5000
+  // const refreshInterval = 5000
   export default {
     components: {
       PlaceOrderModal,

@@ -104,7 +104,7 @@
   import CurrencyInput from '~/components/currency-input.vue'
   import EMsgs from '~/components/error-message.vue'
   import Vuelidate from 'vuelidate'
-  import {minLength, maxLength} from 'vuelidate/lib/validators'
+  import {maxLength} from 'vuelidate/lib/validators'
 
   Vue.use(Vuelidate)
 
