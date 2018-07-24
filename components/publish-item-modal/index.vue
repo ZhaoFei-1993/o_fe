@@ -233,7 +233,7 @@ export default {
       default: true
     },
     editing: Boolean,     // 当前是否编辑广告
-    item: Object,         // 被编辑的广告
+    editingItem: Object,         // 被编辑的广告
   },
   data() {
     return {
@@ -315,7 +315,8 @@ export default {
       // 价格限制2位小数
       this.form.price = floatRate.decimalDiv(100).decimalMul(this.balance.currentRate[this.form.coin_type]).setDigit(2)
     },
-    item: function (newValue) {
+    // 用editingItem覆盖form
+    editingItem: function (newValue) {
       Object.assign(this.form, newValue, {
         coin_amount: newValue.remain_coin_amount // 一个现有的广告，其amount是 remain_coin_amount
       })
@@ -348,7 +349,9 @@ export default {
     },
 
     doCreateOrUpdateItem(isEdit) {
-      this.axios.item.createItem(this.form).then(res => {
+      const itemPromise = isEdit ? this.axios.item.updateItem : this.axios.item.createItem
+
+      itemPromise(this.form).then(res => {
         this.$showTips(isEdit ? '广告编辑成功' : '广告发布成功')
 
         this.$emit(isEdit ? 'edited' : 'published', this.form)
@@ -369,7 +372,7 @@ export default {
       if (!Number(form.coin_amount)) return this.$showTips('请输入交易数量')
       if (form.auto_reply_content.length > this.constant.MAX_AUTO_REPLY_LENGTH) return this.$showTips(this.$tt('最大自动回复长度不可超过{0}', this.constant.MAX_AUTO_REPLY_LENGTH))
 
-      if (this.editingItem) {
+      if (this.editing) {
         this.doCreateOrUpdateItem(true)
       } else {
         this.form.cash_type = this.balance.currentCash

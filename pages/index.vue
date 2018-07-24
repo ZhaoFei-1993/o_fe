@@ -277,7 +277,7 @@
       v-model="showPlaceOrderModal"
     ></PlaceOrderModal>
     <!--todo: 根据现在状态发布币种、方向-->
-    <PublishItemModal v-model="publishModalShowing" @published="onItemPublished"/>
+    <PublishItemModal v-model="isItemPublishing" @published="onItemPublished"/>
     <b-modal id="no-payment-modal" :ok-only="true"
              v-model="showConstraintModal" title="交易限制"
              ok-variant="gradient-yellow"
@@ -330,7 +330,7 @@
           outLink: null,
         },
         busy: false,
-        publishModalShowing: false,
+        isItemPublishing: false,
         coinex,
       }
     },
@@ -461,10 +461,10 @@
         })
       },
       onItemPublish() {
-        this.publishModalShowing = true
+        this.isItemPublishing = true
       },
       onItemPublished(item) {
-        this.publishModalShowing = false
+        this.isItemPublishing = false
       },
       checkQualification(item, qualification) {
         if (!item.counterparty_limit) return true

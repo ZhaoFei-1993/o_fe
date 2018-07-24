@@ -190,7 +190,7 @@
         <p class="c-red" v-if="nameDuplicated">该昵称已被占用，请使用其他昵称。</p>
       </div>
     </b-modal>
-    <PublishItemModal v-if="publishModalShowing" v-model="publishModalShowing" @published="onItemPublished"/>
+    <PublishItemModal v-if="isItemPublishing" v-model="isItemPublishing" @published="onItemPublished"/>
   </div>
 </template>
 
@@ -210,7 +210,7 @@
     data() {
       return {
         coinex,
-        publishModalShowing: false,
+        isItemPublishing: false,
         attentionModelShowing: false,
         attention: [],
         nameDuplicated: false,
@@ -290,10 +290,10 @@
         this.$store.dispatch('signOut')
       },
       onItemPublish() {
-        this.publishModalShowing = true
+        this.isItemPublishing = true
       },
       onItemPublished() {
-        this.publishModalShowing = false
+        this.isItemPublishing = false
       },
     }
   }
