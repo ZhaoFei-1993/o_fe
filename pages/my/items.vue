@@ -79,11 +79,27 @@
         <b-btn v-if="itemStatus === constant.ITEM_STATUS.ONLINE" variant="plain-green" size="xxs" @click="onItemOffline(item)">下架</b-btn>
         <div v-else>
           <b-btn variant="plain-green" size="xxs" @click="onItemEdit(item)">编辑</b-btn>
-          <b-btn variant="plain-green" size="xxs" class="mx-10" @click="onItemOnline(item, $event)">上架</b-btn>
+          <b-btn v-if="user.payments && user.payments.length"
+                 variant="plain-green" size="xxs" class="mx-10" @click="onItemOnline(item, $event)">
+            上架
+          </b-btn>
+          <b-btn v-else
+                 :id="`deleteDisabled_${item.id}`"
+                 variant="plain-light-gray" size="xxs" class="mx-10">
+            上架
+          </b-btn>
           <b-btn variant="plain-green" size="xxs" @click="onItemDelete(item)">删除</b-btn>
+
+          <b-tooltip :target="`deleteDisabled_${item.id}`">
+            您尚未激活支付方式，请先激活再上架广告。
+            <b-link to="/my/payments">去激活支付方式</b-link>
+          </b-tooltip>
         </div>
       </template>
     </b-table>
+
+    <Blank v-if="!items.length"/>
+
     <CBlock v-show="isItemAmountEditing" class="item-coin-amount-container" ref="coin-amount" x="20" y="20">
       <div class="item-coin-amount-confirm">
         <CurrencyInput v-model="onlineItemCoinAmount" class="item-coin-amount-confirm-input" :currency="editingItem.cash_type"/>
@@ -95,6 +111,7 @@
         <span slot="c">{{editingItem.coin_type}}</span>
       </Language>
     </CBlock>
+
     <PublishItemModal v-model="publishModalShowing" @published="onItemPublished"/>
     <PublishItemModal v-model="isItemEditing" :item="editingItem" :editing="isItemEditing" @edited="onItemEdited"/>
   </CBlock>
@@ -104,6 +121,7 @@
 import PublishItemModal from '~/components/publish-item-modal/index.vue'
 import ToggleButton from '~/components/toggle-button.vue'
 import CurrencyInput from '~/components/currency-input.vue'
+import Blank from '~/components/blank.vue'
 import {mapState} from 'vuex'
 
 export default {
@@ -112,6 +130,7 @@ export default {
     PublishItemModal,
     CurrencyInput,
     ToggleButton,
+    Blank,
   },
   data() {
     return {

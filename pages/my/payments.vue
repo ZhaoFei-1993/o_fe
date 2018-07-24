@@ -321,7 +321,8 @@
 
       onPaymentDelete() {
         if (this.form.status === this.constant.PAYMENT_STATUS.ON) {
-          return this.$errorTips('该条支付方式开启中，不可删除')
+          // 暂时前端不作处理，不然无法暴露后台问题
+          // return this.$errorTips('该条支付方式开启中，不可删除')
         }
         this.axios.user.deletePaymentMethod(this.form.id).then(res => {
           this.$showTips('删除成功')

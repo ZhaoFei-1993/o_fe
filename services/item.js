@@ -33,7 +33,7 @@ export default (axios) => {
      */
     async userItems(status) {
       // return Promise.resolve(require('./mock/item').userItems)
-      return axios.get('/me/items', {
+      return axios.get('/items/mine', {
         params: {
           status
         }

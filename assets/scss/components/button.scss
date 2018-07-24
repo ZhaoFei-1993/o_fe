@@ -192,6 +192,24 @@ $background-red: #e45555;
   }
 }
 
+.btn-plain-gray {
+  @extend .btn-plain;
+  color: $gray;
+
+  &:hover {
+    color: $gray;
+  }
+}
+
+.btn-plain-light-gray {
+  @extend .btn-plain;
+  color: $lightGray;
+
+  &:hover {
+    color: $lightGray;
+  }
+}
+
 .btn-plain-yellow {
   @extend .btn-plain;
   color: $brandYellow;
