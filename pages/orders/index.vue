@@ -389,11 +389,15 @@
                 if (item.payment_methods && item.payment_methods.length) {
                   selectedPaymentMethod = {...item.payment_methods[0]}
                 }
+                const remainingTime = parseInt((item.place_time * 1000 + ORDER_PAY_TIME * 60000 - Date.now()) / 1000) // 订单付款截止时间 = 创建时间 + 可付款时间(15min)
+                const { CREATED, PAID } = this.constant
+                const { status } = item
                 return {
                   ...item,
                   _order_type: orderType, // 下划线前缀均为自定义属性（下同）订单类型
                   _selected_payment_method: selectedPaymentMethod, // 用户选中的支付方式
-                  _remaining_time: parseInt((item.place_time * 1000 + ORDER_PAY_TIME * 60000 - Date.now()) / 1000), // 倒计时, 订单付款截止时间 = 创建时间 + 可付款时间
+                  _remaining_time: remainingTime,
+                  status: (status === CREATED.value || status === PAID.value) && remainingTime <= 0 ? this.constant.CLOSED.value : item.status, // 前置判断超时关闭的订单
                 }
               })
             } else {

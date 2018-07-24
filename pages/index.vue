@@ -299,12 +299,12 @@
 <script>
   import Vue from 'vue'
   import {mapState} from 'vuex'
-  import {loginPage, webDomain} from '~/modules/variables'
+  import {coinex, loginPage, webDomain} from '~/modules/variables'
   import PlaceOrderModal from '~/components/place-order-modal'
   import PublishItemModal from '~/components/publish-item-modal'
   import UserPayments from '~/components/user-payments'
 
-  const refreshInterval = 5000
+  // const refreshInterval = 5000
   export default {
     components: {
       PlaceOrderModal,
@@ -331,6 +331,7 @@
         },
         busy: false,
         publishModalShowing: false,
+        coinex,
       }
     },
     computed: {
@@ -448,7 +449,7 @@
             this.currentConstraint = constraint.can_place_order ? {
               content: '您尚未完成实名认证，每日限制下单次数为 3 次。',
               linkText: '去完成实名认证',
-              outLink: '//www.coinex.com/my/info/security',
+              outLink: `${this.coinex}/my/info/security`,
             } : {
               content: '您今天累计取消超过 3 次订单，被冻结交易功能。',
               linkText: '了解更多交易规则',

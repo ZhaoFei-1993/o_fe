@@ -427,7 +427,8 @@
         return '交易广告 #' + this.order.item_id + ' ，单价 ' + this.order.price + ' CNY/ ' + this.order.coin_type
       },
       referCode() {
-        return this.order.id
+        // 去最后六位，防止后端返回数字，都先转换为字符串
+        return `${this.order.id}`.lastChars()
       },
       paymentStatusMessage() {
         switch (this.order.status) {
