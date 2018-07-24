@@ -258,8 +258,9 @@
         evt.preventDefault()
         this.axios.user.updateName(this.userName).then(_ => {
           this.$refs.updateNameModal.hide()
+          this.$store.dispatch('fetchUserAccount')
         }).catch(err => {
-          if (err.code === 72) {
+          if (err.code === this.constant.ERROR_CODE.NAME_USED) {
             this.nameDuplicated = true
           } else {
             onApiError(err, this)
