@@ -390,7 +390,7 @@
                   selectedPaymentMethod = {...item.payment_methods[0]}
                 }
                 const remainingTime = parseInt((item.place_time * 1000 + ORDER_PAY_TIME * 60000 - Date.now()) / 1000) // 订单付款截止时间 = 创建时间 + 可付款时间(15min)
-                const { CREATED, PAID } = this.constant
+                const { CREATED, PAID } = this.constant.ORDER_STATUS
                 const { status } = item
                 return {
                   ...item,
