@@ -131,66 +131,64 @@
           <b-form-select v-model="form.method" :options="constant.PAYMENT_OPTIONS" size="lg"></b-form-select>
         </b-form-group>
 
-        <div v-if="form.method && form.method !== 'ALL'">
-          <b-form-group label="姓名:" horizontal>
-            <b-form-input v-model="form.account_name" size="lg"></b-form-input>
-            <EMsgs :result="$v.form" :msgs="validationConf.messages" keyName="account_name"/>
+        <b-form-group label="姓名:" horizontal>
+          <b-form-input v-model="form.account_name" size="lg"></b-form-input>
+          <EMsgs :result="$v.form" :msgs="validationConf.messages" keyName="account_name"/>
+        </b-form-group>
+
+        <div v-if="form.method === 'bankcard'">
+          <b-form-group label="开户银行:" horizontal>
+            <b-form-select v-model="form.bank" :options="constant.bankOptions"></b-form-select>
+            <EMsgs :result="$v.form" :msgs="validationConf.messages" keyName="bank"/>
           </b-form-group>
-
-          <div v-if="form.method === 'bankcard'">
-            <b-form-group label="开户银行:" horizontal>
-              <b-form-select v-model="form.bank" :options="constant.bankOptions"></b-form-select>
-              <EMsgs :result="$v.form" :msgs="validationConf.messages" keyName="bank"/>
-            </b-form-group>
-            <b-form-group label="开户支行:" horizontal>
-              <b-form-input v-model="form.branch" size="lg"></b-form-input>
-              <EMsgs :result="$v.form" :msgs="validationConf.messages" keyName="branch"/>
-            </b-form-group>
-            <b-form-group label="银行卡号:" horizontal>
-              <b-form-input v-model="form.account_no" size="lg"></b-form-input>
-              <EMsgs :result="$v.form" :msgs="validationConf.messages" keyName="account_no"/>
-            </b-form-group>
-          </div>
-
-          <div v-if="form.method === 'alipay'">
-            <b-form-group label="支付宝账号:" horizontal>
-              <b-form-input v-model="form.account_no" size="lg"></b-form-input>
-              <EMsgs :result="$v.form" :msgs="validationConf.messages" keyName="account_no"/>
-            </b-form-group>
-            <b-form-group label="收款二维码:" horizontal>
-              <div class="payment-qrcode">
-                <ImageUploadPreview v-model="form.qrCodeImage"/>
-
-                <p class="ml-10">为确保二维码正确，请添加后先自己进行扫描测试</p>
-              </div>
-            </b-form-group>
-          </div>
-
-          <div v-if="form.method === 'wechat'">
-            <b-form-group label="微信账号:" horizontal>
-              <b-form-input v-model="form.account_no" size="lg"></b-form-input>
-              <EMsgs :result="$v.form" :msgs="validationConf.messages" keyName="account_no"/>
-            </b-form-group>
-            <b-form-group label="收款二维码:" horizontal>
-              <div class="payment-qrcode">
-                <ImageUploadPreview v-model="form.qrCodeImage"/>
-
-                <p class="ml-10">为确保二维码正确，请添加后先自己进行扫描测试</p>
-              </div>
-            </b-form-group>
-          </div>
-
-          <VerifyCode v-if="user&&user.account"
-                      :needGoogle="user.account.is_have_totp_auth" :needSms="user.account.mobile" :needEmail="true"
-                      :sms.sync="verify.sms"
-                      :google.sync="verify.google"
-                      :email.sync="verify.email"
-                      :codeType.sync="verify.codeType"
-                      :businessType="verify.businessType"
-                      :emailSequence.sync="verify.emailSequence"
-                      :smsSequence.sync="verify.smsSequence"
-                      ref="verify-code"/>
+          <b-form-group label="开户支行:" horizontal>
+            <b-form-input v-model="form.branch" size="lg"></b-form-input>
+            <EMsgs :result="$v.form" :msgs="validationConf.messages" keyName="branch"/>
+          </b-form-group>
+          <b-form-group label="银行卡号:" horizontal>
+            <b-form-input v-model="form.account_no" size="lg"></b-form-input>
+            <EMsgs :result="$v.form" :msgs="validationConf.messages" keyName="account_no"/>
+          </b-form-group>
         </div>
+
+        <div v-if="form.method === 'alipay'">
+          <b-form-group label="支付宝账号:" horizontal>
+            <b-form-input v-model="form.account_no" size="lg"></b-form-input>
+            <EMsgs :result="$v.form" :msgs="validationConf.messages" keyName="account_no"/>
+          </b-form-group>
+          <b-form-group label="收款二维码:" horizontal>
+            <div class="payment-qrcode">
+              <ImageUploadPreview v-model="form.qrCodeImage"/>
+
+              <p class="ml-10">为确保二维码正确，请添加后先自己进行扫描测试</p>
+            </div>
+          </b-form-group>
+        </div>
+
+        <div v-if="form.method === 'wechat'">
+          <b-form-group label="微信账号:" horizontal>
+            <b-form-input v-model="form.account_no" size="lg"></b-form-input>
+            <EMsgs :result="$v.form" :msgs="validationConf.messages" keyName="account_no"/>
+          </b-form-group>
+          <b-form-group label="收款二维码:" horizontal>
+            <div class="payment-qrcode">
+              <ImageUploadPreview v-model="form.qrCodeImage"/>
+
+              <p class="ml-10">为确保二维码正确，请添加后先自己进行扫描测试</p>
+            </div>
+          </b-form-group>
+        </div>
+
+        <VerifyCode v-if="user&&user.account"
+                    :needGoogle="user.account.is_have_totp_auth" :needSms="user.account.mobile" :needEmail="true"
+                    :sms.sync="verify.sms"
+                    :google.sync="verify.google"
+                    :email.sync="verify.email"
+                    :codeType.sync="verify.codeType"
+                    :businessType="verify.businessType"
+                    :emailSequence.sync="verify.emailSequence"
+                    :smsSequence.sync="verify.smsSequence"
+                    ref="verify-code"/>
       </b-form>
     </b-modal>
   </CBlock>
@@ -282,6 +280,10 @@
         app.axios.needAuth(err, redirect, route.fullPath)
       })
     },
+    mounted() {
+      // 默认选中银行卡
+      this.form.method = this.constant.PAYMENT_TYPES.BANKCARD
+    },
     methods: {
       onPaymentStatusChange(payment, checked) {
         const PAYMENT_STATUS = this.constant.PAYMENT_STATUS
@@ -304,6 +306,7 @@
         ;['method', 'account_name', 'bank', 'branch', 'account_no', 'qrCodeImage'].forEach((key) => {
           form[key] = ''
         })
+        form.method = this.constant.PAYMENT_TYPES.BANKCARD
         this.form = form
       },
 
