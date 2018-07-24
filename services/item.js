@@ -1,3 +1,9 @@
+function normalizeItem(item) {
+  // price_limit传0代表不限制
+  if (!item.price_limit) item.price_limit = 0
+  return item
+}
+
 export default (axios) => {
   return {
     async getItems(params) {
@@ -7,6 +13,7 @@ export default (axios) => {
     },
     async createItem(item) {
       // return Promise.resolve({ data: 0, code: 0 })
+      item = normalizeItem(item)
       return axios.post('/items', {
         'side': item.side,                               // 方向 buy/sell
         'coin_type': item.coin_type,                          // 币种
@@ -24,6 +31,7 @@ export default (axios) => {
     },
 
     async editItem(item) {
+      item = normalizeItem(item)
       return axios.put(`/items/${item.id}`, item)
     },
 
@@ -33,7 +41,7 @@ export default (axios) => {
      */
     async userItems(status) {
       // return Promise.resolve(require('./mock/item').userItems)
-      return axios.get('/me/items', {
+      return axios.get('/items/mine', {
         params: {
           status
         }

@@ -56,10 +56,10 @@
       <template slot="content">
         <div slot="content" v-if="autoReplyEditing">
           <b-form-textarea v-model="editingSettings.auto_reply_content" rows="3"></b-form-textarea>
-          <p class="text-right" :class="{'c-red': editingSettings.auto_reply_content.length > 140}">
-            {{editingSettings.auto_reply_content.length}} / 140字
+          <p class="text-right" :class="{'c-red': editingSettings.auto_reply_content.length > constant.MAX_AUTO_REPLY_LENGTH}">
+            {{editingSettings.auto_reply_content.length}} / {{constant.MAX_AUTO_REPLY_LENGTH}}字
           </p>
-          <EMsgs :result="$v.editingSettings" :msgs="errorMessages" keyName="auto_reply_content" style="margin-top: -20px;"/>
+          <EMsgs :result="$v.editingSettings" :msgs="editingSettingsValidation.messages" keyName="auto_reply_content" style="margin-top: -20px;"/>
         </div>
         <p v-else class="auto-reply-content">{{settings.auto_reply_content ? settings.auto_reply_content : '无'}}</p>
       </template>
@@ -103,6 +103,7 @@
   import MyInfoItem from './_c/my-info-item.vue'
   import CurrencyInput from '~/components/currency-input.vue'
   import EMsgs from '~/components/error-message.vue'
+  import getSettingConfig from './setting-form-config'
   import Vuelidate from 'vuelidate'
   import {maxLength} from 'vuelidate/lib/validators'
 
@@ -131,19 +132,13 @@
       settings: function () {
         return this.user.settings ? this.user.settings : {}
       },
-      errorMessages: function () {
-        return {
-          auto_reply_content: {
-            maxLength: '最大长度为140',
-          }
-        }
+      editingSettingsValidation: function () {
+        return this.utils.processValidationConfig(getSettingConfig(this.$t, this.$tt))
       }
     },
-    validations: {
-      editingSettings: {
-        auto_reply_content: {
-          maxLength: maxLength(140),
-        }
+    validations: function () {
+      return {
+        editingSettings: this.editingSettingsValidation.validations
       }
     },
     async fetch({store, app, req, redirect, route}) {

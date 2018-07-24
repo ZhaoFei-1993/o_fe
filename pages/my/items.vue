@@ -14,6 +14,39 @@
     .items-table {
       th {
         text-align: center;
+        outline: none;
+      }
+
+      .sorting {
+        &::before {
+          right: .75em;
+          content: "\2193" !important;
+        }
+
+        &::after {
+          right: .25em;
+          content: "\2191" !important;
+        }
+      }
+
+      .order-type {
+        display: inline-block;
+        width: 22px;
+        height: 22px;
+        background-color: #fff;
+        box-shadow: 0 0 10px 0 #ececec;
+        border-radius: 100px;
+        text-align: center;
+        font-size: 12px;
+        line-height: 22px;
+      }
+
+      .order-type-buy {
+        color: #ffbc32;
+      }
+
+      .order-type-sell {
+        color: #52cbca;
       }
     }
 
@@ -59,8 +92,8 @@
       <template slot="side" slot-scope="{ item }">
         <!-- 自定义的属性 -->
         <span :class="['order-type', item.side === 'buy' ? 'order-type-buy' : 'order-type-sell']">
-              {{ item.side === 'buy' ? '买' : '卖' }}
-            </span>
+          {{ item.side === 'buy' ? '买' : '卖' }}
+        </span>
       </template>
       <template slot="remain_coin_amount" slot-scope="{ item }">
         {{ formatMoney(item.remain_coin_amount) }}
@@ -79,11 +112,27 @@
         <b-btn v-if="itemStatus === constant.ITEM_STATUS.ONLINE" variant="plain-green" size="xxs" @click="onItemOffline(item)">下架</b-btn>
         <div v-else>
           <b-btn variant="plain-green" size="xxs" @click="onItemEdit(item)">编辑</b-btn>
-          <b-btn variant="plain-green" size="xxs" class="mx-10" @click="onItemOnline(item, $event)">上架</b-btn>
+          <b-btn v-if="user.payments && user.payments.length"
+                 variant="plain-green" size="xxs" class="mx-10" @click="onItemOnline(item, $event)">
+            上架
+          </b-btn>
+          <b-btn v-else
+                 :id="`deleteDisabled_${item.id}`"
+                 variant="plain-light-gray" size="xxs" class="mx-10">
+            上架
+          </b-btn>
           <b-btn variant="plain-green" size="xxs" @click="onItemDelete(item)">删除</b-btn>
+
+          <b-tooltip :target="`deleteDisabled_${item.id}`">
+            您尚未激活支付方式，请先激活再上架广告。
+            <b-link to="/my/payments">去激活支付方式</b-link>
+          </b-tooltip>
         </div>
       </template>
     </b-table>
+
+    <Blank v-if="!items.length"/>
+
     <CBlock v-show="isItemAmountEditing" class="item-coin-amount-container" ref="coin-amount" x="20" y="20">
       <div class="item-coin-amount-confirm">
         <CurrencyInput v-model="onlineItemCoinAmount" class="item-coin-amount-confirm-input" :currency="editingItem.cash_type"/>
@@ -95,6 +144,7 @@
         <span slot="c">{{editingItem.coin_type}}</span>
       </Language>
     </CBlock>
+
     <PublishItemModal v-model="publishModalShowing" @published="onItemPublished"/>
     <PublishItemModal v-model="isItemEditing" :item="editingItem" :editing="isItemEditing" @edited="onItemEdited"/>
   </CBlock>
@@ -104,6 +154,7 @@
 import PublishItemModal from '~/components/publish-item-modal/index.vue'
 import ToggleButton from '~/components/toggle-button.vue'
 import CurrencyInput from '~/components/currency-input.vue'
+import Blank from '~/components/blank.vue'
 import {mapState} from 'vuex'
 
 export default {
@@ -112,6 +163,7 @@ export default {
     PublishItemModal,
     CurrencyInput,
     ToggleButton,
+    Blank,
   },
   data() {
     return {
@@ -148,12 +200,14 @@ export default {
           thStyle: {
             width: '70px'
           },
+          sortable: true,
         },
         coin_type: {
           label: '币种',
           thStyle: {
             width: '80px'
           },
+          sortable: true,
         },
         remain_coin_amount: {
           label: '数量',
@@ -253,11 +307,17 @@ export default {
       this.isItemAmountEditing = false
     },
     onItemDelete(item) {
-      this.axios.item.delete(item.id).then(res => {
-        this.getItems()
-        this.$showTips('删除成功')
-      }).catch(err => {
-        this.axios.onError(err)
+      this.$showDialog({
+        title: '确认删除广告',
+        content: '删除的广告将不可恢复，确定删除？',
+        onOk: () => {
+          this.axios.item.delete(item.id).then(res => {
+            this.getItems()
+            this.$showTips('删除成功')
+          }).catch(err => {
+            this.axios.onError(err)
+          })
+        }
       })
     },
     onItemPublish() {

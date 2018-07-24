@@ -330,7 +330,7 @@
           outLink: null,
         },
         busy: false,
-        publishModalShowing: true,
+        publishModalShowing: false,
         coinex,
       }
     },
