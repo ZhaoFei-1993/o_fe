@@ -30,31 +30,31 @@
     <p class="layout-my-desc">强烈建议完成以下设置提升账户安全等级。</p>
     <MyInfoItem title="邮箱">
       <p slot="content"><span>{{user.account.email}}</span></p>
-      <b-btn slot="action" variant="outline-green" size="xs" href="//www.coinex.com/my/info/basic" target="_blank">修改</b-btn>
+      <b-btn slot="action" variant="outline-green" size="xs" :href="`${coinex}/my/info/basic`" target="_blank">修改</b-btn>
     </MyInfoItem>
     <MyInfoItem title="手机">
       <p slot="content">
         <span v-if="user.account.mobile">{{user.account.mobile}}</span>
         <span v-else class="c-red">未绑定</span>
       </p>
-      <b-btn slot="action" variant="outline-green" size="xs" href="//www.coinex.com/my/info/security" target="_blank">更换</b-btn>
+      <b-btn slot="action" variant="outline-green" size="xs" :href="`${coinex}/my/info/security`" target="_blank">更换</b-btn>
     </MyInfoItem>
     <MyInfoItem title="谷歌验证码">
       <p slot="content">{{user.account.is_have_totp_auth ? '已绑定' : '未绑定'}}</p>
-      <b-btn slot="action" variant="outline-green" size="xs" href="//www.coinex.com/my/info/security" target="_blank">
+      <b-btn slot="action" variant="outline-green" size="xs" :href="`${coinex}/my/info/security`" target="_blank">
         {{user.account.is_have_totp_auth ? '更换' : '绑定'}}
       </b-btn>
     </MyInfoItem>
     <MyInfoItem title="登录密码">
       <p slot="content">建议您定期更改密码以保护账户安全</p>
-      <b-btn slot="action" variant="outline-green" size="xs" href="//www.coinex.com/my/info/security" target="_blank">重置</b-btn>
+      <b-btn slot="action" variant="outline-green" size="xs" :href="`${coinex}/my/info/security`" target="_blank">重置</b-btn>
     </MyInfoItem>
     <MyInfoItem title="实名认证">
       <p slot="content">
         <span v-if="user.account.kyc_status === constant.KYC_STATUS.PASS">已认证</span>
         <span v-else class="c-red">未认证</span>
       </p>
-      <b-btn slot="action" v-if="user.account.kyc_status !== constant.KYC_STATUS.PASS" variant="outline-green" size="xs" href="//www.coinex.com/my/info/auth/realname" target="_blank">认证</b-btn>
+      <b-btn slot="action" v-if="user.account.kyc_status !== constant.KYC_STATUS.PASS" variant="outline-green" size="xs" :href="`${coinex}/my/info/auth/realname`" target="_blank">认证</b-btn>
     </MyInfoItem>
   </CBlock>
 </template>
@@ -65,6 +65,7 @@
   import My2Column from '~/components/my-2column.vue'
   import MyInfoItem from './_c/my-info-item.vue'
   import StarRate from '~/components/star-rate.vue'
+  import {coinex} from '~/modules/variables'
 
   export default {
     name: 'page-my-security',
@@ -76,7 +77,9 @@
     },
     layout: 'my',
     data() {
-      return {}
+      return {
+        coinex,
+      }
     },
     fetch({app, store, req, redirect, route}) {
       app.axios.init(req)

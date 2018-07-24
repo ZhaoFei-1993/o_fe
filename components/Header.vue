@@ -118,7 +118,7 @@
         <b-nav-item to="/wallet">OTC钱包</b-nav-item>
         <b-nav-item :href="helpLink" target="_blank">帮助</b-nav-item>
         <span style="color: #d5d5d5">|</span>
-        <b-nav-item :href="'//www.coinex.com?lang='+lang.lang">返回主站</b-nav-item>
+        <b-nav-item :href="`${coinex}?lang=${lang.lang}`">返回主站</b-nav-item>
       </b-navbar-nav>
       <b-navbar-nav class="ml-auto">
         <div v-if="user.account">
@@ -138,7 +138,8 @@
               <i class="iconfont icon-apply-merchant"></i>
               广告管理
             </b-dropdown-item>
-            <b-dropdown-item v-else to="/my/merchant"><i class="iconfont icon-apply-merchant"></i> 商家认证</b-dropdown-item>
+            <b-dropdown-item v-else to="/my/merchant"><i class="iconfont icon-apply-merchant"></i> 商家认证
+            </b-dropdown-item>
             <!--<b-dropdown-item><i class="iconfont icon-manage-ticket"></i> 工单系统</b-dropdown-item>-->
             <b-dropdown-item @click="signOut"><i class="iconfont icon-logout"></i>退出登录</b-dropdown-item>
           </b-nav-item-dropdown>
@@ -195,7 +196,7 @@
 
 <script>
   import {mapState} from 'vuex'
-  import {loginPage, webDomain, signupPage} from '~/modules/variables'
+  import {loginPage, webDomain, signupPage, coinex} from '~/modules/variables'
   import {onApiError} from '~/modules/error-code'
   import PublishItemModal from '~/components/publish-item-modal'
 
@@ -208,6 +209,7 @@
     },
     data() {
       return {
+        coinex,
         publishModalShowing: false,
         attentionModelShowing: false,
         attention: [],
