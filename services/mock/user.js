@@ -32,7 +32,13 @@ export const account = {
     'kyc_status': 'yes',             // kyc实名状态, yes: 已通过，no: 未通过
     'kyc_name': '吴彦祖',             // kyc实名姓名
     'is_have_totp_auth': true,       // 是否绑定谷歌验证器
-    'status': 'normal'               // 账户状态，normal: 正常，forbidden: 封禁
+    'status': 'normal',               // 账户状态，normal: 正常，forbidden: 封禁
+    user_stat: {
+      'deal_count': 1,                     // 最近成交单数
+      'order_count': 2,                    // 最近总单数
+      'pay_time': 100,                       // 平均付款时间
+      'receipt_time': 200                    // 平均放行时间
+    }
   }
 }
 

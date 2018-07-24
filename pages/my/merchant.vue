@@ -123,8 +123,8 @@
     <template v-if="merchant && !formEditing">
       <MyInfoItem v-if="merchant.auth_status === constant.MERCHANT_AUTH_STATUS.PASS" title="商家认证">
         <template slot="content">
-          <p class="c-brand-green">您已通过商家认证审核，现在可以发布广告了</p>
-          <p class="c-brand-green">商家认证已锁定 100,000 CET</p>
+          <p>您已通过商家认证审核，现在可以发布广告了</p>
+          <p>商家认证已锁定 100,000 CET</p>
         </template>
       </MyInfoItem>
 
