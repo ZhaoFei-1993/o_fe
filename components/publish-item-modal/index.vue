@@ -90,7 +90,10 @@
     }
 
     .more-setting-container {
+      display: flex;
+      justify-content: space-between;
       border-bottom: 1px dotted $brandGreen;
+
       .btn-more-setting {
         font-size: 18px;
       }
@@ -116,11 +119,21 @@
       <b-form-group label="交易价格" class="item-price-group">
         <b-form-radio-group v-model="form.pricing_type" :options="pricingTypeOptions" class="mb-10" @input="onPricingTypeChange"></b-form-radio-group>
 
-        <div v-if="form.pricing_type === constant.PRICING_TYPE.FLOAT" class="item-float-price-container">
+        <div v-if="form.pricing_type === constant.PRICING_TYPE.FIXED">
+          <div class="input-label" todo="todo:应该是参考价格吧？">
+            当前市场价格
+            <b-btn variant="plain-yellow" size="xxs" @click="onSetPrice2MarketPrice">{{marketPrice}}</b-btn>
+            <CTooltip content="todo" x="4"/>
+          </div>
+          <CurrencyInput v-model="form.price" :currency="balance.currentCash" placeholder="请输入价格" class="col-left"/>
+        </div>
+
+        <div v-else class="item-float-price-container">
           <div class="item-price-container">
             <div class="input-label">
               当前市场价格
               <b-btn variant="plain-yellow" size="xxs" @click="onSetPrice2MarketPrice">{{marketPrice}}</b-btn>
+              <CTooltip content="todo" x="4"/>
             </div>
             <CurrencyInput v-model="form.price" :currency="balance.currentCash" :disabled="true" placeholder="请输入价格"/>
           </div>
@@ -139,13 +152,7 @@
             <CurrencyInput v-model="form.price_limit" :currency="balance.currentCash" placeholder="请输入价格"/>
           </div>
         </div>
-        <div v-else>
-          <div class="input-label" todo="todo:应该是参考价格吧？">
-            当前市场价格
-            <b-btn variant="plain-yellow" size="xxs" @click="onSetPrice2MarketPrice">{{marketPrice}}</b-btn>
-          </div>
-          <CurrencyInput v-model="form.price" :currency="balance.currentCash" placeholder="请输入价格" class="col-left"/>
-        </div>
+
       </b-form-group>
 
       <b-form-group label="交易数量" class="coin-amount-group">
@@ -154,7 +161,7 @@
           <span slot="c">{{form.coin_type}}</span>
         </Language>
         <div class="coin-amount-container">
-          <CurrencyInput v-model="form.coin_amount" :currency="form.coin_type" class="col-left"/>
+          <CurrencyInput v-model="form.coin_amount" :currency="form.coin_type" placeholder="请输入数量" class="col-left"/>
           <div class="col-right fz-22">
             <span>总金额 ≈</span>
             <span class="c-bright-yellow ml-1"> {{totalCash}} {{balance.currentCash}}</span>
@@ -170,6 +177,7 @@
         <b-btn variant="plain-green" class="btn-more-setting" size="xs" @click="onClickMoreSetting">
           更多设置 <i class="iconfont icon-double-arrow-down ml-1"></i>
         </b-btn>
+        <span class="c-6f fz-18">广告设置 <CTooltip content="todo" size="18" :x="2"/></span>
       </div>
 
       <!--更多设置-->
@@ -206,12 +214,14 @@
 import {mapState} from 'vuex'
 import TabButtons from '~/components/tab-buttons.vue'
 import CurrencyInput from '~/components/currency-input.vue'
+import CTooltip from '~/components/c-tooltip.vue'
 
 export default {
   name: 'publish-ad-modal',
   components: {
     TabButtons,
     CurrencyInput,
+    CTooltip,
   },
   props: {
     value: {
@@ -254,13 +264,23 @@ export default {
     },
     pricingTypeOptions: function () {
       const PRICING_TYPE = this.constant.PRICING_TYPE
-      return [{
-        value: PRICING_TYPE.FIXED,
-        text: '固定价格'
-      }, {
-        value: PRICING_TYPE.FLOAT,
-        text: '浮动价格',
-      }]
+      // usdt没有浮动定价
+      if (this.form.coin_type === 'USDT') {
+        return [{
+          value: PRICING_TYPE.FIXED,
+          text: '固定价格'
+        }]
+      } else {
+        return [{
+          value: PRICING_TYPE.FIXED,
+          text: '固定价格'
+        }, {
+          value: PRICING_TYPE.FLOAT,
+          text: '浮动价格',
+        }]
+
+      }
+
     },
     modalShowing: {
       get() {
@@ -323,32 +343,17 @@ export default {
       form.float_rate = 100
     },
 
-    doCreateItem() {
-      this.form.cash_type = this.balance.currentCash
+    doCreateOrUpdateItem(isEdit) {
       this.axios.item.createItem(this.form).then(res => {
-        this.$showTips('广告发布成功')
+        this.$showTips(isEdit ? '广告编辑成功' : '广告发布成功')
 
-        this.$emit('published', this.form)
+        this.$emit(isEdit ? 'edited' : 'published', this.form)
       }).catch(err => {
         const ERROR_CODE = this.constant.ERROR_CODE
         if (err.code === ERROR_CODE.MISSING_PAY_METHODS) {
           this.$showTips('缺少支付方式，请先添加支付方式')   // todo:可能需要在点击之前就提示
-        } else {
-          this.axios.onError(err)
         }
-      })
-    },
-
-    doEditItem() {
-      this.axios.item.editItem(this.form).then(res => {
-        this.$showTips('广告编辑成功')
-
-        this.$emit('edited', this.form)
-      }).catch(err => {
-        const ERROR_CODE = this.constant.ERROR_CODE
-        if (err.code === ERROR_CODE.MISSING_PAY_METHODS) {
-          this.$showTips('缺少支付方式，请先添加支付方式')   // todo:可能需要在点击之前就提示
-        } else {
+        else {
           this.axios.onError(err)
         }
       })
@@ -360,7 +365,12 @@ export default {
       if (!Number(form.price)) return this.$showTips('价格不可以为0')
       if (!Number(form.coin_amount)) return this.$showTips('请输入交易数量')
 
-      this.editing ? this.doEditItem() : this.doCreateItem()
+      if (this.editingItem) {
+        this.doCreateOrUpdateItem(true)
+      } else {
+        this.form.cash_type = this.balance.currentCash
+        this.doCreateOrUpdateItem(false)
+      }
 
       // if (Math.abs((form.price / this.marketPrice) - 1) > 0.1) {
       //   this.$showDialog({
@@ -376,6 +386,10 @@ export default {
     },
     onCoinTypeChange() {
       this.form.price = this.balance.currentRate[this.form.coin_type]
+      // usdt没有浮动定价
+      if (this.form.coin_type === 'USDT') {
+        this.form.pricing_type = this.constant.PRICING_TYPE.FIXED
+      }
     }
   }
 }

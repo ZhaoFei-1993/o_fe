@@ -14,6 +14,10 @@
         margin-left: 10px;
       }
     }
+
+    .auto-reply-content {
+      word-break: break-all;
+    }
   }
 </style>
 
@@ -52,11 +56,12 @@
       <template slot="content">
         <div slot="content" v-if="autoReplyEditing">
           <b-form-textarea v-model="editingSettings.auto_reply_content" rows="3"></b-form-textarea>
-          <p class="text-right">20-140字</p>
-          <EMsgs :result="$v.editingSettings" :msgs="errorMessages" keyName="auto_reply_content"
-                 style="margin-top: -20px;"/>
+          <p class="text-right" :class="{'c-red': editingSettings.auto_reply_content.length > 140}">
+            {{editingSettings.auto_reply_content.length}} / 140字
+          </p>
+          <EMsgs :result="$v.editingSettings" :msgs="errorMessages" keyName="auto_reply_content" style="margin-top: -20px;"/>
         </div>
-        <p v-else>{{settings.auto_reply_content ? settings.auto_reply_content : '无'}}</p>
+        <p v-else class="auto-reply-content">{{settings.auto_reply_content ? settings.auto_reply_content : '无'}}</p>
       </template>
 
       <div slot="action" class="setting-button-group">
@@ -129,7 +134,6 @@
       errorMessages: function () {
         return {
           auto_reply_content: {
-            minLength: '最小长度为20',
             maxLength: '最大长度为140',
           }
         }
@@ -138,7 +142,6 @@
     validations: {
       editingSettings: {
         auto_reply_content: {
-          minLength: minLength(20),
           maxLength: maxLength(140),
         }
       }
