@@ -113,7 +113,7 @@
         <img src="~assets/img/logo.png" alt="CoinEx OTC" height="34" width="120">
       </b-navbar-brand>
       <b-navbar-nav class="ml-30">
-        <b-nav-item to="/" exact>法币交易</b-nav-item>
+        <b-nav-item to="/chat" exact>聊天</b-nav-item>
         <b-nav-item @click="onItemPublish">发布广告</b-nav-item>
         <b-nav-item to="/wallet">OTC钱包</b-nav-item>
         <b-nav-item :href="helpLink" target="_blank">帮助</b-nav-item>
