@@ -105,7 +105,6 @@
   import EMsgs from '~/components/error-message.vue'
   import getSettingConfig from './setting-form-config'
   import Vuelidate from 'vuelidate'
-  import {maxLength} from 'vuelidate/lib/validators'
 
   Vue.use(Vuelidate)
 
