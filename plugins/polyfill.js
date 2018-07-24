@@ -2,7 +2,7 @@
 
 const Decimal = require("decimal.js").default;
 
-String.prototype.setDigit = function(digit) {
+String.prototype.setDigit = function (digit) {
   const str = (this || "").toString().trim();
   const parts = str.split(".");
   if (parts[1]) {
@@ -11,15 +11,17 @@ String.prototype.setDigit = function(digit) {
   return str;
 };
 
-String.prototype.limitDigit = function(limit, defDigit = 8) {
+String.prototype.limitDigit = function (limit, defDigit = 8) {
   const str = (this || "").toString().trim();
   const digit = str.obtainMaxDigit(limit, defDigit);
   return str.setDigit(digit);
 };
 
-String.prototype.obtainMaxDigit = function(limit, defDigit = 8, array, keyFn) {
+String.prototype.obtainMaxDigit = function (limit, defDigit = 8, array, keyFn) {
   array = array || [(this || "")];
-  keyFn = keyFn || function(number) { return number; };
+  keyFn = keyFn || function (number) {
+    return number;
+  };
 
   let result = defDigit;
   let max = "0";
@@ -48,7 +50,7 @@ String.prototype.obtainMaxDigit = function(limit, defDigit = 8, array, keyFn) {
   return result >= 0 ? result : 0;
 };
 
-String.prototype.scientificToDecimal = function() {
+String.prototype.scientificToDecimal = function () {
   let num = (this || "0").toLowerCase();
   if (/\d+\.?\d*e[\+\-]*\d+/i.test(num)) {
     let prefix = "";
@@ -75,17 +77,15 @@ String.prototype.scientificToDecimal = function() {
   }
   return num;
 };
-String.prototype.simplify = function(length = 5, str = "...") {
+String.prototype.simplify = function (length = 5, str = "...") {
   if (this.length <= length || length <= 0) {
     return this;
   }
   return this.substr(0, length) + str;
 };
-String.prototype.formatCurrency = function(
-  digit = 10,
+String.prototype.formatCurrency = function (digit = 10,
   charDec = ".",
-  charSep = ","
-) {
+  charSep = ",") {
   let n = this || "0";
   let prefix = "";
   if (n[0] === "-") {
@@ -142,7 +142,7 @@ String.prototype.formatCurrency = function(
  *
  * @return {[String]}         [格式化后的数字字符串]
  */
-String.prototype.formatMoney = function(c, charDec, charSep, noZero, lang) {
+String.prototype.formatMoney = function (c, charDec, charSep, noZero, lang) {
   let n = this || "0";
   let prefix = "";
   if (n[0] === "-" || n[0] === '+') {
@@ -217,19 +217,19 @@ String.prototype.formatMoney = function(c, charDec, charSep, noZero, lang) {
   }
 };
 
-String.prototype.decimalCmp = function(b) {
+String.prototype.decimalCmp = function (b) {
   const n = ((this || "0").toString() || "0").trim();
   const bb = ((b || "0").toString() || "0").trim();
   return new Decimal(n.toString()).cmp(new Decimal(bb.toString()));
 };
 // 创建Decimal
-String.prototype.Decimal = function() {
+String.prototype.Decimal = function () {
   const n = ((this || "0").toString() || "0").trim();
   return new Decimal(n.toString());
 };
 
 // 加
-String.prototype.decimalAdd = function(c) {
+String.prototype.decimalAdd = function (c) {
   const n = ((this || "0").toString() || "0").trim();
   const m = ((c || "0").toString() || "0").trim();
 
@@ -237,7 +237,7 @@ String.prototype.decimalAdd = function(c) {
 };
 
 // 减
-String.prototype.decimalMinus = function(c) {
+String.prototype.decimalMinus = function (c) {
   const n = ((this || "0").toString() || "0").trim();
   const m = ((c || "0").toString() || "0").trim();
 
@@ -245,7 +245,7 @@ String.prototype.decimalMinus = function(c) {
 };
 
 // 乘
-String.prototype.decimalMul = Number.prototype.decimalMul = function(c) {
+String.prototype.decimalMul = Number.prototype.decimalMul = function (c) {
   const n = ((this || "0").toString() || "0").trim();
   const m = ((c || "0").toString() || "0").trim();
 
@@ -253,7 +253,7 @@ String.prototype.decimalMul = Number.prototype.decimalMul = function(c) {
 };
 
 // 除
-String.prototype.decimalDiv = Number.prototype.decimalDiv = function(c) {
+String.prototype.decimalDiv = Number.prototype.decimalDiv = function (c) {
   const n = ((this || "0").toString() || "0").trim();
   const m = ((c || "0").toString() || "0").trim();
 
@@ -261,7 +261,7 @@ String.prototype.decimalDiv = Number.prototype.decimalDiv = function(c) {
 };
 
 // 小数位数
-String.prototype.round = function(c) {
+String.prototype.round = function (c) {
   const n = ((this || "0").toString() || "0").trim();
   let m = 1;
   for (let i = 0; i < c; i++) {
@@ -275,7 +275,7 @@ String.prototype.round = function(c) {
 };
 
 // 银行卡
-String.prototype.formatCard = function() {
+String.prototype.formatCard = function () {
   let cardString = "";
   const s = this;
 
@@ -291,7 +291,7 @@ String.prototype.formatCard = function() {
 };
 
 // 格式化 交易id
-String.prototype.formatTxId = function() {
+String.prototype.formatTxId = function () {
   let cardString = "";
   const s = this;
 
@@ -303,6 +303,12 @@ String.prototype.formatTxId = function() {
     }
   }
   return cardString;
+};
+
+String.prototype.lastChars = function (len = 6) {
+  const s = this;
+  if (s.length <= len) return s
+  return s.substr(s.length - len)
 };
 
 // https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Array/find
