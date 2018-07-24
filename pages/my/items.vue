@@ -250,6 +250,7 @@ export default {
     return Promise.all([
       store.dispatch('fetchUserMerchant'),
       store.dispatch('fetchOtcBalance'),
+      store.dispatch('fetchUserPayments'),
     ]).catch(err => {
       app.axios.needAuth(err, redirect, route.fullPath)
     })
