@@ -50,9 +50,11 @@
     "pm2": "pm2 startOrRestart ecosystem.json --env production",
     "pm2-pre": "pm2 startOrRestart ecosystem.json --env pre",
     "generate": "nuxt generate",
-    "lint": "eslint --fix --ext .js,.vue --ignore-path .gitignore .",
-    "precommit": "npm run lint"
+    "lint": "eslint --fix --ext .js,.vue --ignore-path .gitignore ."
   },
+  "pre-commit": [
+    "lint"
+  ],
   "devDependencies": {
     "babel-eslint": "^8.2.5",
     "blueimp-md5": "^2.10.0",
@@ -76,6 +78,7 @@
     "json-server": "^0.14.0",
     "node-sass": "4.9.0",
     "nodemon": "1.17.5",
+    "pre-commit": "^1.2.2",
     "request": "^2.87.0",
     "sass-loader": "7.0.3",
     "style-loader": "0.21.0",

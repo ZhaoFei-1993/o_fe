@@ -278,9 +278,7 @@ export default {
           value: PRICING_TYPE.FLOAT,
           text: '浮动价格',
         }]
-
       }
-
     },
     modalShowing: {
       get() {
@@ -352,8 +350,7 @@ export default {
         const ERROR_CODE = this.constant.ERROR_CODE
         if (err.code === ERROR_CODE.MISSING_PAY_METHODS) {
           this.$showTips('缺少支付方式，请先添加支付方式')   // todo:可能需要在点击之前就提示
-        }
-        else {
+        } else {
           this.axios.onError(err)
         }
       })
