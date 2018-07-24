@@ -14,6 +14,10 @@
         margin-left: 10px;
       }
     }
+
+    .auto-reply-content {
+      word-break: break-all;
+    }
   }
 </style>
 
@@ -52,10 +56,12 @@
       <template slot="content">
         <div slot="content" v-if="autoReplyEditing">
           <b-form-textarea v-model="editingSettings.auto_reply_content" rows="3"></b-form-textarea>
-          <p class="text-right">20-140字</p>
+          <p class="text-right" :class="{'c-red': editingSettings.auto_reply_content.length > 140}">
+            {{editingSettings.auto_reply_content.length}} / 140字
+          </p>
           <EMsgs :result="$v.editingSettings" :msgs="errorMessages" keyName="auto_reply_content" style="margin-top: -20px;"/>
         </div>
-        <p v-else>{{settings.auto_reply_content ? settings.auto_reply_content : '无'}}</p>
+        <p v-else class="auto-reply-content">{{settings.auto_reply_content ? settings.auto_reply_content : '无'}}</p>
       </template>
 
       <div slot="action" class="setting-button-group">
@@ -98,7 +104,7 @@
   import CurrencyInput from '~/components/currency-input.vue'
   import EMsgs from '~/components/error-message.vue'
   import Vuelidate from 'vuelidate'
-  import {minLength, maxLength} from 'vuelidate/lib/validators'
+  import {maxLength} from 'vuelidate/lib/validators'
 
   Vue.use(Vuelidate)
 
@@ -128,7 +134,6 @@
       errorMessages: function () {
         return {
           auto_reply_content: {
-            minLength: '最小长度为20',
             maxLength: '最大长度为140',
           }
         }
@@ -137,13 +142,15 @@
     validations: {
       editingSettings: {
         auto_reply_content: {
-          minLength: minLength(20),
           maxLength: maxLength(140),
         }
       }
     },
-    async fetch({store}) {
-      await store.dispatch('fetchUserSettings')
+    async fetch({store, app, req, redirect, route}) {
+      app.axios.init(req)
+      await store.dispatch('fetchUserSettings').catch(err => {
+        app.axios.needAuth(err, redirect, route.fullPath)
+      })
     },
     mounted() {
       this.store2Data()

@@ -16,7 +16,9 @@
                 <template slot="button-content">
                   <i class="iconfont icon-filter"></i>
                 </template>
-                <b-dropdown-item-button @click="onClickHeadFilter({ key: 'side', value: option.value })" v-for="(option, index) in orderTypeFilterOptions" :key="index">{{ option.text }}</b-dropdown-item-button>
+                <b-dropdown-item-button @click="onClickHeadFilter({ key: 'side', value: option.value })"
+                                        v-for="(option, index) in orderTypeFilterOptions" :key="index">{{ option.text }}
+                </b-dropdown-item-button>
               </b-dropdown>
             </div>
           </template>
@@ -27,7 +29,9 @@
                 <template slot="button-content">
                   <i class="iconfont icon-filter"></i>
                 </template>
-                <b-dropdown-item-button @click="onClickHeadFilter({ key: 'coin_type', value: option.value })" v-for="(option, index) in coinTypeFilterOptions" :key="index">{{ option.text }}</b-dropdown-item-button>
+                <b-dropdown-item-button @click="onClickHeadFilter({ key: 'coin_type', value: option.value })"
+                                        v-for="(option, index) in coinTypeFilterOptions" :key="index">{{ option.text }}
+                </b-dropdown-item-button>
               </b-dropdown>
             </div>
           </template>
@@ -35,7 +39,8 @@
             <b-link :to="`/orders/${item.id}`">{{ item.id }}</b-link>
           </template>
           <template slot="_order_type" slot-scope="{ item }">
-            <span :class="['order-type', item._order_type === constant.SIDE.BUY ? 'order-type-buy' : 'order-type-sell']">
+            <span
+              :class="['order-type', item._order_type === constant.SIDE.BUY ? 'order-type-buy' : 'order-type-sell']">
               {{ item._order_type === constant.SIDE.BUY ? '买' : '卖' }}
             </span>
           </template>
@@ -50,7 +55,9 @@
           </template>
           <template slot="status" slot-scope="{ item, detailsShowing, toggleDetails }">
             {{ constant?constant.ORDER_STATUS[item.status.toUpperCase()].text:'' }}
-            <span @click.stop="toggleDetails" v-if="item.status === constant.ORDER_STATUS.CREATED.value || item.status === constant.ORDER_STATUS.PAID.value" class="detail"
+            <span @click.stop="toggleDetails"
+                  v-if="item.status === constant.ORDER_STATUS.CREATED.value || item.status === constant.ORDER_STATUS.PAID.value"
+                  class="detail"
                   :class="[ detailsShowing ? 'show-detail' : 'hidden-detail' ]"><i
               class="iconfont icon-detail"></i></span>
           </template>
@@ -58,7 +65,8 @@
             <div class="detail-wrapper">
               <div class="col1">
                 <div class="detail-h1 detail-flex">
-                  <span :class="['arrow-icon', item._order_type === constant.SIDE.BUY ? 'buy-arrow-icon' : 'sell-arrow-icon']"></span>
+                  <span
+                    :class="['arrow-icon', item._order_type === constant.SIDE.BUY ? 'buy-arrow-icon' : 'sell-arrow-icon']"></span>
                   <span>购买 {{ item.coin_type }}</span>
                 </div>
                 <div class="detail-h2">
@@ -75,12 +83,15 @@
               </div>
               <div class="col3">
                 <div class="payment-method"
-                  v-if="item.status !== constant.ORDER_STATUS.CANCEL.value
+                     v-if="item.status !== constant.ORDER_STATUS.CANCEL.value
                   && item.status !== constant.ORDER_STATUS.CLOSED.value">
                   <template v-if="item.status === constant.ORDER_STATUS.CREATED.value">
-                    <i v-if="item._selected_payment_method.method === constant.PAYMENT_TYPES.BANKCARD" class="iconfont icon-bankcard"></i>
-                    <i v-if="item._selected_payment_method.method === constant.PAYMENT_TYPES.WECHAT" class="iconfont icon-wechat-round"></i>
-                    <i v-if="item._selected_payment_method.method === constant.PAYMENT_TYPES.ALIPAY" class="iconfont icon-alipay"></i>
+                    <i v-if="item._selected_payment_method.method === constant.PAYMENT_TYPES.BANKCARD"
+                       class="iconfont icon-bankcard"></i>
+                    <i v-if="item._selected_payment_method.method === constant.PAYMENT_TYPES.WECHAT"
+                       class="iconfont icon-wechat-round"></i>
+                    <i v-if="item._selected_payment_method.method === constant.PAYMENT_TYPES.ALIPAY"
+                       class="iconfont icon-alipay"></i>
                     <select v-model="item._selected_payment_method">
                       <option v-for="payment in item.payment_methods" :value="payment">
                         <span v-if="payment.method === constant.PAYMENT_TYPES.BANKCARD">银行转帐</span>
@@ -100,10 +111,12 @@
                   <b-popover :target="`qr-${item.id}`"
                              placement="top"
                              triggers="hover focus">
-                    <img style="display: block;width: 120px;height: 120px;" :src="item._selected_payment_method.qr_code_image">
+                    <img style="display: block;width: 120px;height: 120px;"
+                         :src="item._selected_payment_method.qr_code_image">
                   </b-popover>
                   <span :id="`qr-${item.id}`" style="cursor: pointer;"
-                        v-show="item._selected_payment_method.method !== 'bankcard'"><i class="iconfont icon-qrcode"></i></span>
+                        v-show="item._selected_payment_method.method !== 'bankcard'"><i
+                    class="iconfont icon-qrcode"></i></span>
                 </div>
                 <div v-if="item._selected_payment_method.method === 'bankcard'" class="detail-text">
                   {{ item._selected_payment_method.bank }}，{{ item._selected_payment_method.branch }}
@@ -178,9 +191,9 @@
         </b-table>
         <blank v-if="!orderTableItems.length"></blank>
         <b-pagination v-if="orderTableItems.length"
-          :total-rows="queryParams.totalRows"
-          v-model="queryParams.page"
-          :per-page="queryParams.limit">
+                      :total-rows="queryParams.totalRows"
+                      v-model="queryParams.page"
+                      :per-page="queryParams.limit">
         </b-pagination>
       </div>
     </c-block>
@@ -314,7 +327,8 @@
         },
       }
     },
-    fetch({ store, app, redirect, route }) {
+    fetch({store, app, req, redirect, route}) {
+      app.axios.init(req)
       return store.dispatch('fetchUserAccount').catch(err => {
         app.axios.needAuth(err, redirect, route.fullPath)
       })
@@ -334,7 +348,7 @@
     computed: {
       ...mapState(['user', 'constant']),
       coinTypeFilterOptions() {
-        return [{ text: '全部', value: null }, ...this.constant.COIN_TYPE_OPTIONS]
+        return [{text: '全部', value: null}, ...this.constant.COIN_TYPE_OPTIONS]
       },
     },
     watch: {
@@ -351,7 +365,7 @@
         return order.merchant_id === this.user.account.id
       },
       fetchOrderList() {
-        const { status, page, limit, coin_type: coinType, side } = this.queryParams
+        const {status, page, limit, coin_type: coinType, side} = this.queryParams
         this.axios.order.getOrderList({
           coin_type: coinType,
           side,
@@ -361,7 +375,7 @@
         })
           .then((res) => {
             if (res.code === 0 && res.data) {
-              const { data, curr_page: currentPage, total: totalRows } = res.data
+              const {data, curr_page: currentPage, total: totalRows} = res.data
               this.queryParams.page = currentPage
               this.queryParams.totalRows = totalRows
               this.orderTableItems = data.map(item => {
@@ -373,13 +387,17 @@
                 }
                 let selectedPaymentMethod = {}
                 if (item.payment_methods && item.payment_methods.length) {
-                  selectedPaymentMethod = { ...item.payment_methods[0] }
+                  selectedPaymentMethod = {...item.payment_methods[0]}
                 }
+                const remainingTime = parseInt((item.place_time * 1000 + ORDER_PAY_TIME * 60000 - Date.now()) / 1000) // 订单付款截止时间 = 创建时间 + 可付款时间(15min)
+                const { CREATED, PAID } = this.constant
+                const { status } = item
                 return {
                   ...item,
                   _order_type: orderType, // 下划线前缀均为自定义属性（下同）订单类型
                   _selected_payment_method: selectedPaymentMethod, // 用户选中的支付方式
-                  _remaining_time: parseInt((item.place_time * 1000 + ORDER_PAY_TIME * 60000 - Date.now()) / 1000), // 倒计时, 订单付款截止时间 = 创建时间 + 可付款时间
+                  _remaining_time: remainingTime,
+                  status: (status === CREATED.value || status === PAID.value) && remainingTime <= 0 ? this.constant.CLOSED.value : item.status, // 前置判断超时关闭的订单
                 }
               })
             } else {

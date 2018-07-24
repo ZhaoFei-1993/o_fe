@@ -77,7 +77,7 @@
       userOrderCompleteRatio: function () {
         const userData = this.userData
         // todo: 这里根据后台返回数据，来显示  0% 和 -
-        return userData.deal_count ? (userData.deal_count / userData.order_count * 100).toFixed(1) + '%' : '-'
+        return userData.deal_count ? (userData.deal_count / userData.order_count * 100).toFixed(1) + '%' : '--'
       },
     }
   }

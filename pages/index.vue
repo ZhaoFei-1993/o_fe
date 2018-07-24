@@ -153,6 +153,7 @@
         }
         .col-name {
           padding-left: 0;
+          width: 180px;
           overflow: hidden;
           text-overflow: ellipsis;
           .icon-certificated-merchant {
@@ -206,7 +207,7 @@
           </span>
         </div>
         <div class="list-header">
-          <span class="col-narrow">{{selectedSide === constant.SIDE.BUY ? '卖家' : '买家'}}</span>
+          <span class="col-narrow col-name">{{selectedSide === constant.SIDE.BUY ? '卖家' : '买家'}}</span>
           <span class="col-narrow">30天成单/完成率</span>
           <span class="col-narrow">数量</span>
           <span class="col-wide">限额</span>
@@ -275,6 +276,7 @@
       :item="selectedItem"
       v-model="showPlaceOrderModal"
     ></PlaceOrderModal>
+    <!--todo: 根据现在状态发布币种、方向-->
     <PublishItemModal v-model="publishModalShowing" @published="onItemPublished"/>
     <b-modal id="no-payment-modal" :ok-only="true"
              v-model="showConstraintModal" title="交易限制"
@@ -302,7 +304,7 @@
   import PublishItemModal from '~/components/publish-item-modal'
   import UserPayments from '~/components/user-payments'
 
-  const refreshInterval = 5000
+  // const refreshInterval = 5000
   export default {
     components: {
       PlaceOrderModal,

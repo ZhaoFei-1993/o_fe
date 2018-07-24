@@ -3,14 +3,20 @@
 
   .image-upload-button {
     position: relative;
-    width: 190px;
-    height: 130px;
+    width: 120px;
+    height: 120px;
     font-size: 16px;
-    line-height: 130px;
+    line-height: 120px;
     overflow: hidden;
     text-align: center;
     background-color: #f9f9f9;
     color: $brandYellow;
+
+    .icon-plus {
+      display: inline-block;
+      margin-right: 1px;
+      vertical-align: 1px;
+    }
 
     input[type=file] {
       position: absolute;
@@ -26,9 +32,10 @@
 
 <template>
   <label class="image-upload-button">
-    <i class="iconfont icon-plus mr-1"></i>{{text}}
-    <b-form-file type="file" @change="onAddImage" multiple
-                 accept="image/jpg, image/jpeg, image/png, image/gif, image/bmp" plain>
+    <i class="iconfont icon-plus"></i>
+    {{text}}
+    <b-form-file type="file" @change="onAddImage" multiple plain
+                 accept="image/jpg, image/jpeg, image/png, image/gif, image/bmp">
     </b-form-file>
   </label>
 </template>

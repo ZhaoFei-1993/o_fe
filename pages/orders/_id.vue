@@ -120,7 +120,7 @@
         <div class="d-flex align-items-center">
           <span class="tip">申诉原因</span>
           <b-form-select class="appeal-input" v-model="appealReason"
-                         :options="constant.APPEAL_REASONS"></b-form-select>
+                         :options="constant.appealReasonOptions"></b-form-select>
         </div>
         <div class="d-flex align-items-start mt-20">
           <span class="tip">申诉理由</span>
@@ -347,14 +347,25 @@
         appealComment: null,
         appealReason: null,
         showConfirmReceiptModal: false,
+        refreshOrderTimeout: null,
       }
     },
     components: {
       UserStatsProfile,
       ConfirmReceipt,
     },
+    fetch({store, app, req, redirect, route}) {
+      app.axios.init(req)
+      return Promise.all([
+        store.dispatch('fetchUserAccount'),
+        store.dispatch('fetchSystemConstant'),
+      ]).catch(err => {
+        app.axios.needAuth(err, redirect, route.fullPath)
+      })
+    },
     beforeDestroy() {
       clearInterval(this.secondCountdown)
+      clearTimeout(this.refreshOrderTimeout)
     },
     mounted() {
       this.getCurrentOrder()
@@ -416,7 +427,8 @@
         return '交易广告 #' + this.order.item_id + ' ，单价 ' + this.order.price + ' CNY/ ' + this.order.coin_type
       },
       referCode() {
-        return this.order.id
+        // 去最后六位，防止后端返回数字，都先转换为字符串
+        return `${this.order.id}`.lastChars()
       },
       paymentStatusMessage() {
         switch (this.order.status) {
@@ -506,7 +518,7 @@
               }
             }, 1000)
           }
-          setTimeout(() => {
+          this.refreshOrderTimeout = setTimeout(() => {
             this.refreshOrderStatus()
           }, REFRESH_ORDER_INTERVAL)
         }
