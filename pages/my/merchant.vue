@@ -343,6 +343,8 @@
     },
     methods: {
       onSubmit() {
+        if (this.account.kyc_status !== this.constant.KYC_STATUS.PASS) return this.$showTips(`请先完成实名认证`, 'error')
+        if (!this.account.mobile) return this.$showTips(`请先绑定手机`, 'error')
         if (!this.isVideoSent) return this.$showTips(`请先确认发送认证视频到 bd@coinex.com`, 'error')
         if (!this.isContractRead) return this.$showTips('请先阅读并同意服务协议', 'error')
 
