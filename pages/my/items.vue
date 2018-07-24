@@ -14,6 +14,39 @@
     .items-table {
       th {
         text-align: center;
+        outline: none;
+      }
+
+      .sorting {
+        &::before {
+          right: .75em;
+          content: "\2193" !important;
+        }
+
+        &::after {
+          right: .25em;
+          content: "\2191" !important;
+        }
+      }
+
+      .order-type {
+        display: inline-block;
+        width: 22px;
+        height: 22px;
+        background-color: #fff;
+        box-shadow: 0 0 10px 0 #ececec;
+        border-radius: 100px;
+        text-align: center;
+        font-size: 12px;
+        line-height: 22px;
+      }
+
+      .order-type-buy {
+        color: #ffbc32;
+      }
+
+      .order-type-sell {
+        color: #52cbca;
       }
     }
 
@@ -59,8 +92,8 @@
       <template slot="side" slot-scope="{ item }">
         <!-- 自定义的属性 -->
         <span :class="['order-type', item.side === 'buy' ? 'order-type-buy' : 'order-type-sell']">
-              {{ item.side === 'buy' ? '买' : '卖' }}
-            </span>
+          {{ item.side === 'buy' ? '买' : '卖' }}
+        </span>
       </template>
       <template slot="remain_coin_amount" slot-scope="{ item }">
         {{ formatMoney(item.remain_coin_amount) }}
@@ -167,12 +200,14 @@ export default {
           thStyle: {
             width: '70px'
           },
+          sortable: true,
         },
         coin_type: {
           label: '币种',
           thStyle: {
             width: '80px'
           },
+          sortable: true,
         },
         remain_coin_amount: {
           label: '数量',
