@@ -197,7 +197,7 @@
         <p class="c-6f">申请成为CoinEx认证商家，需要同意冻结您交易所账户中 {{MERCHANT_REQUIRED_CET_AMOUNT|formatMoney}}
           CET作为商家保证金，钱包中冻结的保证金依然享有分红权益，但是不
           可交易和提现。取消商家认证后，商家保证金将继续冻结三个月后解冻。
-          <b-link :href="`${coinex}/token`">什么是 CET？</b-link>
+          <b-link :href="`${coinex}/token`" target="_blank">什么是 CET？</b-link>
         </p>
         <InfoItem title="账户可用余额" v-if="balance && balance.coinexBalance">
           {{cetAvailable}}
@@ -349,10 +349,13 @@
         if (!this.account.mobile) return this.$showTips(`请先绑定手机`, 'error')
         if (!this.isVideoSent) return this.$showTips(`请先确认发送认证视频到 bd@coinex.com`, 'error')
         if (!this.isContractRead) return this.$showTips('请先阅读并同意服务协议', 'error')
+        if (!this.form.wechat) return this.$showTips('请填写认证微信号', 'error')
 
         this.axios.user.applyMerchant(this.form).then(res => {
           this.$showTips('提交申请成功')
           this.$store.dispatch('fetchUserMerchant')
+        }).catch(err => {
+          this.axios.onError(err)
         })
       },
       onReSubmit() {
