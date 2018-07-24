@@ -123,7 +123,7 @@
           <div class="input-label" todo="todo:应该是参考价格吧？">
             当前市场价格
             <b-btn variant="plain-yellow" size="xxs" @click="onSetPrice2MarketPrice">{{marketPrice}}</b-btn>
-            <CTooltip content="todo" x="4"/>
+            <CTooltip content="采用Bitfinex、Coinbase和Bitstamp 三个交易所的平均价格，仅供参考。" x="4"/>
           </div>
           <CurrencyInput v-model="form.price" :currency="balance.currentCash" :decimalDigit="2" placeholder="请输入价格" class="col-left"/>
         </div>
@@ -133,7 +133,7 @@
             <div class="input-label">
               当前市场价格
               <b-btn variant="plain-yellow" size="xxs" @click="onSetPrice2MarketPrice">{{marketPrice}}</b-btn>
-              <CTooltip content="todo" x="4"/>
+              <CTooltip content="采用Bitfinex、Coinbase和Bitstamp 三个交易所的平均价格，仅供参考。" x="4"/>
             </div>
             <CurrencyInput v-model="form.price" :currency="balance.currentCash" :decimalDigit="2" :disabled="true" placeholder="请输入价格"/>
           </div>
@@ -141,7 +141,10 @@
           <i class="iconfont icon-bothway"></i>
 
           <div class="item-float-rate-container">
-            <div class="input-label">浮动比例</div>
+            <div class="input-label">
+              浮动比例
+              <CTooltip content=" 以当前市场价为基数设定浮动比例，大于100%为溢价；小于100%为折价。" x="4"/>
+            </div>
             <CurrencyInput v-model="form.float_rate" currency="%" placeholder="请输入价格" :decimalDigit="2"/>
           </div>
 
@@ -176,21 +179,21 @@
         <b-btn variant="plain-green" class="btn-more-setting" size="xs" @click="onClickMoreSetting">
           更多设置 <i class="iconfont icon-double-arrow-down ml-1"></i>
         </b-btn>
-        <span class="c-6f fz-18">广告设置 <CTooltip content="todo" size="18" :x="2"/></span>
+        <span class="c-6f fz-18">广告设置 <CTooltip content="更多设置内容，可在广告设置中统一进行设置模板。" size="18" :x="2"/></span>
       </div>
 
       <!--更多设置-->
       <div v-if="moreSettingShowing">
         <b-form-group label="交易限额" class="order-cash-limit-group">
           <div class="col-left">
-            <Language text="最低金额[p][/p]元" class="input-label" tag="div">
+            <Language text="最低金额 [p][/p] 元" class="input-label" tag="div">
               <span slot="p">400</span>
             </Language>
             <CurrencyInput v-model="form.min_deal_cash_amount" :currency="balance.currentCash" placeholder="最低单笔金额"/>
           </div>
           <div class="order-cash-limit-separator">至</div>
           <div class="col-right ml-0">
-            <Language text="最高金额[p][/p]元" class="input-label" tag="div">
+            <Language text="最高金额 [p][/p] 元" class="input-label" tag="div">
               <span slot="p">1,000,000</span>
             </Language>
             <CurrencyInput v-model="form.max_deal_cash_amount" :currency="balance.currentCash" placeholder="最高单笔金额"/>
@@ -233,7 +236,7 @@ export default {
       default: true
     },
     editing: Boolean,     // 当前是否编辑广告
-    item: Object,         // 被编辑的广告
+    editingItem: Object,         // 被编辑的广告
   },
   data() {
     return {
@@ -315,7 +318,8 @@ export default {
       // 价格限制2位小数
       this.form.price = floatRate.decimalDiv(100).decimalMul(this.balance.currentRate[this.form.coin_type]).setDigit(2)
     },
-    item: function (newValue) {
+    // 用editingItem覆盖form
+    editingItem: function (newValue) {
       Object.assign(this.form, newValue, {
         coin_amount: newValue.remain_coin_amount // 一个现有的广告，其amount是 remain_coin_amount
       })
@@ -348,7 +352,9 @@ export default {
     },
 
     doCreateOrUpdateItem(isEdit) {
-      this.axios.item.createItem(this.form).then(res => {
+      const itemPromise = isEdit ? this.axios.item.updateItem : this.axios.item.createItem
+
+      itemPromise(this.form).then(res => {
         this.$showTips(isEdit ? '广告编辑成功' : '广告发布成功')
 
         this.$emit(isEdit ? 'edited' : 'published', this.form)
@@ -369,7 +375,7 @@ export default {
       if (!Number(form.coin_amount)) return this.$showTips('请输入交易数量')
       if (form.auto_reply_content.length > this.constant.MAX_AUTO_REPLY_LENGTH) return this.$showTips(this.$tt('最大自动回复长度不可超过{0}', this.constant.MAX_AUTO_REPLY_LENGTH))
 
-      if (this.editingItem) {
+      if (this.editing) {
         this.doCreateOrUpdateItem(true)
       } else {
         this.form.cash_type = this.balance.currentCash

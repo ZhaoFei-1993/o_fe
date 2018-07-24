@@ -133,12 +133,14 @@
           <b-nav-item-dropdown id="user-dropdown" :text="'Hi, '+simplifyUserName(user.account.name)">
             <!--<b-dropdown-item :href="accountSetting">账户设置</b-dropdown-item>-->
             <b-dropdown-item to="/my/security"><i class="iconfont icon-manage-account"></i> 个人中心</b-dropdown-item>
+            <b-dropdown-item to="/wallet"><i class="iconfont icon-wallet"></i> OTC钱包</b-dropdown-item>
             <b-dropdown-item v-if="user.merchant && user.merchant.auth_status === constant.MERCHANT_AUTH_STATUS.PASS"
                              to="/my/items">
               <i class="iconfont icon-apply-merchant"></i>
               广告管理
             </b-dropdown-item>
-            <b-dropdown-item v-else to="/my/merchant"><i class="iconfont icon-apply-merchant"></i> 商家认证
+            <b-dropdown-item v-else to="/my/merchant">
+              <i class="iconfont icon-apply-merchant"></i> 商家认证
             </b-dropdown-item>
             <!--<b-dropdown-item><i class="iconfont icon-manage-ticket"></i> 工单系统</b-dropdown-item>-->
             <b-dropdown-item @click="signOut"><i class="iconfont icon-logout"></i>退出登录</b-dropdown-item>
@@ -190,7 +192,7 @@
         <p class="c-red" v-if="nameDuplicated">该昵称已被占用，请使用其他昵称。</p>
       </div>
     </b-modal>
-    <PublishItemModal v-if="publishModalShowing" v-model="publishModalShowing" @published="onItemPublished"/>
+    <PublishItemModal v-if="isItemPublishing" v-model="isItemPublishing" @published="onItemPublished"/>
   </div>
 </template>
 
@@ -202,7 +204,7 @@
 
   export default {
     head: {
-      link: [{rel: 'stylesheet', href: '//at.alicdn.com/t/font_739076_5b3ei22ua03.css'}]
+      link: [{rel: 'stylesheet', href: '//at.alicdn.com/t/font_739076_x6i5224yel.css'}]
     },
     components: {
       PublishItemModal,
@@ -210,7 +212,7 @@
     data() {
       return {
         coinex,
-        publishModalShowing: false,
+        isItemPublishing: false,
         attentionModelShowing: false,
         attention: [],
         nameDuplicated: false,
@@ -244,6 +246,7 @@
     },
     mounted() {
       // component 里面不能调用fetch和asyncData
+      this.$store.dispatch('fetchUserMerchant')
       this.$store.dispatch('fetchUserAccount').then(_ => {
         if (this.user && this.user.account && !this.user.account.is_name_confirmed) {
           this.userName = this.user.account.name
@@ -257,8 +260,9 @@
         evt.preventDefault()
         this.axios.user.updateName(this.userName).then(_ => {
           this.$refs.updateNameModal.hide()
+          this.$store.dispatch('fetchUserAccount')
         }).catch(err => {
-          if (err.code === 72) {
+          if (err.code === this.constant.ERROR_CODE.NAME_USED) {
             this.nameDuplicated = true
           } else {
             onApiError(err, this)
@@ -289,10 +293,10 @@
         this.$store.dispatch('signOut')
       },
       onItemPublish() {
-        this.publishModalShowing = true
+        this.isItemPublishing = true
       },
       onItemPublished() {
-        this.publishModalShowing = false
+        this.isItemPublishing = false
       },
     }
   }

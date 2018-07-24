@@ -145,8 +145,8 @@
       </Language>
     </CBlock>
 
-    <PublishItemModal v-model="publishModalShowing" @published="onItemPublished"/>
-    <PublishItemModal v-model="isItemEditing" :item="editingItem" :editing="isItemEditing" @edited="onItemEdited"/>
+    <PublishItemModal v-model="isItemPublishing" @published="onItemPublished"/>
+    <PublishItemModal v-model="isItemEditing" :editingItem="editingItem" :editing="true" @edited="onItemEdited"/>
   </CBlock>
 </template>
 
@@ -167,7 +167,7 @@ export default {
   },
   data() {
     return {
-      publishModalShowing: false,
+      isItemPublishing: false,
       items: [],
       itemStatus: '',
       editingItem: {},        // 正在编辑or上架的广告
@@ -250,6 +250,7 @@ export default {
     return Promise.all([
       store.dispatch('fetchUserMerchant'),
       store.dispatch('fetchOtcBalance'),
+      store.dispatch('fetchUserPayments'),
     ]).catch(err => {
       app.axios.needAuth(err, redirect, route.fullPath)
     })
@@ -321,10 +322,10 @@ export default {
       })
     },
     onItemPublish() {
-      this.publishModalShowing = true
+      this.isItemPublishing = true
     },
     onItemPublished() {
-      this.publishModalShowing = false
+      this.isItemPublishing = false
       this.itemStatus === this.constant.ITEM_STATUS.ONLINE && this.getItems()
     },
 

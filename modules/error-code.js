@@ -1,11 +1,13 @@
 const MISSING_PAY_METHODS = 71      // 发广告缺少支付方式
 const ATLEAST_ONE_PAYMENT_METHOD = 606    // 最少需要一种支付方式
 const REACH_ITEM_COUNT_LIMIT = 106    // 最少需要一种支付方式
+const NAME_USED = 72
 // 所有已知错误的map
 export const ERROR_CODE = {
   MISSING_PAY_METHODS,
   ATLEAST_ONE_PAYMENT_METHOD,
   REACH_ITEM_COUNT_LIMIT,
+  NAME_USED,
 }
 
 // code对应的错误信息
