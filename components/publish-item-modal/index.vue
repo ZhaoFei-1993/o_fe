@@ -125,7 +125,7 @@
             <b-btn variant="plain-yellow" size="xxs" @click="onSetPrice2MarketPrice">{{marketPrice}}</b-btn>
             <CTooltip content="todo" x="4"/>
           </div>
-          <CurrencyInput v-model="form.price" :currency="balance.currentCash" placeholder="请输入价格" class="col-left"/>
+          <CurrencyInput v-model="form.price" :currency="balance.currentCash" :decimalDigit="2" placeholder="请输入价格" class="col-left"/>
         </div>
 
         <div v-else class="item-float-price-container">
@@ -135,7 +135,7 @@
               <b-btn variant="plain-yellow" size="xxs" @click="onSetPrice2MarketPrice">{{marketPrice}}</b-btn>
               <CTooltip content="todo" x="4"/>
             </div>
-            <CurrencyInput v-model="form.price" :currency="balance.currentCash" :disabled="true" placeholder="请输入价格"/>
+            <CurrencyInput v-model="form.price" :currency="balance.currentCash" :decimalDigit="2" :disabled="true" placeholder="请输入价格"/>
           </div>
 
           <i class="iconfont icon-bothway"></i>
@@ -149,10 +149,9 @@
             <div class="input-label">
               {{form.side === 'buy' ? '最高单价（可留空）' : '最低单价（可留空）'}}
             </div>
-            <CurrencyInput v-model="form.price_limit" :currency="balance.currentCash" placeholder="请输入价格"/>
+            <CurrencyInput v-model="form.price_limit" :currency="balance.currentCash" :decimalDigit="2" placeholder="请输入价格"/>
           </div>
         </div>
-
       </b-form-group>
 
       <b-form-group label="交易数量" class="coin-amount-group">
@@ -197,9 +196,14 @@
             <CurrencyInput v-model="form.max_deal_cash_amount" :currency="balance.currentCash" placeholder="最高单笔金额"/>
           </div>
         </b-form-group>
+
         <b-form-group label="自动回复">
           <b-form-textarea v-model="form.auto_reply_content" rows="3"></b-form-textarea>
+          <p class="text-right" :class="{'c-red': form.auto_reply_content.length > constant.MAX_AUTO_REPLY_LENGTH}">
+            {{form.auto_reply_content.length}} / {{constant.MAX_AUTO_REPLY_LENGTH}}字
+          </p>
         </b-form-group>
+
         <b-form-group label="交易方限制">
           <b-form-checkbox-group v-model="form.counterparty_limit"
                                  :options="constant.COUNTERPARTY_LIMIT_OPTIONS">
@@ -235,13 +239,13 @@ export default {
     return {
       form: {
         side: 'buy',
-        float_rate: 100,      // todo:所有相关的小数位数限制？
+        float_rate: 100,
         price: 0,
-        price_limit: 100,           // 价格限制，根据买卖方向不同，表示最大限制/最小限制
-        coin_amount: 0,
+        price_limit: '',           // 价格限制，根据买卖方向不同，表示最大限制/最小限制
+        coin_amount: '',
         pricing_type: 'fixed',
-        min_deal_cash_amount: 0,
-        max_deal_cash_amount: 0,
+        min_deal_cash_amount: '',
+        max_deal_cash_amount: '',
         coin_type: 'BCH',
         cash_type: '',
         auto_reply_content: '',
@@ -301,15 +305,17 @@ export default {
   },
   watch: {
     'form.price': function (price) {
-      const form = this.form
-      form.float_rate = price.decimalDiv(this.balance.currentRate[form.coin_type]).decimalMul(100)
-
-      if (form.side === 'buy' && form.price_limit < price && Number(price) !== 0) form.price_limit = price
-      if (form.side === 'sell' && form.price_limit > price && Number(price) !== 0) form.price_limit = price
+      // 暂时只有单向变化，不做双向的 jeff 20180724
+      // const form = this.form
+      // form.float_rate = price.decimalDiv(this.balance.currentRate[form.coin_type]).decimalMul(100)
+      //
+      // if (form.side === 'buy' && form.price_limit < price && Number(price) !== 0) form.price_limit = price
+      // if (form.side === 'sell' && form.price_limit > price && Number(price) !== 0) form.price_limit = price
     },
     'form.float_rate': function (floatRate) {
       if (this.form.pricing_type !== this.constant.PRICING_TYPE.FLOAT) return
-      this.form.price = floatRate.decimalDiv(100).decimalMul(this.balance.currentRate[this.form.coin_type])
+      // 价格限制2位小数
+      this.form.price = floatRate.decimalDiv(100).decimalMul(this.balance.currentRate[this.form.coin_type]).setDigit(2)
     },
     item: function (newValue) {
       Object.assign(this.form, newValue, {
@@ -323,7 +329,7 @@ export default {
     this.$store.dispatch('fetchUserSettings').then(() => {
       // 从用户配置中获取默认的广告配置
       Object.assign(this.form, this.user.settings)
-      this.form.price_limit = this.form.price = this.marketPrice
+      this.form.price = this.marketPrice
     })
   },
   methods: {
@@ -338,7 +344,7 @@ export default {
     },
     onPricingTypeChange(pricingType) {
       const form = this.form
-      form.price_limit = this.marketPrice
+      // form.price_limit = this.marketPrice
       form.price = this.marketPrice
       form.float_rate = 100
     },
@@ -364,6 +370,7 @@ export default {
       const form = this.form
       if (!Number(form.price)) return this.$showTips('价格不可以为0')
       if (!Number(form.coin_amount)) return this.$showTips('请输入交易数量')
+      if (form.auto_reply_content.length > this.constant.MAX_AUTO_REPLY_LENGTH) return this.$showTips(this.$tt('最大自动回复长度不可超过{0}', this.constant.MAX_AUTO_REPLY_LENGTH))
 
       if (this.editingItem) {
         this.doCreateOrUpdateItem(true)

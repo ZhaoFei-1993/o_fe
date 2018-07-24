@@ -145,4 +145,7 @@ export default {
     EACH_TIME: 'each_time',
     EACH_TWO_HOURS: 'each_two_hours',
   },
+
+  // 自动回复内容的最大长度
+  MAX_AUTO_REPLY_LENGTH: 50,
 }
