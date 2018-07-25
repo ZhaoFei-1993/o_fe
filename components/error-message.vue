@@ -12,9 +12,9 @@
   export default {
     name: 'error-message',
     props: {
-      name: String,
       result: Object,     // vuelidate 针对表单字段的校验结果
-      msgs: Object,        // 字段的错误提示信息
+      msgs: Object,        // 字段的错误提示信息 Deprecated 废弃，尽量不要使用。用messages代替
+      messages: Object,     // 字段的错误提示信息
       keyName: String,        // 索引的key,用以从result和msgs上索引数据，可为空
     },
     computed: {
@@ -27,13 +27,14 @@
     render() {
       const keyName = this.keyName
       const result = keyName ? this.result[keyName] : this.result
-      const msgs = keyName ? this.msgs[keyName] : this.msgs
+      let messages = this.messages || this.msgs
+      messages = keyName ? messages[keyName] : messages
 
       if (!result || !result.$error) return <div class="error-message"></div>
 
       for (const validationName in result) {
-        if (!result[validationName] && msgs[validationName]) {
-          return <div class="error-message">{msgs[validationName]}</div>
+        if (!result[validationName] && messages[validationName]) {
+          return <div class="error-message">{messages[validationName]}</div>
         }
       }
       return <div class="error-message">{this.i18ntext.errorMessage}</div>
