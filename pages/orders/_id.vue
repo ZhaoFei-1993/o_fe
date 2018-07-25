@@ -334,6 +334,10 @@
     }
   }
 
+  .payment-qrcode {
+    max-width: 400px;
+    max-height: 400px;
+  }
 
 </style>
 <script>
@@ -587,7 +591,7 @@
       showQrCode(codeImg) {
         this.$showDialog({
           title: '支付二维码',
-          content: (<div><img src={codeImg}/></div>),
+          content: (<div><img class="payment-qrcode" src={codeImg}/></div>),
           okOnly: true,
         })
       },

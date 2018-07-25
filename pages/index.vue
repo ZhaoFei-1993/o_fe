@@ -470,7 +470,7 @@
             this.currentConstraint = (!constraint.kyc_place_order_verified) ? {
               content: '您尚未完成实名认证，每日限制下单次数为 3 次。',
               linkText: '去完成实名认证',
-              outLink: `${this.coinex}/my/info/security?redirect=${encodeURIComponent(webDomain + this.$route.fullPath)}`,
+              outLink: `${this.coinex}/my/info/basic?redirect=${encodeURIComponent(webDomain + this.$route.fullPath)}`,
             } : {
               content: '您今天累计取消超过 3 次订单，被冻结交易功能。',
               linkText: '了解更多交易规则',
