@@ -469,7 +469,7 @@
                 this.$errorTips(`提交失败code=${res.code}`)
               }
             }).catch(err => {
-              this.$errorTips(`提交失败${err}`)
+              this.$errorTips(`提交失败: ${err}`)
             })
           }
         })
@@ -488,7 +488,7 @@
                 this.$errorTips(`提交失败code=${res.code}`)
               }
             }).catch(err => {
-              this.$errorTips(`提交失败${err}`)
+              this.$errorTips(`提交失败: ${err}`)
             })
           }
         })
