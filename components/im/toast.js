@@ -11,20 +11,22 @@ if (process.browser) {
     data: {
       style: {
         toast: {
+          display: 'flex',
+          justifyContent: 'center',
           position: 'absolute',
           left: '0',
           bottom: '60px',
           width: '100%',
         },
         toastContent: {
-          width: '150px',
-          height: '22px',
+          display: 'inline-block',
+          minHeight: '22px',
           lineHeight: '22px',
           textAlign: 'center',
           backgroundColor: 'rgba(0, 0, 0, 0.3)',
           color: '#fff',
           borderRadius: '5px',
-          margin: '0 auto',
+          padding: '0 5px',
           fontSize: '14px',
         },
       },

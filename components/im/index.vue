@@ -137,6 +137,8 @@
             this.members = this.conversation.members
             // 有用户被添加至某个对话
             conversation.on(Event.MEMBERS_JOINED, payload => {
+              const { invitedBy, members } = payload
+              if (members && members.length === 1 && members[0] === invitedBy) return // 只有一个人参与的对话不做提示
               this.pushSystemMessage(`${payload.invitedBy} 邀请 ${payload.members} 加入对话`)
             })
             // 有成员被从某个对话中移除
@@ -252,7 +254,7 @@
           $toast.show('单文件不可超过5M', 1500)
           return
         }
-        if (file.name) {
+        if (file.name && this.conversation) {
           $toast.show('发送中...0%')
           const fileObj = new AV.File(file.name, file)
           fileObj.save({
@@ -331,7 +333,7 @@
       },
       onSendMsg() {
         const msg = this.message.trim()
-        if (msg) {
+        if (msg && this.conversation) {
           this.conversation.send(new TextMessage(msg)).then(message => {
             this.msgLog.push({
               ...message,
