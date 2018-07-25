@@ -51,6 +51,7 @@
               <b-input-group :append="balance.currentCash">
                 <ExtendedInputNumber v-model="form.cash_amount" :name="item.id+'cash_amount'"
                                      @focus="()=>onFocus('cashAmount')"
+                                     decimalDigit="2"
                                      @input="cashAmountChanged"
                                      :placeholder="'可填写想'+sideText+'的金额'"/>
               </b-input-group>

@@ -153,8 +153,6 @@ export default ({app, store}) => {
 
       // code 不为 0，即为后台报错
       if (data && data.code) {
-        const url = response.request ? response.request.responseURL : ''
-        console.log(`请求url：${url}`)
         const err = new Error(data.message)
         err.code = data.code
         err.data = data.data
