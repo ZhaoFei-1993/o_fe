@@ -64,7 +64,7 @@
           this.$emit('confirmReceipt')
           this.needVerify = false
         }).catch(err => {
-          this.$errorTips(`提交失败${err}`)
+          this.$errorTips(`提交失败${err.message}`)
           this.needVerify = true
         })
       },

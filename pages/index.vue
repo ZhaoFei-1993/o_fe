@@ -216,7 +216,7 @@
           </span>
         </div>
         <div class="list-header">
-          <span class="col-narrow col-name">{{selectedSide === constant.SIDE.BUY ? '卖家' : '买家'}}</span>
+          <span class="col-narrow col-name">商家</span>
           <span class="col-narrow">30天成单/完成率</span>
           <span class="col-narrow">数量</span>
           <span class="col-wide">限额</span>
@@ -226,7 +226,8 @@
           <span class="col-narrow">操作</span>
         </div>
         <div :class="['list',selectedSide.toLowerCase()]">
-          <div class="item-row" v-for="item in items">
+          <div v-if="!items||!items.length" class="text-center p-20">暂无该交易对广告</div>
+          <div v-else class="item-row" v-for="item in items">
             <span class="col-narrow col-name text-left fz-18 c-6f">
               {{item.user.name}}
               <div><span v-b-tooltip.hover title="认证商家"><i class="iconfont icon-certificated-merchant"></i></span></div>
