@@ -12,6 +12,7 @@ export default () => {
   const mutations = {
     INIT_CHAT_CLIENT(state, data) {
       if (!state.imClient) {
+        AV.init(APP_ID, APP_KEY) // 初始化leancloud云存储
         state.imClient = data
       }
     },
@@ -19,15 +20,26 @@ export default () => {
 
   const actions = {
     newChatClient({ commit }, clientId) {
-      console.log(clientId)
-      AV.init(APP_ID, APP_KEY) // 初始化leancloud云存储
-      const realtime = new Realtime({
-        appId: APP_ID,
-        appKey: APP_KEY,
-      })
-      realtime.createIMClient(clientId).then(myClient => {
-        commit('INIT_CHAT_CLIENT', myClient)
-      })
+      if (!state.imClient) {
+        const realtime = new Realtime({
+          appId: APP_ID,
+          appKey: APP_KEY,
+        })
+        const self = this
+        realtime.createIMClient(clientId, {
+          signatureFactory() {
+            return self.app.axios.chat.sign({
+              sign_type: 'signin',
+            }).then(res => {
+              if (res.code === 0) {
+                return res.data
+              }
+            })
+          },
+        }).then(myClient => {
+          commit('INIT_CHAT_CLIENT', myClient)
+        })
+      }
     },
   }
 

@@ -179,17 +179,19 @@
       },
     },
     beforeDestroy() {
-      [
-        Event.MESSAGE,
-        Event.UNREAD_MESSAGES_COUNT_UPDATE,
-        Event.DISCONNECT,
-        Event.OFFLINE,
-        Event.ONLINE,
-        Event.SCHEDULE,
-        Event.RETRY,
-        Event.RECONNECT,
-        Event.RECONNECT_ERROR,
-      ].forEach(event => this.client.off(event))
+      if (this.client) {
+        [
+          Event.MESSAGE,
+          Event.UNREAD_MESSAGES_COUNT_UPDATE,
+          Event.DISCONNECT,
+          Event.OFFLINE,
+          Event.ONLINE,
+          Event.SCHEDULE,
+          Event.RETRY,
+          Event.RECONNECT,
+          Event.RECONNECT_ERROR,
+        ].forEach(event => this.client.off(event))
+      }
       this.conversation = null
       this.messageIterator = null
     },
@@ -264,19 +266,6 @@
       onSelectFile() {
         this.$refs.fileSelector.click()
       },
-      // signatureFactory(clientId) {
-      //   return this.axios.chat.connect({
-      //     client_id: clientId,
-      //   })
-      // },
-      // conversationSignatureFactory(conversationId, clientId, targetIds, action) {
-      //   return this.axios.chat.startConversation({
-      //     conv_id: conversationId,
-      //     client_id: clientId,
-      //     members: targetIds.join(','),
-      //     action,
-      //   })
-      // },
       messageHandler(msg) {
         this.msgLog.push(msg)
         this.scrollToBottom()
