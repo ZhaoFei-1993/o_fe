@@ -32,10 +32,16 @@
 
     <MyInfoItem title="交易限额">
       <div slot="content">
-        <div v-if="amountLimitEditing">
-          <CurrencyInput v-model="editingSettings.min_deal_cash_amount" :currency="settings.cash_type"/>
-          <span class="fz-12 mx-2">—</span>
-          <CurrencyInput v-model="editingSettings.max_deal_cash_amount" :currency="settings.cash_type"/>
+        <div v-if="amountLimitEditing" class="d-flex">
+          <div>
+            <CurrencyInput v-model="editingSettings.min_deal_cash_amount" :currency="settings.cash_type" :decimalDigit="2"/>
+            <EMsgs :result="$v.editingSettings" :messages="editingSettingsValidation.messages" keyName="min_deal_cash_amount" class="ps-a"/>
+          </div>
+          <span class="fz-12 mx-2 mt-10">—</span>
+          <div>
+            <CurrencyInput v-model="editingSettings.max_deal_cash_amount" :currency="settings.cash_type" :decimalDigit="2"/>
+            <EMsgs :result="$v.editingSettings" :messages="editingSettingsValidation.messages" keyName="max_deal_cash_amount" class="ps-a"/>
+          </div>
         </div>
         <div v-else>
           {{settings.min_deal_cash_amount}} {{settings.cash_type}} — {{settings.max_deal_cash_amount}}
@@ -59,7 +65,7 @@
           <p class="text-right" :class="{'c-red': editingSettings.auto_reply_content.length > constant.MAX_AUTO_REPLY_LENGTH}">
             {{editingSettings.auto_reply_content.length}} / {{constant.MAX_AUTO_REPLY_LENGTH}}字
           </p>
-          <EMsgs :result="$v.editingSettings" :msgs="editingSettingsValidation.messages" keyName="auto_reply_content" style="margin-top: -20px;"/>
+          <EMsgs :result="$v.editingSettings" :messages="editingSettingsValidation.messages" keyName="auto_reply_content" style="margin-top: -20px;"/>
         </div>
         <p v-else class="auto-reply-content">{{settings.auto_reply_content ? settings.auto_reply_content : '无'}}</p>
       </template>
@@ -103,7 +109,7 @@
   import MyInfoItem from './_c/my-info-item.vue'
   import CurrencyInput from '~/components/currency-input.vue'
   import EMsgs from '~/components/error-message.vue'
-  import getSettingConfig from './setting-form-config'
+  import getSettingConfig from '~/components/publish-item-modal/item-setting-config'
   import Vuelidate from 'vuelidate'
 
   Vue.use(Vuelidate)
@@ -155,6 +161,10 @@
         this.store2Data()
       },
       onEditAmountLimitConfirm() {
+        this.$v.editingSettings.min_deal_cash_amount.$touch()
+        this.$v.editingSettings.max_deal_cash_amount.$touch()
+        if (this.$v.editingSettings.min_deal_cash_amount.$invalid || this.$v.editingSettings.max_deal_cash_amount.$invalid) return
+
         this.onEditConfirm({
           min_deal_cash_amount: this.editingSettings.min_deal_cash_amount,
           max_deal_cash_amount: this.editingSettings.max_deal_cash_amount
@@ -171,8 +181,8 @@
         this.store2Data()
       },
       onEditAutoReplyConfirm() {
-        this.$v.$touch()
-        if (this.$v.$invalid) return
+        this.$v.editingSettings.auto_reply_content.$touch()
+        if (this.$v.editingSettings.auto_reply_content.$invalid) return
 
         this.onEditConfirm({
           auto_reply_content: this.editingSettings.auto_reply_content
@@ -211,6 +221,8 @@
       onEditConfirm(data) {
         return this.$store.dispatch('setUserSettings', Object.assign({}, this.settings, data)).then(() => {
           this.store2Data()
+        }).catch(err => {
+          this.axios.onError(err)
         })
       }
     }

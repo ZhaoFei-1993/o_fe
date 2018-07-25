@@ -353,7 +353,7 @@
 
         this.axios.user.applyMerchant(this.form).then(res => {
           this.$showTips('提交申请成功')
-          this.$store.dispatch('fetchUserMerchant')
+          return this.$store.dispatch('fetchUserMerchant')
         }).catch(err => {
           this.axios.onError(err)
         })

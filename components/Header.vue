@@ -113,8 +113,10 @@
         <img src="~assets/img/logo.png" alt="CoinEx OTC" height="34" width="120">
       </b-navbar-brand>
       <b-navbar-nav class="ml-30">
-        <b-nav-item to="/chat" exact>聊天</b-nav-item>
-        <b-nav-item @click="onItemPublish">发布广告</b-nav-item>
+        <b-nav-item to="/" exact>法币交易</b-nav-item>
+        <PublishItemButton>
+          <b-nav-item>发布广告</b-nav-item>
+        </PublishItemButton>
         <b-nav-item to="/wallet">OTC钱包</b-nav-item>
         <b-nav-item :href="helpLink" target="_blank">帮助</b-nav-item>
         <span style="color: #d5d5d5">|</span>
@@ -192,7 +194,6 @@
         <p class="c-red" v-if="nameDuplicated">该昵称已被占用，请使用其他昵称。</p>
       </div>
     </b-modal>
-    <PublishItemModal v-if="isItemPublishing" v-model="isItemPublishing" @published="onItemPublished"/>
   </div>
 </template>
 
@@ -200,19 +201,18 @@
   import {mapState} from 'vuex'
   import {loginPage, webDomain, signupPage, coinex} from '~/modules/variables'
   import {onApiError} from '~/modules/error-code'
-  import PublishItemModal from '~/components/publish-item-modal'
+  import PublishItemButton from '~/components/publish-item-modal/publish-item-button.vue'
 
   export default {
     head: {
       link: [{rel: 'stylesheet', href: '//at.alicdn.com/t/font_739076_x6i5224yel.css'}]
     },
     components: {
-      PublishItemModal,
+      PublishItemButton,
     },
     data() {
       return {
         coinex,
-        isItemPublishing: false,
         attentionModelShowing: false,
         attention: [],
         nameDuplicated: false,
@@ -224,7 +224,7 @@
     },
 
     computed: {
-      ...mapState(['lang', 'user', 'messages', 'constant', 'chat']),
+      ...mapState(['lang', 'user', 'messages', 'constant']),
       helpLink() {
         let lang = 'en-us'
         switch (this.lang.lang) {
@@ -248,17 +248,13 @@
       // component 里面不能调用fetch和asyncData
       this.$store.dispatch('fetchUserMerchant')
       this.$store.dispatch('fetchUserAccount').then(_ => {
-        if (this.user && this.user.account) {
-          if (!this.user.account.is_name_confirmed) {
-            this.userName = this.user.account.name
-            this.$refs.updateNameModal.show()
-          }
-          if (!this.chat.imClient) {
-            const clientId = `${this.user.account.id}`
-            // const clientId = 'leo' // test
-            this.$store.dispatch('newChatClient', clientId)
-          }
+        if (this.user && this.user.account && !this.user.account.is_name_confirmed) {
+          this.userName = this.user.account.name
+          this.$refs.updateNameModal.show()
         }
+      }).catch(err => {
+        if (err.code === this.constant.ERROR_CODE.UNAUTHORIZED) return
+        this.axios.onError(err)
       })
     },
     methods: {
@@ -298,12 +294,6 @@
       },
       signOut() {
         this.$store.dispatch('signOut')
-      },
-      onItemPublish() {
-        this.isItemPublishing = true
-      },
-      onItemPublished() {
-        this.isItemPublishing = false
       },
     }
   }
