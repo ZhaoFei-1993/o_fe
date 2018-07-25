@@ -351,9 +351,12 @@
         this.verify.businessType = this.constant.VERIFY_CODE_BUSINESS.ADD_PAYMENT
 
         if (this.isPaymentEditing) {
+          this.isPaymentEditing = false
+
+          this.$refs['verify-code'].reset()
           this.clearForm()
+          this.$v.form.$reset()
         }
-        this.isPaymentEditing = false
       },
 
       /**

@@ -199,6 +199,15 @@
 
         return !this.$v.$invalid
       },
+      reset() {
+        this.$emit('update:sms', '')
+        this.$emit('update:google', '')
+        this.$emit('update:email', '')
+
+        this.$nextTick(() => {
+          this.$v.$reset()
+        })
+      },
       onSendEmailCode() {
         if (this.emailTimer) return
 
