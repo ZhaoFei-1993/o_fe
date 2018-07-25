@@ -51,7 +51,7 @@
               <b-input-group :append="balance.currentCash">
                 <ExtendedInputNumber v-model="form.cash_amount" :name="item.id+'cash_amount'"
                                      @focus="()=>onFocus('cashAmount')"
-                                     decimalDigit="2"
+                                     :decimalDigit="2"
                                      @input="cashAmountChanged"
                                      :placeholder="'可填写想'+sideText+'的金额'"/>
               </b-input-group>
@@ -76,7 +76,7 @@
             * 提交信息即生成订单，请在15分钟内完成打款。
             <b-link href="TODO">更多交易须知 ></b-link>
           </div>
-          <div class="payment-tip" v-if="kycLimitAmount!==noKycLimit">
+          <div class="payment-tip" v-if="kycLimitAmount===noKycLimit">
             * 您尚未完成实名认证，每次交易限额{{noKycLimit}}元。
             <b-link href="TODO">去完成实名认证 ></b-link>
           </div>
@@ -255,7 +255,7 @@
         return `${this.maxDealCashAmount / this.item.price}`.setDigit(8)
       },
       validAmount() {
-        return this.maxDealCashAmount > this.item.min_deal_cash_amount
+        return this.maxDealCashAmount >= this.item.min_deal_cash_amount
       },
       sideMaxCash() {
         // 用户买单和balance无关，卖单需要有足够余额
@@ -263,7 +263,8 @@
       },
       maxDealCashAmount() {
         // 取以下各项的最小值（广告剩余量、广告限制最大额、如果是卖家则考虑余额、未实名验证的限额）
-        return Math.min(this.item.remain_coin_amount * this.item.price, (this.item.max_deal_cash_amount || Number.MAX_SAFE_INTEGER), this.sideMaxCash, this.kycLimitAmount)
+        const maxAmount = Math.min(this.item.remain_coin_amount * this.item.price, (this.item.max_deal_cash_amount || Number.MAX_SAFE_INTEGER), this.sideMaxCash, this.kycLimitAmount)
+        return `${maxAmount}`.setDigit(2)
       },
       sideText() {
         // user看到的是与merchant反的
@@ -334,9 +335,9 @@
           this.submitting = false
           this.hideModal()
           this.$router.push(`/orders/${response.data.id}`)
-        }).catch(() => {
+        }).catch(err => {
           this.submitting = false
-          this.$showTips('广告信息已更新，请重新下单', 'error')
+          this.$showTips(`下单失败 ${err.message}，请重新下单`, 'error')
           this.hideModal()
         })
       },

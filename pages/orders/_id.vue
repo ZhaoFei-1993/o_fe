@@ -50,9 +50,12 @@
               v-if="(order.status!==constant.ORDER_STATUS.CANCEL.value||order.pay_time)&&order.status!==constant.ORDER_STATUS.CLOSED.value">
             <div class="message">{{stepsMessage.payCash}}</div>
             <div class="step-time" v-if="order.pay_time">{{order.pay_time | getTimeText}}</div>
-            <button v-if="isBuySide&&!order.pay_time" class="btn btn-gradient-yellow btn-xs" @click="confirmPay()">
+            <b-btn v-if="isBuySide && !order.pay_time"
+                   :disabled="expired"
+                   size="xs" variant="gradient-yellow"
+                   @click="confirmPay()">
               我已付款
-            </button>
+            </b-btn>
           </li>
           <li :class="['step',{active:order.status===constant.ORDER_STATUS.PAID.value}]"
               v-if="order.status!==constant.ORDER_STATUS.CANCEL.value&&order.status!==constant.ORDER_STATUS.CLOSED.value">
@@ -81,10 +84,10 @@
       <div class="order-helper">
         <div v-if="canCancel" class="d-flex align-items-center justify-content-between">
           <span>想要终止交易？</span>
-          <button class="btn btn-outline-green btn-xs" @click="cancelOrder">取消订单</button>
+          <b-btn size="xs" variant="outline-green" :disabled="expired" @click="cancelOrder">取消订单</b-btn>
         </div>
         <template v-if="showAppeal">
-           <span v-if="!appeal||appeal.status===''">
+          <span v-if="!appeal||appeal.status===''">
           交易出现问题？需要
           <span class="c-brand-green appeal-btn" v-if="canAppeal" @click="startAppeal">申诉</span>
           <span class="c-brand-green appeal-btn" v-else v-b-tooltip.hover title="买家付款30分钟后，可发起申诉。">申诉</span>
@@ -109,8 +112,6 @@
             <span>申诉裁决：{{appealResult}}</span>
           </div>
         </template>
-
-
       </div>
     </div>
     <div class="sidebar">
@@ -146,7 +147,8 @@
         </div>
       </div>
     </b-modal>
-    <ConfirmReceipt :orderId="order.id" :show-confirm-receipt-modal="showConfirmReceiptModal"/>
+    <ConfirmReceipt :orderId="order.id" :show-confirm-receipt-modal="showConfirmReceiptModal"
+                    @confirmReceipt="refreshOrderStatus"/>
   </div>
 </template>
 <style lang="scss">
@@ -428,7 +430,7 @@
       showPayment() {
         const notCancel = this.order.status !== this.constant.ORDER_STATUS.CANCEL.value
         const notClosed = this.order.status !== this.constant.ORDER_STATUS.CLOSED.value
-        return this.selectedMethod && notClosed && notCancel
+        return this.selectedMethod && notClosed && notCancel && !this.expired
       },
       tradeText() {
         if (!this.counterparty) return {}
@@ -458,16 +460,23 @@
         // 去最后六位，防止后端返回数字，都先转换为字符串
         return `${this.order.id}`.lastChars()
       },
+      expired() {
+        return this.order.status === this.constant.ORDER_STATUS.CREATED.value && this.payRemainTime <= 0
+      },
       paymentStatusMessage() {
+        let payMessage = '订单已超时'
+        if (this.payRemainTime > 0) {
+          payMessage = `
+                待支付，买方需在
+                <span class="c-red">${Math.floor(this.payRemainTime / 60)}分${this.payRemainTime % 60}秒</span>
+                内完成支付，付款参考号：<span class="c-red">${this.referCode}</span>
+                `
+        }
         switch (this.order.status) {
           case this.constant.ORDER_STATUS.CREATED.value:
             return {
-              message: `
-                    待支付，买方需在
-                    <span class="c-red">${Math.floor(this.payRemainTime / 60)}分${this.payRemainTime % 60}秒</span>
-                    内完成支付，付款参考号：<span class="c-red">${this.referCode}</span>
-                    `,
-              warning: this.isBuySide ? `请使用实名付款，转账时除参考号外请不要备注任何信息！` : null,
+              message: payMessage,
+              warning: this.isBuySide && !this.expired ? `请使用实名付款，转账时除参考号外请不要备注任何信息！` : null,
             }
           case this.constant.ORDER_STATUS.PAID.value:
             return {
@@ -523,7 +532,7 @@
       },
       getAppeal() {
         this.axios.order.getAppeal(this.order.id).then(response => {
-          this.appeal = response.data.data
+          this.appeal = response.data
         }).catch(err => {
           this.axios.onError(err)
         })
@@ -540,9 +549,6 @@
         if (this.order.status === this.constant.ORDER_STATUS.CREATED.value || this.order.status === this.constant.ORDER_STATUS.PAID.value || this.order.appeal_status !== '') {
           if (this.order.status === this.constant.ORDER_STATUS.CREATED.value) {
             this.payRemainTime = Math.floor(((this.order.place_time + ORDER_PAY_TIME * 60) * 1000 - Date.now()) / 1000)
-            if (this.payRemainTime <= 0) {
-              this.order.status = this.constant.ORDER_STATUS.CLOSED.value
-            }
             clearInterval(this.secondCountdown)
             this.secondCountdown = setInterval(() => {
               if (this.payRemainTime > 0) {

@@ -4,7 +4,7 @@
     <div class="pt-20 px-20">
       <SidebarInfoItem title="30天成交量">
         <Language text="[t][/t] 单">
-          <span slot="t" class="c-brand-yellow">{{userData.user_stat.deal_count || 0}}</span>
+          <span slot="t" class="c-brand-yellow">{{statics.deal_count || 0}}</span>
         </Language>
       </SidebarInfoItem>
 
@@ -13,11 +13,11 @@
       </SidebarInfoItem>
 
       <SidebarInfoItem title="平均付款时间">
-        <span class="c-brand-yellow">{{utils.formatDuration(userData.user_stat.pay_time)}}</span>
+        <span class="c-brand-yellow">{{utils.formatDuration(statics.pay_time)}}</span>
       </SidebarInfoItem>
 
       <SidebarInfoItem title="平均放行时间">
-        <span class="c-brand-yellow">{{utils.formatDuration(userData.user_stat.receipt_time)}}</span>
+        <span class="c-brand-yellow">{{utils.formatDuration(statics.receipt_time)}}</span>
       </SidebarInfoItem>
     </div>
   </div>
@@ -69,10 +69,12 @@
       SidebarInfoItem,
     },
     computed: {
+      statics() {
+        return this.userData.user_stat || this.userData// 从order里面读取的用户信息没有user_stat层级
+      },
       // 用户单子完成率
       userOrderCompleteRatio: function () {
-        const statics = this.userData.user_stat || this.userData // order详情里面的信息是扁平的
-        return statics.order_count ? (statics.deal_count / statics.order_count * 100).toFixed(1) + '%' : '--'
+        return this.statics.order_count ? (this.statics.deal_count / this.statics.order_count * 100).toFixed(1) + '%' : '--'
       },
     }
   }

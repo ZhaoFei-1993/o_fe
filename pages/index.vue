@@ -94,6 +94,7 @@
           line-height: 40px;
           display: flex;
           align-items: center;
+          font-weight: 500;
           justify-content: space-between;
           background-color: #f9f9f9;
           .col-narrow, .col-wide {
@@ -101,12 +102,18 @@
           }
           .select-payment {
             height: 24px;
+            font-weight: 500;
             border: 1px solid #dddddd;
+            &:focus {
+              outline: none;
+              box-shadow: none;
+              border: 1px solid $brandGreen;
+            }
           }
         }
         .list {
           &.sell .item-row:nth-of-type(even) {
-            background-color: #fafffe;
+            background-color: #FFFDFA;
           }
           .item-row {
             display: flex;
@@ -152,7 +159,7 @@
           padding: 0 16px;
         }
         .col-name {
-          padding-left: 0;
+          padding-left: 16px;
           width: 180px;
           overflow: hidden;
           text-overflow: ellipsis;
@@ -204,12 +211,12 @@
           <span>
             没有合适的？
             <PublishItemButton>
-              <b-btn variant="plain" class="c-brand-green">自己发布广告</b-btn>
+              <b-btn variant="plain" class="c-brand-green fz-14">自己发布广告</b-btn>
             </PublishItemButton>
           </span>
         </div>
         <div class="list-header">
-          <span class="col-narrow col-name">{{selectedSide === constant.SIDE.BUY ? '卖家' : '买家'}}</span>
+          <span class="col-narrow col-name">商家</span>
           <span class="col-narrow">30天成单/完成率</span>
           <span class="col-narrow">数量</span>
           <span class="col-wide">限额</span>
@@ -219,16 +226,18 @@
           <span class="col-narrow">操作</span>
         </div>
         <div :class="['list',selectedSide.toLowerCase()]">
-          <div class="item-row" v-for="item in items">
-            <span class="col-narrow col-name text-center fz-18 c-6f">
-              <span v-b-tooltip.hover title="认证商家"><i class="iconfont icon-certificated-merchant"></i></span>{{item.user.name}}
+          <div v-if="!items||!items.length" class="text-center p-20">暂无该交易对广告</div>
+          <div v-else class="item-row" v-for="item in items">
+            <span class="col-narrow col-name text-left fz-18 c-6f">
+              {{item.user.name}}
+              <div><span v-b-tooltip.hover title="认证商家"><i class="iconfont icon-certificated-merchant"></i></span></div>
             </span>
             <div class="col-narrow" v-if="item.user && item.user.user_stat">
-              <div class="fz-12 c-4a" v-if="item.user.user_stat.order_count">
+              <div class="fz-14 c-4a" v-if="item.user.user_stat.order_count">
                 {{item.user.user_stat.deal_count}}单 /
                 {{(item.user.user_stat.deal_count / item.user.user_stat.order_count) | percentage}}
               </div>
-              <div class="fz-12 c-4a" v-else>
+              <div class="fz-14 c-4a" v-else>
                 0单 / --
               </div>
               <div class="fz-12 c-6f">
@@ -237,14 +246,13 @@
                 `付款时间${utils.formatDuration(item.user.user_stat.pay_time)}`}}
               </div>
             </div>
-            <span class="col-narrow text-right fz-12 c-6f">{{item.remain_coin_amount + ' ' + selectedCoin}}</span>
-            <span
-              class="col-wide text-right pr-60 fz-12 c-6f">{{item.min_deal_cash_amount + '-' + item.max_deal_cash_amount + balance.currentCash}}</span>
+            <span class="col-narrow text-right fz-14 c-6f">{{item.remain_coin_amount + ' ' + selectedCoin}}</span>
+            <span class="col-wide text-right pr-60 fz-14 c-6f">{{item.min_deal_cash_amount + '-' + item.max_deal_cash_amount + balance.currentCash}}</span>
             <span class='payment col-narrow'>
               <UserPayments :payments="item.payment_methods"></UserPayments>
             </span>
             <span
-              :class="['sort-price col-wide pr-60 text-right',sortPrice]">{{item.price + ' '+balance.currentCash}}</span>
+              :class="['sort-price fz-18 col-wide pr-60 text-right',sortPrice]">{{item.price + ' '+balance.currentCash}}</span>
             <span class="col-narrow">
               <template v-if="user && user.id ===item.user.id">
                 <button class="btn btn-order-disabled" :id="'button-order-'+item.id" v-b-tooltip.hover title="不能与自己交易"> {{(selectedSide === constant.SIDE.BUY ? '购买' : '出售') + selectedCoin}} </button>
@@ -432,8 +440,8 @@
             this.selectedItem = item
             this.showPlaceOrderModal = true
           })
-        }, rejected => {
-          // 暂不处理
+        }).catch(err => {
+          this.$showTips(err.message, 'error')
         })
       },
       qualified(item) {
@@ -445,30 +453,28 @@
         return true
       },
       verifyHasPayment(item) {
-        if (!this.user.payments) {
-          return false
-        }
-        for (const pay of item.payment_methods) {
-          if (this.user.payments.find(p => p.method === pay)) {
-            return true
+        return this.$store.dispatch('fetchUserPayments').then(() => {
+          // 卖家需要有对应支付方式
+          if (!this.user.payments) {
+            return Promise.reject(new Error('获取支付方式失败'))
           }
-        }
-        return false
+          for (const pay of item.payment_methods) {
+            if (this.user.payments.find(p => p.status === 'on' && p.method === pay)) {
+              return Promise.resolve()
+            }
+          }
+          this.currentConstraint = {
+            content: '您尚未添加该广告支持的支付方式，无法下单。',
+            linkText: '添加支付方式',
+            link: '/my/payments',
+          }
+          this.showConstraintModal = true
+          return Promise.reject(new Error('获取支付方式失败'))
+        })
       },
       verifyDynamicConstraint(item) {
         if (item.side === this.constant.SIDE.BUY) {
-          // 卖家需要有对应支付方式
-          if (!this.verifyHasPayment(item)) {
-            this.currentConstraint = {
-              content: '您尚未添加该广告支持的支付方式，无法下单。',
-              linkText: '添加支付方式',
-              link: '/my/payments',
-            }
-            this.showConstraintModal = true
-            return Promise.reject(item)
-          } else {
-            return Promise.resolve()
-          }
+          return this.verifyHasPayment(item)
         }
         return this.axios.user.dynamicConstraint().then(response => {
           const constraint = response.data
