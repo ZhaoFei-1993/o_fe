@@ -287,7 +287,7 @@
       <div>
         {{currentConstraint.content}}
         <p>
-          <b-link v-if="currentConstraint.outLink" href="currentConstraint.outLink">{{currentConstraint.linkText}}
+          <b-link v-if="currentConstraint.outLink" :href="currentConstraint.outLink">{{currentConstraint.linkText}}
           </b-link>
           <b-link v-else :to="currentConstraint.link">{{currentConstraint.linkText}}</b-link>
         </p>
@@ -443,10 +443,10 @@
         }
         return this.axios.user.dynamicConstraint().then(response => {
           const constraint = response.data
-          if (constraint.can_place_order && constraint.can_trade) {
+          if (constraint.cancel_order_times_verified && constraint.kyc_place_order_verified) {
             return Promise.resolve()
           } else {
-            this.currentConstraint = constraint.can_place_order ? {
+            this.currentConstraint = (!constraint.kyc_place_order_verified) ? {
               content: '您尚未完成实名认证，每日限制下单次数为 3 次。',
               linkText: '去完成实名认证',
               outLink: `${this.coinex}/my/info/security`,
