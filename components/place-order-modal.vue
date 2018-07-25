@@ -334,9 +334,9 @@
           this.submitting = false
           this.hideModal()
           this.$router.push(`/orders/${response.data.id}`)
-        }).catch(() => {
+        }).catch(err => {
           this.submitting = false
-          this.$showTips('广告信息已更新，请重新下单', 'error')
+          this.$showTips(`下单失败 ${err}，请重新下单`, 'error')
           this.hideModal()
         })
       },

@@ -441,7 +441,7 @@
           title: '确认付款',
           content: (<div>确认您已向买方付款？<span class="c-red">未付款点击“我已付款”将被冻结账户。</span></div>),
           onOk: () => {
-            this.axios.order.confirmPay(item.id).then(res => {
+            this.axios.order.confirmPay(item.id, item._selected_payment_method).then(res => {
               if (res.code === 0) { // 成功后跳转到`已结束`
                 this.onClickFilter(1)
               } else {

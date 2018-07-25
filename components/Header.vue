@@ -23,7 +23,7 @@
       font-size: 14px;
 
       .nav-link {
-        height: 50px;
+        height: 60px;
         line-height: 60px;
         padding-top: 0;
         color: #27313e;
