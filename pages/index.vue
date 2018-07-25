@@ -453,30 +453,28 @@
         return true
       },
       verifyHasPayment(item) {
-        if (!this.user.payments) {
-          return false
-        }
-        for (const pay of item.payment_methods) {
-          if (this.user.payments.find(p => p.method === pay)) {
-            return true
+        return this.$store.dispatch('fetchUserPayments').then(() => {
+          // 卖家需要有对应支付方式
+          if (!this.user.payments) {
+            return Promise.reject(new Error('获取支付方式失败'))
           }
-        }
-        return false
+          for (const pay of item.payment_methods) {
+            if (this.user.payments.find(p => p.status === 'on' && p.method === pay)) {
+              return Promise.resolve()
+            }
+          }
+          this.currentConstraint = {
+            content: '您尚未添加该广告支持的支付方式，无法下单。',
+            linkText: '添加支付方式',
+            link: '/my/payments',
+          }
+          this.showConstraintModal = true
+          return Promise.reject(new Error('获取支付方式失败'))
+        })
       },
       verifyDynamicConstraint(item) {
         if (item.side === this.constant.SIDE.BUY) {
-          // 卖家需要有对应支付方式
-          if (!this.verifyHasPayment(item)) {
-            this.currentConstraint = {
-              content: '您尚未添加该广告支持的支付方式，无法下单。',
-              linkText: '添加支付方式',
-              link: '/my/payments',
-            }
-            this.showConstraintModal = true
-            return Promise.reject(item)
-          } else {
-            return Promise.resolve()
-          }
+          return this.verifyHasPayment(item)
         }
         return this.axios.user.dynamicConstraint().then(response => {
           const constraint = response.data
