@@ -73,7 +73,9 @@
         <span v-else class="c-gray fz-12">暂停接单</span>
       </span>
 
-      <b-btn size="xs" variant="gradient-yellow" @click="onItemPublish">发布广告</b-btn>
+      <PublishItemButton @published="onItemPublished">
+        <b-btn size="xs" variant="gradient-yellow">发布广告</b-btn>
+      </PublishItemButton>
     </h2>
 
     <div class="mt-30">
@@ -145,13 +147,13 @@
       </Language>
     </CBlock>
 
-    <PublishItemModal v-model="isItemPublishing" @published="onItemPublished"/>
     <PublishItemModal v-model="isItemEditing" :editingItem="editingItem" :editing="true" @edited="onItemEdited"/>
   </CBlock>
 </template>
 
 <script>
 import PublishItemModal from '~/components/publish-item-modal/index.vue'
+import PublishItemButton from '~/components/publish-item-modal/publish-item-button.vue'
 import ToggleButton from '~/components/toggle-button.vue'
 import CurrencyInput from '~/components/currency-input.vue'
 import Blank from '~/components/blank.vue'
@@ -164,10 +166,10 @@ export default {
     CurrencyInput,
     ToggleButton,
     Blank,
+    PublishItemButton,
   },
   data() {
     return {
-      isItemPublishing: false,
       items: [],
       itemStatus: '',
       editingItem: {},        // 正在编辑or上架的广告
@@ -323,11 +325,8 @@ export default {
         }
       })
     },
-    onItemPublish() {
-      this.isItemPublishing = true
-    },
+
     onItemPublished() {
-      this.isItemPublishing = false
       this.itemStatus === this.constant.ITEM_STATUS.ONLINE && this.getItems()
     },
 
