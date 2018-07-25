@@ -483,7 +483,7 @@
           onOk: () => {
             this.axios.order.cancelOrder(item.id).then(res => {
               if (res.code === 0) {
-                item.status = this.constant.ORDER_STATUS.CANCEL
+                item.status = this.constant.ORDER_STATUS.CANCEL.value
               } else {
                 this.$errorTips(`提交失败code=${res.code}`)
               }
