@@ -50,7 +50,6 @@
         .icon-bothway {
           width: 50px;
           text-align: center;
-          margin-bottom: -20px;
         }
 
         .item-float-rate-container {
@@ -75,6 +74,7 @@
 
     .order-cash-limit-group {
       margin-top: 20px;
+      margin-bottom: 0;
 
       div[role="group"] {
         display: flex;
@@ -83,7 +83,6 @@
 
       .order-cash-limit-separator {
         width: 50px;
-        margin-bottom: -20px;
         text-align: center;
         color: #6f6f6f;
       }
@@ -187,21 +186,24 @@
         <b-form-group label="交易限额" class="order-cash-limit-group">
           <div class="col-left">
             <Language text="最低金额 [p][/p] 元" class="input-label" tag="div">
-              <span slot="p">400</span>
+              <span slot="p">{{constant.DEAL_CASH_AMOUNT.MIN}}</span>
             </Language>
-            <CurrencyInput v-model="form.min_deal_cash_amount" :currency="balance.currentCash" placeholder="最低单笔金额"/>
+            <CurrencyInput v-model="form.min_deal_cash_amount" :currency="balance.currentCash" placeholder="最低单笔金额" :decimalDigit="2"/>
+            <EMsgs :result="$v.form" :messages="itemValidations.messages" keyName="min_deal_cash_amount"/>
           </div>
           <div class="order-cash-limit-separator">至</div>
           <div class="col-right ml-0">
             <Language text="最高金额 [p][/p] 元" class="input-label" tag="div">
-              <span slot="p">1,000,000</span>
+              <span slot="p">{{constant.DEAL_CASH_AMOUNT.MAX.formatMoney()}}</span>
             </Language>
-            <CurrencyInput v-model="form.max_deal_cash_amount" :currency="balance.currentCash" placeholder="最高单笔金额"/>
+            <CurrencyInput v-model="form.max_deal_cash_amount" :currency="balance.currentCash" placeholder="最高单笔金额" :decimalDigit="2"/>
+            <EMsgs :result="$v.form" :messages="itemValidations.messages" keyName="max_deal_cash_amount"/>
           </div>
         </b-form-group>
 
         <b-form-group label="自动回复">
           <b-form-textarea v-model="form.auto_reply_content" rows="3"></b-form-textarea>
+          <EMsgs :result="$v.form" :messages="itemValidations.messages" keyName="auto_reply_content" class="ps-a"/>
           <p class="text-right" :class="{'c-red': form.auto_reply_content.length > constant.MAX_AUTO_REPLY_LENGTH}">
             {{form.auto_reply_content.length}} / {{constant.MAX_AUTO_REPLY_LENGTH}}字
           </p>
@@ -218,10 +220,15 @@
 </template>
 
 <script>
+import Vue from 'vue'
 import {mapState} from 'vuex'
 import TabButtons from '~/components/tab-buttons.vue'
 import CurrencyInput from '~/components/currency-input.vue'
 import CTooltip from '~/components/c-tooltip.vue'
+import EMsgs from '~/components/error-message.vue'
+import getItemSettingConfig from './item-setting-config'
+import Vuelidate from 'vuelidate'
+Vue.use(Vuelidate)
 
 export default {
   name: 'publish-ad-modal',
@@ -229,6 +236,7 @@ export default {
     TabButtons,
     CurrencyInput,
     CTooltip,
+    EMsgs,
   },
   props: {
     value: {
@@ -302,6 +310,14 @@ export default {
     // 当前coin当前cash下的市场参考价
     marketPrice: function () {
       return this.balance.currentRate[this.form.coin_type]
+    },
+    itemValidations: function () {
+      return this.utils.processValidationConfig(getItemSettingConfig(this.$t, this.$tt))
+    }
+  },
+  validations() {
+    return {
+      form: this.itemValidations.validations
     }
   },
   watch: {
@@ -374,6 +390,9 @@ export default {
 
     onSubmit(e) {
       e.preventDefault()
+      this.$v.$touch()
+      if (this.$v.$invalid) return
+
       const form = this.form
       if (!Number(form.price)) return this.$showTips('价格不可以为0')
       if (!Number(form.coin_amount)) return this.$showTips('请输入交易数量')

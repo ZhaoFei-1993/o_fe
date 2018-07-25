@@ -148,4 +148,10 @@ export default {
 
   // 自动回复内容的最大长度
   MAX_AUTO_REPLY_LENGTH: 50,
+
+  // 允许的交易最大最小值的上下限（暂时只针对CNY）
+  DEAL_CASH_AMOUNT: {
+    MIN: 100,
+    MAX: 5000000
+  },
 }

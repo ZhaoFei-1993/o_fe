@@ -142,8 +142,8 @@ String.prototype.formatCurrency = function (digit = 10,
  *
  * @return {[String]}         [格式化后的数字字符串]
  */
-String.prototype.formatMoney = function (c, charDec, charSep, noZero, lang) {
-  let n = this || "0";
+Number.prototype.formatMoney = String.prototype.formatMoney = function (c = 0, charDec = '.', charSep = ',', noZero = true, lang) {
+  let n = String(this || "0");
   let prefix = "";
   if (n[0] === "-" || n[0] === '+') {
     prefix = n[0];
@@ -179,8 +179,6 @@ String.prototype.formatMoney = function (c, charDec, charSep, noZero, lang) {
 
   const decimalArray = rounded.split(".");
   let integerString = "";
-  charDec = charDec === undefined ? "." : charDec;
-  charSep = charSep === undefined ? "," : charSep;
   // 三位加逗号
   for (let i = decimalArray[0].length - 1; i >= 0; i--) {
     if ((decimalArray[0].length - i) % 3 === 0 && i > 0) {
