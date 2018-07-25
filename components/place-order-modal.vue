@@ -255,7 +255,7 @@
         return `${this.maxDealCashAmount / this.item.price}`.setDigit(8)
       },
       validAmount() {
-        return this.maxDealCashAmount > this.item.min_deal_cash_amount
+        return this.maxDealCashAmount >= this.item.min_deal_cash_amount
       },
       sideMaxCash() {
         // 用户买单和balance无关，卖单需要有足够余额

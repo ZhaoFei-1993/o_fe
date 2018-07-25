@@ -440,8 +440,8 @@
             this.selectedItem = item
             this.showPlaceOrderModal = true
           })
-        }, rejected => {
-          // 暂不处理
+        }).catch(err => {
+          this.$showTips(err.message, 'error')
         })
       },
       qualified(item) {
