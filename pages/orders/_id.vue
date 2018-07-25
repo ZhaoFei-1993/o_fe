@@ -532,7 +532,7 @@
       },
       getAppeal() {
         this.axios.order.getAppeal(this.order.id).then(response => {
-          this.appeal = response.data.data
+          this.appeal = response.data
         }).catch(err => {
           this.axios.onError(err)
         })
