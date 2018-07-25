@@ -15,7 +15,7 @@
 </template>
 
 <script>
-import {mapState} from 'vuex'
+import {mapState, mapGetters} from 'vuex'
 import PublishModal from './index.vue'
 
 export default {
@@ -29,15 +29,30 @@ export default {
     }
   },
   computed: {
-    ...mapState(['user', 'constant'])
+    ...mapState(['user', 'constant']),
+    ...mapGetters(['paymentEnabled']),
   },
   mounted() {
     this.$store.dispatch('fetchUserMerchant')
+    this.$store.dispatch('fetchUserPayments')
   },
   methods: {
     onShowModal() {
       if (!this.user.account) {
         window.location.href = `${this.constant.loginPage}?redirect=${encodeURIComponent(this.constant.webDomain + this.$route.fullPath)}`
+        return
+      }
+
+      if (!this.paymentEnabled) {
+        this.$showDialog({
+          title: '没有启用支付方式',
+          content: '添加并且启用至少一个支付方式后才可以发布广告',
+          okTitle: '启用支付方式',
+          onOk: () => {
+            this.$router.push('/my/payments')
+          }
+        })
+
         return
       }
 
@@ -53,6 +68,12 @@ export default {
 
         return
       }
+
+      // console.lo
+      if (!(this.user.paymentEnabled)) {
+
+      }
+
       this.modalShowing = true
     },
     onPublished(item) {

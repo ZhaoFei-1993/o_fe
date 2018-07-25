@@ -55,7 +55,13 @@
         <span v-else-if="user.account.kyc_status === constant.KYC_STATUS.PROCESSING" class="c-brand-green">信息已提交，待系统审核</span>
         <span v-else class="c-red">未认证</span>
       </p>
-      <b-btn slot="action" v-if="user.account.kyc_status !== constant.KYC_STATUS.PASS" variant="outline-green" size="xs" :href="`${coinex}/my/info/auth/realname`" target="_blank">认证</b-btn>
+      <b-btn slot="action"
+             v-if="user.account.kyc_status !== constant.KYC_STATUS.PASS"
+             :disabled="user.account.kyc_status === constant.KYC_STATUS.PROCESSING"
+             variant="outline-green" size="xs" target="_blank"
+             :href="`${coinex}/my/info/auth/realname`">
+        认证
+      </b-btn>
     </MyInfoItem>
   </CBlock>
 </template>
