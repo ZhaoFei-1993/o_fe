@@ -139,6 +139,18 @@
         }
       }
     },
+    mounted() {
+      // 根据用户的数据，来判断下默认显示哪个验证码
+      if (this.needGoogle) {
+        this.$emit('update:codeType', this.constant.VERIFY_CODE_TYPE.GOOGLE)
+      }
+      else if (this.needSms) {
+        this.$emit('update:codeType', this.constant.VERIFY_CODE_TYPE.SMS)
+      }
+      else {
+        this.$emit('update:codeType', '')
+      }
+    },
     validations: function () {
       const rules = {}
       const VERIFY_CODE_TYPE = this.constant.VERIFY_CODE_TYPE

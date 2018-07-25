@@ -34,7 +34,7 @@
     </MyInfoItem>
     <MyInfoItem title="手机">
       <p slot="content">
-        <span v-if="user.account.mobile">{{user.account.mobile}}</span>
+        <span v-if="user.account.mobile">+{{user.account.country_code}} {{user.account.mobile}}</span>
         <span v-else class="c-red">未绑定</span>
       </p>
       <b-btn slot="action" variant="outline-green" size="xs" :href="`${coinex}/my/info/security`" target="_blank">更换</b-btn>

@@ -209,6 +209,7 @@
   import getPaymentFormConfig from './payment-form-config'
   import EMsgs from '~/components/error-message.vue'
   import {coinex} from '~/modules/variables'
+  import constant from '~/modules/constant'
 
   Vue.use(Vuelidate)
 
@@ -227,7 +228,7 @@
     data() {
       return {
         verify: {
-          codeType: 'sms',   // todo:默认值
+          codeType: constant.VERIFY_CODE_TYPE.GOOGLE,
           sms: '',
           google: '',
           email: '',

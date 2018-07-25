@@ -139,6 +139,7 @@
 
           <i class="iconfont icon-bothway"></i>
 
+          <!--todo: 浮动比例的限制、amount的限制(特别是卖的时候的限制）-->
           <div class="item-float-rate-container">
             <div class="input-label">
               浮动比例
