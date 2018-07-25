@@ -243,11 +243,18 @@
     mounted() {
       // component 里面不能调用fetch和asyncData
       this.$store.dispatch('fetchUserAccount').then(_ => {
-        if (this.user && this.user.account && !this.user.account.is_name_confirmed) {
-          this.userName = this.user.account.name
-          this.$refs.updateNameModal.show()
+        if (this.user && this.user.account) {
+          if (!this.user.account.is_name_confirmed) {
+            this.userName = this.user.account.name
+            this.$refs.updateNameModal.show()
+          }
+          if (!this.chat.imClient) {
+            this.$store.dispatch('newChatClient', this.user.account.id)
+          }
         }
       })
+      // test
+      this.$store.dispatch('newChatClient', window.localStorage.getItem('me') || 'leo')
     },
     methods: {
       handleUpdateName(evt) {

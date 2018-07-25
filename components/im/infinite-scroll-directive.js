@@ -1,3 +1,5 @@
+// 参考https://github.com/ElemeFE/vue-infinite-scroll
+
 const ctx = '@@InfiniteScroll'
 
 const throttle = function (fn, delay) {
@@ -5,7 +7,7 @@ const throttle = function (fn, delay) {
   let lastExec
   let timer
   let context
-  let args //eslint-disable-line
+  let args
 
   const execute = function () {
     fn.apply(context, args)
@@ -46,7 +48,7 @@ const getScrollTop = function (element) {
   return element.scrollTop
 }
 
-const getComputedStyle = document.defaultView.getComputedStyle
+const getComputedStyle = process.browser ? document.defaultView.getComputedStyle : null
 
 const getScrollEventTarget = function (element) {
   let currentNode = element
@@ -91,7 +93,7 @@ const isAttached = function (element) {
 }
 
 const doBind = function () {
-  if (this.binded) return // eslint-disable-line
+  if (this.binded) return
   this.binded = true
 
   const directive = this
@@ -165,7 +167,7 @@ const doCheck = function (force) {
   const distance = this.distance
   const reversed = this.reversedCheck
 
-  if (force !== true && this.disabled) return //eslint-disable-line
+  if (force !== true && this.disabled) return
   const viewportScrollTop = getScrollTop(scrollEventTarget)
   const viewportBottom = viewportScrollTop + getVisibleHeight(scrollEventTarget)
 
@@ -210,7 +212,7 @@ export default {
         el[ctx].bindTryCount = 0
 
         const tryBind = function () {
-          if (el[ctx].bindTryCount > 10) return //eslint-disable-line
+          if (el[ctx].bindTryCount > 10) return
           el[ctx].bindTryCount++
           if (isAttached(el)) {
             doBind.call(el[ctx], args)

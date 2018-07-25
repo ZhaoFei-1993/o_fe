@@ -56,6 +56,7 @@
       margin: auto;
       display: block;
       width: auto;
+      max-width: 80%;
       height: auto;
       animation-name: zoom;
       animation-duration: 0.6s;

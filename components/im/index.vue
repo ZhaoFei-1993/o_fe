@@ -1,11 +1,11 @@
 <template>
-  <div class="chat">
-    <div class="content" ref="chatbox" @scroll="onScroll($event)">
+  <div class="chat" ref="chatWrapper" :style="{width: `${width}px`, height: `${height}px`}">
+    <div class="content" ref="chatbox" v-infinite-scroll="loadMore" infinite-scroll-disabled="loading" infinite-scroll-distance="0" infinite-scroll-reverse infinite-scroll-immediate-check="false">
       <div v-for="item in msgLog" class="content-detail-box">
         <div class="msg-time">
           {{ item._timestamp | formatTime }}
         </div>
-        <template v-if="item.from === myClientId">
+        <template v-if="item.from === clientId">
           <div class="msg-box-right">
             <div class="msg-detail-wrapper">
               <div class="msg-username username-right">{{ item.from }}</div>
@@ -49,145 +49,148 @@
         </b-input-group-append>
       </b-input-group>
     </div>
-    <div v-if="!!tips" class="toast"><div class="toast-content">{{ tips }}</div></div>
-    <modal v-model="modalData.show" :src="modalData.src"></modal>
+    <image-modal v-model="imageModalData.show" :src="imageModalData.src"></image-modal>
   </div>
 </template>
 
 <script>
-  import { Realtime, TextMessage, Event } from 'leancloud-realtime'
-  import { ImageMessage } from 'leancloud-realtime-plugin-typed-messages'
+  import { TextMessage, Event } from 'leancloud-realtime'
   import AV from 'leancloud-storage'
+  import { ImageMessage } from 'leancloud-realtime-plugin-typed-messages'
   import UserAvatar from '~/components/user-avatar'
-  import Modal from './modal'
-  // import InfiniteScrollDirective from './infinite-scroll-directive.js'
-
-  let HAD_INIT_AV = false
+  import ImageModal from './image-modal'
+  import infiniteScroll from './infinite-scroll-directive.js'
+  import $toast from './toast.js'
 
   export default {
+    directives: {
+      infiniteScroll,
+      focus: {
+        inserted: function (el) {
+          el.focus()
+        }
+      },
+    },
+    props: {
+      client: {
+        // required: true,
+        type: Object,
+      },
+      conversationId: {
+        // required: true,
+        type: String,
+      },
+      clientId: {
+        type: String,
+      },
+      width: {
+        type: Number,
+        default: 400,
+      },
+      height: {
+        type: Number,
+        default: 480,
+      },
+    },
     data() {
       return {
         ImageMessage,
         TextMessage,
-        modalData: {
+        imageModalData: {
           show: false,
           src: '',
         },
-        tips: '',
         colors: ['#b2d9fd', '#fae7a3', '#ceeaaf', '#ffddd3', '#d4bfe8'],
-        members: [], // members[0]必须保证为自己
+        members: [],
         message: '',
-        myClient: null,
         conversation: null,
         limit: 20,
         messageIterator: null,
         msgLog: [],
         loading: false, // 消息加载中
         loadAll: false, // 是否已经加载全部消息
+        colorIndex: -1,
+        membersMap: {},
+        originalTitle: '', // 保存旧页面title
+        unreadMessagesCount: 0,
       }
     },
     components: {
       UserAvatar,
-      Modal,
+      ImageModal,
+    },
+    watch: {
+      client(instance) {
+        if (!instance) return
+
+        instance.getConversation(this.conversationId)
+          .then(conversation => {
+            this.conversation = conversation
+            this.unreadMessagesCount = this.conversation.unreadMessagesCount
+            this.members = this.conversation.members
+            // 有用户被添加至某个对话
+            conversation.on(Event.MEMBERS_JOINED, payload => {
+              this.pushSystemMessage(`${payload.invitedBy} 邀请 ${payload.members} 加入对话`)
+            })
+            // 有成员被从某个对话中移除
+            conversation.on(Event.MEMBERS_LEFT, payload => {
+              console.log('MEMBERS_LEFT', payload)
+              this.pushSystemMessage(`${payload.kickedBy} 将 ${payload.members} 移出对话`)
+            })
+            // 当前用户被从某个对话中移除
+            conversation.on(Event.KICKED, payload => {
+              this.pushSystemMessage(`${payload.kickedBy} 将你移出对话`)
+            })
+            this.messageIterator = conversation.createMessagesIterator({
+              limit: this.limit,
+            })
+            this.initMsgLog()
+          })
+
+        instance.on(Event.UNREAD_MESSAGES_COUNT_UPDATE, conversations => {
+          const conv = conversations.find(item => {
+            return item.id === this.conversationId
+          })
+          if (conv) {
+            this.unreadMessagesCount = conv.unreadMessagesCount
+          }
+        })
+
+        instance.on(Event.MESSAGE, (message) => {
+          this.messageHandler(message)
+        })
+      },
+      unreadMessagesCount(val) {
+        const countText = val ? `(${val}) ` : ''
+        window.document.title = `${countText}${this.originalTitle}`
+      },
     },
     beforeDestroy() {
-      this.myClient = null
       this.conversation = null
       this.messageIterator = null
     },
     mounted() {
-      // test
-      this.members = JSON.parse(window.localStorage.getItem('members')) || ['leo', 'jeff']
-
-      const APP_ID = 'OibOYNHFsWoqChdhAlebT7rS-gzGzoHsz'
-      const APP_KEY = 'IEIfsx2I6LkRajvtP2jcoCIW'
-      if (!HAD_INIT_AV) {
-        AV.init(APP_ID, APP_KEY)
-        HAD_INIT_AV = true
-      }
-      const realtime = new Realtime({
-        appId: APP_ID,
-        appKey: APP_KEY,
-      })
-      realtime.on(Event.DISCONNECT, function () {
-        console.log('服务器连接已断开')
-      })
-      realtime.on(Event.OFFLINE, function () {
-        console.log('离线（网络连接已断开）')
-      })
-      realtime.on(Event.ONLINE, function () {
-        console.log('已恢复在线')
-      })
-      realtime.on(Event.SCHEDULE, function (attempt, delay) {
-        console.log(delay + 'ms 后进行第' + (attempt + 1) + '次重连')
-      })
-      realtime.on(Event.RETRY, function (attempt) {
-        console.log('正在进行第' + (attempt + 1) + '次重连')
-      })
-      realtime.on(Event.RECONNECT, function () {
-        console.log('与服务端连接恢复')
-      })
-      realtime.createIMClient(this.myClientId).then(myClient => {
-        this.myClient = myClient
-        myClient.on(Event.MESSAGE, this.messageHandler)
-
-        return myClient.createConversation({
-          members: this.members.slice(1), // 排除自己
-          name: `${this.members.join(' & ')} 聊天`,
-          unique: true,
-        })
-      }).then(conversation => {
-        this.conversation = conversation
-        // 有用户被添加至某个对话
-        conversation.on(Event.MEMBERS_JOINED, payload => {
-          console.log('MEMBERS_JOINED', payload.members, payload.invitedBy)
-          this.pushSystemMessage(`当前聊天用户: ${payload.members.join(' & ')}`)
-        })
-        // 有成员被从某个对话中移除
-        conversation.on(Event.MEMBERS_LEFT, payload => {
-          console.log('MEMBERS_LEFT', payload.members, payload.kickedBy)
-        })
-        // 当前用户被添加至某个对话
-        conversation.on(Event.INVITED, payload => {
-          console.log('INVITED', payload.invitedBy)
-        })
-        // 当前用户被从某个对话中移除
-        conversation.on(Event.KICKED, payload => {
-          console.log('KICKED', payload.kickedBy)
-        })
-        conversation.on(Event.UNREAD_MESSAGES_COUNT_UPDATE, conversations => {
-          console.log(conversations)
-        })
-        this.messageIterator = conversation.createMessagesIterator({
-          limit: this.limit,
-        })
-        this.initMsgLog()
-      })
-    },
-    computed: {
-      membersMap() {
-        const map = {}
-        this.members.forEach((member, index) => {
-          map[member] = {
-            index,
-            color: this.colors[index],
-          }
-        })
-        return map
-      },
-      myClientId() {
-        return this.members[0]
-      },
+      $toast.init(this.$refs.chatWrapper) // 初始化toast
+      this.originalTitle = window.document.title
+      window.document.addEventListener('visibilitychange', this.handleVisibilityChange) // 监听页面焦点事件，取消未读
     },
     methods: {
-      onScroll(evt) {
-        if (this.loadAll) {
-          return
+      handleVisibilityChange() {
+        if (!window.document.hidden && this.conversation.unreadMessagesCount) {
+          this.conversation.read().then(conversation => {
+            this.unreadMessagesCount = conversation.unreadMessagesCount
+          })
         }
-        if (evt.target.scrollTop < 10) {
-          console.log('loadMore')
-          this.loadMore()
-        }
+      },
+      onJoin() { // 主动加入群聊
+        this.conversation.join().then(conversation => {
+          this.members = conversation.members
+        }).catch(console.error.bind(console))
+      },
+      onLeave() { // 主动退出群聊
+        this.conversation.quit().then(conversation => {
+          this.members = conversation.members
+        }).catch(console.error.bind(console))
       },
       pushSystemMessage(text) { // 添加系统暂态消息，不会保存到服务器，暂时支持纯文字
         this.msgLog.push({
@@ -200,85 +203,103 @@
         })
       },
       onClickImage(src) {
-        this.modalData.src = src
-        this.modalData.show = true
+        this.imageModalData.src = src
+        this.imageModalData.show = true
       },
       onUpload(evt) {
         const file = evt.target.files[0]
         if (file.size > 5000000) {
           this.$refs.fileSelector.value = '' // 需要重置dom
-          this.tips = '单文件不可超过5M'
-          setTimeout(() => {
-            this.tips = ''
-          }, 3000)
+          $toast.show('单文件不可超过5M', 1500)
           return
         }
         if (file.name) {
-          this.tips = '发送中...0%'
+          $toast.show('发送中...0%')
           const fileObj = new AV.File(file.name, file)
           fileObj.save({
             onprogress(e) {
-              console.log(e.percent)
-              this.tips = `发送中...${e.percent}%`
+              $toast.show(`发送中...${e.percent}%`)
             },
           }).then(savedFile => {
             const message = new ImageMessage(savedFile)
             return this.conversation.send(message)
           }).then((message) => {
-            console.log(message)
-            this.tips = '发送成功...100%'
-            setTimeout(() => {
-              this.tips = ''
-              this.messageHandler({
-                ...message,
-                content: { // leancloud返回字段content=undefined，需要自己补充
-                  _lcfile: message._lcfile,
-                  _lctype: message.type,
-                },
-              })
-            }, 1500)
+            $toast.show('发送成功...100%', 1500)
+            this.messageHandler({
+              ...message,
+              content: { // leancloud返回字段content=undefined，需要自己补充
+                _lcfile: message._lcfile,
+                _lctype: message.type,
+              },
+            })
           }).catch(err => {
-            this.tips = `发送失败 ${err}`
+            $toast.show(`发送失败 ${err}`, 1500)
           })
         }
       },
       onSelectFile() {
         this.$refs.fileSelector.click()
       },
-      signatureFactory(clientId) {
-        return this.axios.chat.connect({
-          client_id: clientId,
-        })
-      },
-      conversationSignatureFactory(conversationId, clientId, targetIds, action) {
-        return this.axios.chat.startConversation({
-          conv_id: conversationId,
-          client_id: clientId,
-          members: targetIds.join(','),
-          action,
-        })
-      },
+      // signatureFactory(clientId) {
+      //   return this.axios.chat.connect({
+      //     client_id: clientId,
+      //   })
+      // },
+      // conversationSignatureFactory(conversationId, clientId, targetIds, action) {
+      //   return this.axios.chat.startConversation({
+      //     conv_id: conversationId,
+      //     client_id: clientId,
+      //     members: targetIds.join(','),
+      //     action,
+      //   })
+      // },
       messageHandler(msg) {
         this.msgLog.push(msg)
         this.scrollToBottom()
+        this.conversation.read()
+      },
+      colorMap(arr) { // 遍历每一个消息，对用户头像进行映射，以防部分已退出用户没有头像
+        arr.forEach(item => {
+          if (!this.membersMap[item.from]) {
+            this.membersMap[item.from] = {
+              color: this.colors[++this.colorIndex]
+            }
+          }
+        })
+        return arr
       },
       initMsgLog() {
         this.messageIterator.next().then((res) => {
           if (res.value) {
-            this.msgLog = res.value.concat(this.msgLog)
+            this.msgLog = this.colorMap(res.value).concat(this.msgLog)
             this.pushSystemMessage('现在可以开始聊天')
+            // 滚动到底部
             this.scrollToBottom()
+            // 对话标记为已读
+            this.conversation.read()
+            console.log(this.conversation.unreadMessagesCount)
           }
         })
       },
       loadMore() {
-        if (!this.loading) {
+        if (!this.loading && this.messageIterator && !this.loadAll) {
           this.loading = true
+          const oldTarget = this.$refs.chatbox
+          let oldScrollHeight = 0
+          if (oldTarget) {
+            oldScrollHeight = oldTarget.scrollHeight // 保存旧scrollHeight数据
+          }
           this.messageIterator.next().then((res) => {
             this.loading = false
             this.loadAll = res.done
             if (res.value) {
-              this.msgLog = res.value.concat(this.msgLog)
+              this.msgLog = this.colorMap(res.value).concat(this.msgLog)
+              this.$nextTick(() => {
+                const target = this.$refs.chatbox
+                if (target) {
+                  target.scrollTop = target.scrollTop + (target.scrollHeight - oldScrollHeight) // 新的滚动高度 = 新高度 - 旧高度
+                }
+              })
             }
           })
         }
@@ -365,30 +386,11 @@
 
 <style lang="scss">
   .chat {
-    width: 400px;
-    height: 480px;
     background-color: #fff;
     margin: 0 auto;
     position: relative;
     display: flex;
     flex-direction: column;
-    .toast {
-      position: absolute;
-      left: 0;
-      bottom: 60px;
-      width: 100%;
-      .toast-content {
-        width: 150px;
-        height: 22px;
-        line-height: 22px;
-        text-align: center;
-        background-color: rgba(0, 0, 0, 0.3);
-        color: #fff;
-        border-radius: 5px;
-        margin: 0 auto;
-        font-size: 14px;
-      }
-    }
     .title {
       position: relative;
       width: 100%;

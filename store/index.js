@@ -4,6 +4,7 @@ import createUser from './user'
 import createWebp from './webp'
 import createBalance from './balance'
 import createConstant from './constant'
+import createChat from './chat'
 
 const createStore = () => {
   return new Vuex.Store({
@@ -19,6 +20,7 @@ const createStore = () => {
       webp: createWebp(),
       constant: createConstant(),
       balance: createBalance(),
+      chat: createChat(),
     },
   })
 }
