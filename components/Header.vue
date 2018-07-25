@@ -224,7 +224,7 @@
     },
 
     computed: {
-      ...mapState(['lang', 'user', 'messages', 'constant']),
+      ...mapState(['lang', 'user', 'messages', 'constant', 'chat']),
       helpLink() {
         let lang = 'en-us'
         switch (this.lang.lang) {
@@ -254,12 +254,12 @@
             this.$refs.updateNameModal.show()
           }
           if (!this.chat.imClient) {
-            this.$store.dispatch('newChatClient', this.user.account.id)
+            // const clientId = `${this.user.account.id}`
+            const clientId = 'leo' // test
+            this.$store.dispatch('newChatClient', clientId)
           }
         }
       })
-      // test
-      this.$store.dispatch('newChatClient', window.localStorage.getItem('me') || 'leo')
     },
     methods: {
       handleUpdateName(evt) {

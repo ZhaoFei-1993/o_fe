@@ -19,6 +19,7 @@ export default () => {
 
   const actions = {
     newChatClient({ commit }, clientId) {
+      console.log(clientId)
       AV.init(APP_ID, APP_KEY) // 初始化leancloud云存储
       const realtime = new Realtime({
         appId: APP_ID,

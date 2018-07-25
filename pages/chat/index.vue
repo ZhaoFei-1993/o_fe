@@ -1,6 +1,6 @@
 <template>
   <div>
-    <im :client="chat.imClient" :conversation-id="convId" :client-id="cid"></im>
+    <im :client="chat.imClient" :conversation-id="convId" :client-id="clientId"></im>
   </div>
 </template>
 
@@ -12,14 +12,14 @@
     data() {
       return {
         convId: '5b4d9de45b90c830ff7ff15d',
-        cid: '',
+        clientId: '',
       }
     },
     components: {
       im,
     },
     mounted() {
-      this.cid = window.localStorage.getItem('me')
+      this.clientId = window.localStorage.getItem('me')
     },
     computed: {
       ...mapState(['chat']),

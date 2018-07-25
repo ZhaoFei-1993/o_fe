@@ -11,11 +11,11 @@
               <div class="msg-username username-right">{{ item.from }}</div>
               <div class="msg-text">
                 <span v-if="item.content._lctype === TextMessage.TYPE">{{ item.content._lctext }}</span>
-                <img v-else-if="item.content._lctype === ImageMessage.TYPE" @click="onClickImage(item.content._lcfile.url)" style="width: 100%;" :src="item.content._lcfile.url">
+                <img v-else-if="item.content._lctype === ImageMessage.TYPE" @click="onClickImage(item.content._lcfile.url)" style="width: 100%" :src="item.content._lcfile.url">
                 <span v-else>[不支持当前消息类型]</span>
               </div>
             </div>
-            <UserAvatar v-if="membersMap[item.from]" :username="item.from" :color="membersMap[item.from].color" :online="false" :size="40"></UserAvatar>
+            <UserAvatar v-if="colorMap[item.from]" :username="item.from" :color="colorMap[item.from].color" :online="false" :size="40"></UserAvatar>
           </div>
         </template>
         <template v-else-if="item.from === 'system'">
@@ -25,12 +25,12 @@
         </template>
         <template v-else>
           <div class="msg-box-left">
-            <UserAvatar v-if="membersMap[item.from]" :username="item.from" :color="membersMap[item.from].color" :online="false" :size="40"></UserAvatar>
+            <UserAvatar v-if="colorMap[item.from]" :username="item.from" :color="colorMap[item.from].color" :online="false" :size="40"></UserAvatar>
             <div class="msg-detail-wrapper">
               <div class="msg-username username-left">{{ item.from }}</div>
               <div class="msg-text">
                 <span v-if="item.content._lctype === TextMessage.TYPE">{{ item.content._lctext }}</span>
-                <img v-else-if="item.content._lctype === ImageMessage.TYPE" @click="onClickImage(item.content._lcfile.url)" style="width: 100%;" :src="item.content._lcfile.url">
+                <img v-else-if="item.content._lctype === ImageMessage.TYPE" @click="onClickImage(item.content._lcfile.url)" style="width: 100%" :src="item.content._lcfile.url">
                 <span v-else>[不支持当前消息类型]</span>
               </div>
             </div>
@@ -42,9 +42,9 @@
       <b-input-group class="input-group">
         <b-form-input placeholder="输入信息，回车发送" type="text" class="input-text" v-model="message" @keyup.enter.native="onSendMsg"></b-form-input>
         <b-input-group-append>
-          <input id="chat-file-image" type="file" accept="image/*" style="display: none;" ref="fileSelector" @change="onUpload">
+          <input id="chat-file-image" type="file" accept="image/*" style="display: none" ref="fileSelector" @change="onUpload">
           <b-btn id="upload" @click="onSelectFile">
-            <span style="color: #52cbca;"><i class="iconfont icon-attachment"></i></span>
+            <span style="color: #52cbca"><i class="iconfont icon-attachment"></i></span>
           </b-btn>
         </b-input-group-append>
       </b-input-group>
@@ -63,35 +63,6 @@
   import $toast from './toast.js'
 
   export default {
-    directives: {
-      infiniteScroll,
-      focus: {
-        inserted: function (el) {
-          el.focus()
-        }
-      },
-    },
-    props: {
-      client: {
-        // required: true,
-        type: Object,
-      },
-      conversationId: {
-        // required: true,
-        type: String,
-      },
-      clientId: {
-        type: String,
-      },
-      width: {
-        type: Number,
-        default: 400,
-      },
-      height: {
-        type: Number,
-        default: 480,
-      },
-    },
     data() {
       return {
         ImageMessage,
@@ -110,10 +81,32 @@
         loading: false, // 消息加载中
         loadAll: false, // 是否已经加载全部消息
         colorIndex: -1,
-        membersMap: {},
+        colorMap: {},
         originalTitle: '', // 保存旧页面title
-        unreadMessagesCount: 0,
+        unreadMessagesCount: 0, // 未读消息数
       }
+    },
+    directives: {
+      infiniteScroll, // 无限load指令
+    },
+    props: {
+      client: {
+        type: Object,
+      },
+      conversationId: {
+        type: String,
+      },
+      clientId: {
+        type: String,
+      },
+      width: {
+        type: Number,
+        default: 400,
+      },
+      height: {
+        type: Number,
+        default: 480,
+      },
     },
     components: {
       UserAvatar,
@@ -123,7 +116,8 @@
       client(instance) {
         if (!instance) return
 
-        instance.getConversation(this.conversationId)
+        instance
+          .getConversation(this.conversationId)
           .then(conversation => {
             this.conversation = conversation
             this.unreadMessagesCount = this.conversation.unreadMessagesCount
@@ -134,7 +128,6 @@
             })
             // 有成员被从某个对话中移除
             conversation.on(Event.MEMBERS_LEFT, payload => {
-              console.log('MEMBERS_LEFT', payload)
               this.pushSystemMessage(`${payload.kickedBy} 将 ${payload.members} 移出对话`)
             })
             // 当前用户被从某个对话中移除
@@ -147,6 +140,9 @@
             this.initMsgLog()
           })
 
+        instance.on(Event.MESSAGE, (message) => {
+          this.messageHandler(message)
+        })
         instance.on(Event.UNREAD_MESSAGES_COUNT_UPDATE, conversations => {
           const conv = conversations.find(item => {
             return item.id === this.conversationId
@@ -155,17 +151,45 @@
             this.unreadMessagesCount = conv.unreadMessagesCount
           }
         })
-
-        instance.on(Event.MESSAGE, (message) => {
-          this.messageHandler(message)
+        instance.on(Event.DISCONNECT, () => {
+          $toast.show('连接已断开')
+        })
+        instance.on(Event.OFFLINE, () => {
+          $toast.show('网络不可用，请检查网络设置')
+        })
+        instance.on(Event.ONLINE, () => {
+          $toast.show('网络已恢复', 1500)
+        })
+        instance.on(Event.SCHEDULE, (attempt, time) => {
+          $toast.show(`${time / 1000}s 后进行第 ${attempt + 1} 次重连`)
+        })
+        instance.on(Event.RETRY, attempt => {
+          $toast.show(`正在进行第 ${attempt + 1} 次重连`)
+        })
+        instance.on(Event.RECONNECT, () => {
+          this.conversation.join()
+        })
+        instance.on(Event.RECONNECT_ERROR, () => {
+          $toast.show('重连失败，请刷新页面重试')
         })
       },
-      unreadMessagesCount(val) {
-        const countText = val ? `(${val}) ` : ''
+      unreadMessagesCount(count) {
+        const countText = count ? `(${count}) ` : ''
         window.document.title = `${countText}${this.originalTitle}`
       },
     },
     beforeDestroy() {
+      [
+        Event.MESSAGE,
+        Event.UNREAD_MESSAGES_COUNT_UPDATE,
+        Event.DISCONNECT,
+        Event.OFFLINE,
+        Event.ONLINE,
+        Event.SCHEDULE,
+        Event.RETRY,
+        Event.RECONNECT,
+        Event.RECONNECT_ERROR,
+      ].forEach(event => this.client.off(event))
       this.conversation = null
       this.messageIterator = null
     },
@@ -224,7 +248,7 @@
             const message = new ImageMessage(savedFile)
             return this.conversation.send(message)
           }).then((message) => {
-            $toast.show('发送成功...100%', 1500)
+            $toast.show('发送成功...100%', 1000)
             this.messageHandler({
               ...message,
               content: { // leancloud返回字段content=undefined，需要自己补充
@@ -258,10 +282,10 @@
         this.scrollToBottom()
         this.conversation.read()
       },
-      colorMap(arr) { // 遍历每一个消息，对用户头像进行映射，以防部分已退出用户没有头像
+      colorForeach(arr) { // 遍历每一个消息，对用户头像进行映射，以防部分已退出用户没有头像
         arr.forEach(item => {
-          if (!this.membersMap[item.from]) {
-            this.membersMap[item.from] = {
+          if (!this.colorMap[item.from]) {
+            this.colorMap[item.from] = {
               color: this.colors[++this.colorIndex]
             }
           }
@@ -271,13 +295,12 @@
       initMsgLog() {
         this.messageIterator.next().then((res) => {
           if (res.value) {
-            this.msgLog = this.colorMap(res.value).concat(this.msgLog)
+            this.msgLog = this.colorForeach(res.value).concat(this.msgLog)
             this.pushSystemMessage('现在可以开始聊天')
             // 滚动到底部
             this.scrollToBottom()
             // 对话标记为已读
             this.conversation.read()
-            console.log(this.conversation.unreadMessagesCount)
           }
         })
       },
@@ -293,7 +316,7 @@
             this.loading = false
             this.loadAll = res.done
             if (res.value) {
-              this.msgLog = this.colorMap(res.value).concat(this.msgLog)
+              this.msgLog = this.colorForeach(res.value).concat(this.msgLog)
               this.$nextTick(() => {
                 const target = this.$refs.chatbox
                 if (target) {
@@ -451,7 +474,6 @@
             max-width: 250px;
             padding: 5px;
             border-radius: 4px;
-            // word-break: break-all;
             word-wrap: break-word;
             background-color: #f9f9f9;
             &::after {
@@ -491,7 +513,6 @@
             max-width: 250px;
             padding: 5px;
             border-radius: 4px;
-            // word-break: break-all;
             word-wrap: break-word;
             background-color: #f9f9f9;
             &::after {
