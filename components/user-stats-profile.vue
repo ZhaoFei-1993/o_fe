@@ -71,7 +71,7 @@
     computed: {
       // 用户单子完成率
       userOrderCompleteRatio: function () {
-        const statics = this.userData.user_stat
+        const statics = this.userData.user_stat || this.userData // order详情里面的信息是扁平的
         return statics.order_count ? (statics.deal_count / statics.order_count * 100).toFixed(1) + '%' : '--'
       },
     }

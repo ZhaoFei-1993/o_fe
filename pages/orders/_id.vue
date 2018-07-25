@@ -356,7 +356,6 @@
         id: this.$route.params.id,
         counterparty: null,
         merchant: null,
-        counterpartyId: null,
         order: null,
         selectedMethod: null,
         secondCountdown: null,
