@@ -128,7 +128,7 @@
         </h4>
 
         <b-form-group label="类型:" horizontal class="mb-25">
-          <b-form-select v-model="form.method" :options="constant.PAYMENT_OPTIONS" size="lg"></b-form-select>
+          <b-form-select v-model="form.method" :options="constant.ACTUAL_PAYMENT_OPTIONS" size="lg"></b-form-select>
         </b-form-group>
 
         <b-form-group label="姓名:" horizontal>

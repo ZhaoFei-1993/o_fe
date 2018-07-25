@@ -4,11 +4,17 @@
 
 const COIN_TYPES = ['BTC', 'BCH', 'ETH', 'USDT']
 
-const PAYMENT_OPTIONS = [
-  {text: '不限', value: 'ALL'},
+// 实际支持的支付方式
+const ACTUAL_PAYMENT_OPTIONS = [
   {text: '银行卡', value: 'bankcard', icon: 'icon-bankcard'},        // method, 服务端对方法的定义
   {text: '支付宝', value: 'alipay', icon: 'icon-alipay'},
-  {text: '微信', value: 'wechat', icon: 'icon-wechat-round'},
+  {text: '微信', value: 'wechat', icon: 'icon-wechat-round'}
+]
+
+// 包括"不限"的支付方式
+const PAYMENT_OPTIONS = [
+  {text: '不限', value: 'ALL'},
+  ...ACTUAL_PAYMENT_OPTIONS,
 ]
 
 const APPEAL_RESULTS = [
@@ -31,6 +37,7 @@ export default {
       value: name
     }
   }),
+  ACTUAL_PAYMENT_OPTIONS,
   PAYMENT_OPTIONS,
   PAYMENT_TYPES: {
     BANKCARD: 'bankcard',
