@@ -2,15 +2,15 @@
 let serverApiDomain = '//otc.coinex.com/res'
 let clientApiDomain = '//otc.coinex.com/res'
 
-let coinex = '//www.coinex.com'
+let coinexDomain = '//www.coinex.com'       // 尽量不要用coinex，而是用coinexDomain。coinex语义并不明确
 const MODE = process.env.MODE || 'production'
 // 非正式环境(pre & dev)
 if (MODE !== 'production') {
-  coinex = '//test2.coinex.com'
+  coinexDomain = '//test2.coinex.com'
 }
 
-let loginPage = coinex + '/account/signin'
-let signupPage = coinex + '/account/signup'
+let loginPage = coinexDomain + '/account/signin'
+let signupPage = coinexDomain + '/account/signup'
 let webDomain = '//otc.coinex.com'
 
 // pre
@@ -35,8 +35,11 @@ loginPage = protocol + loginPage
 serverApiDomain = protocol + serverApiDomain
 clientApiDomain = protocol + clientApiDomain
 
+const coinex = coinexDomain
+
 export {
   coinex,
+  coinexDomain,
   clientApiDomain,
   serverApiDomain,
   loginPage,

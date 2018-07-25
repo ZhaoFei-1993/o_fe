@@ -203,7 +203,9 @@
           <span>广告列表</span>
           <span>
             没有合适的？
-            <b-btn variant="plain" class="c-brand-green" @click="onItemPublish">自己发布广告</b-btn>
+            <PublishItemButton>
+              <b-btn variant="plain" class="c-brand-green">自己发布广告</b-btn>
+            </PublishItemButton>
           </span>
         </div>
         <div class="list-header">
@@ -277,10 +279,8 @@
     <PlaceOrderModal
       v-if="selectedItem&&user.account"
       :item="selectedItem"
-      v-model="showPlaceOrderModal"
-    ></PlaceOrderModal>
-    <!--todo: 根据现在状态发布币种、方向-->
-    <PublishItemModal v-model="isItemPublishing" @published="onItemPublished"/>
+      v-model="showPlaceOrderModal"/>
+
     <b-modal id="no-payment-modal" :ok-only="true"
              v-model="showConstraintModal" title="交易限制"
              ok-variant="gradient-yellow"
@@ -304,8 +304,19 @@
   import {mapState} from 'vuex'
   import {coinex, loginPage, webDomain} from '~/modules/variables'
   import PlaceOrderModal from '~/components/place-order-modal'
-  import PublishItemModal from '~/components/publish-item-modal'
   import UserPayments from '~/components/user-payments'
+  import PublishItemButton from '~/components/publish-item-modal/publish-item-button.vue'
+
+  // 从路由数据中获取需要的列表数据
+  function resolveDataFromRoute($route, constant) {
+    const side = $route.query.side || constant.SIDE.BUY
+    return {
+      selectedCoin: $route.query.coin || 'BTC',
+      selectedSide: side,
+      selectedPayment: $route.query.payment || 'ALL',
+      sortPrice: $route.query.sort || side === constant.SIDE.BUY ? 'ASC' : 'DESC',
+    }
+  }
 
   // const refreshInterval = 5000
   const PAGE_SIZE = 30
@@ -319,17 +330,13 @@
   export default {
     components: {
       PlaceOrderModal,
-      PublishItemModal,
       UserPayments,
+      PublishItemButton,
     },
     layout: 'fullwidth',
     data() {
       return {
         loginPage: `${loginPage}?redirect=${encodeURIComponent(webDomain + this.$route.fullPath)}`,
-        selectedCoin: this.$route.query.coin || 'BTC',
-        selectedSide: this.$route.query.side || 'buy',
-        selectedPayment: this.$route.query.payment || 'ALL',
-        sortPrice: this.$route.query.sort || this.selectedSide === 'buy' ? 'ASC' : 'DESC',
         items: [],
         selectedItem: null,
         showPlaceOrderModal: false,
@@ -341,10 +348,12 @@
           outLink: null,
         },
         busy: false,
-        isItemPublishing: false,
         coinex,
         pager: defaultPager,
       }
+    },
+    asyncData({app, store, route}) {
+      return resolveDataFromRoute(route, store.state.constant)
     },
     computed: {
       ...mapState(['constant', 'user', 'balance']),
@@ -365,13 +374,17 @@
       //   this.getItems()
       // }, refreshInterval)
     },
+    beforeRouteUpdate(to, from, next) {
+      next()
+      // 每次在路由更新之后，根据新的路由参数来获取数据
+      Object.assign(this, resolveDataFromRoute(this.$route, this.constant))
+      this.getItems()
+    },
     beforeDestroy() {
       clearInterval(this.requestItems)
     },
     methods: {
       showItems(side, coin) {
-        this.selectedSide = side
-        this.selectedCoin = coin
         this.$router.replace({
           query: {
             side,
@@ -379,7 +392,15 @@
             payment: this.selectedPayment,
           },
         })
-        this.getItems()
+      },
+      filterPayment(payment) {
+        this.$router.replace({
+          query: {
+            side: this.selectedSide,
+            coin: this.selectedCoin,
+            payment,
+          },
+        })
       },
       getItems() {
         const {limit, currentPage} = this.pager
@@ -414,18 +435,6 @@
           })
         }, rejected => {
           // 暂不处理
-        })
-      },
-      filterPayment(payment) {
-        this.$router.replace({
-          query: {
-            side: this.selectedSide,
-            coin: this.selectedCoin,
-            payment,
-          },
-        })
-        Vue.nextTick(() => {
-          this.getItems()
         })
       },
       qualified(item) {
@@ -480,12 +489,6 @@
             return Promise.reject(constraint)
           }
         })
-      },
-      onItemPublish() {
-        this.isItemPublishing = true
-      },
-      onItemPublished(item) {
-        this.isItemPublishing = false
       },
       checkQualification(item, qualification) {
         if (!item.counterparty_limit) return true

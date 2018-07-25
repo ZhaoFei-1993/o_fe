@@ -180,7 +180,9 @@
         </div>
 
         <VerifyCode v-if="user&&user.account"
-                    :needGoogle="user.account.is_have_totp_auth" :needSms="user.account.mobile" :needEmail="true"
+                    :needGoogle="user.account.is_have_totp_auth"
+                    :needSms="user.account.mobile"
+                    :needEmail="true"
                     :sms.sync="verify.sms"
                     :google.sync="verify.google"
                     :email.sync="verify.email"
@@ -390,9 +392,10 @@
           ...form,
         }).then(res => {
           this.submitting = false
-          this.$store.dispatch('fetchUserPayments')
           this.modalShowing = false
           this.$showTips(this.isPaymentEditing ? '修改成功' : '添加成功')
+
+          return this.$store.dispatch('fetchUserPayments')
         }).catch(err => {
           this.submitting = false
           this.axios.onError(err)
