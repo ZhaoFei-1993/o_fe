@@ -127,7 +127,8 @@
                   <div class="detail-text">
                     备注参考号：<span class="detail-code">{{ `${item.id}`.substr(`${item.id}`.length - 6) }}</span>
                   </div>
-                  <div class="detail-text detail-warn-text" v-if="item._isBuySide && item.status === constant.ORDER_STATUS.CREATED.value">
+                  <div class="detail-text detail-warn-text"
+                       v-if="item._isBuySide && item.status === constant.ORDER_STATUS.CREATED.value">
                     转账时除参考号外请不要备注任何信息，防止卡被冻结!
                   </div>
                 </template>
@@ -481,9 +482,8 @@
           content: (<div>确认取消订单？<span class="c-red">如您已向卖家付款，取消订单您将会损失付款资金。</span></div>),
           onOk: () => {
             this.axios.order.cancelOrder(item.id).then(res => {
-              if (res.code === 0) { // 成功后跳转到`已结束`
+              if (res.code === 0) {
                 item.status = this.constant.ORDER_STATUS.CANCEL
-                this.onClickFilter(1)
               } else {
                 this.$errorTips(`提交失败code=${res.code}`)
               }
@@ -502,7 +502,6 @@
           this.items.find(item => item.id === this.curReceiptOrderId).status = this.constant.ORDER_STATUS.SUCCESS.value
         } catch (err) {
         }
-        this.onClickFilter(1)
       },
       onClickFilter(index) {
         for (let i = 0; i < this.filterOptions.length; i++) {
