@@ -87,7 +87,8 @@ export default {
   },
 
   KYC_STATUS: {
-    PASS: 'pass'
+    PASS: 'pass',
+    PROCESSING: 'processing',
   },
 
   ORDER_STATUS: {

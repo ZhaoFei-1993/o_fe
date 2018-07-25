@@ -52,6 +52,7 @@
     <MyInfoItem title="实名认证">
       <p slot="content">
         <span v-if="user.account.kyc_status === constant.KYC_STATUS.PASS">已认证</span>
+        <span v-else-if="user.account.kyc_status === constant.KYC_STATUS.PROCESSING" class="c-brand-green">信息已提交，待系统审核</span>
         <span v-else class="c-red">未认证</span>
       </p>
       <b-btn slot="action" v-if="user.account.kyc_status !== constant.KYC_STATUS.PASS" variant="outline-green" size="xs" :href="`${coinex}/my/info/auth/realname`" target="_blank">认证</b-btn>
