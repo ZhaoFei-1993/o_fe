@@ -58,8 +58,9 @@
             <span @click.stop="toggleDetails"
                   v-if="item.status === constant.ORDER_STATUS.CREATED.value || item.status === constant.ORDER_STATUS.PAID.value"
                   class="detail"
-                  :class="[ detailsShowing ? 'show-detail' : 'hidden-detail' ]"><i
-              class="iconfont icon-detail"></i></span>
+                  :class="[ detailsShowing ? 'show-detail' : 'hidden-detail' ]">
+              <i class="iconfont icon-detail"></i>
+            </span>
           </template>
           <template slot="row-details" slot-scope="{ item }">
             <div class="detail-wrapper">
@@ -390,14 +391,14 @@
                   selectedPaymentMethod = {...item.payment_methods[0]}
                 }
                 const remainingTime = parseInt((item.place_time * 1000 + ORDER_PAY_TIME * 60000 - Date.now()) / 1000) // 订单付款截止时间 = 创建时间 + 可付款时间(15min)
-                const { CREATED, PAID, CLOSED } = this.constant.ORDER_STATUS
+                const { CREATED, CLOSED } = this.constant.ORDER_STATUS
                 const { status } = item
                 return {
                   ...item,
                   _order_type: orderType, // 下划线前缀均为自定义属性（下同）订单类型
                   _selected_payment_method: selectedPaymentMethod, // 用户选中的支付方式
                   _remaining_time: remainingTime,
-                  status: (status === CREATED.value || status === PAID.value) && remainingTime <= 0 ? CLOSED.value : item.status, // 前置判断超时关闭的订单
+                  status: (status === CREATED.value) && remainingTime <= 0 ? CLOSED.value : item.status, // 前置判断超时关闭的订单
                 }
               })
             } else {
@@ -668,7 +669,7 @@
           display: inline-block;
           width: 18px;
           height: 18px;
-          background-size: conver;
+          background-size: cover;
           margin-right: 6px;
         }
         .buy-arrow-icon {
