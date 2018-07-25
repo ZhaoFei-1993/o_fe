@@ -104,6 +104,16 @@
       }
     }
   }
+
+  .name-input {
+    width: 100%;
+    height: 32px;
+    padding: 6px 12px;
+    &:focus {
+      outline: none;
+      border: 1px solid $brandGreen;
+    }
+  }
 </style>
 
 <template>
@@ -185,9 +195,10 @@
              class="text-center"
              :ok-only="true"
              @ok="handleUpdateName">
+
       <div v-if="user&&user.account">
         <p>请确认或修改您的昵称，昵称一旦确定将无法修改。</p>
-        <b-form-input v-model="userName" type="text" placeholder="您的昵称" required></b-form-input>
+        <input class="name-input" v-model="userName" type="text" placeholder="您的昵称" required />
         <p class="c-red" v-if="invalidName">请输入2-30个字符的昵称。</p>
         <p class="c-red" v-if="nameDuplicated">该昵称已被占用，请使用其他昵称。</p>
       </div>
