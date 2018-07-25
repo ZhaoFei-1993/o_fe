@@ -224,7 +224,7 @@
     },
 
     computed: {
-      ...mapState(['lang', 'user', 'messages', 'constant']),
+      ...mapState(['lang', 'user', 'messages', 'constant', 'chat']),
       helpLink() {
         let lang = 'en-us'
         switch (this.lang.lang) {
@@ -248,9 +248,16 @@
       // component 里面不能调用fetch和asyncData
       this.$store.dispatch('fetchUserMerchant')
       this.$store.dispatch('fetchUserAccount').then(_ => {
-        if (this.user && this.user.account && !this.user.account.is_name_confirmed) {
-          this.userName = this.user.account.name
-          this.$refs.updateNameModal.show()
+        if (this.user && this.user.account) {
+          if (!this.user.account.is_name_confirmed) {
+            this.userName = this.user.account.name
+            this.$refs.updateNameModal.show()
+          }
+          if (!this.chat.imClient) {
+            // const clientId = `${this.user.account.id}`
+            const clientId = 'leo' // test
+            this.$store.dispatch('newChatClient', clientId)
+          }
         }
       }).catch(err => {
         if (err.code === this.constant.ERROR_CODE.UNAUTHORIZED) return

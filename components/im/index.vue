@@ -9,6 +9,10 @@
           <div class="msg-box-right">
             <div class="msg-detail-wrapper">
               <div class="msg-username username-right">{{ item.from }}</div>
+              <div class="msg-username username-right" v-if="item.status === MessageStatus.FAILED">
+                <span class="msg-send-error"></span>
+                <span>发送失败</span>
+              </div>
               <div class="msg-text">
                 <span v-if="item.content._lctype === TextMessage.TYPE">{{ item.content._lctext }}</span>
                 <img v-else-if="item.content._lctype === ImageMessage.TYPE" @click="onClickImage(item.content._lcfile.url)" style="width: 100%" :src="item.content._lcfile.url">
@@ -28,6 +32,10 @@
             <UserAvatar v-if="colorMap[item.from]" :username="item.from" :color="colorMap[item.from].color" :online="false" :size="40"></UserAvatar>
             <div class="msg-detail-wrapper">
               <div class="msg-username username-left">{{ item.from }}</div>
+              <div class="msg-username username-left" v-if="item.status === MessageStatus.FAILED">
+                <span class="msg-send-error"></span>
+                <span>发送失败</span>
+              </div>
               <div class="msg-text">
                 <span v-if="item.content._lctype === TextMessage.TYPE">{{ item.content._lctext }}</span>
                 <img v-else-if="item.content._lctype === ImageMessage.TYPE" @click="onClickImage(item.content._lcfile.url)" style="width: 100%" :src="item.content._lcfile.url">
@@ -38,7 +46,7 @@
         </template>
       </div>
     </div>
-    <div class="input-box">
+    <div class="input-box" :style="{height: `${inputHeight}px`}">
       <b-input-group class="input-group">
         <b-form-input placeholder="输入信息，回车发送" type="text" class="input-text" v-model="message" @keyup.enter.native="onSendMsg"></b-form-input>
         <b-input-group-append>
@@ -54,7 +62,7 @@
 </template>
 
 <script>
-  import { TextMessage, Event } from 'leancloud-realtime'
+  import { TextMessage, Event, MessageStatus } from 'leancloud-realtime'
   import AV from 'leancloud-storage'
   import { ImageMessage } from 'leancloud-realtime-plugin-typed-messages'
   import UserAvatar from '~/components/user-avatar'
@@ -67,6 +75,7 @@
       return {
         ImageMessage,
         TextMessage,
+        MessageStatus,
         imageModalData: {
           show: false,
           src: '',
@@ -106,6 +115,10 @@
       height: {
         type: Number,
         default: 480,
+      },
+      inputHeight: { // 输入框高度
+        type: Number,
+        default: 45,
       },
     },
     components: {
@@ -253,7 +266,7 @@
             $toast.show('发送成功...100%', 1000)
             this.messageHandler({
               ...message,
-              content: { // leancloud返回字段content=undefined，需要自己补充
+              content: { // leancloud返回字段content=undefined，需要自己构造
                 _lcfile: message._lcfile,
                 _lctype: message.type,
               },
@@ -441,6 +454,13 @@
       .msg-username {
         font-size: 12px;
         color: #9b9b9b;
+        .msg-send-error {
+          background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABfElEQVQ4T6WTPUtCYRTHz/9qVJC21CxeCzRuQyBIU98hoqGCEJqiTShuhRmRVkRrLYWEDQ1+iKboBRrUFLKr7S3a0Av6nLjXF7yppXS25znn/Dj/8wL6p6FVftqhTgoLTTHBq/tBfC+V6crzErn+GW8CpIZDA8L2dQzQQiswM8V6iqVl9+vBW81fBzyNhOwf4vMGgPs3Vcyc6ZN6faPZULFSXdWSshonYNqczI+VN8Ya/5n5YlyLGFUagIS84QX4rkmfELNEEliiS5OPSViEcHnye3kDkJTVbQKCHQP0QOaAokWOKgCXGiXCYpeAU0WLLFUlqGcA/E0AppAgAkBbTY1liipa2G8AUs71AEt02NVOCdpRcuGgAcg4Np0li8gSSGqEoF0T9SABn5Lbva2PMSGrMQDznYyRmOKKFp4x7cGzvDb4Dou+qp4/pKT7uTzp0vYLJoAhZWjVVrJbTwg01wZybi2UVlqucmNC7ZgEMKH/S8wPHR1TV1OoBn8Dv26REZSgcFEAAAAASUVORK5CYII=);
+          vertical-align: sub;
+          display: inline-block;
+          width: 16px;
+          height: 16px;
+        }
       }
       .msg-time {
         text-align: center;
@@ -526,7 +546,6 @@
       }
     }
     .input-box {
-      flex: 1;
       width: 100%;
       .input-group {
         height: 100%;
