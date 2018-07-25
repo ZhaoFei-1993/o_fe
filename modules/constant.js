@@ -118,6 +118,12 @@ export default {
     CANCEL: 'cancel',
   },
   APPEAL_REASONS: ['卖家未放币', '买家付款未收到', '买家付款金额错误', '其他'],
+  APPEAL_STATUS: {
+    CREATED: 'created',
+    PROCESSING: 'processing',
+    CANCEL: 'cancel',
+    COMPLETED: 'completed',
+  },
   SIDE: {
     BUY: 'buy',
     SELL: 'sell',
@@ -145,4 +151,7 @@ export default {
     EACH_TIME: 'each_time',
     EACH_TWO_HOURS: 'each_two_hours',
   },
+
+  // 自动回复内容的最大长度
+  MAX_AUTO_REPLY_LENGTH: 50,
 }

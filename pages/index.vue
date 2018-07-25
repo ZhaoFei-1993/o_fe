@@ -270,6 +270,9 @@
           </div>
         </div>
       </div>
+      <b-pagination :total-rows="pager.total" :value="pager.currentPage" :per-page="pager.limit"
+                    @change="onPagerChange">
+      </b-pagination>
     </div>
     <PlaceOrderModal
       v-if="selectedItem&&user.account"
@@ -277,7 +280,7 @@
       v-model="showPlaceOrderModal"
     ></PlaceOrderModal>
     <!--todo: 根据现在状态发布币种、方向-->
-    <PublishItemModal v-model="publishModalShowing" @published="onItemPublished"/>
+    <PublishItemModal v-model="isItemPublishing" @published="onItemPublished"/>
     <b-modal id="no-payment-modal" :ok-only="true"
              v-model="showConstraintModal" title="交易限制"
              ok-variant="gradient-yellow"
@@ -287,9 +290,9 @@
       <div>
         {{currentConstraint.content}}
         <p>
-          <b-link v-if="currentConstraint.outLink" :to="currentConstraint.outLink">{{currentConstraint.linkText}}
+          <b-link v-if="currentConstraint.outLink" :href="currentConstraint.outLink">{{currentConstraint.linkText}}
           </b-link>
-          <b-link v-else :href="currentConstraint.link">{{currentConstraint.linkText}}</b-link>
+          <b-link v-else :to="currentConstraint.link">{{currentConstraint.linkText}}</b-link>
         </p>
       </div>
     </b-modal>
@@ -299,12 +302,20 @@
 <script>
   import Vue from 'vue'
   import {mapState} from 'vuex'
-  import {loginPage, webDomain} from '~/modules/variables'
+  import {coinex, loginPage, webDomain} from '~/modules/variables'
   import PlaceOrderModal from '~/components/place-order-modal'
   import PublishItemModal from '~/components/publish-item-modal'
   import UserPayments from '~/components/user-payments'
 
   // const refreshInterval = 5000
+  const PAGE_SIZE = 30
+  const defaultPager = {
+    limit: PAGE_SIZE,
+    currentPage: 1,
+    total: 0,
+    totalPage: 1,
+    hasNext: true
+  }
   export default {
     components: {
       PlaceOrderModal,
@@ -330,7 +341,9 @@
           outLink: null,
         },
         busy: false,
-        publishModalShowing: true,
+        isItemPublishing: false,
+        coinex,
+        pager: defaultPager,
       }
     },
     computed: {
@@ -341,8 +354,8 @@
       return Promise.all([
         store.dispatch('fetchUserQualification'),
         store.dispatch('fetchUserPayments'),
-      ]).catch(err => {
-        console.log(err)
+      ]).catch(() => {
+        // 首页不做处理
       })
     },
     mounted() {
@@ -369,20 +382,29 @@
         this.getItems()
       },
       getItems() {
+        const {limit, currentPage} = this.pager
         this.busy = true
         this.axios.item.getItems({
+          limit,
+          currentPage,
           // taker和maker的方向是反的
           side: this.selectedSide === this.constant.SIDE.BUY ? this.constant.SIDE.SELL : this.constant.SIDE.BUY,
           coin_type: this.selectedCoin,
           payment_method: this.selectedPayment === 'ALL' ? undefined : this.selectedPayment.toLowerCase(),
         }).then(response => {
+          const data = response.data
           this.busy = false
-          this.items = response.data.data
+          this.items = data.data
+          this.pager = this.utils.extractPager(data)
         })
+      },
+      onPagerChange(currentPage) {
+        this.pager.currentPage = currentPage
+        this.getItems()
       },
       placeOrder(item) {
         if (!this.user.account) {
-          window.location.href = loginPage
+          window.location.href = this.loginPage
           return
         }
         this.verifyDynamicConstraint(item).then(res => {
@@ -442,13 +464,13 @@
         }
         return this.axios.user.dynamicConstraint().then(response => {
           const constraint = response.data
-          if (constraint.can_place_order && constraint.can_trade) {
+          if (constraint.cancel_order_times_verified && constraint.kyc_place_order_verified) {
             return Promise.resolve()
           } else {
-            this.currentConstraint = constraint.can_place_order ? {
+            this.currentConstraint = (!constraint.kyc_place_order_verified) ? {
               content: '您尚未完成实名认证，每日限制下单次数为 3 次。',
               linkText: '去完成实名认证',
-              outLink: '//www.coinex.com/my/info/security',
+              outLink: `${this.coinex}/my/info/basic?redirect=${encodeURIComponent(webDomain + this.$route.fullPath)}`,
             } : {
               content: '您今天累计取消超过 3 次订单，被冻结交易功能。',
               linkText: '了解更多交易规则',
@@ -460,10 +482,10 @@
         })
       },
       onItemPublish() {
-        this.publishModalShowing = true
+        this.isItemPublishing = true
       },
       onItemPublished(item) {
-        this.publishModalShowing = false
+        this.isItemPublishing = false
       },
       checkQualification(item, qualification) {
         if (!item.counterparty_limit) return true

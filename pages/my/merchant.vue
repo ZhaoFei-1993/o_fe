@@ -123,8 +123,8 @@
     <template v-if="merchant && !formEditing">
       <MyInfoItem v-if="merchant.auth_status === constant.MERCHANT_AUTH_STATUS.PASS" title="商家认证">
         <template slot="content">
-          <p class="c-brand-green">您已通过商家认证审核，现在可以发布广告了</p>
-          <p class="c-brand-green">商家认证已锁定 100,000 CET</p>
+          <p>您已通过商家认证审核，现在可以发布广告了</p>
+          <p>商家认证已锁定 100,000 CET</p>
         </template>
       </MyInfoItem>
 
@@ -135,7 +135,7 @@
       </MyInfoItem>
       <MyInfoItem v-else-if="merchant.auth_status === constant.MERCHANT_AUTH_STATUS.NO" title="商家认证">
         <p slot="content" class="c-brand-green" data-todo="文案">您未通过商家认证审核。</p>
-        <!--<p data-todo="原因">驳回原因：</p>-->
+        <p data-todo="细化原因">驳回原因：认证审核资料不符合要求</p>
         <b-btn slot="action" variant="outline-green" size="xs" @click="onReSubmit">重新提交</b-btn>
       </MyInfoItem>
       <MyInfoItem v-else-if="merchant.auth_status === constant.MERCHANT_AUTH_STATUS.CANCEL" title="商家认证">
@@ -161,7 +161,7 @@
             </div>
             <div v-else>
               <p class="c-red">未认证</p>
-              <b-link href="//www.coinex.com/my/info/security">去认证 ></b-link>
+              <b-link :href="`${coinex}/my/info/security`">去认证 ></b-link>
             </div>
           </ContactItem>
           <ContactItem title="实名认证" icon="icon-namecard" :required="true">
@@ -170,7 +170,7 @@
             </div>
             <div v-else>
               <p class="c-red">未认证</p>
-              <b-link href="//www.coinex.com/my/info/security">去认证 ></b-link>
+              <b-link :href="`${coinex}/my/info/security`">去认证 ></b-link>
             </div>
           </ContactItem>
           <ContactItem title="联系人微信" icon="icon-wechat-linear" :active="true" :required="true">
@@ -197,16 +197,16 @@
         <p class="c-6f">申请成为CoinEx认证商家，需要同意冻结您交易所账户中 {{MERCHANT_REQUIRED_CET_AMOUNT|formatMoney}}
           CET作为商家保证金，钱包中冻结的保证金依然享有分红权益，但是不
           可交易和提现。取消商家认证后，商家保证金将继续冻结三个月后解冻。
-          <b-link href="https://www.coinex.com/token">什么是 CET？</b-link>
+          <b-link :href="`${coinex}/token`" target="_blank">什么是 CET？</b-link>
         </p>
         <InfoItem title="账户可用余额" v-if="balance && balance.coinexBalance">
           {{cetAvailable}}
           <span v-if="cetAvailable < MERCHANT_REQUIRED_CET_AMOUNT">
             <span class="c-red mr-20">余额不足</span>
             请先进行
-            <b-link href="//www.coinex.com/my/wallet/deposit?type=cet">充值</b-link>
+            <b-link :href="`${coinex}/my/wallet/deposit?type=cet`">充值</b-link>
             或
-            <b-link href="//www.coinex.com/exchange?currency=bch&dest=cet">交易</b-link>
+            <b-link :href="`${coinex}/exchange?currency=bch&dest=cet`">交易</b-link>
           </span>
         </InfoItem>
       </ProgressItem>
@@ -234,6 +234,7 @@
   import My2Column from '~/components/my-2column.vue'
   import ProgressIndicator from '~/components/progress-indicator.vue'
   import MyInfoItem from './_c/my-info-item.vue'
+  import {coinex} from '~/modules/variables'
 
   const ProgressItem = Vue.extend({
     props: {
@@ -304,6 +305,7 @@
         MERCHANT_REQUIRED_CET_AMOUNT: 50000,
         VERIFY_EMAIL: 'bd@coinex.com', // todo:是这个？
         formEditing: false,
+        coinex,
       }
     },
     computed: {
@@ -343,12 +345,17 @@
     },
     methods: {
       onSubmit() {
+        if (this.account.kyc_status !== this.constant.KYC_STATUS.PASS) return this.$showTips(`请先完成实名认证`, 'error')
+        if (!this.account.mobile) return this.$showTips(`请先绑定手机`, 'error')
         if (!this.isVideoSent) return this.$showTips(`请先确认发送认证视频到 bd@coinex.com`, 'error')
         if (!this.isContractRead) return this.$showTips('请先阅读并同意服务协议', 'error')
+        if (!this.form.wechat) return this.$showTips('请填写认证微信号', 'error')
 
         this.axios.user.applyMerchant(this.form).then(res => {
           this.$showTips('提交申请成功')
           this.$store.dispatch('fetchUserMerchant')
+        }).catch(err => {
+          this.axios.onError(err)
         })
       },
       onReSubmit() {

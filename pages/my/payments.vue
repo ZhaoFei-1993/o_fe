@@ -131,66 +131,64 @@
           <b-form-select v-model="form.method" :options="constant.PAYMENT_OPTIONS" size="lg"></b-form-select>
         </b-form-group>
 
-        <div v-if="form.method && form.method !== 'ALL'">
-          <b-form-group label="姓名:" horizontal>
-            <b-form-input v-model="form.account_name" size="lg"></b-form-input>
-            <EMsgs :result="$v.form" :msgs="validationConf.messages" keyName="account_name"/>
+        <b-form-group label="姓名:" horizontal>
+          <b-form-input v-model="form.account_name" size="lg"></b-form-input>
+          <EMsgs :result="$v.form" :msgs="validationConf.messages" keyName="account_name"/>
+        </b-form-group>
+
+        <div v-if="form.method === 'bankcard'">
+          <b-form-group label="开户银行:" horizontal>
+            <b-form-select v-model="form.bank" :options="constant.bankOptions"></b-form-select>
+            <EMsgs :result="$v.form" :msgs="validationConf.messages" keyName="bank"/>
           </b-form-group>
-
-          <div v-if="form.method === 'bankcard'">
-            <b-form-group label="开户银行:" horizontal>
-              <b-form-select v-model="form.bank" :options="constant.bankOptions"></b-form-select>
-              <EMsgs :result="$v.form" :msgs="validationConf.messages" keyName="bank"/>
-            </b-form-group>
-            <b-form-group label="开户支行:" horizontal>
-              <b-form-input v-model="form.branch" size="lg"></b-form-input>
-              <EMsgs :result="$v.form" :msgs="validationConf.messages" keyName="branch"/>
-            </b-form-group>
-            <b-form-group label="银行卡号:" horizontal>
-              <b-form-input v-model="form.account_no" size="lg"></b-form-input>
-              <EMsgs :result="$v.form" :msgs="validationConf.messages" keyName="account_no"/>
-            </b-form-group>
-          </div>
-
-          <div v-if="form.method === 'alipay'">
-            <b-form-group label="支付宝账号:" horizontal>
-              <b-form-input v-model="form.account_no" size="lg"></b-form-input>
-              <EMsgs :result="$v.form" :msgs="validationConf.messages" keyName="account_no"/>
-            </b-form-group>
-            <b-form-group label="收款二维码:" horizontal>
-              <div class="payment-qrcode">
-                <ImageUploadPreview v-model="form.qrCodeImage"/>
-
-                <p class="ml-10">为确保二维码正确，请添加后先自己进行扫描测试</p>
-              </div>
-            </b-form-group>
-          </div>
-
-          <div v-if="form.method === 'wechat'">
-            <b-form-group label="微信账号:" horizontal>
-              <b-form-input v-model="form.account_no" size="lg"></b-form-input>
-              <EMsgs :result="$v.form" :msgs="validationConf.messages" keyName="account_no"/>
-            </b-form-group>
-            <b-form-group label="收款二维码:" horizontal>
-              <div class="payment-qrcode">
-                <ImageUploadPreview v-model="form.qrCodeImage"/>
-
-                <p class="ml-10">为确保二维码正确，请添加后先自己进行扫描测试</p>
-              </div>
-            </b-form-group>
-          </div>
-
-          <VerifyCode v-if="user&&user.account"
-                      :needGoogle="user.account.is_have_totp_auth" :needSms="user.account.mobile" :needEmail="true"
-                      :sms.sync="verify.sms"
-                      :google.sync="verify.google"
-                      :email.sync="verify.email"
-                      :codeType.sync="verify.codeType"
-                      :businessType="verify.businessType"
-                      :emailSequence.sync="verify.emailSequence"
-                      :smsSequence.sync="verify.smsSequence"
-                      ref="verify-code"/>
+          <b-form-group label="开户支行:" horizontal>
+            <b-form-input v-model="form.branch" size="lg"></b-form-input>
+            <EMsgs :result="$v.form" :msgs="validationConf.messages" keyName="branch"/>
+          </b-form-group>
+          <b-form-group label="银行卡号:" horizontal>
+            <b-form-input v-model="form.account_no" size="lg"></b-form-input>
+            <EMsgs :result="$v.form" :msgs="validationConf.messages" keyName="account_no"/>
+          </b-form-group>
         </div>
+
+        <div v-if="form.method === 'alipay'">
+          <b-form-group label="支付宝账号:" horizontal>
+            <b-form-input v-model="form.account_no" size="lg"></b-form-input>
+            <EMsgs :result="$v.form" :msgs="validationConf.messages" keyName="account_no"/>
+          </b-form-group>
+          <b-form-group label="收款二维码:" horizontal>
+            <div class="payment-qrcode">
+              <ImageUploadPreview v-model="form.qrCodeImage"/>
+
+              <p class="ml-10">为确保二维码正确，请添加后先自己进行扫描测试</p>
+            </div>
+          </b-form-group>
+        </div>
+
+        <div v-if="form.method === 'wechat'">
+          <b-form-group label="微信账号:" horizontal>
+            <b-form-input v-model="form.account_no" size="lg"></b-form-input>
+            <EMsgs :result="$v.form" :msgs="validationConf.messages" keyName="account_no"/>
+          </b-form-group>
+          <b-form-group label="收款二维码:" horizontal>
+            <div class="payment-qrcode">
+              <ImageUploadPreview v-model="form.qrCodeImage"/>
+
+              <p class="ml-10">为确保二维码正确，请添加后先自己进行扫描测试</p>
+            </div>
+          </b-form-group>
+        </div>
+
+        <VerifyCode v-if="user&&user.account"
+                    :needGoogle="user.account.is_have_totp_auth" :needSms="user.account.mobile" :needEmail="true"
+                    :sms.sync="verify.sms"
+                    :google.sync="verify.google"
+                    :email.sync="verify.email"
+                    :codeType.sync="verify.codeType"
+                    :businessType="verify.businessType"
+                    :emailSequence.sync="verify.emailSequence"
+                    :smsSequence.sync="verify.smsSequence"
+                    ref="verify-code"/>
       </b-form>
     </b-modal>
   </CBlock>
@@ -208,6 +206,7 @@
   import Vuelidate from 'vuelidate'
   import getPaymentFormConfig from './payment-form-config'
   import EMsgs from '~/components/error-message.vue'
+  import {coinex} from '~/modules/variables'
 
   Vue.use(Vuelidate)
 
@@ -246,14 +245,7 @@
         modalShowing: false,
         isPaymentEditing: false,     // 是否正在被编辑payment（而不是添加）
         submitting: false,        // 正在上传支付方式
-
-        bankList: [{
-          text: '中国银行',
-          value: '11'
-        }, {
-          text: '华夏银行',
-          value: '22'
-        }]
+        coinex,
       }
     },
     computed: {
@@ -283,9 +275,14 @@
       return Promise.all([
         store.dispatch('fetchUserPayments'),
         store.dispatch('fetchSystemConstant'),
+        store.dispatch('fetchUserAccount'),
       ]).catch(err => {
         app.axios.needAuth(err, redirect, route.fullPath)
       })
+    },
+    mounted() {
+      // 默认选中银行卡
+      this.form.method = this.constant.PAYMENT_TYPES.BANKCARD
     },
     methods: {
       onPaymentStatusChange(payment, checked) {
@@ -309,6 +306,7 @@
         ;['method', 'account_name', 'bank', 'branch', 'account_no', 'qrCodeImage'].forEach((key) => {
           form[key] = ''
         })
+        form.method = this.constant.PAYMENT_TYPES.BANKCARD
         this.form = form
       },
 
@@ -321,7 +319,8 @@
 
       onPaymentDelete() {
         if (this.form.status === this.constant.PAYMENT_STATUS.ON) {
-          return this.$errorTips('该条支付方式开启中，不可删除')
+          // 暂时前端不作处理，不然无法暴露后台问题
+          // return this.$errorTips('该条支付方式开启中，不可删除')
         }
         this.axios.user.deletePaymentMethod(this.form.id).then(res => {
           this.$showTips('删除成功')
@@ -334,6 +333,18 @@
       },
 
       onPaymentAdd() {
+        if (!(this.user.account.kyc_status === this.constant.KYC_STATUS.PASS)) {
+          this.$showDialog({
+            title: '未实名认证',
+            content: '请实名认证后再添加支付方式',
+            onOk: () => {
+              window.location.href = `${coinex}/my/info/auth/realname`
+            },
+            okTitle: '实名认证'
+          })
+
+          return
+        }
         this.modalShowing = true
         this.verify.businessType = this.constant.VERIFY_CODE_BUSINESS.ADD_PAYMENT
 

@@ -46,57 +46,71 @@
       </div>
       <div class="order-steps">
         <ol>
-          <li :class="['step',{active:order.status==='created'}]"
-              v-if="(order.status!=='cancel'||order.pay_time)&&order.status!=='closed'">
+          <li :class="['step',{active:order.status===constant.ORDER_STATUS.CREATED.value}]"
+              v-if="(order.status!==constant.ORDER_STATUS.CANCEL.value||order.pay_time)&&order.status!==constant.ORDER_STATUS.CLOSED.value">
             <div class="message">{{stepsMessage.payCash}}</div>
             <div class="step-time" v-if="order.pay_time">{{order.pay_time | getTimeText}}</div>
             <button v-if="isBuySide&&!order.pay_time" class="btn btn-gradient-yellow btn-xs" @click="confirmPay()">
               我已付款
             </button>
           </li>
-          <li :class="['step',{active:order.status==='paid'}]" v-if="order.status!=='cancel'&&order.status!=='closed'">
+          <li :class="['step',{active:order.status===constant.ORDER_STATUS.PAID.value}]"
+              v-if="order.status!==constant.ORDER_STATUS.CANCEL.value&&order.status!==constant.ORDER_STATUS.CLOSED.value">
             <div class="message">{{stepsMessage.payCoin}}</div>
             <div class="step-time" v-if="order.complete_time">{{order.complete_time| getTimeText}}</div>
-            <button v-if="!isBuySide&&order.status==='paid'" class="btn btn-gradient-yellow btn-xs"
+            <button v-if="!isBuySide&&order.status===constant.ORDER_STATUS.PAID.value"
+                    class="btn btn-gradient-yellow btn-xs"
                     @click="confirmReceipt()">确认收款
             </button>
           </li>
-          <li :class="['step',{active:order.status==='success'}]"
-              v-if="order.status!=='cancel'&&order.status!=='closed'">
+          <li :class="['step',{active:order.status===constant.ORDER_STATUS.SUCCESS.value}]"
+              v-if="order.status!=='cancel'&&order.status!==constant.ORDER_STATUS.CLOSED.value">
             <div class="message">{{stepsMessage.success}}</div>
             <div class="step-time" v-if="order.complete_time">{{order.complete_time| getTimeText}}</div>
           </li>
-          <li :class="['step',{active:order.status==='cancel'}]" v-if="order.status==='cancel'">
+          <li :class="['step',{active:order.status===constant.ORDER_STATUS.CANCEL.value}]"
+              v-if="order.status===constant.ORDER_STATUS.CANCEL.value">
             <div class="message">{{stepsMessage.cancel}}</div>
           </li>
-          <li :class="['step',{active:order.status==='closed'}]" v-if="order.status==='closed'">
+          <li :class="['step',{active:order.status===constant.ORDER_STATUS.CLOSED.value}]"
+              v-if="order.status===constant.ORDER_STATUS.CLOSED.value">
             <div class="message">{{stepsMessage.closed}}</div>
           </li>
         </ol>
       </div>
       <div class="order-helper">
-        <span v-if="!appeal||appeal.status===''">
+        <div v-if="canCancel" class="d-flex align-items-center justify-content-between">
+          <span>想要终止交易？</span>
+          <button class="btn btn-outline-green btn-xs" @click="cancelOrder">取消订单</button>
+        </div>
+        <template v-if="showAppeal">
+           <span v-if="!appeal||appeal.status===''">
           交易出现问题？需要
           <span class="c-brand-green appeal-btn" v-if="canAppeal" @click="startAppeal">申诉</span>
           <span class="c-brand-green appeal-btn" v-else v-b-tooltip.hover title="买家付款30分钟后，可发起申诉。">申诉</span>
         </span>
+        </template>
         <template v-if="appeal">
-          <div v-if="appeal.status==='created'" class="d-flex align-items-center justify-content-between">
+          <div v-if="appeal.status===constant.APPEAL_STATUS.CREATED"
+               class="d-flex align-items-center justify-content-between">
             <span>{{appealSide}}已发起申诉，请等待申诉专员介入</span>
             <button class="btn btn-outline-green btn-xs" @click="cancelAppeal">取消申诉</button>
           </div>
-          <div v-if="appeal.status==='processing'" class="d-flex align-items-center justify-content-between">
+          <div v-if="appeal.status===constant.APPEAL_STATUS.PROCESSING"
+               class="d-flex align-items-center justify-content-between">
             <span>申诉专员已经介入，请及时提供必要的信息</span>
             <button class="btn btn-outline-green btn-xs" @click="cancelAppeal">取消申诉</button>
           </div>
-          <div v-if="appeal.status==='cancel'">
+          <div v-if="appeal.status===constant.APPEAL_STATUS.CANCEL">
             <span>{{appealSide}}已取消申诉，如果仍有问题，请</span>
             <b-link href="https://otc.coinex.com/res/support/ticket" target="_blank">提交工单</b-link>
           </div>
-          <div v-if="appeal.status==='completed'">
+          <div v-if="appeal.status===constant.APPEAL_STATUS.COMPLETED">
             <span>申诉裁决：{{appealResult}}</span>
           </div>
         </template>
+
+
       </div>
     </div>
     <div class="sidebar">
@@ -320,6 +334,10 @@
     }
   }
 
+  .payment-qrcode {
+    max-width: 400px;
+    max-height: 400px;
+  }
 
 </style>
 <script>
@@ -338,7 +356,6 @@
         id: this.$route.params.id,
         counterparty: null,
         merchant: null,
-        counterpartyId: null,
         order: null,
         selectedMethod: null,
         secondCountdown: null,
@@ -397,6 +414,17 @@
         return (paid && this.utils.getTimeDifference(this.order.pay_time) > PAID_CAN_APPEAL) ||
           (success && this.utils.getTimeDifference(this.order.complete_time) < SUCCESS_CAN_APPEAL)
       },
+      showAppeal() {
+        // 支付后立即 和 完成后七天内展示申诉提示
+        const paid = this.order.status === this.constant.ORDER_STATUS.PAID.value
+        const success = this.order.status === this.constant.ORDER_STATUS.SUCCESS.value
+        return paid ||
+          (success && this.utils.getTimeDifference(this.order.complete_time) < SUCCESS_CAN_APPEAL)
+      },
+      canCancel() {
+        const orderStatusOk = this.order.status === this.constant.ORDER_STATUS.CREATED.value || this.order.status === this.constant.ORDER_STATUS.PAID.value
+        return this.isBuySide && orderStatusOk
+      },
       showPayment() {
         const notCancel = this.order.status !== this.constant.ORDER_STATUS.CANCEL.value
         const notClosed = this.order.status !== this.constant.ORDER_STATUS.CLOSED.value
@@ -438,7 +466,8 @@
                     待支付，买方需在
                     <span class="c-red">${Math.floor(this.payRemainTime / 60)}分${this.payRemainTime % 60}秒</span>
                     内完成支付，付款参考号：<span class="c-red">${this.referCode}</span>
-                    `
+                    `,
+              warning: this.isBuySide ? `请使用实名付款，转账时除参考号外请不要备注任何信息！` : null,
             }
           case this.constant.ORDER_STATUS.PAID.value:
             return {
@@ -549,10 +578,19 @@
           }
         })
       },
+      cancelOrder() {
+        this.$showDialog({
+          title: '取消订单',
+          content: (<div><p>确认取消订单？</p><p class="c-red">取消的订单将不可重新打开。</p></div>),
+          onOk: () => {
+            this.axios.order.cancelOrder(this.order.id)
+          }
+        })
+      },
       showQrCode(codeImg) {
         this.$showDialog({
           title: '支付二维码',
-          content: (<div><img src={codeImg}/></div>),
+          content: (<div><img class="payment-qrcode" src={codeImg}/></div>),
           okOnly: true,
         })
       },

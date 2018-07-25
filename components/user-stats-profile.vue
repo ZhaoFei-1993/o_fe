@@ -3,8 +3,8 @@
     <UserMiniProfile class="user-mini-profile" :username="userData.name" :online="true"/>
     <div class="pt-20 px-20">
       <SidebarInfoItem title="30天成交量">
-        <Language text="[t][/t]单">
-          <span slot="t" class="c-brand-yellow">{{userData.deal_count || 0}} </span>
+        <Language text="[t][/t] 单">
+          <span slot="t" class="c-brand-yellow">{{userData.user_stat.deal_count || 0}}</span>
         </Language>
       </SidebarInfoItem>
 
@@ -13,15 +13,11 @@
       </SidebarInfoItem>
 
       <SidebarInfoItem title="平均付款时间">
-        <Language text="[t][/t]分钟">
-          <span slot="t" class="c-brand-yellow">{{utils.formatDuration(userData.pay_time)}} </span> <!--空格勿删-->
-        </Language>
+        <span class="c-brand-yellow">{{utils.formatDuration(userData.user_stat.pay_time)}}</span>
       </SidebarInfoItem>
 
       <SidebarInfoItem title="平均放行时间">
-        <Language text="[t][/t]分钟">
-          <span slot="t" class="c-brand-yellow">{{utils.formatDuration(userData.receipt_time)}} </span>
-        </Language>
+        <span class="c-brand-yellow">{{utils.formatDuration(userData.user_stat.receipt_time)}}</span>
       </SidebarInfoItem>
     </div>
   </div>
@@ -75,9 +71,8 @@
     computed: {
       // 用户单子完成率
       userOrderCompleteRatio: function () {
-        const userData = this.userData
-        // todo: 这里根据后台返回数据，来显示  0% 和 -
-        return userData.deal_count ? (userData.deal_count / userData.order_count * 100).toFixed(1) + '%' : '--'
+        const statics = this.userData.user_stat || this.userData // order详情里面的信息是扁平的
+        return statics.order_count ? (statics.deal_count / statics.order_count * 100).toFixed(1) + '%' : '--'
       },
     }
   }

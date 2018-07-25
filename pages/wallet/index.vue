@@ -133,7 +133,7 @@
   import {mapState} from 'vuex'
 
   const P_LIMIT = 10 // 每页条数, P_前缀表示页面组件全局常量
-  const P_INTERVAL = 5000 // 资产轮询时间
+  const P_INTERVAL = 500000 // 资产轮询时间
 
   export default {
     data() {
@@ -425,6 +425,9 @@
         this.form.amount = 0
       },
       onShowTransferModal(type, item) {
+        this.$store.dispatch('fetchOtcBalance') // otc资产
+        this.$store.dispatch('fetchCoinexBalance') // coinex资产
+        this.$store.dispatch('fetchExchangeRate') // 汇率
         const { coin_type: coinType } = item
         this.form.coinType = coinType // 设置划转币种
         if (type === 'in') {
