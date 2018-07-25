@@ -289,7 +289,7 @@
         <p>
           <b-link v-if="currentConstraint.outLink" href="currentConstraint.outLink">{{currentConstraint.linkText}}
           </b-link>
-          <b-link v-else :href="currentConstraint.link">{{currentConstraint.linkText}}</b-link>
+          <b-link v-else :to="currentConstraint.link">{{currentConstraint.linkText}}</b-link>
         </p>
       </div>
     </b-modal>
