@@ -317,6 +317,9 @@
         this.isPaymentEditing = true
         this.form = payment
         this.verify.businessType = this.constant.VERIFY_CODE_BUSINESS.MODIFY_PAYMENT
+
+        this.$refs['verify-code'].reset()
+        this.$v.form.$reset()
       },
 
       onPaymentDelete() {
@@ -353,10 +356,11 @@
         if (this.isPaymentEditing) {
           this.isPaymentEditing = false
 
-          this.$refs['verify-code'].reset()
           this.clearForm()
-          this.$v.form.$reset()
         }
+
+        this.$refs['verify-code'].reset()
+        this.$v.form.$reset()
       },
 
       /**

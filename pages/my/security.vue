@@ -63,6 +63,14 @@
         认证
       </b-btn>
     </MyInfoItem>
+    <MyInfoItem title="交易验证">
+      <p slot="content">
+        <span v-if="user.account.trade_validate_frequency === 'never'">从不二次验证</span>
+        <span v-if="user.account.trade_validate_frequency === 'each_two_hours'">2小时内不二次验证</span>
+        <span v-if="user.account.trade_validate_frequency === 'each_time'">每次交易均二次验证</span>
+      </p>
+      <b-btn slot="action" variant="outline-green" size="xs" target="_blank" :href="`${coinex}/my/info/security`">更换</b-btn>
+    </MyInfoItem>
   </CBlock>
 </template>
 
