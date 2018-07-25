@@ -12,9 +12,9 @@ $background-red: #e45555;
   box-sizing: border-box;
   color: #fff;
   transition: color 0.15s ease-in-out,
-              background-color 0.15s ease-in-out,
-              border-color 0.15s ease-in-out,
-              box-shadow 0.15s ease-in-out;
+  background-color 0.15s ease-in-out,
+  border-color 0.15s ease-in-out,
+  box-shadow 0.15s ease-in-out;
 
   &:focus,
   &.focus {
@@ -23,6 +23,14 @@ $background-red: #e45555;
 
   &[disabled] {
     cursor: default !important;
+    border: 2px solid $gray !important;
+    color: $gray !important;
+    background: none !important;
+    &:hover {
+      border: 2px solid $gray !important;
+      color: $gray !important;
+      background: none !important;
+    }
   }
 }
 
@@ -31,7 +39,7 @@ $background-red: #e45555;
   line-height: 44px;
   font-size: 22px;
   border-radius: 48px;
-  height:48px;
+  height: 48px;
 }
 
 .btn-lg {
@@ -40,7 +48,7 @@ $background-red: #e45555;
   font-size: 22px;
   line-height: 38px;
   border-radius: 44px;
-  height:42px;
+  height: 42px;
 }
 
 .btn-sm {
@@ -51,7 +59,7 @@ $background-red: #e45555;
   font-size: 22px;
   border-width: 2px;
   border-radius: 34px;
-  height:34px;
+  height: 34px;
 }
 
 .btn-xs {
@@ -68,9 +76,8 @@ $background-red: #e45555;
   font-size: 14px;
   border-width: 1px;
   border-radius: 100px;
-  height:26px;
+  height: 26px;
 }
-
 
 .btn-green {
   background-color: $brandGreen;
@@ -105,14 +112,9 @@ $background-red: #e45555;
   color: $brandGreen;
 
   &:hover {
-    background-color: $brandGreen;
-    border-color: transparent;
+    background-image: $image-gradient-green;
+    border: none;
     color: #fff;
-  }
-  &[disabled]:hover {
-    background-color: transparent;
-    border-color: $brandGreen;
-    color: $brandGreen;
   }
 }
 
@@ -159,13 +161,14 @@ $background-red: #e45555;
 
 .btn-outline-yellow {
   background-color: transparent;
-  border-color: $brandYellow;
-  color: $brandYellow;
+  border-color: $brightYellow;
+  color: $brightYellow;
 
   &:hover {
-    background-color: $brandYellow;
+    background-image: $image-gradient-yellow;
     border-color: transparent;
     color: #fff;
+    border: none;
   }
 }
 
