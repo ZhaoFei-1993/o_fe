@@ -351,6 +351,7 @@ export default {
       Object.assign(this.form, this.user.settings)
       this.form.price = this.marketPrice
     }).catch(err => {
+      if (err.code === this.constant.ERROR_CODE.UNAUTHORIZED) return
       this.axios.onError(err)
     })
   },

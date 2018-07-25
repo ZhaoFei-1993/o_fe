@@ -36,6 +36,11 @@ export default {
   },
   methods: {
     onShowModal() {
+      if (!this.user.account) {
+        window.location.href = `${this.constant.loginPage}?redirect=${encodeURIComponent(this.constant.webDomain + this.$route.fullPath)}`
+        return
+      }
+
       if (!(this.user.merchant && this.user.merchant.auth_status === this.constant.MERCHANT_AUTH_STATUS.PASS)) {
         this.$showDialog({
           title: '您尚未成为认证商家',    // todo:文案

@@ -252,6 +252,9 @@
           this.userName = this.user.account.name
           this.$refs.updateNameModal.show()
         }
+      }).catch(err => {
+        if (err.code === this.constant.ERROR_CODE.UNAUTHORIZED) return
+        this.axios.onError(err)
       })
     },
     methods: {

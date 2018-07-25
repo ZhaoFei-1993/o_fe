@@ -1,5 +1,6 @@
 import CONSTSANTS from '~/modules/constant'
 import {ERROR_CODE} from '~/modules/error-code'
+import * as variables from '~/modules/variables'
 
 /**
  * 将后台给的列表转化为options格式，方便组件使用
@@ -18,6 +19,7 @@ function list2Options(data) {
 export default () => {
   const state = {
     ...CONSTSANTS,
+    ...variables,
     ERROR_CODE,
     bankOptions: [],                    // 银行列表
     appealReasonOptions: [],            // 申诉原因列表
