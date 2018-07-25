@@ -83,11 +83,13 @@
           <span>想要终止交易？</span>
           <button class="btn btn-outline-green btn-xs" @click="cancelOrder">取消订单</button>
         </div>
-        <span v-if="!appeal||appeal.status===''">
+        <template v-if="showAppeal">
+           <span v-if="!appeal||appeal.status===''">
           交易出现问题？需要
           <span class="c-brand-green appeal-btn" v-if="canAppeal" @click="startAppeal">申诉</span>
           <span class="c-brand-green appeal-btn" v-else v-b-tooltip.hover title="买家付款30分钟后，可发起申诉。">申诉</span>
         </span>
+        </template>
         <template v-if="appeal">
           <div v-if="appeal.status===constant.APPEAL_STATUS.CREATED"
                class="d-flex align-items-center justify-content-between">
@@ -107,6 +109,8 @@
             <span>申诉裁决：{{appealResult}}</span>
           </div>
         </template>
+
+
       </div>
     </div>
     <div class="sidebar">
@@ -407,6 +411,13 @@
         return (paid && this.utils.getTimeDifference(this.order.pay_time) > PAID_CAN_APPEAL) ||
           (success && this.utils.getTimeDifference(this.order.complete_time) < SUCCESS_CAN_APPEAL)
       },
+      showAppeal() {
+        // 支付后立即 和 完成后七天内展示申诉提示
+        const paid = this.order.status === this.constant.ORDER_STATUS.PAID.value
+        const success = this.order.status === this.constant.ORDER_STATUS.SUCCESS.value
+        return paid ||
+          (success && this.utils.getTimeDifference(this.order.complete_time) < SUCCESS_CAN_APPEAL)
+      },
       canCancel() {
         const orderStatusOk = this.order.status === this.constant.ORDER_STATUS.CREATED.value || this.order.status === this.constant.ORDER_STATUS.PAID.value
         return this.isBuySide && orderStatusOk
@@ -452,7 +463,8 @@
                     待支付，买方需在
                     <span class="c-red">${Math.floor(this.payRemainTime / 60)}分${this.payRemainTime % 60}秒</span>
                     内完成支付，付款参考号：<span class="c-red">${this.referCode}</span>
-                    `
+                    `,
+              warning: this.isBuySide ? `请使用实名付款，转账时除参考号外请不要备注任何信息！` : null,
             }
           case this.constant.ORDER_STATUS.PAID.value:
             return {
