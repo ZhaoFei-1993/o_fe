@@ -212,6 +212,8 @@
       onEditConfirm(data) {
         return this.$store.dispatch('setUserSettings', Object.assign({}, this.settings, data)).then(() => {
           this.store2Data()
+        }).catch(err => {
+          this.axios.onError(err)
         })
       }
     }

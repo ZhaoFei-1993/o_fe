@@ -390,9 +390,10 @@
           ...form,
         }).then(res => {
           this.submitting = false
-          this.$store.dispatch('fetchUserPayments')
           this.modalShowing = false
           this.$showTips(this.isPaymentEditing ? '修改成功' : '添加成功')
+
+          return this.$store.dispatch('fetchUserPayments')
         }).catch(err => {
           this.submitting = false
           this.axios.onError(err)

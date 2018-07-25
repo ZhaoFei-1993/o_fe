@@ -67,6 +67,7 @@ export default (axios) => {
 
     setSettings(settings) {
       // return Promise.resolve(require('./mock/user').settings)
+      // return Promise.reject(new Error('您还不是商家'))
       return axios.post('/user/settings', settings)
     },
     signOut() {

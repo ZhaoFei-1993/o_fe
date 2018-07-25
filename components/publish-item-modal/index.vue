@@ -326,12 +326,16 @@ export default {
     }
   },
   mounted() {
-    this.$store.dispatch('fetchExchangeRate')
-    this.$store.dispatch('fetchOtcBalance')
-    this.$store.dispatch('fetchUserSettings').then(() => {
+    return Promise.all([
+      this.$store.dispatch('fetchExchangeRate'),
+      this.$store.dispatch('fetchOtcBalance'),
+      this.$store.dispatch('fetchUserSettings'),
+    ]).then(() => {
       // 从用户配置中获取默认的广告配置
       Object.assign(this.form, this.user.settings)
       this.form.price = this.marketPrice
+    }).catch(err => {
+      this.axios.onError(err)
     })
   },
   methods: {

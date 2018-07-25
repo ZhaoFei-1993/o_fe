@@ -266,11 +266,13 @@ export default {
     getItems() {
       this.axios.item.userItems(this.itemStatus).then(res => {
         this.items = res.data
+      }).catch(err => {
+        this.axios.onError(err)
       })
     },
     onUserStatusChange(bool) {
       this.axios.user.changeMerchantAvailable(bool).then(res => {
-        this.$store.dispatch('fetchUserMerchant')
+        return this.$store.dispatch('fetchUserMerchant')
       }).catch(err => {
         this.axios.onError(err)
       })

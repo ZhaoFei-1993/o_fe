@@ -488,18 +488,23 @@
             this.axios.needAuth(err, this.$router.push, this.$route.fullPath)
           } else {
             this.$router.push('/')
+            this.axios.onError(err)
           }
         })
       },
       getAppeal() {
         this.axios.order.getAppeal(this.order.id).then(response => {
           this.appeal = response.data.data
+        }).catch(err => {
+          this.axios.onError(err)
         })
       },
       refreshOrderStatus() {
         this.axios.order.refreshOrderStatus(this.id).then(response => {
           this.order = Object.assign({}, this.order, response.data)
           this.checkOrderStatus()
+        }).catch(err => {
+          this.axios.onError(err)
         })
       },
       checkOrderStatus() {
@@ -528,7 +533,11 @@
           title: '确认付款',
           content: (<div>确认您已向买方付款？<span class="c-red">未付款点击“我已付款”将被冻结账户。</span></div>),
           onOk: () => {
-            this.axios.order.confirmPay(this.order.id, this.selectedMethod)
+            this.axios.order.confirmPay(this.order.id, this.selectedMethod).then(res => {
+              this.$successTips('确认收款成功')
+            }).catch(err => {
+              this.axios.onError(err)
+            })
           }
         })
       },
@@ -538,6 +547,8 @@
       submitAppeal() {
         this.axios.order.submitAppeal(this.order.id, this.appealReason, this.appealComment).then(_ => {
           this.getAppeal()
+        }).catch(err => {
+          this.axios.onError(err)
         })
       },
       cancelAppeal() {
@@ -545,7 +556,9 @@
           title: '取消申诉',
           content: (<div><p>确认取消申诉？</p><p class="c-red">取消申诉后的订单将不可再次申诉。</p></div>),
           onOk: () => {
-            this.axios.order.cancelAppeal(this.order.id)
+            this.axios.order.cancelAppeal(this.order.id).catch(err => {
+              this.axios.onError(err)
+            })
           }
         })
       },
