@@ -307,7 +307,6 @@
 </template>
 
 <script>
-  import Vue from 'vue'
   import {mapState} from 'vuex'
   import {coinex, loginPage, webDomain} from '~/modules/variables'
   import PlaceOrderModal from '~/components/place-order-modal'
