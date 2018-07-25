@@ -85,7 +85,7 @@
               <div class="col3">
                 <div class="payment-method"
                      v-if="item.status !== constant.ORDER_STATUS.CANCEL.value
-                  && item.status !== constant.ORDER_STATUS.CLOSED.value">
+                  && item.status !== constant.ORDER_STATUS.CLOSED.value && !item._expired">
                   <template v-if="item.status === constant.ORDER_STATUS.CREATED.value">
                     <i v-if="item._selected_payment_method.method === constant.PAYMENT_TYPES.BANKCARD"
                        class="iconfont icon-bankcard"></i>
@@ -104,46 +104,59 @@
                 </div>
               </div>
               <div class="col4">
-                <div class="detail-text">
-                  {{ item._selected_payment_method.account_name }}
-                </div>
-                <div class="detail-text">
-                  {{ item._selected_payment_method.account_no }}
-                  <b-popover :target="`qr-${item.id}`"
-                             placement="top"
-                             triggers="hover focus">
-                    <img style="display: block;width: 120px;height: 120px;"
-                         :src="item._selected_payment_method.qr_code_image">
-                  </b-popover>
-                  <span :id="`qr-${item.id}`" style="cursor: pointer;"
-                        v-show="item._selected_payment_method.method !== 'bankcard'"><i
-                    class="iconfont icon-qrcode"></i></span>
-                </div>
-                <div v-if="item._selected_payment_method.method === 'bankcard'" class="detail-text">
-                  {{ item._selected_payment_method.bank }}，{{ item._selected_payment_method.branch }}
-                </div>
-                <div class="detail-text">
-                  备注参考号：<span class="detail-code">{{ `${item.id}`.substr(`${item.id}`.length - 6) }}</span>
-                </div>
-                <div class="detail-text detail-warn-text">
-                  转账时除参考号外请不要备注任何信息，防止卡被冻结!
-                </div>
+                <template v-if="!item._expired">
+                  <div class="detail-text">
+                    {{ item._selected_payment_method.account_name }}
+                  </div>
+                  <div class="detail-text">
+                    {{ item._selected_payment_method.account_no }}
+                    <b-popover :target="`qr-${item.id}`"
+                               placement="top"
+                               triggers="hover focus">
+                      <img style="display: block;width: 120px;height: 120px;"
+                           :src="item._selected_payment_method.qr_code_image">
+                    </b-popover>
+                    <span :id="`qr-${item.id}`" style="cursor: pointer;"
+                          v-show="item._selected_payment_method.method !== constant.PAYMENT_TYPES.BANKCARD"><i
+                      class="iconfont icon-qrcode"></i></span>
+                  </div>
+                  <div v-if="item._selected_payment_method.method === constant.PAYMENT_TYPES.BANKCARD"
+                       class="detail-text">
+                    {{ item._selected_payment_method.bank }}，{{ item._selected_payment_method.branch }}
+                  </div>
+                  <div class="detail-text">
+                    备注参考号：<span class="detail-code">{{ `${item.id}`.substr(`${item.id}`.length - 6) }}</span>
+                  </div>
+                  <div class="detail-text detail-warn-text" v-if="item._isBuySide && item.status === constant.ORDER_STATUS.CREATED.value">
+                    转账时除参考号外请不要备注任何信息，防止卡被冻结!
+                  </div>
+                </template>
+
               </div>
               <div class="col5">
                 <template v-if="item._order_type === constant.SIDE.BUY">
                   <template v-if="item.status === constant.ORDER_STATUS.CREATED.value">
-                    <div class="detail-text detail-timer">
-                      还剩{{ item._remaining_time | formatDuration }}
-                    </div>
-                    <div class="message-btn">
-                      <i class="iconfont icon-message"></i>
-                    </div>
-                    <div class="detail-btn-wrapper">
-                      <b-btn size="xs" variant="gradient-yellow" class="detail-btn" @click="confirmPay(item)">我已付款</b-btn>
-                    </div>
-                    <div class="detail-btn-wrapper">
-                      <b-btn size="xs" variant="outline-green" class="detail-btn" @click="cancelOrder(item)">取消订单</b-btn>
-                    </div>
+                    <template v-if="item._remaining_time>0">
+                      <div class="detail-text detail-timer">
+                        还剩{{ item._remaining_time | formatDuration }}
+                      </div>
+                      <div class="message-btn">
+                        <i class="iconfont icon-message"></i>
+                      </div>
+                      <div class="detail-btn-wrapper">
+                        <b-btn size="xs" variant="gradient-yellow" class="detail-btn" @click="confirmPay(item)">我已付款
+                        </b-btn>
+                      </div>
+                      <div class="detail-btn-wrapper">
+                        <b-btn size="xs" variant="outline-green" class="detail-btn" @click="cancelOrder(item)">取消订单
+                        </b-btn>
+                      </div>
+                    </template>
+                    <template v-else>
+                      <div class="detail-btn-wrapper detail-waiting">
+                        订单已超时
+                      </div>
+                    </template>
                   </template>
                   <template v-if="item.status === constant.ORDER_STATUS.PAID.value">
                     <div class="message-btn">
@@ -153,7 +166,8 @@
                       等待卖家收款
                     </div>
                     <div class="detail-btn-wrapper">
-                      <b-btn size="xs" variant="outline-green" class="detail-btn" @click="cancelOrder(item)">取消订单</b-btn>
+                      <b-btn size="xs" variant="outline-green" class="detail-btn" @click="cancelOrder(item)">取消订单
+                      </b-btn>
                     </div>
                   </template>
                   <template v-if="item.status === constant.ORDER_STATUS.CLOSED.value">
@@ -167,22 +181,30 @@
                 </template>
                 <template v-if="item._order_type === constant.SIDE.SELL">
                   <template v-if="item.status === constant.ORDER_STATUS.CREATED.value">
-                    <div class="detail-text detail-timer">
-                      还剩{{ item._remaining_time | formatDuration }}
-                    </div>
-                    <div class="message-btn">
-                      <i class="iconfont icon-message"></i>
-                    </div>
-                    <div class="detail-btn-wrapper detail-waiting">
-                      等待买家付款
-                    </div>
+                    <template v-if="item._remaining_time>0">
+                      <div class="detail-text detail-timer">
+                        还剩{{ item._remaining_time | formatDuration }}
+                      </div>
+                      <div class="message-btn">
+                        <i class="iconfont icon-message"></i>
+                      </div>
+                      <div class="detail-btn-wrapper detail-waiting">
+                        等待买家付款
+                      </div>
+                    </template>
+                    <template v-else>
+                      <div class="detail-btn-wrapper detail-waiting">
+                        已超时
+                      </div>
+                    </template>
                   </template>
                   <template v-if="item.status === constant.ORDER_STATUS.PAID.value">
                     <div class="message-btn">
                       <i class="iconfont icon-message"></i>
                     </div>
                     <div class="detail-btn-wrapper">
-                      <b-btn size="xs" variant="gradient-yellow" class="detail-btn" @click="confirmReceipt(item)">确认收款</b-btn>
+                      <b-btn size="xs" variant="gradient-yellow" class="detail-btn" @click="confirmReceipt(item)">确认收款
+                      </b-btn>
                     </div>
                   </template>
                 </template>
@@ -201,7 +223,8 @@
     <div class="bottom-tips">
       温馨提示：每日取消订单超过三笔，将被冻结当天下单权限。
     </div>
-    <ConfirmReceipt :orderId="curReceiptOrderId" :show-confirm-receipt-modal="showConfirmReceiptModal"/>
+    <ConfirmReceipt :orderId="curReceiptOrderId" :show-confirm-receipt-modal="showConfirmReceiptModal"
+                    @confirmReceipt="markOrderSuccess"/>
   </div>
 </template>
 
@@ -391,14 +414,13 @@
                   selectedPaymentMethod = {...item.payment_methods[0]}
                 }
                 const remainingTime = parseInt((item.place_time * 1000 + ORDER_PAY_TIME * 60000 - Date.now()) / 1000) // 订单付款截止时间 = 创建时间 + 可付款时间(15min)
-                const { CREATED, CLOSED } = this.constant.ORDER_STATUS
-                const { status } = item
                 return {
                   ...item,
                   _order_type: orderType, // 下划线前缀均为自定义属性（下同）订单类型
                   _selected_payment_method: selectedPaymentMethod, // 用户选中的支付方式
                   _remaining_time: remainingTime,
-                  status: (status === CREATED.value) && remainingTime <= 0 ? CLOSED.value : item.status, // 前置判断超时关闭的订单
+                  _expired: remainingTime <= 0 && item.status === this.constant.ORDER_STATUS.CREATED.value,
+                  _isBuySide: (item.merchant_id === this.user.account.id) === (item.merchant_side === this.constant.SIDE.BUY)
                 }
               })
             } else {
@@ -420,14 +442,12 @@
             } else {
               for (let i = 0; i < this.orderTableItems.length; i++) {
                 const item = this.orderTableItems[i]
-                const { status } = item
-                let { _remaining_time: remainingTime } = item // 先创建_remaining_time临时变量，防止下面逻辑频繁修改数据导致页面频繁更新
-                const { CREATED, PAID, CLOSED } = this.constant.ORDER_STATUS
-                if (status === CREATED.value || status === PAID.value) { // 针对待付款和已付款订单
+                const {status} = item
+                let {_remaining_time: remainingTime} = item // 先创建_remaining_time临时变量，防止下面逻辑频繁修改数据导致页面频繁更新
+                const {CREATED} = this.constant.ORDER_STATUS
+                if (status === CREATED.value) { // 针对待付款
                   remainingTime -= 1 // 剩余时间，单位：秒
-                  if (remainingTime < 0) {
-                    item.status = CLOSED.value
-                  } else {
+                  if (remainingTime >= 0) {
                     item._remaining_time = remainingTime
                   }
                 }
@@ -443,8 +463,8 @@
           content: (<div>确认您已向买方付款？<span class="c-red">未付款点击“我已付款”将被冻结账户。</span></div>),
           onOk: () => {
             this.axios.order.confirmPay(item.id, item._selected_payment_method).then(res => {
-              if (res.code === 0) { // 成功后跳转到`已结束`
-                this.onClickFilter(1)
+              if (res.code === 0) {
+                item.status = this.constant.ORDER_STATUS.PAID.value
               } else {
                 this.$errorTips(`提交失败code=${res.code}`)
               }
@@ -462,6 +482,7 @@
           onOk: () => {
             this.axios.order.cancelOrder(item.id).then(res => {
               if (res.code === 0) { // 成功后跳转到`已结束`
+                item.status = this.constant.ORDER_STATUS.CANCEL
                 this.onClickFilter(1)
               } else {
                 this.$errorTips(`提交失败code=${res.code}`)
@@ -475,6 +496,13 @@
       confirmReceipt(item) {
         this.curReceiptOrderId = item.id
         this.showConfirmReceiptModal = true
+      },
+      markOrderSuccess() {
+        try {
+          this.items.find(item => item.id === this.curReceiptOrderId).status = this.constant.ORDER_STATUS.SUCCESS.value
+        } catch (err) {
+        }
+        this.onClickFilter(1)
       },
       onClickFilter(index) {
         for (let i = 0; i < this.filterOptions.length; i++) {
