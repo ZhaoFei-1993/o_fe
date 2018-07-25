@@ -270,6 +270,9 @@
           </div>
         </div>
       </div>
+      <b-pagination :total-rows="pager.total" :value="pager.currentPage" :per-page="pager.limit"
+                    @change="onPagerChange">
+      </b-pagination>
     </div>
     <PlaceOrderModal
       v-if="selectedItem&&user.account"
@@ -305,6 +308,14 @@
   import UserPayments from '~/components/user-payments'
 
   // const refreshInterval = 5000
+  const PAGE_SIZE = 30
+  const defaultPager = {
+    limit: PAGE_SIZE,
+    currentPage: 1,
+    total: 0,
+    totalPage: 1,
+    hasNext: true
+  }
   export default {
     components: {
       PlaceOrderModal,
@@ -332,6 +343,7 @@
         busy: false,
         isItemPublishing: false,
         coinex,
+        pager: defaultPager,
       }
     },
     computed: {
@@ -370,16 +382,25 @@
         this.getItems()
       },
       getItems() {
+        const {limit, currentPage} = this.pager
         this.busy = true
         this.axios.item.getItems({
+          limit,
+          currentPage,
           // taker和maker的方向是反的
           side: this.selectedSide === this.constant.SIDE.BUY ? this.constant.SIDE.SELL : this.constant.SIDE.BUY,
           coin_type: this.selectedCoin,
           payment_method: this.selectedPayment === 'ALL' ? undefined : this.selectedPayment.toLowerCase(),
         }).then(response => {
+          const data = response.data
           this.busy = false
-          this.items = response.data.data
+          this.items = data.data
+          this.pager = this.utils.extractPager(data)
         })
+      },
+      onPagerChange(currentPage) {
+        this.pager.currentPage = currentPage
+        this.getItems()
       },
       placeOrder(item) {
         if (!this.user.account) {
