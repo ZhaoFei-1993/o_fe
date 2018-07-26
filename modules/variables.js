@@ -35,10 +35,7 @@ loginPage = protocol + loginPage
 serverApiDomain = protocol + serverApiDomain
 clientApiDomain = protocol + clientApiDomain
 
-const coinex = coinexDomain
-
 export {
-  coinex,
   coinexDomain,
   clientApiDomain,
   serverApiDomain,

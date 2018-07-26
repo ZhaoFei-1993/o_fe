@@ -130,7 +130,7 @@
         <b-nav-item to="/wallet">OTC钱包</b-nav-item>
         <b-nav-item :href="helpLink" target="_blank">帮助</b-nav-item>
         <span style="color: #d5d5d5">|</span>
-        <b-nav-item :href="`${coinex}?lang=${lang.lang}`">返回主站</b-nav-item>
+        <b-nav-item :href="`${coinexDomain}?lang=${lang.lang}`">返回主站</b-nav-item>
       </b-navbar-nav>
       <b-navbar-nav class="ml-auto">
         <div v-if="user.account">
@@ -210,7 +210,7 @@
 
 <script>
   import {mapState} from 'vuex'
-  import {loginPage, webDomain, signupPage, coinex} from '~/modules/variables'
+  import {loginPage, webDomain, signupPage, coinexDomain} from '~/modules/variables'
   import {onApiError} from '~/modules/error-code'
   import PublishItemButton from '~/components/publish-item-modal/publish-item-button.vue'
 
@@ -223,7 +223,7 @@
     },
     data() {
       return {
-        coinex,
+        coinexDomain,
         attentionModelShowing: false,
         attention: [],
         nameDuplicated: false,

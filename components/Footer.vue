@@ -20,28 +20,28 @@
         <div class="linksWrap">
           <div class="linkBox">
             <p class="boxTitle">产品</p>
-            <b-link :href="coinex">币币交易</b-link>
+            <b-link :href="coinexDomain">币币交易</b-link>
             <b-link to="/">OTC交易</b-link>
             <b-link target="_blank" :href="'https://pool.viabtc.com/?lang='+lang.lang">矿池</b-link>
             <b-link target="_blank" :href="'https://www.viabtc.com/?lang='+lang.lang">区块浏览器</b-link>
           </div>
           <div class="linkBox">
             <p class="boxTitle">关于</p>
-            <b-link :href="`${coinex}/aboutus`">关于我们</b-link>
+            <b-link :href="`${coinexDomain}/aboutus`">关于我们</b-link>
             <!-- <b-link to="/">加入我们</b-link> -->
-            <b-link :href="`${coinex}/token`">关于CET</b-link>
-            <b-link :href="`${coinex}/announcement`">公告</b-link>
+            <b-link :href="`${coinexDomain}/token`">关于CET</b-link>
+            <b-link :href="`${coinexDomain}/announcement`">公告</b-link>
           </div>
           <div class="linkBox">
             <p class="boxTitle">声明</p>
-            <b-link :href="`${coinex}/service`">服务协议</b-link>
-            <b-link :href="`${coinex}/privacy`">隐私协议</b-link>
-            <b-link :href="`${coinex}/fees`">费率</b-link>
+            <b-link :href="`${coinexDomain}/service`">服务协议</b-link>
+            <b-link :href="`${coinexDomain}/privacy`">隐私协议</b-link>
+            <b-link :href="`${coinexDomain}/fees`">费率</b-link>
           </div>
           <div class="linkBox" style="width:auto">
             <p class="boxTitle">支持</p>
             <b-link href="https://support.coinex.com" target="_blank">常见问题</b-link>
-            <b-link :href="`${coinex}/res/support/ticket`" target="_blank">提交工单</b-link>
+            <b-link :href="`${coinexDomain}/res/support/ticket`" target="_blank">提交工单</b-link>
             <b-link target="_blank" href="https://github.com/coinexcom/coinex_exchange_api/wiki">API文档</b-link>
             <!-- <b-link target="_blank" :href="lang.lang !== 'en_US'?'http://coinex.udesk.cn':'http://coinex-en.udesk.cn'">客服</b-link> -->
             <b-link :href="'https://docs.google.com/forms/d/e/1FAIpQLSdA8WGHG8SJrWEDbYXJeNSzjovUtU8kmcLKSOHDfACGdgMgUQ/viewform'">上币申请</b-link>
@@ -61,12 +61,12 @@
 
 <script>
 import { mapState } from 'vuex'
-import {coinex} from '~/modules/variables'
+import {coinexDomain} from '~/modules/variables'
 
 export default {
   data() {
     return {
-      coinex,
+      coinexDomain,
     }
   },
   computed: {
