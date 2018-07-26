@@ -16,7 +16,8 @@ export const userItems = {
     'price_limit': '0.00',                     // 价格限制
     'pricing_type': 'fixed',                   // 定价方式
     'side': 'buy',                             // 方向
-    'user_id': 1                               // 用户ID
+    'user_id': 1,                               // 用户ID
+    remain_coin_amount: '0E-8',
   }, {
     'auto_reply_content': '',                  // 自动回复内容
     'cash_type': 'CNY',                        // 法币类型
@@ -34,7 +35,8 @@ export const userItems = {
     'price_limit': '0.00',                     // 价格限制
     'pricing_type': 'fixed',                   // 定价方式
     'side': 'buy',                             // 方向
-    'user_id': 1                               // 用户ID
+    'user_id': 1,                               // 用户ID
+    remain_coin_amount: '0E-8',
   }, {
     'auto_reply_content': '',                  // 自动回复内容
     'cash_type': 'CNY',                        // 法币类型
@@ -52,6 +54,7 @@ export const userItems = {
     'price_limit': '0.00',                     // 价格限制
     'pricing_type': 'fixed',                   // 定价方式
     'side': 'buy',                             // 方向
-    'user_id': 1                               // 用户ID
+    'user_id': 1,                               // 用户ID
+    remain_coin_amount: '0E-8',
   }]
 }

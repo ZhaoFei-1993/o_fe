@@ -20,6 +20,7 @@
         display: flex;
         align-items: center;
         margin-bottom: 25px;
+        font-size: 18px;
 
         &::before {
           content: '';
@@ -157,11 +158,11 @@
           <ContactItem title="手机认证" icon="icon-mobile" :active="true" :required="true">
             <div v-if="account.mobile" class="c-6f">
               <p class="mt-10">已认证</p>
-              <p>{{account.mobile}}</p>
+              <p>+{{account.country_code}} {{account.mobile}}</p>
             </div>
             <div v-else>
               <p class="c-red">未认证</p>
-              <b-link :href="`${coinex}/my/info/security`">去认证 ></b-link>
+              <b-link :href="`${coinex}/my/info/security`" target="_blank">去认证 ></b-link>
             </div>
           </ContactItem>
           <ContactItem title="实名认证" icon="icon-namecard" :required="true">
@@ -170,10 +171,10 @@
             </div>
             <div v-else>
               <p class="c-red">未认证</p>
-              <b-link :href="`${coinex}/my/info/security`">去认证 ></b-link>
+              <b-link :href="`${coinex}/my/info/auth/realname`" target="_blank">去认证 ></b-link>
             </div>
           </ContactItem>
-          <ContactItem title="联系人微信" icon="icon-wechat-linear" :active="true" :required="true">
+          <ContactItem title="联系人微信" icon="icon-wechat-linear" :required="true">
             <b-form-input v-model="form.wechat" placeholder="该微信号码用于后续认证与沟通"></b-form-input>
           </ContactItem>
         </div>
@@ -200,13 +201,13 @@
           <b-link :href="`${coinex}/token`" target="_blank">什么是 CET？</b-link>
         </p>
         <InfoItem title="账户可用余额" v-if="balance && balance.coinexBalance">
-          {{cetAvailable}}
-          <span v-if="cetAvailable < MERCHANT_REQUIRED_CET_AMOUNT">
+          <span class="fz-16">{{cetAvailable}} CET</span>
+          <span v-if="cetAvailable < MERCHANT_REQUIRED_CET_AMOUNT" class="ml-10">
             <span class="c-red mr-20">余额不足</span>
             请先进行
-            <b-link :href="`${coinex}/my/wallet/deposit?type=cet`">充值</b-link>
+            <b-link :href="`${coinex}/my/wallet/deposit?type=cet`" target="_blank">充值</b-link>
             或
-            <b-link :href="`${coinex}/exchange?currency=bch&dest=cet`">交易</b-link>
+            <b-link :href="`${coinex}/exchange?currency=bch&dest=cet`" target="_blank">交易</b-link>
           </span>
         </InfoItem>
       </ProgressItem>
@@ -215,7 +216,7 @@
         <p class="c-6f">我们将在3个工作日内对您的商家申请资料进行审核。请保持通讯畅通，我们会主动与您取得联系。审核通过后，您即可在OTC平台发布广告。</p>
         <b-form-checkbox v-model="isContractRead" class="c-6f" id="contract-checkbox">
           我已阅读并同意
-          <b-link href="todo">《认证商家服务协议》</b-link>
+          <b-link href="todo" target="_blank">《认证商家服务协议》</b-link>
           ，并冻结{{MERCHANT_REQUIRED_CET_AMOUNT|formatMoney}} CET作为商家保证金。
         </b-form-checkbox>
       </ProgressItem>

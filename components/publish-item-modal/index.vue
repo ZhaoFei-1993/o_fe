@@ -139,6 +139,7 @@
 
           <i class="iconfont icon-bothway"></i>
 
+          <!--todo: 浮动比例的限制、amount的限制(特别是卖的时候的限制）-->
           <div class="item-float-rate-container">
             <div class="input-label">
               浮动比例
@@ -170,7 +171,7 @@
         </div>
         <div class="c-6f mt-2">
           * 当日取消订单超过3次，会被冻结买入功能。
-          <b-link href="todo" class="ml-1">更多交易须知 ></b-link>
+          <b-link href="todo" class="ml-1" target="_blank">更多交易须知 ></b-link>
         </div>
       </b-form-group>
 

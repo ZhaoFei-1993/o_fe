@@ -128,7 +128,7 @@
         </h4>
 
         <b-form-group label="类型:" horizontal class="mb-25">
-          <b-form-select v-model="form.method" :options="constant.PAYMENT_OPTIONS" size="lg"></b-form-select>
+          <b-form-select v-model="form.method" :options="constant.ACTUAL_PAYMENT_OPTIONS" size="lg"></b-form-select>
         </b-form-group>
 
         <b-form-group label="姓名:" horizontal>
@@ -209,6 +209,7 @@
   import getPaymentFormConfig from './payment-form-config'
   import EMsgs from '~/components/error-message.vue'
   import {coinex} from '~/modules/variables'
+  import constant from '~/modules/constant'
 
   Vue.use(Vuelidate)
 
@@ -227,7 +228,7 @@
     data() {
       return {
         verify: {
-          codeType: 'sms',   // todo:默认值
+          codeType: constant.VERIFY_CODE_TYPE.GOOGLE,
           sms: '',
           google: '',
           email: '',
@@ -317,6 +318,9 @@
         this.isPaymentEditing = true
         this.form = payment
         this.verify.businessType = this.constant.VERIFY_CODE_BUSINESS.MODIFY_PAYMENT
+
+        this.$refs['verify-code'].reset()
+        this.$v.form.$reset()
       },
 
       onPaymentDelete() {
@@ -351,9 +355,13 @@
         this.verify.businessType = this.constant.VERIFY_CODE_BUSINESS.ADD_PAYMENT
 
         if (this.isPaymentEditing) {
+          this.isPaymentEditing = false
+
           this.clearForm()
         }
-        this.isPaymentEditing = false
+
+        this.$refs['verify-code'].reset()
+        this.$v.form.$reset()
       },
 
       /**

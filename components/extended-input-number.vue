@@ -45,17 +45,24 @@
     },
     methods: {
       onInput(evt) {
-        let value = evt.target.value.setDigit(this.decimalDigit)
+        // 应该说全局没有负数的，所以这里武断地把0-9.以外的字符给过滤掉了。如果有需要后期可以加参数来配置这一特性
+        let value = evt.target.value.replace(/[^0-9.]/gi, '')
         // 如果value为空，则直接返回，防止被转为0
-        if (value === '') return this.$emit('input', value)
-
-        // 不能用 value = Math.min(this.max, value) 这种形式，会转换成数字
+        if (value === '') {
+          this.setValue(value, evt)
+          return
+        }
+        value = value.setDigit(this.decimalDigit)
+        // 不能用 value = Math.min(this.max, value) 这种形式，会转换成数字，遇到0.0变成0导致无法输入的问题
         if (value > this.max) {
           value = `${this.max}`.setDigit(this.decimalDigit)
         }
         if (value < this.min) {
           value = `${this.min}`.setDigit(this.decimalDigit)
         }
+        this.setValue(value, evt)
+      },
+      setValue(value, evt) {
         evt.target.value = value
         this.$emit('input', value)
       },

@@ -146,14 +146,31 @@
         editingSettings: this.editingSettingsValidation.validations
       }
     },
-    async fetch({store, app, req, redirect, route}) {
+    fetch({store, app, req, redirect, route}) {
       app.axios.init(req)
-      await store.dispatch('fetchUserSettings').catch(err => {
+
+      return Promise.all([
+        store.dispatch('fetchUserSettings'),
+        store.dispatch('fetchUserMerchant'),
+      ]).catch(err => {
         app.axios.needAuth(err, redirect, route.fullPath)
       })
     },
     mounted() {
       this.store2Data()
+
+      if (!(this.user.merchant && this.user.merchant.auth_status === this.constant.MERCHANT_AUTH_STATUS.PASS)) {
+        this.$showDialog({
+          title: '您还不是认证商家',
+          content: '请申请并通过商家认证之后再进行广告设置',
+          okTitle: '去认证',
+          noCloseOnBackdrop: true,
+          hideHeaderClose: true,
+          onOk: () => {
+            this.$router.push('/my/merchant')
+          },
+        })
+      }
     },
     methods: {
       onEditAmountLimit() {
@@ -220,9 +237,10 @@
        */
       onEditConfirm(data) {
         return this.$store.dispatch('setUserSettings', Object.assign({}, this.settings, data)).then(() => {
-          this.store2Data()
+          return this.store2Data()
         }).catch(err => {
           this.axios.onError(err)
+          return Promise.reject(err)
         })
       }
     }

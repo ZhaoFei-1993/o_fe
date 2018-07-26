@@ -12,6 +12,7 @@
 //   title: '银行卡',
 //   icon: 'icon-bankcard'
 // }
+import constant from '~/modules/constant'
 export default () => {
   const initialState = {
     account: null,
@@ -21,6 +22,13 @@ export default () => {
     qualification: [],
   }
   const state = Object.assign({}, initialState)
+
+  const getters = {
+    paymentEnabled: (state) => {
+      return state.payments && state.payments.some((payment) => payment.status === constant.PAYMENT_STATUS.ON)
+    }
+  }
+
   const mutations = {
     SET_USER_ACCOUNT(state, {data, constant}) {
       // 根据用户账户，计算用户安全等级
@@ -113,6 +121,7 @@ export default () => {
 
   return {
     state,
+    getters,
     actions,
     mutations,
   }
