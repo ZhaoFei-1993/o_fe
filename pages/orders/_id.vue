@@ -38,7 +38,12 @@
               class="mr-10 iconfont icon-alipay"></i>支付宝支付</span>
           </template>
           <span class="payment-account">{{selectedMethod.account_name + ' '+ selectedMethod.account_no}}</span>
-          <span class="qr-code-button" v-if="selectedMethod.method!==constant.PAYMENT_TYPES.BANKCARD && selectedMethod.qr_code_image"
+          <span v-if="selectedMethod.method === constant.PAYMENT_TYPES.BANKCARD"
+                class="detail-text">
+            {{ selectedMethod.bank }}，{{ selectedMethod.branch }}
+          </span>
+          <span class="qr-code-button"
+                v-if="selectedMethod.method!==constant.PAYMENT_TYPES.BANKCARD && selectedMethod.qr_code_image"
                 @click="showQrCode(selectedMethod.qr_code_image)">查看支付二维码</span>
         </div>
         <div class="payment-status" v-html="paymentStatusMessage.message"></div>
@@ -116,7 +121,7 @@
     </div>
     <div class="sidebar">
       <CBlock class="my-sidebar-info" :x="0" :y="20">
-        <UserStatsProfile :user-data="counterparty" v-if="counterparty"/>
+        <UserStatsProfile :user-data="counterparty" v-if="counterparty" :is-merchant="counterparty.id===order.merchant_id"/>
       </CBlock>
     </div>
     <b-modal ref="appealModal"
@@ -218,6 +223,8 @@
         }
         .payment-status {
           font-size: 18px;
+          color: #27313e;
+          font-weight: 500;
         }
         .payment-warning {
           color: $red;
@@ -238,6 +245,7 @@
             position: relative;
             &.active {
               color: #192330;
+              font-weight: 500;
               div:first-child {
                 &:after {
                   position: absolute;

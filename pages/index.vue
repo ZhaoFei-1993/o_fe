@@ -277,7 +277,7 @@
                 <button class="btn btn-order-disabled" :id="'button-order-'+item.id" v-b-tooltip.hover title="不能与自己交易"> {{(selectedSide === constant.SIDE.BUY ? '购买' : '出售') + selectedCoin}} </button>
               </template>
               <button
-                v-else-if="qualified(item)"
+                v-else-if="!user || !user.account || qualified(item)"
                 :class="['btn btn-order',{'btn-outline-yellow':selectedSide===constant.SIDE.BUY,'btn-outline-green':selectedSide===constant.SIDE.SELL}]"
                 @click="placeOrder(item)"
               >

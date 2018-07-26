@@ -31,30 +31,37 @@
       <div class="username">
         {{username}}
       </div>
+      <div v-if="isMerchant"><span v-b-tooltip.hover title="认证商家"><i
+        class="iconfont icon-certificated-merchant"></i></span></div>
       <UserPayments :payments="payments"></UserPayments>
     </div>
   </div>
 </template>
 
 <script>
-import UserAvatar from './user-avatar.vue'
-import UserPayments from './user-payments.vue'
+  import UserAvatar from './user-avatar.vue'
+  import UserPayments from './user-payments.vue'
 
-export default {
-  name: 'user-mini-profile',
-  components: {
-    UserAvatar,
-    UserPayments,
-  },
-  props: {
-    username: String,
-    payments: Array,
-    online: Boolean,
-    avatarSize: Number,
-  },
-  data() {
-    return {
+  export default {
+    name: 'user-mini-profile',
+    components: {
+      UserAvatar,
+      UserPayments,
+    },
+    props: {
+      username: String,
+      payments: Array,
+      isMerchant: Boolean,
+      online: Boolean,
+      avatarSize: Number,
+    },
+    data() {
+      return {}
     }
   }
-}
 </script>
+<style lang="scss">
+  .icon-certificated-merchant {
+    color: #7dd322;
+  }
+</style>

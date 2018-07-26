@@ -97,7 +97,7 @@ export default {
       value: 'created',
     },
     PAID: {
-      text: '付确认',
+      text: '待收款',
       value: 'paid',
     },
     SUCCESS: {

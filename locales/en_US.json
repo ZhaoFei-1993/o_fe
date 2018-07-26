@@ -184,6 +184,9 @@
     },
     "components_star-rate_vue": {},
     "components_user-avatar_vue": {},
+    "components_user-mini-profile_vue": {
+        "认证商家": "认证商家"
+    },
     "components_user-payments_vue": {},
     "components_user-stats-profile_vue": {
         "30天成交量": "30天成交量",

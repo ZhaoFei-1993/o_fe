@@ -26,7 +26,6 @@
       display: flex;
       align-items: center;
       color: $brandGreen;
-
       .switch {
         margin-bottom: 0;
       }
