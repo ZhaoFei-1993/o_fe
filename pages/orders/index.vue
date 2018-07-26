@@ -112,7 +112,7 @@
                     {{ item._selected_payment_method.account_no }}
                     <b-popover :target="`qr-${item.id}`"
                                placement="top"
-                               triggers="hover focus">
+                               triggers="hover click focus">
                       <img style="display: block;width: 120px;height: 120px;"
                            :src="item._selected_payment_method.qr_code_image">
                     </b-popover>
@@ -225,7 +225,8 @@
       温馨提示：每日取消订单超过三笔，将被冻结当天下单权限。
     </div>
     <ConfirmReceipt :orderId="curReceiptOrderId" :show-confirm-receipt-modal="showConfirmReceiptModal"
-                    @confirmReceipt="markOrderSuccess"/>
+                    @confirmReceipt="markOrderSuccess"
+                    @cancelReceipt="showConfirmReceiptModal=false"/>
   </div>
 </template>
 

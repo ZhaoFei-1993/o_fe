@@ -33,3 +33,11 @@ export function onApiError(err, vm) {
 
   vm.$showTips && vm.$showTips(message, 'error')
 }
+
+export class PlaceOrderError extends Error {
+  constructor(message, errorType) {
+    super(message)
+    this.message = message
+    this.errorType = errorType
+  }
+}

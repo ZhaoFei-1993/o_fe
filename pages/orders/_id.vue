@@ -52,6 +52,7 @@
             <div class="step-time" v-if="order.pay_time">{{order.pay_time | getTimeText}}</div>
             <b-btn v-if="isBuySide && !order.pay_time"
                    :disabled="expired"
+                   class="btn-default-disabled"
                    size="xs" variant="gradient-yellow"
                    @click="confirmPay()">
               我已付款
@@ -84,7 +85,7 @@
       <div class="order-helper">
         <div v-if="canCancel" class="d-flex align-items-center justify-content-between">
           <span>想要终止交易？</span>
-          <b-btn size="xs" variant="outline-green" :disabled="expired" @click="cancelOrder">取消订单</b-btn>
+          <b-btn size="xs" variant="outline-green" class="btn-default-disabled" :disabled="expired" @click="cancelOrder">取消订单</b-btn>
         </div>
         <template v-if="showAppeal">
           <span v-if="!appeal||appeal.status===''">
@@ -148,7 +149,8 @@
       </div>
     </b-modal>
     <ConfirmReceipt :orderId="order.id" :show-confirm-receipt-modal="showConfirmReceiptModal"
-                    @confirmReceipt="refreshOrderStatus"/>
+                    @confirmReceipt="refreshOrderStatus"
+                    @cancelReceipt="showConfirmReceiptModal=false"/>
   </div>
 </template>
 <style lang="scss">
@@ -428,9 +430,10 @@
         return this.isBuySide && orderStatusOk
       },
       showPayment() {
-        const notCancel = this.order.status !== this.constant.ORDER_STATUS.CANCEL.value
-        const notClosed = this.order.status !== this.constant.ORDER_STATUS.CLOSED.value
-        return this.selectedMethod && notClosed && notCancel && !this.expired
+        const createdBuyer = this.order.status === this.constant.ORDER_STATUS.CREATED.value && this.isBuySide
+        const paid = this.order.status === this.constant.ORDER_STATUS.PAID.value
+        const success = this.order.status === this.constant.ORDER_STATUS.SUCCESS.value
+        return this.selectedMethod && (createdBuyer || paid || success) && !this.expired
       },
       tradeText() {
         if (!this.counterparty) return {}

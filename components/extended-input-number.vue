@@ -3,8 +3,8 @@
     width: 100%;
     padding: 0 4px;
 
-    &:focus{
-      outline:none;
+    &:focus {
+      outline: none;
       border-color: #52cbca;
       border-style: solid;
     }
@@ -46,12 +46,16 @@
     methods: {
       onInput(evt) {
         let value = evt.target.value.setDigit(this.decimalDigit)
-
         // 如果value为空，则直接返回，防止被转为0
         if (value === '') return this.$emit('input', value)
 
-        value = Math.min(this.max, value)
-        value = Math.max(this.min, value)
+        // 不能用 value = Math.min(this.max, value) 这种形式，会转换成数字
+        if (value > this.max) {
+          value = `${this.max}`.setDigit(this.decimalDigit)
+        }
+        if (value < this.min) {
+          value = `${this.min}`.setDigit(this.decimalDigit)
+        }
         evt.target.value = value
         this.$emit('input', value)
       },

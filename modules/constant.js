@@ -160,4 +160,9 @@ export default {
     MIN: 100,
     MAX: 5000000
   },
+  PLACE_ORDER_ERROR: {
+    KYC_LIMIT: 'KYC_LIMIT',
+    CANCEL_LIMIT: 'CANCEL_LIMIT',
+    PAYMENT_LIMIT: 'PAYMENT_LIMIT',
+  },
 }

@@ -236,7 +236,7 @@
           cash_amount: null,
         },
         submitting: false,
-        min_deal_coin_amount: this.item.min_deal_cash_amount / this.item.price,
+        min_deal_coin_amount: `${this.item.min_deal_cash_amount / this.item.price}`.setDigit(8),
         noKycLimit: 500,
       }
     },
@@ -356,13 +356,13 @@
       cashAmountChanged() {
         this.$v.form.cash_amount.$touch()
         if (this.form.focusInput === 'cashAmount') {
-          this.form.coin_amount = this.form.cash_amount === '' ? null : (this.form.cash_amount / this.item.price)
+          this.form.coin_amount = this.form.cash_amount === '' ? null : `${this.form.cash_amount / this.item.price}`.setDigit(8)
         }
       },
       coinAmountChanged() {
         this.$v.form.coin_amount.$touch()
         if (this.form.focusInput === 'coinAmount') {
-          this.form.cash_amount = this.form.coin_amount === '' ? null : (this.form.coin_amount * this.item.price)
+          this.form.cash_amount = this.form.coin_amount === '' ? null : `${this.form.coin_amount * this.item.price}`.setDigit(2)
         }
       },
       onFocus(inputName) {

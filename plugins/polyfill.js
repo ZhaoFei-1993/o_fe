@@ -3,9 +3,9 @@
 const Decimal = require("decimal.js").default;
 
 String.prototype.setDigit = function (digit) {
-  const str = (this || "").toString().trim();
-  const parts = str.split(".");
-  if (parts[1]) {
+  const str = this;
+  const parts = str.slice(0).split(".");
+  if (parts[1] && parts[1].length > digit) {
     return parts[0] + (digit > 0 ? "." : "") + parts[1].substr(0, digit);
   }
   return str;
