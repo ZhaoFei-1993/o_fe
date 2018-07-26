@@ -103,9 +103,11 @@
         type: Object,
       },
       conversationId: {
+        required: true,
         type: String,
       },
       clientId: {
+        required: true,
         type: String,
       },
       width: {
@@ -161,6 +163,7 @@
       init() { // 全部功能初始化
         const { client } = this
         if (!client) return
+        if (!this.conversationId) return
 
         client
           .getConversation(this.conversationId)
