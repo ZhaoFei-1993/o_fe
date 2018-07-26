@@ -43,6 +43,7 @@
             padding-right: 16px;
             color: #27313e;
             font-size: 22px;
+            cursor: pointer;
             i.iconfont {
               font-size: 22px;
               margin-right: 0.5rem;
@@ -196,7 +197,7 @@
       <div class="trade-choices row">
         <div class="col-6">
           <div :class="['choice-block buy', {active:constant.SIDE.BUY===selectedSide}]">
-            <div class="side"><i class="iconfont icon-arrow-down"></i>购买</div>
+            <div class="side" @click="showItems(constant.SIDE.BUY)"><i class="iconfont icon-arrow-down"></i>购买</div>
             <div class="coin-types">
               <span :class="['coin-type', {active:coin===selectedCoin}]" v-for="coin in constant.COIN_TYPES"
                     @click="showItems(constant.SIDE.BUY,coin)">{{coin}}</span>
@@ -205,7 +206,7 @@
         </div>
         <div class="col-6">
           <div :class="['choice-block sell', {active:constant.SIDE.SELL===selectedSide}]">
-            <div class="side"><i class="iconfont icon-arrow-up"></i>出售</div>
+            <div class="side" @click="showItems(constant.SIDE.SELL)"><i class="iconfont icon-arrow-up"></i>出售</div>
             <div class="coin-types">
               <span :class="['coin-type', {active:coin===selectedCoin}]" v-for="coin in constant.COIN_TYPES"
                     @click="showItems(constant.SIDE.SELL,coin)">{{coin}}</span>
@@ -404,7 +405,7 @@
         this.$router.replace({
           query: {
             side,
-            coin,
+            coin: coin || this.selectedCoin,
             payment: this.selectedPayment,
           },
         })
