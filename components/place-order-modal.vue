@@ -70,6 +70,10 @@
                                      :placeholder="'可填写想'+sideText+'的数量'"/>
               </b-input-group>
               <EMsgs :result="$v.form.coin_amount" :msgs="invalidMessages.coin_amount"/>
+              <span class="c-red" v-if="form.coin_amount>sideMaxCoin">
+                您的余额为{{sideMaxCoin}}
+                <b-link to="/wallet">去划转 ></b-link>
+              </span>
             </div>
           </div>
           <div class="payment-tip">
@@ -246,25 +250,26 @@
     computed: {
       ...mapState(['constant', 'balance', 'user']),
       kycLimitAmount() {
-        return (this.user && this.user.account.kyc_status === this.constant.KYC_STATUS.PASS) ? Number.MAX_SAFE_INTEGER : this.noKycLimit
+        return (this.user && this.user.account.kyc_status === this.constant.KYC_STATUS.PASS) ? Number.MAX_SAFE_INTEGER : this.noKycLimit / this.item.price
       },
       currentBalance() {
         return parseFloat(this.balance.otcBalance.find(b => b.coin_type === this.item.coin_type).available)
       },
       maxDealCoinAmount() {
-        return `${this.maxDealCashAmount / this.item.price}`.setDigit(8)
+        // coin 更精确，优先用coin计算
+        // 取以下各项的最小值（广告剩余量、广告限制最大额、如果是卖家则考虑余额、未实名验证的限额）
+        const maxAmount = Math.min(this.item.remain_coin_amount, (this.item.max_deal_cash_amount / this.item.price || Number.MAX_SAFE_INTEGER), this.sideMaxCoin, this.kycLimitAmount)
+        return `${maxAmount}`.setDigit(8)
       },
       validAmount() {
         return this.maxDealCashAmount >= this.item.min_deal_cash_amount
       },
-      sideMaxCash() {
+      sideMaxCoin() {
         // 用户买单和balance无关，卖单需要有足够余额
-        return this.item.side === this.constant.SIDE.SELL ? Number.MAX_SAFE_INTEGER : this.currentBalance * this.item.price
+        return this.item.side === this.constant.SIDE.SELL ? Number.MAX_SAFE_INTEGER : this.currentBalance
       },
       maxDealCashAmount() {
-        // 取以下各项的最小值（广告剩余量、广告限制最大额、如果是卖家则考虑余额、未实名验证的限额）
-        const maxAmount = Math.min(this.item.remain_coin_amount * this.item.price, (this.item.max_deal_cash_amount || Number.MAX_SAFE_INTEGER), this.sideMaxCash, this.kycLimitAmount)
-        return `${maxAmount}`.setDigit(2)
+        return `${this.maxDealCoinAmount * this.item.price}`.setDigit(2)
       },
       sideText() {
         // user看到的是与merchant反的
@@ -294,8 +299,8 @@
             },
             message: {
               required: '请填写购买金额',
-              minValue: `最小下单金额为${this.item.min_deal_cash_amount}`,
-              maxValue: `最大下单金额为${this.maxDealCashAmount}`,
+              minValue: `最小下单金额为${this.item.min_deal_cash_amount}元`,
+              maxValue: `最大下单金额为${this.maxDealCashAmount}元`,
             },
           },
           coin_amount: {
@@ -321,6 +326,10 @@
         this.$v.form.$touch()
         if (this.$v.form.$invalid) {
           return this.$showTips('请检查表单并正确输入内容', 'error')
+        }
+        if (this.submitting) {
+          // disabled 可能不能完全限制？
+          return
         }
         this.submitting = true
         this.axios.order.createOrder({

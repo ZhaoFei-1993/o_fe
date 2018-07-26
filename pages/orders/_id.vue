@@ -18,7 +18,7 @@
           <template v-if="order.status ===constant.ORDER_STATUS.CREATED.value">
             <span v-if="isBuySide">
               <i v-if="selectedMethod.method === constant.PAYMENT_TYPES.WECHAT" class="iconfont icon-wechat-round"></i>
-              <i v-if="selectedMethod.method === constant.PAYMENT_TYPES.BANKCARD" class="iconfont icon-bank"></i>
+              <i v-if="selectedMethod.method === constant.PAYMENT_TYPES.BANKCARD" class="iconfont icon-bankcard"></i>
               <i v-if="selectedMethod.method === constant.PAYMENT_TYPES.ALIPAY" class="iconfont icon-alipay"></i>
               <select v-model="selectedMethod">
                 <option v-for="payment in order.payment_methods" :value="payment" :class="payment.method">
@@ -31,11 +31,11 @@
           </template>
           <template v-else>
             <span v-if="selectedMethod.method === 'bankcard'">
-            <i class="iconfont icon-bank"></i>银行转帐</span>
+            <i class="mr-10 iconfont icon-bankcard"></i>银行转帐</span>
             <span v-if="selectedMethod.method === 'wechat'"><i
-              class="iconfont icon-wechat-round"></i>微信支付</span>
+              class="mr-10 iconfont icon-wechat-round"></i>微信支付</span>
             <span v-if="selectedMethod.method === 'alipay'"><i
-              class="iconfont icon-wechat-round"></i>支付宝支付</span>
+              class="mr-10 iconfont icon-alipay"></i>支付宝支付</span>
           </template>
           <span class="payment-account">{{selectedMethod.account_name + ' '+ selectedMethod.account_no}}</span>
           <span class="qr-code-button" v-if="selectedMethod.qr_code_image"
@@ -568,7 +568,7 @@
       confirmPay() {
         this.$showDialog({
           title: '确认付款',
-          content: (<div>确认您已向卖方付款？<span class="c-red">未付款点击“我已付款”将被冻结账户。</span></div>),
+          content: (<div class="text-left">确认您已向卖方付款？<p class="c-red">未付款点击“我已付款”将被冻结账户。</p></div>),
           onOk: () => {
             this.axios.order.confirmPay(this.order.id, this.selectedMethod).then(res => {
               this.$successTips('确认付款成功')
@@ -591,7 +591,7 @@
       cancelAppeal() {
         this.$showDialog({
           title: '取消申诉',
-          content: (<div><p>确认取消申诉？</p><p class="c-red">取消申诉后的订单将不可再次申诉。</p></div>),
+          content: (<div class="text-left"><p>确认取消申诉？</p><p class="c-red">取消申诉后的订单将不可再次申诉。</p></div>),
           onOk: () => {
             this.axios.order.cancelAppeal(this.order.id).catch(err => {
               this.axios.onError(err)
@@ -602,7 +602,7 @@
       cancelOrder() {
         this.$showDialog({
           title: '取消订单',
-          content: (<div><p>确认取消订单？</p><p class="c-red">取消的订单将不可重新打开。</p></div>),
+          content: (<div class="text-left"><p>确认取消订单？</p><p class="c-red">取消的订单将不可重新打开。</p></div>),
           onOk: () => {
             this.axios.order.cancelOrder(this.order.id)
           }

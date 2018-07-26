@@ -208,7 +208,7 @@
   import Vuelidate from 'vuelidate'
   import getPaymentFormConfig from './payment-form-config'
   import EMsgs from '~/components/error-message.vue'
-  import {coinex} from '~/modules/variables'
+  import {coinexDomain} from '~/modules/variables'
   import constant from '~/modules/constant'
 
   Vue.use(Vuelidate)
@@ -248,7 +248,7 @@
         modalShowing: false,
         isPaymentEditing: false,     // 是否正在被编辑payment（而不是添加）
         submitting: false,        // 正在上传支付方式
-        coinex,
+        coinexDomain,
       }
     },
     computed: {
@@ -344,7 +344,7 @@
             title: '未实名认证',
             content: '请实名认证后再添加支付方式',
             onOk: () => {
-              window.location.href = `${coinex}/my/info/auth/realname`
+              window.location.href = `${coinexDomain}/my/info/auth/realname`
             },
             okTitle: '实名认证'
           })
