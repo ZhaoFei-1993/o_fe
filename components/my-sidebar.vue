@@ -64,7 +64,8 @@
         <i class="iconfont icon-merchant"></i>
         <span class="title">商家认证</span>
       </b-list-group-item>
-      <b-list-group-item to="/my/item-setting">
+      <b-list-group-item v-if="user.merchant && user.merchant.auth_status === constant.MERCHANT_AUTH_STATUS.PASS"
+                         to="/my/item-setting">
         <i class="iconfont icon-item-setting"></i>
         <span class="title">广告设置</span>
       </b-list-group-item>
@@ -84,7 +85,10 @@
       return {}
     },
     computed: {
-      ...mapState(['user'])
+      ...mapState(['user', 'constant'])
+    },
+    mounted() {
+      this.$store.dispatch('fetchUserMerchant')
     },
     methods: {},
   }
