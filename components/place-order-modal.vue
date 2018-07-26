@@ -299,8 +299,8 @@
             },
             message: {
               required: '请填写购买金额',
-              minValue: `最小下单金额为${this.item.min_deal_cash_amount}`,
-              maxValue: `最大下单金额为${this.maxDealCashAmount}`,
+              minValue: `最小下单金额为${this.item.min_deal_cash_amount}元`,
+              maxValue: `最大下单金额为${this.maxDealCashAmount}元`,
             },
           },
           coin_amount: {
