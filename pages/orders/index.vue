@@ -120,7 +120,8 @@
                           v-show="item._selected_payment_method.method !== constant.PAYMENT_TYPES.BANKCARD"><i
                       class="iconfont icon-qrcode"></i></span>
                   </div>
-                  <div class="detail-text">
+                  <div v-if="item._selected_payment_method.method === constant.PAYMENT_TYPES.BANKCARD"
+                       class="detail-text">
                     {{ item._selected_payment_method.bank }}，{{ item._selected_payment_method.branch }}
                   </div>
                   <div class="detail-text">
