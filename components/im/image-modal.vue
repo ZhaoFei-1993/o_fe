@@ -66,9 +66,9 @@
       animation-duration: 0.6s;
     }
 
-    @-webkit-keyframes zoom {
-      from {-webkit-transform:scale(1)}
-      to {-webkit-transform:scale(2)}
+    @keyframes zoom {
+      from {transform:scale(1)}
+      to {transform:scale(2)}
     }
 
     @keyframes zoom {
