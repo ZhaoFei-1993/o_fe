@@ -8,7 +8,7 @@
         <template v-if="item.from === clientId">
           <div class="msg-box-right">
             <div class="msg-detail-wrapper">
-              <div class="msg-username username-right">{{ item.from }}</div>
+              <div class="msg-username username-right">{{ memberInfoMap[item.from].name }}</div>
               <div class="msg-username username-right" v-if="item.status === MessageStatus.FAILED">
                 <span class="msg-send-error"></span>
                 <span>发送失败</span>
@@ -19,7 +19,7 @@
                 <span v-else>[不支持当前消息类型]</span>
               </div>
             </div>
-            <UserAvatar v-if="colorMap[item.from]" :username="item.from" :color="colorMap[item.from].color" :online="false" :size="40"></UserAvatar>
+            <UserAvatar v-if="memberInfoMap[item.from]" :username="memberInfoMap[item.from].name" :color="memberInfoMap[item.from].color" :online="false" :size="40"></UserAvatar>
           </div>
         </template>
         <template v-else-if="item.from === 'system'">
@@ -29,9 +29,9 @@
         </template>
         <template v-else>
           <div class="msg-box-left">
-            <UserAvatar v-if="colorMap[item.from]" :username="item.from" :color="colorMap[item.from].color" :online="false" :size="40"></UserAvatar>
+            <UserAvatar v-if="memberInfoMap[item.from]" :username="memberInfoMap[item.from].name" :color="memberInfoMap[item.from].color" :online="false" :size="40"></UserAvatar>
             <div class="msg-detail-wrapper">
-              <div class="msg-username username-left">{{ item.from }}</div>
+              <div class="msg-username username-left">{{ memberInfoMap[item.from].name }}</div>
               <div class="msg-username username-left" v-if="item.status === MessageStatus.FAILED">
                 <span class="msg-send-error"></span>
                 <span>发送失败</span>
@@ -84,13 +84,13 @@
         members: [],
         message: '',
         conversation: null,
-        limit: 20,
+        limit: 20, // 每次拉取历史记录条数
         messageIterator: null,
         msgLog: [],
         loading: false, // 消息加载中
         loadAll: false, // 是否已经加载全部消息
         colorIndex: -1,
-        colorMap: {},
+        memberInfoMap: {}, // 保存聊天者信息：头像色号，用户名
         originalTitle: '', // 保存旧页面title
         unreadMessagesCount: 0, // 未读消息数
       }
@@ -126,71 +126,12 @@
       ImageModal,
     },
     watch: {
-      client(instance) {
-        if (!instance) return
-
-        instance
-          .getConversation(this.conversationId)
-          .then(conversation => {
-            this.conversation = conversation
-            this.unreadMessagesCount = this.conversation.unreadMessagesCount
-            this.members = this.conversation.members
-            // 有用户被添加至某个对话
-            conversation.on(Event.MEMBERS_JOINED, payload => {
-              const { invitedBy, members } = payload
-              if (members && members.length === 1 && members[0] === invitedBy) return // 只有一个人参与的对话不做提示
-              this.pushSystemMessage(`${payload.invitedBy} 邀请 ${payload.members} 加入对话`)
-            })
-            // 有成员被从某个对话中移除
-            conversation.on(Event.MEMBERS_LEFT, payload => {
-              this.pushSystemMessage(`${payload.kickedBy} 将 ${payload.members} 移出对话`)
-            })
-            // 当前用户被从某个对话中移除
-            conversation.on(Event.KICKED, payload => {
-              this.pushSystemMessage(`${payload.kickedBy} 将你移出对话`)
-            })
-            this.messageIterator = conversation.createMessagesIterator({
-              limit: this.limit,
-            })
-            this.initMsgLog()
-          })
-
-        instance.on(Event.MESSAGE, (message) => {
-          this.messageHandler(message)
-        })
-        instance.on(Event.UNREAD_MESSAGES_COUNT_UPDATE, conversations => {
-          const conv = conversations.find(item => {
-            return item.id === this.conversationId
-          })
-          if (conv) {
-            this.unreadMessagesCount = conv.unreadMessagesCount
-          }
-        })
-        instance.on(Event.DISCONNECT, () => {
-          $toast.show('连接已断开')
-        })
-        instance.on(Event.OFFLINE, () => {
-          $toast.show('网络不可用，请检查网络设置')
-        })
-        instance.on(Event.ONLINE, () => {
-          $toast.show('网络已恢复', 1500)
-        })
-        instance.on(Event.SCHEDULE, (attempt, time) => {
-          $toast.show(`${time / 1000}s 后进行第 ${attempt + 1} 次重连`)
-        })
-        instance.on(Event.RETRY, attempt => {
-          $toast.show(`正在进行第 ${attempt + 1} 次重连`)
-        })
-        instance.on(Event.RECONNECT, () => {
-          this.conversation.join()
-        })
-        instance.on(Event.RECONNECT_ERROR, () => {
-          $toast.show('重连失败，请刷新页面重试')
-        })
-      },
       unreadMessagesCount(count) {
         const countText = count ? `(${count}) ` : ''
         window.document.title = `${countText}${this.originalTitle}`
+      },
+      client() {
+        this.init()
       },
     },
     beforeDestroy() {
@@ -211,11 +152,76 @@
       this.messageIterator = null
     },
     mounted() {
+      this.init()
       $toast.init(this.$refs.chatWrapper) // 初始化toast
       this.originalTitle = window.document.title
       window.document.addEventListener('visibilitychange', this.handleVisibilityChange) // 监听页面焦点事件，取消未读
     },
     methods: {
+      init() { // 全部功能初始化
+        const { client } = this
+        if (!client) return
+
+        client
+          .getConversation(this.conversationId)
+          .then(conversation => {
+            this.conversation = conversation
+            this.unreadMessagesCount = this.conversation.unreadMessagesCount
+            this.members = this.conversation.members
+            // 有用户被添加至某个对话
+            conversation.on(Event.MEMBERS_JOINED, payload => {
+              const { invitedBy, members } = payload
+              if (invitedBy === 'REST_API') return // 系统邀请信息不展示
+              if (members && members.length === 1 && members[0] === invitedBy) return // 只有一个人参与的邀请信息不展示
+              this.pushSystemMessage(`${invitedBy} 邀请 ${members.join('、')} 加入对话`)
+            })
+            // 有成员被从某个对话中移除
+            conversation.on(Event.MEMBERS_LEFT, payload => {
+              this.pushSystemMessage(`${payload.kickedBy} 将 ${payload.members.join('、')} 移出对话`)
+            })
+            // 当前用户被从某个对话中移除
+            conversation.on(Event.KICKED, payload => {
+              this.pushSystemMessage(`${payload.kickedBy} 将你移出对话`)
+            })
+            this.messageIterator = conversation.createMessagesIterator({
+              limit: this.limit,
+            })
+            this.initMsgLog()
+          })
+
+        client.on(Event.MESSAGE, (message) => {
+          this.messageHandler(message)
+        })
+        client.on(Event.UNREAD_MESSAGES_COUNT_UPDATE, conversations => {
+          const conv = conversations.find(item => {
+            return item.id === this.conversationId
+          })
+          if (conv) {
+            this.unreadMessagesCount = conv.unreadMessagesCount
+          }
+        })
+        client.on(Event.DISCONNECT, () => {
+          $toast.show('连接已断开')
+        })
+        client.on(Event.OFFLINE, () => {
+          $toast.show('网络不可用，请检查网络设置')
+        })
+        client.on(Event.ONLINE, () => {
+          $toast.show('网络已恢复', 1500)
+        })
+        client.on(Event.SCHEDULE, (attempt, time) => {
+          $toast.show(`${time / 1000}s 后进行第 ${attempt + 1} 次重连`)
+        })
+        client.on(Event.RETRY, attempt => {
+          $toast.show(`正在进行第 ${attempt + 1} 次重连`)
+        })
+        client.on(Event.RECONNECT, () => {
+          this.conversation.join()
+        })
+        client.on(Event.RECONNECT_ERROR, () => {
+          $toast.show('重连失败，请刷新页面重试')
+        })
+      },
       handleVisibilityChange() {
         if (!window.document.hidden && this.conversation.unreadMessagesCount) {
           this.conversation.read().then(conversation => {
@@ -249,6 +255,7 @@
       },
       onUpload(evt) {
         const file = evt.target.files[0]
+        if (!file) return
         if (file.size > 5000000) {
           this.$refs.fileSelector.value = '' // 需要重置dom
           $toast.show('单文件不可超过5M', 1500)
@@ -282,15 +289,17 @@
         this.$refs.fileSelector.click()
       },
       messageHandler(msg) {
-        this.msgLog.push(msg)
+        this.msgLog = this.msgLog.concat(this.memberInfoMapper([msg]))
         this.scrollToBottom()
         this.conversation.read()
       },
-      colorForeach(arr) { // 遍历每一个消息，对用户头像进行映射，以防部分已退出用户没有头像
+      memberInfoMapper(arr) { // 遍历每一个消息，对用户头像进行映射，以防部分已退出用户没有头像
+        const { conversation } = this
         arr.forEach(item => {
-          if (!this.colorMap[item.from]) {
-            this.colorMap[item.from] = {
-              color: this.colors[++this.colorIndex]
+          if (!this.memberInfoMap[item.from]) {
+            this.memberInfoMap[item.from] = {
+              color: this.colors[++this.colorIndex],
+              name: conversation._attributes.attr[item.from] || '',
             }
           }
         })
@@ -299,7 +308,7 @@
       initMsgLog() {
         this.messageIterator.next().then((res) => {
           if (res.value) {
-            this.msgLog = this.colorForeach(res.value).concat(this.msgLog)
+            this.msgLog = this.memberInfoMapper(res.value).concat(this.msgLog)
             this.pushSystemMessage('现在可以开始聊天')
             // 滚动到底部
             this.scrollToBottom()
@@ -320,7 +329,7 @@
             this.loading = false
             this.loadAll = res.done
             if (res.value) {
-              this.msgLog = this.colorForeach(res.value).concat(this.msgLog)
+              this.msgLog = this.memberInfoMapper(res.value).concat(this.msgLog)
               this.$nextTick(() => {
                 const target = this.$refs.chatbox
                 if (target) {
@@ -335,7 +344,7 @@
         const msg = this.message.trim()
         if (msg && this.conversation) {
           this.conversation.send(new TextMessage(msg)).then(message => {
-            this.msgLog.push({
+            this.messageHandler({
               ...message,
               content: { // leancloud返回字段content=undefined，需要自己补充
                 _lctext: message._lctext,
@@ -343,7 +352,6 @@
               },
             })
             this.message = ''
-            this.scrollToBottom()
           }).catch(console.error.bind(console))
         }
       },
@@ -468,6 +476,8 @@
         text-align: center;
         color: #9b9b9b;
         font-size: 12px;
+        height: 24px;
+        line-height: 24px;
       }
       .msg-box-left {
         display: flex;

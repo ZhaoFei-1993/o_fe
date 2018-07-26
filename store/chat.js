@@ -25,20 +25,22 @@ export default () => {
           appId: APP_ID,
           appKey: APP_KEY,
         })
-        // const self = this
+        const self = this
         return realtime.createIMClient(clientId, {
-          // signatureFactory() {
-          //   return self.app.axios.chat.sign({
-          //     sign_type: 'signin',
-          //   }).then(res => {
-          //     if (res.code === 0) {
-          //       return res.data
-          //     }
-          //   })
-          // },
+          signatureFactory() {
+            return self.app.axios.chat.sign({
+              sign_type: 'signin',
+            }).then(res => {
+              if (res.code === 0) {
+                return res.data
+              }
+            })
+          },
         }).then(myClient => {
           commit('INIT_CHAT_CLIENT', myClient)
-          return myClient
+          return Promise.resolve(myClient)
+        }).catch(err => {
+          return Promise.reject(err)
         })
       }
       return state.imClient

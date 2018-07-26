@@ -55,7 +55,7 @@
           </template>
           <template slot="status" slot-scope="{ item, detailsShowing, toggleDetails }">
             {{ constant?constant.ORDER_STATUS[item.status.toUpperCase()].text:'' }}
-            <span @click.stop="toggleDetails"
+            <span @click.stop="fetchUnreadMessageCount({toggleDetails, item})"
                   v-if="item.status === constant.ORDER_STATUS.CREATED.value || item.status === constant.ORDER_STATUS.PAID.value"
                   class="detail"
                   :class="[ detailsShowing ? 'show-detail' : 'hidden-detail' ]">
@@ -432,7 +432,6 @@
                   _unreadMessageCount: 0, // 未读消息数量
                 }
               })
-              this.fetchUnreadMessageCount()
             } else {
               this.orderTableItems = []
             }
@@ -442,18 +441,11 @@
             this.axios.onError(err)
           })
       },
-      fetchUnreadMessageCount() {
-        this.$store.dispatch('newChatClient', `${this.user.account.id}`)
-          .then((client) => {
-            const tasks = this.orderTableItems.map(item => {
-              return client.getConversation(item.conversation_id)
-            })
-            Promise.all(tasks).then(res => {
-              res.forEach((item, index) => {
-                this.orderTableItems[index]._unreadMessageCount = item.unreadMessagesCount
-              })
-            })
-          })
+      fetchUnreadMessageCount({ toggleDetails, item }) {
+        toggleDetails()
+        this.chat.imClient.getConversation(item.conversation_id).then(conversation => {
+          item._unreadMessageCount = conversation.unreadMessagesCount
+        }).catch(console.error)
       },
       startTimer() {
         clearInterval(this.timer) // 切换到其它tab需要清除定时器

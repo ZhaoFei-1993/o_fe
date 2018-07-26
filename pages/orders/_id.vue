@@ -118,6 +118,9 @@
       <CBlock class="my-sidebar-info" :x="0" :y="20">
         <UserStatsProfile :user-data="counterparty" v-if="counterparty"/>
       </CBlock>
+      <CBlock id="my-chat-box">
+        <IM :client="chat.imClient" :conversation-id="convId" :client-id="`${user.account.id}`"></IM>
+      </CBlock>
     </div>
     <b-modal ref="appealModal"
              title="交易申诉"
@@ -306,6 +309,10 @@
     .sidebar {
       width: 400px;
       margin-left: 20px;
+      #my-chat-box {
+        margin-top: 10px;
+        padding: 0 !important;
+      }
     }
     #appeal-modal {
       width: 560px;
@@ -343,6 +350,7 @@
 
 </style>
 <script>
+  import IM from '~/components/im'
   import UserStatsProfile from '~/components/user-stats-profile.vue'
   import ConfirmReceipt from './_c/confirm-receipt'
   import {mapState} from 'vuex'
@@ -367,11 +375,13 @@
         appealReason: null,
         showConfirmReceiptModal: false,
         refreshOrderTimeout: null,
+        convId: '',
       }
     },
     components: {
       UserStatsProfile,
       ConfirmReceipt,
+      IM,
     },
     fetch({store, app, req, redirect, route}) {
       app.axios.init(req)
@@ -390,7 +400,7 @@
       this.getCurrentOrder()
     },
     computed: {
-      ...mapState(['user', 'constant']),
+      ...mapState(['user', 'constant', 'chat']),
       orderStatus() {
         return Object.values(this.constant.ORDER_STATUS).find(s => s.value === this.order.status).text
       },
@@ -514,6 +524,7 @@
         this.axios.order.getOrderById(this.id).then(response => {
           if (response.code === 0) {
             this.order = response.data
+            this.convId = this.order.conversation_id // 聊天对话id
             this.selectedMethod = this.order.payment_methods[0]
             this.counterparty = this.user.account.id === this.order.user_id ? this.order.merchant : this.order.user
             this.checkOrderStatus()
