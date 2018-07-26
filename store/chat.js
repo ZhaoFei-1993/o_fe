@@ -19,27 +19,29 @@ export default () => {
   }
 
   const actions = {
-    newChatClient({ commit }, clientId) {
+    newChatClient({ commit, state }, clientId) {
       if (!state.imClient) {
         const realtime = new Realtime({
           appId: APP_ID,
           appKey: APP_KEY,
         })
-        const self = this
-        realtime.createIMClient(clientId, {
-          signatureFactory() {
-            return self.app.axios.chat.sign({
-              sign_type: 'signin',
-            }).then(res => {
-              if (res.code === 0) {
-                return res.data
-              }
-            })
-          },
+        // const self = this
+        return realtime.createIMClient(clientId, {
+          // signatureFactory() {
+          //   return self.app.axios.chat.sign({
+          //     sign_type: 'signin',
+          //   }).then(res => {
+          //     if (res.code === 0) {
+          //       return res.data
+          //     }
+          //   })
+          // },
         }).then(myClient => {
           commit('INIT_CHAT_CLIENT', myClient)
+          return myClient
         })
       }
+      return state.imClient
     },
   }
 

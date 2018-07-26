@@ -142,7 +142,10 @@
                         还剩{{ item._remaining_time | formatDuration }}
                       </div>
                       <div class="message-btn">
-                        <i class="iconfont icon-message"></i>
+                        <b-link :to="`/orders/${item.id}`" class="message-link">
+                          <i class="iconfont icon-message"></i>
+                          <sup class="message-badge" v-if="item._unreadMessageCount > 0"></sup>
+                        </b-link>
                       </div>
                       <div class="detail-btn-wrapper">
                         <b-btn size="xs" variant="gradient-yellow" class="detail-btn" @click="confirmPay(item)">我已付款
@@ -162,6 +165,7 @@
                   <template v-if="item.status === constant.ORDER_STATUS.PAID.value">
                     <div class="message-btn">
                       <i class="iconfont icon-message"></i>
+                      <sup class="message-badge" v-if="item._unreadMessageCount > 0"></sup>
                     </div>
                     <div class="detail-btn-wrapper detail-waiting">
                       等待卖家收款
@@ -174,6 +178,7 @@
                   <template v-if="item.status === constant.ORDER_STATUS.CLOSED.value">
                     <div class="message-btn">
                       <i class="iconfont icon-message"></i>
+                      <sup class="message-badge" v-if="item._unreadMessageCount > 0"></sup>
                     </div>
                     <div class="detail-btn-wrapper detail-waiting">
                       已结束
@@ -188,6 +193,7 @@
                       </div>
                       <div class="message-btn">
                         <i class="iconfont icon-message"></i>
+                        <sup class="message-badge" v-if="item._unreadMessageCount > 0"></sup>
                       </div>
                       <div class="detail-btn-wrapper detail-waiting">
                         等待买家付款
@@ -202,6 +208,7 @@
                   <template v-if="item.status === constant.ORDER_STATUS.PAID.value">
                     <div class="message-btn">
                       <i class="iconfont icon-message"></i>
+                      <sup class="message-badge" v-if="item._unreadMessageCount > 0"></sup>
                     </div>
                     <div class="detail-btn-wrapper">
                       <b-btn size="xs" variant="gradient-yellow" class="detail-btn" @click="confirmReceipt(item)">确认收款
@@ -371,7 +378,7 @@
       ConfirmReceipt,
     },
     computed: {
-      ...mapState(['user', 'constant']),
+      ...mapState(['user', 'constant', 'chat']),
       coinTypeFilterOptions() {
         return [{text: '全部', value: null}, ...this.constant.COIN_TYPE_OPTIONS]
       },
@@ -421,9 +428,11 @@
                   _selected_payment_method: selectedPaymentMethod, // 用户选中的支付方式
                   _remaining_time: remainingTime,
                   _expired: remainingTime <= 0 && item.status === this.constant.ORDER_STATUS.CREATED.value,
-                  _isBuySide: (item.merchant_id === this.user.account.id) === (item.merchant_side === this.constant.SIDE.BUY)
+                  _isBuySide: (item.merchant_id === this.user.account.id) === (item.merchant_side === this.constant.SIDE.BUY),
+                  _unreadMessageCount: 0, // 未读消息数量
                 }
               })
+              this.fetchUnreadMessageCount()
             } else {
               this.orderTableItems = []
             }
@@ -431,6 +440,19 @@
           .catch(err => {
             console.log(err)
             this.axios.onError(err)
+          })
+      },
+      fetchUnreadMessageCount() {
+        this.$store.dispatch('newChatClient', `${this.user.account.id}`)
+          .then((client) => {
+            const tasks = this.orderTableItems.map(item => {
+              return client.getConversation(item.conversation_id)
+            })
+            Promise.all(tasks).then(res => {
+              res.forEach((item, index) => {
+                this.orderTableItems[index]._unreadMessageCount = item.unreadMessagesCount
+              })
+            })
           })
       },
       startTimer() {
@@ -654,6 +676,7 @@
         }
         .message-btn {
           display: inline-block;
+          position: relative;
           border-radius: 100px;
           width: 28px;
           height: 28px;
@@ -663,6 +686,22 @@
           color: #52cbca;
           line-height: 28px;
           margin-left: 6px;
+          a.message-link {
+            &:hover {
+              text-decoration: none !important;
+            }
+          }
+          .message-badge {
+            position: absolute;
+            right: 8px;
+            height: 8px;
+            width: 8px;
+            border-radius: 50%;
+            top: 3px;
+            transform: translate3d(100%, -50%, 0);
+            background-color: #f56c6c;
+            display: inline-block;
+          }
         }
         .detail-timer {
           display: inline-block;

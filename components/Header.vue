@@ -265,8 +265,8 @@
             this.$refs.updateNameModal.show()
           }
           if (!this.chat.imClient) {
-            // const clientId = `${this.user.account.id}`
-            const clientId = 'leo' // test
+            const clientId = `${this.user.account.id}`
+            // const clientId = 'leo' // test
             this.$store.dispatch('newChatClient', clientId)
           }
         }
