@@ -103,7 +103,7 @@
                   </template>
                 </div>
               </div>
-              <div class="col4">
+              <div class="col4" v-if="item._selected_payment_method">
                 <template v-if="!item._expired">
                   <div class="detail-text">
                     {{ item._selected_payment_method.account_name }}
