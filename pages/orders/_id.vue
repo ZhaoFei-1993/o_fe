@@ -148,7 +148,8 @@
       </div>
     </b-modal>
     <ConfirmReceipt :orderId="order.id" :show-confirm-receipt-modal="showConfirmReceiptModal"
-                    @confirmReceipt="refreshOrderStatus"/>
+                    @confirmReceipt="refreshOrderStatus"
+                    @cancelReceipt="showConfirmReceiptModal=false"/>
   </div>
 </template>
 <style lang="scss">
@@ -428,9 +429,10 @@
         return this.isBuySide && orderStatusOk
       },
       showPayment() {
-        const notCancel = this.order.status !== this.constant.ORDER_STATUS.CANCEL.value
-        const notClosed = this.order.status !== this.constant.ORDER_STATUS.CLOSED.value
-        return this.selectedMethod && notClosed && notCancel && !this.expired
+        const createdBuyer = this.order.status === this.constant.ORDER_STATUS.CREATED.value && this.isBuySide
+        const paid = this.order.status === this.constant.ORDER_STATUS.PAID.value
+        const success = this.order.status === this.constant.ORDER_STATUS.SUCCESS.value
+        return this.selectedMethod && (createdBuyer || paid || success) && !this.expired
       },
       tradeText() {
         if (!this.counterparty) return {}

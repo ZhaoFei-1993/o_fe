@@ -401,6 +401,7 @@ a.dropdown-item {
 }
 
 // popover
+$sideList: top right bottom left;
 .popover {
   padding: 8px;
   border-radius: 4px;
@@ -415,9 +416,11 @@ a.dropdown-item {
     font-weight: 500;
     color: #192330;
   }
-  &.bs-popover-left{
-    .arrow::before,.arrow::after {
-      border-left-color: #fdf5e6;
+  @each $side in $sideList {
+    &.bs-popover-#{$side}{
+      .arrow::before,.arrow::after {
+        border-#{$side}-color: #fdf5e6;
+      }
     }
   }
 }

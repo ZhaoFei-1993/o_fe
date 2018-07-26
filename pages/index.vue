@@ -254,7 +254,7 @@
             <span
               :class="['sort-price fz-18 col-wide pr-60 text-right',sortPrice]">{{item.price + ' '+balance.currentCash}}</span>
             <span class="col-narrow">
-              <template v-if="user && user.id ===item.user.id">
+              <template v-if="user && user.id === item.user.id">
                 <button class="btn btn-order-disabled" :id="'button-order-'+item.id" v-b-tooltip.hover title="不能与自己交易"> {{(selectedSide === constant.SIDE.BUY ? '购买' : '出售') + selectedCoin}} </button>
               </template>
               <button
@@ -313,9 +313,10 @@
   import PlaceOrderModal from '~/components/place-order-modal'
   import UserPayments from '~/components/user-payments'
   import PublishItemButton from '~/components/publish-item-modal/publish-item-button.vue'
+  import {PlaceOrderError} from '~/modules/error-code'
 
-  // 从路由数据中获取需要的列表数据
-  function resolveDataFromRoute($route, constant) {
+// 从路由数据中获取需要的列表数据
+function resolveDataFromRoute($route, constant) {
     const side = $route.query.side || constant.SIDE.BUY
     return {
       selectedCoin: $route.query.coin || 'BTC',
@@ -441,7 +442,36 @@
             this.showPlaceOrderModal = true
           })
         }).catch(err => {
-          this.$showTips(err.message, 'error')
+          if (err.errorType) {
+            switch (err.errorType) {
+              case this.constant.PLACE_ORDER_ERROR.PAYMENT_LIMIT:
+                this.currentConstraint = {
+                  content: '您尚未添加该广告支持的支付方式，无法下单。',
+                  linkText: '添加支付方式',
+                  link: '/my/payments',
+                }
+                break
+              case this.constant.PLACE_ORDER_ERROR.KYC_LIMIT:
+                this.currentConstraint = {
+                  content: '您尚未完成实名认证，每日限制下单次数为 3 次。',
+                  linkText: '去完成实名认证',
+                  outLink: `${this.coinex}/my/info/basic?redirect=${encodeURIComponent(webDomain + this.$route.fullPath)}`,
+                }
+                break
+              case this.constant.PLACE_ORDER_ERROR.CANCEL_LIMIT:
+                this.currentConstraint = {
+                  content: '您今天累计取消超过 3 次订单，被冻结交易功能。',
+                  linkText: '了解更多交易规则',
+                  outLink: '//support.coinex.com',
+                }
+                break
+              default:
+                this.$showTips(err.message, 'error')
+            }
+            this.showConstraintModal = true
+          } else {
+            this.$showTips(err.message, 'error')
+          }
         })
       },
       qualified(item) {
@@ -463,13 +493,7 @@
               return Promise.resolve()
             }
           }
-          this.currentConstraint = {
-            content: '您尚未添加该广告支持的支付方式，无法下单。',
-            linkText: '添加支付方式',
-            link: '/my/payments',
-          }
-          this.showConstraintModal = true
-          return Promise.reject(new Error('获取支付方式失败'))
+          return Promise.reject(new PlaceOrderError('尚未添加该广告支持的支付方式', this.constant.PLACE_ORDER_ERROR.PAYMENT_LIMIT))
         })
       },
       verifyDynamicConstraint(item) {
@@ -478,20 +502,12 @@
         }
         return this.axios.user.dynamicConstraint().then(response => {
           const constraint = response.data
-          if (constraint.cancel_order_times_verified && constraint.kyc_place_order_verified) {
-            return Promise.resolve()
+          if (!constraint.kyc_place_order_verified) {
+            return Promise.reject(new PlaceOrderError('未完成实名认证', this.constant.PLACE_ORDER_ERROR.KYC_LIMIT))
+          } else if (!constraint.cancel_order_times_verified) {
+            return Promise.reject(new PlaceOrderError('频繁取消订单', this.constant.PLACE_ORDER_ERROR.KYC_LIMIT))
           } else {
-            this.currentConstraint = (!constraint.kyc_place_order_verified) ? {
-              content: '您尚未完成实名认证，每日限制下单次数为 3 次。',
-              linkText: '去完成实名认证',
-              outLink: `${this.coinex}/my/info/basic?redirect=${encodeURIComponent(webDomain + this.$route.fullPath)}`,
-            } : {
-              content: '您今天累计取消超过 3 次订单，被冻结交易功能。',
-              linkText: '了解更多交易规则',
-              outLink: '//support.coinex.com',
-            }
-            this.showConstraintModal = true
-            return Promise.reject(constraint)
+            return Promise.resolve()
           }
         })
       },

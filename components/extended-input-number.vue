@@ -3,8 +3,8 @@
     width: 100%;
     padding: 0 4px;
 
-    &:focus{
-      outline:none;
+    &:focus {
+      outline: none;
       border-color: #52cbca;
       border-style: solid;
     }
@@ -52,20 +52,20 @@
           this.setValue(value, evt)
           return
         }
-
         value = value.setDigit(this.decimalDigit)
-
-        value = Math.min(this.max, value)
-        value = Math.max(this.min, value)
-
+        // 不能用 value = Math.min(this.max, value) 这种形式，会转换成数字，遇到0.0变成0导致无法输入的问题
+        if (value > this.max) {
+          value = `${this.max}`.setDigit(this.decimalDigit)
+        }
+        if (value < this.min) {
+          value = `${this.min}`.setDigit(this.decimalDigit)
+        }
         this.setValue(value, evt)
       },
-
       setValue(value, evt) {
         evt.target.value = value
         this.$emit('input', value)
       },
-
       onFocus(evt) {
         this.$emit('focus', evt)
       }

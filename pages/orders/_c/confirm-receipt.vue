@@ -6,8 +6,10 @@
            cancel-variant="outline-green"
            ok-variant="gradient-yellow"
            button-size="sm"
+           :centered="true"
            v-model="showConfirmReceiptModal"
            @ok="confirmReceipt"
+           @cancel="cancelReceipt"
            ref="confirmReceiptModal">
     <div>确认已收到该笔款项？<span class="c-red">如您没有收到买家付款，确认收款后，放行的数字货币将无法追回。</span></div>
     <VerifyCode v-if="needVerify"
@@ -64,11 +66,14 @@
           this.$refs.confirmReceiptModal.hide()
           this.$emit('confirmReceipt')
           this.needVerify = false
-        }).catch(err => {
-          this.$errorTips(`提交失败${err.message}`)
+        }).catch(() => {
+          this.$showTips('请输入验证码', 'error')
           this.needVerify = true
         })
       },
+      cancelReceipt() {
+        this.$emit('cancelReceipt')
+      }
     },
   }
 </script>
