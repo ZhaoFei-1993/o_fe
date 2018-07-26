@@ -50,7 +50,7 @@
       <b-input-group class="input-group">
         <b-form-input placeholder="输入信息，回车发送" type="text" class="input-text" v-model="message" @keyup.enter.native="onSendMsg"></b-form-input>
         <b-input-group-append>
-          <input id="chat-file-image" type="file" accept="image/*" style="display: none" ref="fileSelector" @change="onUpload">
+          <input id="chat-file-image" type="file" accept="image/jpg, image/jpeg, image/png, image/gif, image/bmp" style="display: none" ref="fileSelector" @change="onUpload">
           <b-btn id="upload" @click="onSelectFile">
             <span style="color: #52cbca"><i class="iconfont icon-attachment"></i></span>
           </b-btn>
@@ -259,7 +259,7 @@
           const fileObj = new AV.File(file.name, file)
           fileObj.save({
             onprogress(e) {
-              $toast.show(`发送中...${e.percent}%`)
+              $toast.show(`发送中...${Math.round(e.percent)}%`)
             },
           }).then(savedFile => {
             const message = new ImageMessage(savedFile)
