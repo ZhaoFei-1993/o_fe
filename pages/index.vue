@@ -39,9 +39,9 @@
             height: 50px;
             line-height: 50px;
             width: 120px;
-            color: white;
+            background-color: #f9f9f9;
             padding-right: 16px;
-            background-image: linear-gradient(to left, #ffe070, #ffb900);
+            color: #27313e;
             font-size: 22px;
             i.iconfont {
               font-size: 22px;
@@ -61,6 +61,18 @@
             }
           }
           &.active {
+            &.buy {
+              .side {
+                color: white;
+                background-image: linear-gradient(to left, #ffe070, #ffb900);
+              }
+            }
+            &.sell {
+              .side {
+                color: white;
+                background-image: linear-gradient(to left, #22e6b8, #00c1ce);
+              }
+            }
             .coin-type.active {
               color: $brandYellow;
               border-bottom: 2px solid $brandYellow;
@@ -70,11 +82,7 @@
               border-bottom: 2px solid $brandGreen;
             }
           }
-          &.sell {
-            .side {
-              background-image: linear-gradient(to left, #22e6b8, #00c1ce);
-            }
-          }
+
         }
       }
       .items-list {
@@ -113,7 +121,7 @@
         }
         .list {
           &.sell .item-row:nth-of-type(even) {
-            background-color: #FFFDFA;
+            background-color: #F8FDFD;
           }
           .item-row {
             display: flex;
@@ -254,7 +262,7 @@
             <span
               :class="['sort-price fz-18 col-wide pr-60 text-right',sortPrice]">{{item.price + ' '+balance.currentCash}}</span>
             <span class="col-narrow">
-              <template v-if="user && user.id === item.user.id">
+              <template v-if="user && user.account && user.account.id === item.user.id">
                 <button class="btn btn-order-disabled" :id="'button-order-'+item.id" v-b-tooltip.hover title="不能与自己交易"> {{(selectedSide === constant.SIDE.BUY ? '购买' : '出售') + selectedCoin}} </button>
               </template>
               <button
@@ -315,8 +323,8 @@
   import PublishItemButton from '~/components/publish-item-modal/publish-item-button.vue'
   import {PlaceOrderError} from '~/modules/error-code'
 
-// 从路由数据中获取需要的列表数据
-function resolveDataFromRoute($route, constant) {
+  // 从路由数据中获取需要的列表数据
+  function resolveDataFromRoute($route, constant) {
     const side = $route.query.side || constant.SIDE.BUY
     return {
       selectedCoin: $route.query.coin || 'BTC',
