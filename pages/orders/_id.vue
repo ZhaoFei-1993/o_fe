@@ -35,7 +35,7 @@
             <span v-if="selectedMethod.method === 'wechat'"><i
               class="iconfont icon-wechat-round"></i>微信支付</span>
             <span v-if="selectedMethod.method === 'alipay'"><i
-              class="iconfont icon-wechat-round"></i>支付宝支付</span>
+              class="iconfont icon-alipay"></i>支付宝支付</span>
           </template>
           <span class="payment-account">{{selectedMethod.account_name + ' '+ selectedMethod.account_no}}</span>
           <span class="qr-code-button" v-if="selectedMethod.qr_code_image"
