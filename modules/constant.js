@@ -93,11 +93,11 @@ export default {
 
   ORDER_STATUS: {
     CREATED: {
-      text: '等待买家付款',
+      text: '待付款',
       value: 'created',
     },
     PAID: {
-      text: '已付款待确认',
+      text: '付确认',
       value: 'paid',
     },
     SUCCESS: {
