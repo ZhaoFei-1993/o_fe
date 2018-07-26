@@ -566,10 +566,10 @@
       confirmPay() {
         this.$showDialog({
           title: '确认付款',
-          content: (<div>确认您已向买方付款？<span class="c-red">未付款点击“我已付款”将被冻结账户。</span></div>),
+          content: (<div>确认您已向卖方付款？<span class="c-red">未付款点击“我已付款”将被冻结账户。</span></div>),
           onOk: () => {
             this.axios.order.confirmPay(this.order.id, this.selectedMethod).then(res => {
-              this.$successTips('确认收款成功')
+              this.$successTips('确认付款成功')
             }).catch(err => {
               this.axios.onError(err)
             })
