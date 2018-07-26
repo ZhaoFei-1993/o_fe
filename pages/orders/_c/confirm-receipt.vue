@@ -9,7 +9,7 @@
            :centered="true"
            v-model="showConfirmReceiptModal"
            @ok="confirmReceipt"
-           @cancel="cancelReceipt"
+           @hide="cancelReceipt"
            ref="confirmReceiptModal">
     <div>确认已收到该笔款项？<span class="c-red">如您没有收到买家付款，确认收款后，放行的数字货币将无法追回。</span></div>
     <VerifyCode v-if="needVerify"

@@ -560,6 +560,9 @@
               }
             }, 1000)
           }
+          if (this.order.status === this.constant.ORDER_STATUS.PAID.value) {
+            this.selectedMethod = this.order.payment_methods[0]
+          }
           this.refreshOrderTimeout = setTimeout(() => {
             this.refreshOrderStatus()
           }, REFRESH_ORDER_INTERVAL)

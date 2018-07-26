@@ -44,7 +44,7 @@
         <b-form v-if="form" @submit.prevent="onSubmit">
           <div class="price-input">
             <div class="input-container">
-              <div class="max-value">最高金额{{' '+ maxDealCashAmount+ ' '+balance.currentCash}}
+              <div class="max-value">最高金额{{' '+ shownMaxDealCashAmount+ ' '+balance.currentCash}}
                 <span class="purchase-all"
                       @click="purchaseAll">全部{{sideText}}</span>
               </div>
@@ -59,7 +59,7 @@
             </div>
             <span class="separator"><i class="iconfont icon-exchange"></i></span>
             <div class="input-container">
-              <div class="max-value">最高数量{{' '+ maxDealCoinAmount + ' '+ item.coin_type}}<span
+              <div class="max-value">最高数量{{' '+ shownMaxDealCoinAmount + ' '+ item.coin_type}}<span
                 class="purchase-all"
                 @click="purchaseAll">全部{{sideText}}</span>
               </div>
@@ -254,6 +254,14 @@
       },
       currentBalance() {
         return parseFloat(this.balance.otcBalance.find(b => b.coin_type === this.item.coin_type).available)
+      },
+      shownMaxDealCoinAmount(){
+        // 此处不考虑余额和实名验证
+        const maxAmount = Math.min(this.item.remain_coin_amount, (this.item.max_deal_cash_amount / this.item.price || Number.MAX_SAFE_INTEGER))
+        return `${maxAmount}`.setDigit(8)
+      },
+      shownMaxDealCashAmount() {
+        return `${this.shownMaxDealCoinAmount * this.item.price}`.setDigit(2)
       },
       maxDealCoinAmount() {
         // coin 更精确，优先用coin计算
