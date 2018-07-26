@@ -20,6 +20,7 @@
         display: flex;
         align-items: center;
         margin-bottom: 25px;
+        font-size: 18px;
 
         &::before {
           content: '';
@@ -157,7 +158,7 @@
           <ContactItem title="手机认证" icon="icon-mobile" :active="true" :required="true">
             <div v-if="account.mobile" class="c-6f">
               <p class="mt-10">已认证</p>
-              <p>{{account.mobile}}</p>
+              <p>+{{account.country_code}} {{account.mobile}}</p>
             </div>
             <div v-else>
               <p class="c-red">未认证</p>
@@ -173,7 +174,7 @@
               <b-link :href="`${coinex}/my/info/auth/realname`" target="_blank">去认证 ></b-link>
             </div>
           </ContactItem>
-          <ContactItem title="联系人微信" icon="icon-wechat-linear" :active="true" :required="true">
+          <ContactItem title="联系人微信" icon="icon-wechat-linear" :required="true">
             <b-form-input v-model="form.wechat" placeholder="该微信号码用于后续认证与沟通"></b-form-input>
           </ContactItem>
         </div>
@@ -200,8 +201,8 @@
           <b-link :href="`${coinex}/token`" target="_blank">什么是 CET？</b-link>
         </p>
         <InfoItem title="账户可用余额" v-if="balance && balance.coinexBalance">
-          {{cetAvailable}}
-          <span v-if="cetAvailable < MERCHANT_REQUIRED_CET_AMOUNT">
+          <span class="fz-16">{{cetAvailable}} CET</span>
+          <span v-if="cetAvailable < MERCHANT_REQUIRED_CET_AMOUNT" class="ml-10">
             <span class="c-red mr-20">余额不足</span>
             请先进行
             <b-link :href="`${coinex}/my/wallet/deposit?type=cet`" target="_blank">充值</b-link>
