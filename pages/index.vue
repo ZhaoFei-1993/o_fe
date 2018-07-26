@@ -313,10 +313,10 @@
   import PlaceOrderModal from '~/components/place-order-modal'
   import UserPayments from '~/components/user-payments'
   import PublishItemButton from '~/components/publish-item-modal/publish-item-button.vue'
-  import {PlaceOrderError} from "~/modules/error-code";
+  import {PlaceOrderError} from '~/modules/error-code'
 
-  // 从路由数据中获取需要的列表数据
-  function resolveDataFromRoute($route, constant) {
+// 从路由数据中获取需要的列表数据
+function resolveDataFromRoute($route, constant) {
     const side = $route.query.side || constant.SIDE.BUY
     return {
       selectedCoin: $route.query.coin || 'BTC',
