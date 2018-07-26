@@ -30,15 +30,15 @@
             </span>
           </template>
           <template v-else>
-            <span v-if="selectedMethod.method === 'bankcard'">
+            <span v-if="selectedMethod.method === constant.PAYMENT_TYPES.BANKCARD">
             <i class="mr-10 iconfont icon-bankcard"></i>银行转帐</span>
-            <span v-if="selectedMethod.method === 'wechat'"><i
+            <span v-if="selectedMethod.method === constant.PAYMENT_TYPES.WECHAT"><i
               class="mr-10 iconfont icon-wechat-round"></i>微信支付</span>
-            <span v-if="selectedMethod.method === 'alipay'"><i
+            <span v-if="selectedMethod.method === constant.PAYMENT_TYPES.ALIPAY"><i
               class="mr-10 iconfont icon-alipay"></i>支付宝支付</span>
           </template>
           <span class="payment-account">{{selectedMethod.account_name + ' '+ selectedMethod.account_no}}</span>
-          <span class="qr-code-button" v-if="selectedMethod.qr_code_image"
+          <span class="qr-code-button" v-if="selectedMethod.method!==constant.PAYMENT_TYPES.BANKCARD && selectedMethod.qr_code_image"
                 @click="showQrCode(selectedMethod.qr_code_image)">查看支付二维码</span>
         </div>
         <div class="payment-status" v-html="paymentStatusMessage.message"></div>

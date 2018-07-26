@@ -537,9 +537,10 @@
         })
       },
       verifyDynamicConstraint(item) {
-        if (item.min_deal_cash_amount >= this.noKycLimit) {
-          return Promise.reject(new PlaceOrderError('未完成实名认证', this.constant.PLACE_ORDER_ERROR.KYC_AMOUNT_LIMIT))
-        }
+        // 不做外部验证了
+        // if (item.min_deal_cash_amount >= this.noKycLimit) {
+        //   return Promise.reject(new PlaceOrderError('未完成实名认证', this.constant.PLACE_ORDER_ERROR.KYC_AMOUNT_LIMIT))
+        // }
         if (item.side === this.constant.SIDE.BUY) {
           return this.verifyHasPayment(item)
         }
