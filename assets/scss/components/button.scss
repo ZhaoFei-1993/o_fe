@@ -20,6 +20,17 @@ $background-red: #e45555;
   &.focus {
     box-shadow: 0 0 0 !important;
   }
+  &[disabled] {
+    cursor: not-allowed;
+    border: 2px solid $gray;
+    color: $gray;
+    background: none;
+    &:hover {
+      border: 2px solid $gray;
+      color: $gray;
+      background: none;
+    }
+  }
 }
 
 .btn-xl {
@@ -230,16 +241,3 @@ $background-red: #e45555;
   }
 }
 
-.btn-default-disabled{
-  &[disabled] {
-    cursor: default !important;
-    border: 2px solid $gray !important;
-    color: $gray !important;
-    background: none !important;
-    &:hover {
-      border: 2px solid $gray !important;
-      color: $gray !important;
-      background: none !important;
-    }
-  }
-}

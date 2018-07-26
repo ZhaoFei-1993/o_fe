@@ -52,7 +52,6 @@
             <div class="step-time" v-if="order.pay_time">{{order.pay_time | getTimeText}}</div>
             <b-btn v-if="isBuySide && !order.pay_time"
                    :disabled="expired"
-                   class="btn-default-disabled"
                    size="xs" variant="gradient-yellow"
                    @click="confirmPay()">
               我已付款
@@ -85,7 +84,7 @@
       <div class="order-helper">
         <div v-if="canCancel" class="d-flex align-items-center justify-content-between">
           <span>想要终止交易？</span>
-          <b-btn size="xs" variant="outline-green" class="btn-default-disabled" :disabled="expired" @click="cancelOrder">取消订单</b-btn>
+          <b-btn size="xs" variant="outline-green" :disabled="expired" @click="cancelOrder">取消订单</b-btn>
         </div>
         <template v-if="showAppeal">
           <span v-if="!appeal||appeal.status===''">
