@@ -267,6 +267,9 @@ export default {
   methods: {
     getItems() {
       this.axios.item.userItems(this.itemStatus).then(res => {
+        res.data.forEach(item => {
+          item.remain_coin_amount = parseFloat(item.remain_coin_amount) // 防止出现0E-8这种情况
+        })
         this.items = res.data
       }).catch(err => {
         this.axios.onError(err)

@@ -34,7 +34,7 @@
     </MyInfoItem>
     <MyInfoItem title="手机">
       <p slot="content">
-        <span v-if="user.account.mobile">{{user.account.mobile}}</span>
+        <span v-if="user.account.mobile">+{{user.account.country_code}} {{user.account.mobile}}</span>
         <span v-else class="c-red">未绑定</span>
       </p>
       <b-btn slot="action" variant="outline-green" size="xs" :href="`${coinex}/my/info/security`" target="_blank">更换</b-btn>
@@ -52,9 +52,24 @@
     <MyInfoItem title="实名认证">
       <p slot="content">
         <span v-if="user.account.kyc_status === constant.KYC_STATUS.PASS">已认证</span>
+        <span v-else-if="user.account.kyc_status === constant.KYC_STATUS.PROCESSING" class="c-brand-green">信息已提交，待系统审核</span>
         <span v-else class="c-red">未认证</span>
       </p>
-      <b-btn slot="action" v-if="user.account.kyc_status !== constant.KYC_STATUS.PASS" variant="outline-green" size="xs" :href="`${coinex}/my/info/auth/realname`" target="_blank">认证</b-btn>
+      <b-btn slot="action"
+             v-if="user.account.kyc_status !== constant.KYC_STATUS.PASS"
+             :disabled="user.account.kyc_status === constant.KYC_STATUS.PROCESSING"
+             variant="outline-green" size="xs" target="_blank"
+             :href="`${coinex}/my/info/auth/realname`">
+        认证
+      </b-btn>
+    </MyInfoItem>
+    <MyInfoItem title="交易验证">
+      <p slot="content">
+        <span v-if="user.account.trade_validate_frequency === 'never'">从不二次验证</span>
+        <span v-if="user.account.trade_validate_frequency === 'each_two_hours'">2小时内不二次验证</span>
+        <span v-if="user.account.trade_validate_frequency === 'each_time'">每次交易均二次验证</span>
+      </p>
+      <b-btn slot="action" variant="outline-green" size="xs" target="_blank" :href="`${coinex}/my/info/security`">更换</b-btn>
     </MyInfoItem>
   </CBlock>
 </template>

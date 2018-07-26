@@ -24,12 +24,13 @@
 <script>
   import VerifyCode from '~/components/verify-code'
   import {mapState} from 'vuex'
+  import constant from '~/modules/constant'
 
   export default {
     data() {
       return {
         verify: {
-          codeType: 'totp',
+          codeType: constant.VERIFY_CODE_TYPE.GOOGLE,
           sms: '',
           google: '',
           businessType: '',

@@ -48,11 +48,10 @@ export default {
   props: {
     'text': {
       type: String,
-      // default: '添加照片'
     },
   },
   methods: {
-    onAddImage() {
+    onAddImage(event) {
       for (const file of event.target.files) {
         if (!this.utils.isImage(file.name)) {
           this.$showTips('仅限图片格式', 'error')
