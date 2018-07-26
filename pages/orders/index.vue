@@ -103,7 +103,7 @@
                   </template>
                 </div>
               </div>
-              <div class="col4">
+              <div class="col4" v-if="item._selected_payment_method">
                 <template v-if="!item._expired">
                   <div class="detail-text">
                     {{ item._selected_payment_method.account_name }}
@@ -120,8 +120,7 @@
                           v-show="item._selected_payment_method.method !== constant.PAYMENT_TYPES.BANKCARD"><i
                       class="iconfont icon-qrcode"></i></span>
                   </div>
-                  <div v-if="item._selected_payment_method.method === constant.PAYMENT_TYPES.BANKCARD"
-                       class="detail-text">
+                  <div class="detail-text">
                     {{ item._selected_payment_method.bank }}，{{ item._selected_payment_method.branch }}
                   </div>
                   <div class="detail-text">
