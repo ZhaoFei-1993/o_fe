@@ -348,7 +348,7 @@
   }
 
   // const refreshInterval = 5000
-  const PAGE_SIZE = 30
+  const PAGE_SIZE = 10
   const defaultPager = {
     limit: PAGE_SIZE,
     currentPage: 1,
@@ -475,7 +475,6 @@
             this.showPlaceOrderModal = true
           })
         }).catch(err => {
-          console.log(err.errType, 'ddd')
           if (err.errorType) {
             switch (err.errorType) {
               case this.constant.PLACE_ORDER_ERROR.PAYMENT_LIMIT:
