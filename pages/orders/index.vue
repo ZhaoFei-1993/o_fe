@@ -101,6 +101,17 @@
                       </option>
                     </select>
                   </template>
+                  <template v-else>
+                    <span v-if="item._selected_payment_method.method === 'bankcard'">
+                      <i class="iconfont icon-bank"></i>银行转帐
+                    </span>
+                    <span v-if="item._selected_payment_method.method === 'wechat'">
+                      <i class="iconfont icon-wechat-round"></i>微信支付
+                    </span>
+                    <span v-if="item._selected_payment_method.method === 'alipay'">
+                      <i class="iconfont icon-wechat-round"></i>支付宝支付
+                    </span>
+                  </template>
                 </div>
               </div>
               <div class="col4" v-if="item._selected_payment_method">
