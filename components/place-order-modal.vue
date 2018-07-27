@@ -288,8 +288,8 @@
             },
             message: {
               required: '请填写购买金额',
-              minValue: `最小下单金额${this.item.min_deal_cash_amount}元`,
-              maxValue: `最大下单金额${this.maxDealCashAmount}元`,
+              minValue: `最小下单金额${this.item.min_deal_cash_amount}CNY`,
+              maxValue: `最大下单金额${this.maxDealCashAmount}CNY`,
               kycLimit: `非实名认证用户最大下单金额为${this.noKycLimit}`
             },
           },
@@ -304,8 +304,8 @@
             },
             message: {
               required: '请填写购买金额',
-              minValue: `最小下单数量${this.min_deal_coin_amount}`,
-              maxValue: `最大下单数量${this.maxDealCoinAmount}`,
+              minValue: `最小下单数量${this.min_deal_coin_amount}${this.item.coin_type}`,
+              maxValue: `最大下单数量${this.maxDealCoinAmount}${this.item.coin_type}`,
               hasBalance: `账户余额${this.sideMaxCoin}${this.item.coin_type}`
             },
           },
