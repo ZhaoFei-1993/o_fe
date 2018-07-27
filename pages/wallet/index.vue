@@ -133,7 +133,7 @@
   import {mapState} from 'vuex'
 
   const P_LIMIT = 10 // 每页条数, P_前缀表示页面组件全局常量
-  const P_INTERVAL = 500000 // 资产轮询时间
+  const P_INTERVAL = 60000 // 资产轮询时间
 
   export default {
     data() {
@@ -287,9 +287,7 @@
     created() {
       this.fetchBalanceHistory()
       this.timer = setInterval(() => {
-        this.$store.dispatch('fetchOtcBalance') // otc资产
-        this.$store.dispatch('fetchCoinexBalance') // coinex资产
-        this.$store.dispatch('fetchExchangeRate') // 汇率
+        this.updateAllBalance()
       }, P_INTERVAL)
     },
     beforeDestroy() {
@@ -354,8 +352,7 @@
     },
     methods: {
       onTransfer() {
-        const {amount} = this.form
-        if (amount > 0) {
+        if (this.form.amount > 0) {
           if (!this.form.submitting) {
             this.form.submitting = true
             this.axios.balance[`${this.form.from}2${this.form.to}`]({
@@ -367,6 +364,7 @@
                   this.form.submitting = false
                   this.$successTips('划转成功')
                   this.showTransferModal = false
+                  this.updateAllBalance()
                 }
               })
               .catch(err => {
@@ -411,10 +409,12 @@
       onshowHand() {
         this.form.amount = this.availableAmount
       },
-      onSwap() {
-        const tmp = this.form.from
-        this.form.from = this.form.to
-        this.form.to = tmp
+      onSwap() { // 资产流向互换
+        this.updateAllBalance()
+
+        const tmp = this.form.to
+        this.form.to = this.form.from
+        this.form.from = tmp
 
         const {coin_type: coinType} = this.curAssetItem
         const fromBalance = this[`${this.form.from}Balance`].find(item => {
@@ -424,9 +424,7 @@
         this.form.amount = 0
       },
       onShowTransferModal(type, item) {
-        this.$store.dispatch('fetchOtcBalance') // otc资产
-        this.$store.dispatch('fetchCoinexBalance') // coinex资产
-        this.$store.dispatch('fetchExchangeRate') // 汇率
+        this.updateAllBalance()
         const { coin_type: coinType } = item
         this.form.coinType = coinType // 设置划转币种
         if (type === 'in') {
@@ -436,12 +434,18 @@
           this.form.from = 'otc'
           this.form.to = 'coinex'
         }
+        this.form.amount = 0 // 划转数量重置0
         const fromBalance = this[`${this.form.from}Balance`].find(item => {
           return item.coin_type === coinType
         })
         this.availableAmount = fromBalance ? fromBalance.available : 0
         this.showTransferModal = true
         this.curAssetItem = item
+      },
+      updateAllBalance() {
+        this.$store.dispatch('fetchOtcBalance') // otc资产
+        this.$store.dispatch('fetchCoinexBalance') // coinex资产
+        this.$store.dispatch('fetchExchangeRate') // 汇率
       },
     },
   }
