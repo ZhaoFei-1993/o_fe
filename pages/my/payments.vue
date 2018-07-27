@@ -132,28 +132,29 @@
         </b-form-group>
 
         <b-form-group label="姓名:" horizontal>
-          <b-form-input v-model="form.account_name" size="lg"></b-form-input>
+          <b-form-input v-model="form.account_name" size="lg" disabled></b-form-input>
           <EMsgs :result="$v.form" :msgs="validationConf.messages" keyName="account_name"/>
         </b-form-group>
 
         <div v-if="form.method === 'bankcard'">
           <b-form-group label="开户银行:" horizontal>
-            <b-form-select v-model="form.bank" :options="constant.bankOptions"></b-form-select>
+            <b-form-select v-model="form.bank" :options="bankOptionsWithDefault">
+            </b-form-select>
             <EMsgs :result="$v.form" :msgs="validationConf.messages" keyName="bank"/>
           </b-form-group>
           <b-form-group label="开户支行:" horizontal>
-            <b-form-input v-model="form.branch" size="lg"></b-form-input>
+            <b-form-input v-model="form.branch" size="lg" placeholder="请填写开户支行(选填)"></b-form-input>
             <EMsgs :result="$v.form" :msgs="validationConf.messages" keyName="branch"/>
           </b-form-group>
           <b-form-group label="银行卡号:" horizontal>
-            <b-form-input v-model="form.account_no" size="lg"></b-form-input>
+            <b-form-input v-model="form.account_no" size="lg" placeholder="请填写银行卡号"></b-form-input>
             <EMsgs :result="$v.form" :msgs="validationConf.messages" keyName="account_no"/>
           </b-form-group>
         </div>
 
         <div v-if="form.method === 'alipay'">
           <b-form-group label="支付宝账号:" horizontal>
-            <b-form-input v-model="form.account_no" size="lg"></b-form-input>
+            <b-form-input v-model="form.account_no" size="lg" placeholder="请填写支付宝账号"></b-form-input>
             <EMsgs :result="$v.form" :msgs="validationConf.messages" keyName="account_no"/>
           </b-form-group>
           <b-form-group label="收款二维码:" horizontal>
@@ -167,7 +168,7 @@
 
         <div v-if="form.method === 'wechat'">
           <b-form-group label="微信账号:" horizontal>
-            <b-form-input v-model="form.account_no" size="lg"></b-form-input>
+            <b-form-input v-model="form.account_no" size="lg" placeholder="请填写微信账号"></b-form-input>
             <EMsgs :result="$v.form" :msgs="validationConf.messages" keyName="account_no"/>
           </b-form-group>
           <b-form-group label="收款二维码:" horizontal>
@@ -239,7 +240,7 @@
         form: {
           method: '',
           account_name: '',
-          bank: '',
+          bank: null,
           branch: '',
           account_no: '',
           qr_code_image: '',
@@ -266,6 +267,14 @@
         } else {
           return this.utils.processValidationConfig(baseValidations)
         }
+      },
+      bankOptionsWithDefault: function () {
+        // 添加了默认选项的银行卡列表
+        return [{
+          value: null,
+          text: '-- 请选择开户银行 --',
+          disabled: true
+        }].concat(this.constant.bankOptions)
       }
     },
     validations() {
@@ -286,6 +295,8 @@
     mounted() {
       // 默认选中银行卡
       this.form.method = this.constant.PAYMENT_TYPES.BANKCARD
+      // 用户名自动从用户的实名认证中取，且不可修改
+      this.form.account_name = this.user.account.user_kyc.last_name + this.user.account.user_kyc.first_name
     },
     methods: {
       onPaymentStatusChange(payment, checked) {
