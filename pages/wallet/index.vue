@@ -114,7 +114,7 @@
           <div class="amount-available">
             <span>可转数量：</span>
             <span>{{ availableAmount | formatMoney }}</span>
-            <b-link class="float-right" @click="onshowHand">全部划转</b-link>
+            <b-link class="float-right" @click="onShowhand">全部划转</b-link>
           </div>
         </b-form-group>
         <div class="submit-btn-wrapper">
@@ -412,50 +412,50 @@
         this.selectedCoin = this.priceCoins[index]
         this.showCoinDropdown = false
       },
-      onshowHand() {
-        this.form.amount = this.availableAmount
+      onShowhand() {
+        this.form.amount = +this.availableAmount // 后端可能返回0e-8这种数字
       },
       onSwap() { // 资产流向互换
         this.updateAllBalance()
-        .then(() => {
-          const tmp = this.form.to
-          this.form.to = this.form.from
-          this.form.from = tmp
+          .then(() => {
+            const tmp = this.form.to
+            this.form.to = this.form.from
+            this.form.from = tmp
 
-          const {coin_type: coinType} = this.curAssetItem
-          const fromBalance = this[`${this.form.from}Balance`].find(item => {
-            return item.coin_type === coinType
+            const {coin_type: coinType} = this.curAssetItem
+            const fromBalance = this[`${this.form.from}Balance`].find(item => {
+              return item.coin_type === coinType
+            })
+            this.availableAmount = fromBalance ? fromBalance.available : 0
+            this.form.amount = 0
           })
-          this.availableAmount = fromBalance ? fromBalance.available : 0
-          this.form.amount = 0
-        })
-        .catch(err => {
-          console.error(`资产更新失败${err}`)
-        })
+          .catch(err => {
+            console.error(`资产更新失败${err}`)
+          })
       },
       onShowTransferModal(type, item) {
         this.updateAllBalance()
-        .then(() => {
-          const { coin_type: coinType } = item
-          this.form.coinType = coinType // 设置划转币种
-          if (type === 'in') {
-            this.form.from = 'coinex'
-            this.form.to = 'otc'
-          } else if (type === 'out') {
-            this.form.from = 'otc'
-            this.form.to = 'coinex'
-          }
-          this.form.amount = 0 // 划转数量重置0
-          const fromBalance = this[`${this.form.from}Balance`].find(item => {
-            return item.coin_type === coinType
+          .then(() => {
+            const { coin_type: coinType } = item
+            this.form.coinType = coinType // 设置划转币种
+            if (type === 'in') {
+              this.form.from = 'coinex'
+              this.form.to = 'otc'
+            } else if (type === 'out') {
+              this.form.from = 'otc'
+              this.form.to = 'coinex'
+            }
+            this.form.amount = 0 // 划转数量重置0
+            const fromBalance = this[`${this.form.from}Balance`].find(item => {
+              return item.coin_type === coinType
+            })
+            this.availableAmount = fromBalance ? fromBalance.available : 0
+            this.showTransferModal = true
+            this.curAssetItem = item
           })
-          this.availableAmount = fromBalance ? fromBalance.available : 0
-          this.showTransferModal = true
-          this.curAssetItem = item
-        })
-        .catch(err => {
-          console.log(`资产更新失败${err}`)
-        })
+          .catch(err => {
+            console.log(`资产更新失败${err}`)
+          })
       },
       updateAllBalance() {
         return Promise.all([
