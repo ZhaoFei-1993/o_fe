@@ -53,6 +53,7 @@
                 <ExtendedInputNumber v-model="form.cash_amount" :name="item.id+'cash_amount'"
                                      @focus="()=>onFocus('cashAmount')"
                                      :decimalDigit="2"
+                                     :step="0.1**2"
                                      @input="cashAmountChanged"
                                      :placeholder="'可填写想'+sideText+'的金额'"/>
               </b-input-group>
@@ -67,6 +68,7 @@
               </div>
               <b-input-group :append="item.coin_type">
                 <ExtendedInputNumber v-model="form.coin_amount" :name="item.id+'coin_amount'"
+                                     :step="0.1**8"
                                      @focus="()=>onFocus('coinAmount')"
                                      @input="coinAmountChanged"
                                      :placeholder="'可填写想'+sideText+'的数量'"/>
@@ -286,9 +288,9 @@
             },
             message: {
               required: '请填写购买金额',
-              minValue: `最小下单金额${this.item.min_deal_cash_amount}元`,
-              maxValue: `最大下单金额${this.maxDealCashAmount}元`,
-              kycLimit: `非实名认证用户最大下单金额为${this.noKycLimit}`
+              minValue: `最小下单金额${this.item.min_deal_cash_amount}CNY`,
+              maxValue: `最大下单金额${this.maxDealCashAmount}CNY`,
+              kycLimit: `非实名认证用户最大下单金额为${this.noKycLimit}CNY`
             },
           },
           coin_amount: {
@@ -302,8 +304,8 @@
             },
             message: {
               required: '请填写购买金额',
-              minValue: `最小下单数量${this.min_deal_coin_amount}`,
-              maxValue: `最大下单数量${this.maxDealCoinAmount}`,
+              minValue: `最小下单数量${this.min_deal_coin_amount}${this.item.coin_type}`,
+              maxValue: `最大下单数量${this.maxDealCoinAmount}${this.item.coin_type}`,
               hasBalance: `账户余额${this.sideMaxCoin}${this.item.coin_type}`
             },
           },
