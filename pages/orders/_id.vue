@@ -102,12 +102,14 @@
           <div v-if="appeal.status===constant.APPEAL_STATUS.CREATED"
                class="d-flex align-items-center justify-content-between">
             <span>{{appealSide}}已发起申诉，请等待申诉专员介入</span>
-            <button class="btn btn-outline-green btn-xs" @click="cancelAppeal">取消申诉</button>
+            <button v-if="isCurrentUserAppealing" class="btn btn-outline-green btn-xs" @click="cancelAppeal">取消申诉
+            </button>
           </div>
           <div v-if="appeal.status===constant.APPEAL_STATUS.PROCESSING"
                class="d-flex align-items-center justify-content-between">
             <span>申诉专员已经介入，请及时提供必要的信息</span>
-            <button class="btn btn-outline-green btn-xs" @click="cancelAppeal">取消申诉</button>
+            <button v-if="isCurrentUserAppealing" class="btn btn-outline-green btn-xs" @click="cancelAppeal">取消申诉
+            </button>
           </div>
           <div v-if="appeal.status===constant.APPEAL_STATUS.CANCEL">
             <span>{{appealSide}}已取消申诉，如果仍有问题，请</span>
@@ -430,6 +432,10 @@
       appealSide() {
         if (!this.appeal) return null
         return this.isBuyerAppeal ? '买家' : '卖家'
+      },
+      isCurrentUserAppealing() {
+        if (!this.appeal) return false
+        return this.appeal.user_id === this.user.account.id
       },
       canAppeal() {
         // 支付后三十分钟以后 和 完成后七天内可以申诉
