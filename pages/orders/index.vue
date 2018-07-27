@@ -55,7 +55,7 @@
           </template>
           <template slot="status" slot-scope="{ item, detailsShowing, toggleDetails }">
             {{ constant?constant.ORDER_STATUS[item.status.toUpperCase()].text:'' }}
-            <span @click.stop="toggleDetails"
+            <span @click.stop="fetchUnreadMessageCount({toggleDetails, item})"
                   v-if="item.status === constant.ORDER_STATUS.CREATED.value || item.status === constant.ORDER_STATUS.PAID.value"
                   class="detail"
                   :class="[ detailsShowing ? 'show-detail' : 'hidden-detail' ]">
@@ -153,7 +153,10 @@
                         还剩{{ item._remaining_time | formatDuration }}
                       </div>
                       <div class="message-btn">
-                        <i class="iconfont icon-message"></i>
+                        <b-link :to="`/orders/${item.id}`" class="message-link">
+                          <i :class="['iconfont', 'icon-message', item._unreadMessageCount > 0 ? 'shake-rotate' : '']"></i>
+                          <sup class="message-badge" v-if="item._unreadMessageCount > 0"></sup>
+                        </b-link>
                       </div>
                       <div class="detail-btn-wrapper">
                         <b-btn size="xs" variant="gradient-yellow" class="detail-btn" @click="confirmPay(item)">我已付款
@@ -172,7 +175,8 @@
                   </template>
                   <template v-if="item.status === constant.ORDER_STATUS.PAID.value">
                     <div class="message-btn">
-                      <i class="iconfont icon-message"></i>
+                      <i :class="['iconfont', 'icon-message', item._unreadMessageCount > 0 ? 'shake-rotate' : '']"></i>
+                      <sup class="message-badge" v-if="item._unreadMessageCount > 0"></sup>
                     </div>
                     <div class="detail-btn-wrapper detail-waiting">
                       等待卖家收款
@@ -184,7 +188,8 @@
                   </template>
                   <template v-if="item.status === constant.ORDER_STATUS.CLOSED.value">
                     <div class="message-btn">
-                      <i class="iconfont icon-message"></i>
+                      <i :class="['iconfont', 'icon-message', item._unreadMessageCount > 0 ? 'shake-rotate' : '']"></i>
+                      <sup class="message-badge" v-if="item._unreadMessageCount > 0"></sup>
                     </div>
                     <div class="detail-btn-wrapper detail-waiting">
                       已结束
@@ -198,7 +203,8 @@
                         还剩{{ item._remaining_time | formatDuration }}
                       </div>
                       <div class="message-btn">
-                        <i class="iconfont icon-message"></i>
+                        <i :class="['iconfont', 'icon-message', item._unreadMessageCount > 0 ? 'shake-rotate' : '']"></i>
+                        <sup class="message-badge" v-if="item._unreadMessageCount > 0"></sup>
                       </div>
                       <div class="detail-btn-wrapper detail-waiting">
                         等待买家付款
@@ -212,7 +218,8 @@
                   </template>
                   <template v-if="item.status === constant.ORDER_STATUS.PAID.value">
                     <div class="message-btn">
-                      <i class="iconfont icon-message"></i>
+                      <i :class="['iconfont', 'icon-message', item._unreadMessageCount > 0 ? 'shake-rotate' : '']"></i>
+                      <sup class="message-badge" v-if="item._unreadMessageCount > 0"></sup>
                     </div>
                     <div class="detail-btn-wrapper">
                       <b-btn size="xs" variant="gradient-yellow" class="detail-btn" @click="confirmReceipt(item)">确认收款
@@ -383,7 +390,7 @@
       ConfirmReceipt,
     },
     computed: {
-      ...mapState(['user', 'constant']),
+      ...mapState(['user', 'constant', 'chat']),
       coinTypeFilterOptions() {
         return [{text: '全部', value: null}, ...this.constant.COIN_TYPE_OPTIONS]
       },
@@ -433,7 +440,8 @@
                   _selected_payment_method: selectedPaymentMethod, // 用户选中的支付方式
                   _remaining_time: remainingTime,
                   _expired: remainingTime <= 0 && item.status === this.constant.ORDER_STATUS.CREATED.value,
-                  _isBuySide: (item.merchant_id === this.user.account.id) === (item.merchant_side === this.constant.SIDE.BUY)
+                  _isBuySide: (item.merchant_id === this.user.account.id) === (item.merchant_side === this.constant.SIDE.BUY),
+                  _unreadMessageCount: 0, // 未读消息数量
                 }
               })
             } else {
@@ -444,6 +452,13 @@
             console.log(err)
             this.axios.onError(err)
           })
+      },
+      fetchUnreadMessageCount({ toggleDetails, item }) {
+        toggleDetails()
+        if (!item.conversation_id) return
+        this.chat.imClient.getConversation(item.conversation_id).then(conversation => {
+          item._unreadMessageCount = conversation.unreadMessagesCount
+        }).catch(console.error)
       },
       startTimer() {
         clearInterval(this.timer) // 切换到其它tab需要清除定时器
@@ -668,6 +683,7 @@
         }
         .message-btn {
           display: inline-block;
+          position: relative;
           border-radius: 100px;
           width: 28px;
           height: 28px;
@@ -677,6 +693,31 @@
           color: #52cbca;
           line-height: 28px;
           margin-left: 6px;
+          a.message-link {
+            &:hover {
+              text-decoration: none !important;
+            }
+          }
+          .shake-rotate {
+            display: inline-block;
+            transform-origin: center center;
+            animation-name: shake-rotate;
+            animation-duration: 100ms;
+            animation-iteration-count: infinite;
+            animation-timing-function: ease-in-out;
+            animation-delay: 0s;
+          }
+          .message-badge {
+            position: absolute;
+            right: 8px;
+            height: 8px;
+            width: 8px;
+            border-radius: 50%;
+            top: 3px;
+            transform: translate3d(100%, -50%, 0);
+            background-color: #f56c6c;
+            display: inline-block;
+          }
         }
         .detail-timer {
           display: inline-block;
@@ -725,5 +766,43 @@
         }
       }
     }
+    @mixin shake($x, $y, $rot, $name, $steps:10, $opacity:false) {
+      $r:0deg;
+      $h:0px;
+      $v:0px;
+
+      $interval: $steps;
+      $step: 0%;
+
+      @keyframes #{$name}{
+        @while $step < 100% {
+          @if ($rot != 0deg){ $r : random($rot) - $rot/2;}
+            @else { $r : 0deg; }
+          @if ($x != 0px){ $h : random($x) - $x/2; }
+            @else { $h : 0px; }
+          @if ($y != 0px){ $v : random($y) - $y/2; }
+            @else { $v : 0px; }
+
+          @if($step == 0%){
+            #{$step} {
+              transform: translate(0px, 0px) rotate(0deg);
+              @if($opacity){
+                opacity: random(10)*.1;
+              }
+            }
+          } @else {
+            #{$step} {
+              transform: translate($h, $v) rotate($r);
+              @if($opacity){
+                opacity: random(10)*.1;
+              }
+            }
+          }
+          $step: $step + $interval;
+        }
+
+      }
+    }
+    @include shake(0px, 0px, 25deg, 'shake-rotate', 2);
   }
 </style>
