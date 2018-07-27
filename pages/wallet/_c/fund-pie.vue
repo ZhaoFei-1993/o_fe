@@ -240,22 +240,6 @@ export default {
           },
         ],
       },
-      currencyRate: {
-        rates: {
-          BCH_to_CNY: {
-            rate: 2,
-          },
-          BCH_to_BTC: {
-            rate: 1,
-          },
-          BCH_to_EOS: {
-            rate: 1,
-          },
-          BCH_to_LTC: {
-            rate: 1,
-          },
-        },
-      },
     }
   },
 
