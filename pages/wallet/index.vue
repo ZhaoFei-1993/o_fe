@@ -99,7 +99,7 @@
     <b-modal title="资金划转" v-model="showTransferModal" hide-footer no-close-on-backdrop>
       <b-form>
         <b-form-group label="选择币种" horizontal>
-          <b-form-select v-model="form.coinType" :options="constant.COIN_TYPE_OPTIONS"></b-form-select>
+          <b-form-select v-model="form.coinType" :options="constant.COIN_TYPE_OPTIONS" @change="onChangeCoinType"></b-form-select>
         </b-form-group>
         <b-form-group label="从" horizontal>
           <b-form-select v-model="form.from" :options="walletOptions" @change="onSwap"></b-form-select>
@@ -351,6 +351,12 @@
       },
     },
     methods: {
+      onChangeCoinType(coinType) {
+        const fromBalance = this[`${this.form.from}Balance`].find(item => {
+          return item.coin_type === coinType
+        })
+        this.availableAmount = fromBalance ? fromBalance.available : 0
+      },
       onTransfer() {
         if (this.form.amount > 0) {
           if (!this.form.submitting) {
@@ -411,41 +417,52 @@
       },
       onSwap() { // 资产流向互换
         this.updateAllBalance()
+        .then(() => {
+          const tmp = this.form.to
+          this.form.to = this.form.from
+          this.form.from = tmp
 
-        const tmp = this.form.to
-        this.form.to = this.form.from
-        this.form.from = tmp
-
-        const {coin_type: coinType} = this.curAssetItem
-        const fromBalance = this[`${this.form.from}Balance`].find(item => {
-          return item.coin_type === coinType
+          const {coin_type: coinType} = this.curAssetItem
+          const fromBalance = this[`${this.form.from}Balance`].find(item => {
+            return item.coin_type === coinType
+          })
+          this.availableAmount = fromBalance ? fromBalance.available : 0
+          this.form.amount = 0
         })
-        this.availableAmount = fromBalance ? fromBalance.available : 0
-        this.form.amount = 0
+        .catch(err => {
+          console.error(`资产更新失败${err}`)
+        })
       },
       onShowTransferModal(type, item) {
         this.updateAllBalance()
-        const { coin_type: coinType } = item
-        this.form.coinType = coinType // 设置划转币种
-        if (type === 'in') {
-          this.form.from = 'coinex'
-          this.form.to = 'otc'
-        } else if (type === 'out') {
-          this.form.from = 'otc'
-          this.form.to = 'coinex'
-        }
-        this.form.amount = 0 // 划转数量重置0
-        const fromBalance = this[`${this.form.from}Balance`].find(item => {
-          return item.coin_type === coinType
+        .then(() => {
+          const { coin_type: coinType } = item
+          this.form.coinType = coinType // 设置划转币种
+          if (type === 'in') {
+            this.form.from = 'coinex'
+            this.form.to = 'otc'
+          } else if (type === 'out') {
+            this.form.from = 'otc'
+            this.form.to = 'coinex'
+          }
+          this.form.amount = 0 // 划转数量重置0
+          const fromBalance = this[`${this.form.from}Balance`].find(item => {
+            return item.coin_type === coinType
+          })
+          this.availableAmount = fromBalance ? fromBalance.available : 0
+          this.showTransferModal = true
+          this.curAssetItem = item
         })
-        this.availableAmount = fromBalance ? fromBalance.available : 0
-        this.showTransferModal = true
-        this.curAssetItem = item
+        .catch(err => {
+          console.log(`资产更新失败${err}`)
+        })
       },
       updateAllBalance() {
-        this.$store.dispatch('fetchOtcBalance') // otc资产
-        this.$store.dispatch('fetchCoinexBalance') // coinex资产
-        this.$store.dispatch('fetchExchangeRate') // 汇率
+        return Promise.all([
+          this.$store.dispatch('fetchOtcBalance'), // otc资产
+          this.$store.dispatch('fetchCoinexBalance'), // coinex资产
+          this.$store.dispatch('fetchExchangeRate'), // 汇率
+        ])
       },
     },
   }
