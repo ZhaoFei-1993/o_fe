@@ -119,7 +119,7 @@
         <UserStatsProfile :user-data="counterparty" v-if="counterparty"/>
       </CBlock>
       <CBlock id="my-chat-box">
-        <IM :client="chat.imClient" :conversation-id="convId" :client-id="`${user.account.id}`"></IM>
+        <Chat :client="chat.imClient" :conversation-id="convId" :client-id="`${user.account.id}`"></Chat>
       </CBlock>
     </div>
     <b-modal ref="appealModal"
@@ -350,7 +350,7 @@
 
 </style>
 <script>
-  import IM from '~/components/im'
+  import Chat from '~/components/chat'
   import UserStatsProfile from '~/components/user-stats-profile.vue'
   import ConfirmReceipt from './_c/confirm-receipt'
   import {mapState} from 'vuex'
@@ -381,7 +381,7 @@
     components: {
       UserStatsProfile,
       ConfirmReceipt,
-      IM,
+      Chat,
     },
     fetch({store, app, req, redirect, route}) {
       app.axios.init(req)

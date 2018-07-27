@@ -65,7 +65,7 @@
   import { TextMessage, Event, MessageStatus } from 'leancloud-realtime'
   import AV from 'leancloud-storage'
   import { ImageMessage } from 'leancloud-realtime-plugin-typed-messages'
-  import UserAvatar from '~/components/user-avatar'
+  import UserAvatar from './avatar'
   import ImageModal from './image-modal'
   import infiniteScroll from './infinite-scroll-directive.js'
   import $toast from './toast.js'
@@ -161,12 +161,12 @@
     },
     methods: {
       init() { // 全部功能初始化
-        const { client } = this
+        const { client, conversationId } = this
         if (!client) return
-        if (!this.conversationId) return
+        if (!conversationId) return
 
         client
-          .getConversation(this.conversationId)
+          .getConversation(conversationId)
           .then(conversation => {
             this.conversation = conversation
             this.unreadMessagesCount = this.conversation.unreadMessagesCount
@@ -197,7 +197,7 @@
         })
         client.on(Event.UNREAD_MESSAGES_COUNT_UPDATE, conversations => {
           const conv = conversations.find(item => {
-            return item.id === this.conversationId
+            return item.id === conversationId
           })
           if (conv) {
             this.unreadMessagesCount = conv.unreadMessagesCount

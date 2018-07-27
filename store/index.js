@@ -4,7 +4,7 @@ import createUser from './user'
 import createWebp from './webp'
 import createBalance from './balance'
 import createConstant from './constant'
-import createChat from './chat'
+import createChat from '~/components/chat/store/'
 
 const createStore = () => {
   return new Vuex.Store({
