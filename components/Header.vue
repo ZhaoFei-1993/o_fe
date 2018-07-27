@@ -105,15 +105,42 @@
     }
   }
 
-  .name-input {
-    width: 100%;
-    height: 32px;
-    padding: 6px 12px;
-    &:focus {
-      outline: none;
-      border: 1px solid $brandGreen;
+  #update-name {
+    .modal-body {
+      padding-bottom: 0;
+    }
+    .name-form {
+      position: relative;
+      font-size: 16px;
+      .name-input {
+        width: 100%;
+        height: 36px;
+        padding: 6px 150px 6px 0;
+        font-size: 16px;
+        line-height: 36px;
+        border: none;
+        border-bottom: 1px solid #dddddd;
+        &:focus {
+          outline: none;
+          border-bottom: 1px solid $brandGreen;
+        }
+        &::placeholder {
+          font-size: 16px;
+        }
+      }
+      .name-tip {
+        position: absolute;
+        right: 0px;
+        top: 6px;
+        color: $red;
+      }
+    }
+    .btn-gradient-yellow {
+      width: 280px;
+      height: 44px;
     }
   }
+
 </style>
 
 <template>
@@ -185,7 +212,7 @@
 
     <b-modal id="update-name"
              ref="updateNameModal"
-             title="确认昵称"
+             title="设置昵称"
              :hide-header-close="true"
              :no-close-on-esc="true"
              :no-close-on-backdrop="true"
@@ -199,41 +226,53 @@
              @ok="handleUpdateName">
 
       <div v-if="user&&user.account">
-        <p>请确认或修改您的昵称，昵称一旦确定将无法修改。</p>
-        <input class="name-input" v-model="userName" type="text" placeholder="您的昵称" required />
-        <p class="c-red" v-if="invalidName">请输入2-30个字符的昵称。</p>
-        <p class="c-red" v-if="nameDuplicated">该昵称已被占用，请使用其他昵称。</p>
+        <b-form v-if="form" class="name-form">
+          <input class="name-input" v-model="form.userName" @input="inputUserName" type="text" placeholder="您的昵称"
+                 required/>
+          <span class="name-tip">昵称设置后不可修改</span>
+          <EMsgs class="text-left" :result="$v.form.userName" :msgs="invalidMessages.userName"/>
+        </b-form>
       </div>
     </b-modal>
   </div>
 </template>
 
 <script>
+  import Vue from 'vue'
+  import Vuelidate from 'vuelidate'
   import {mapState} from 'vuex'
+  import {required, minLength, maxLength} from 'vuelidate/lib/validators'
+  import EMsgs from '~/components/error-message.vue'
   import {loginPage, webDomain, signupPage, coinexDomain} from '~/modules/variables'
   import {onApiError} from '~/modules/error-code'
   import PublishItemButton from '~/components/publish-item-modal/publish-item-button.vue'
 
+  Vue.use(Vuelidate)
   export default {
     head: {
       link: [{rel: 'stylesheet', href: '//at.alicdn.com/t/font_739076_x6i5224yel.css'}]
     },
     components: {
       PublishItemButton,
+      EMsgs,
     },
     data() {
       return {
+        form: {
+          userName: null,
+        },
         coinexDomain,
         attentionModelShowing: false,
         attention: [],
         nameDuplicated: false,
-        userName: null,
         activeAttentionIndex: 0,
         loginPage: `${loginPage}?redirect=${encodeURIComponent(webDomain + this.$route.fullPath)}`,
         registerPage: `${signupPage}?redirect=${encodeURIComponent(webDomain + this.$route.fullPath)}`,
       }
     },
-
+    validations() {
+      return {form: this.validationConf.validations}
+    },
     computed: {
       ...mapState(['lang', 'user', 'messages', 'constant', 'chat']),
       helpLink() {
@@ -252,7 +291,30 @@
         return 'https://support.coinex.com/hc/' + lang
       },
       invalidName() {
-        return !this.userName || this.userName.length < 2 || this.userName.length > 30
+        return !this.form.userName || this.form.userName.length < 2 || this.form.userName.length > 30
+      },
+      validationConf() {
+        return this.utils.processValidationConfig({
+          userName: {
+            validation: {
+              required,
+              minLength: minLength(2),
+              maxLength: maxLength(30),
+              uniqueName: () => {
+                return !this.nameDuplicated
+              }
+            },
+            message: {
+              required: '请填写昵称',
+              minLength: '昵称不能少于两个字符',
+              maxLength: '昵称不能多于三十个字符',
+              uniqueName: '该昵称已被占用',
+            },
+          },
+        })
+      },
+      invalidMessages() {
+        return this.validationConf.invalidMessages
       },
     },
     mounted() {
@@ -261,7 +323,7 @@
       this.$store.dispatch('fetchUserAccount').then(_ => {
         if (this.user && this.user.account) {
           if (!this.user.account.is_name_confirmed) {
-            this.userName = this.user.account.name
+            this.form.userName = this.user.account.name
             this.$refs.updateNameModal.show()
           }
           if (!this.chat.imClient) {
@@ -278,9 +340,13 @@
     },
     methods: {
       handleUpdateName(evt) {
+        this.$v.form.$touch()
+        if (this.$v.form.$invalid) {
+          return this.$showTips('请检查表单并正确输入内容', 'error')
+        }
         // 要验证重名，避免被关闭，需要ref来调用
         evt.preventDefault()
-        this.axios.user.updateName(this.userName).then(_ => {
+        this.axios.user.updateName(this.form.userName).then(_ => {
           this.$refs.updateNameModal.hide()
           this.$store.dispatch('fetchUserAccount')
         }).catch(err => {
@@ -290,6 +356,10 @@
             onApiError(err, this)
           }
         })
+      },
+      inputUserName() {
+        this.$v.form.userName.$touch()
+        this.nameDuplicated = false
       },
       simplifyUserName(str = '') {
         if (isNaN(str)) {

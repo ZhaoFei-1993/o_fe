@@ -44,7 +44,7 @@
           </span>
           <span class="qr-code-button"
                 v-if="selectedMethod.method!==constant.PAYMENT_TYPES.BANKCARD && selectedMethod.qr_code_image"
-                @click="showQrCode(selectedMethod.qr_code_image)">查看支付二维码</span>
+                @click="showQrCode(selectedMethod.qr_code_image_url)">查看支付二维码</span>
         </div>
         <div class="payment-status" v-html="paymentStatusMessage.message"></div>
         <div class="payment-warning">{{paymentStatusMessage.warning}}</div>
@@ -121,7 +121,8 @@
     </div>
     <div class="sidebar">
       <CBlock class="my-sidebar-info" :x="0" :y="20">
-        <UserStatsProfile :user-data="counterparty" v-if="counterparty" :is-merchant="counterparty.id===order.merchant_id"/>
+        <UserStatsProfile :user-data="counterparty" v-if="counterparty"
+                          :is-merchant="counterparty.id===order.merchant_id"/>
       </CBlock>
       <CBlock id="my-chat-box">
         <Chat :client="chat.imClient" :conversation-id="convId" :client-id="`${user.account.id}`"></Chat>
@@ -149,10 +150,11 @@
           <span class="tip">申诉理由</span>
           <textarea class="appeal-input"
                     v-model="appealComment"
-                    placeholder="请填写十五字以上的申诉理由"
+                    placeholder="请填写15-500字以上的申诉理由"
                     rows="8">
           </textarea>
         </div>
+        <div :class="['text-right',appealCommentLength>500?'c-red':'c-gray']">{{appealCommentLength}}/500</div>
       </div>
     </b-modal>
     <ConfirmReceipt :orderId="order.id" :show-confirm-receipt-modal="showConfirmReceiptModal"
@@ -324,7 +326,6 @@
       }
     }
     #appeal-modal {
-      width: 560px;
       .tip {
         width: 80px;
       }
@@ -414,7 +415,7 @@
         return Object.values(this.constant.ORDER_STATUS).find(s => s.value === this.order.status).text
       },
       cannotSubmitAppeal() {
-        return !(this.appealReason && this.appealComment && this.appealComment.length > 15)
+        return !(this.appealReason && this.appealComment && this.appealComment.length >= 15 && this.appealComment.length <= 500)
       },
       isMerchant() {
         return this.order.merchant_id === this.user.account.id
@@ -423,9 +424,11 @@
         return this.order.merchant_side === this.constant.SIDE.BUY ? this.isMerchant : !this.isMerchant
       },
       isBuyerAppeal() {
+        if (!this.appeal) return false
         return this.order.user_side === this.constant.SIDE.BUY && this.appeal.user_id === this.order.user_id
       },
       appealSide() {
+        if (!this.appeal) return null
         return this.isBuyerAppeal ? '买家' : '卖家'
       },
       canAppeal() {
@@ -434,6 +437,9 @@
         const success = this.order.status === this.constant.ORDER_STATUS.SUCCESS.value
         return (paid && this.utils.getTimeDifference(this.order.pay_time) > PAID_CAN_APPEAL) ||
           (success && this.utils.getTimeDifference(this.order.complete_time) < SUCCESS_CAN_APPEAL)
+      },
+      appealCommentLength() {
+        return this.appealComment ? this.appealComment.length : 0
       },
       showAppeal() {
         // 支付后立即 和 完成后七天内展示申诉提示

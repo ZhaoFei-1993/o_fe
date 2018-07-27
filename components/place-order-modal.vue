@@ -41,7 +41,7 @@
         <span>支付方式：<span class="emphasis">{{paymentMethods}}</span></span>
       </div>
       <div class="item-payment">
-        <b-form v-if="form" @submit.prevent="onSubmit">
+        <b-form v-if="form">
           <div class="price-input">
             <div class="input-container">
               <div class="max-value">最多{{item.side=== constant.SIDE.BUY?'可卖':'可买'}}
@@ -244,7 +244,7 @@
     computed: {
       ...mapState(['constant', 'balance', 'user']),
       kycLimitAmount() {
-        return (this.user && this.user.account.kyc_status === this.constant.KYC_STATUS.PASS) ? Number.MAX_SAFE_INTEGER : this.noKycLimit / this.item.price
+        return (this.user && this.user.account.kyc_status === this.constant.KYC_STATUS.PASS) ? Number.MAX_SAFE_INTEGER : this.noKycLimit
       },
       currentBalance() {
         return parseFloat(this.balance.otcBalance.find(b => b.coin_type === this.item.coin_type).available)
