@@ -41,7 +41,7 @@
         <span>支付方式：<span class="emphasis">{{paymentMethods}}</span></span>
       </div>
       <div class="item-payment">
-        <b-form v-if="form" @submit.prevent="onSubmit">
+        <b-form v-if="form">
           <div class="price-input">
             <div class="input-container">
               <div class="max-value">最多{{item.side=== constant.SIDE.BUY?'可卖':'可买'}}

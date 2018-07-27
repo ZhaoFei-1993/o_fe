@@ -183,10 +183,11 @@
 
   #prevent-order-modal {
     .actions {
-      margin-top: 20px;
+      margin-top: 24px;
       button {
         margin: 0 10px;
         width: 160px;
+        height: 42px;
       }
     }
   }
@@ -316,12 +317,12 @@
         {{currentConstraint.content}}
       </div>
       <div class="actions">
-        <b-btn size="xs" variant="outline-green" @click="showConstraintModal=false">取消</b-btn>
+        <b-btn size="sm" variant="outline-green" @click="showConstraintModal=false">取消</b-btn>
         <b-link v-if="currentConstraint.outLink" :href="currentConstraint.outLink">
-          <b-btn size="xs" variant="gradient-yellow">{{currentConstraint.buttonText}}</b-btn>
+          <b-btn size="sm" variant="gradient-yellow">{{currentConstraint.buttonText}}</b-btn>
         </b-link>
         <b-link v-else :to="currentConstraint.link">
-          <b-btn size="xs" variant="gradient-yellow">{{currentConstraint.buttonText}}</b-btn>
+          <b-btn size="sm" variant="gradient-yellow">{{currentConstraint.buttonText}}</b-btn>
         </b-link>
       </div>
     </b-modal>
