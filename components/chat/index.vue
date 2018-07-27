@@ -1,7 +1,7 @@
 <template>
   <div class="chat" ref="chatWrapper" :style="{width: `${width}px`, height: `${height}px`}">
     <div class="content" ref="chatbox" v-infinite-scroll="loadMore" infinite-scroll-disabled="loading" infinite-scroll-distance="0" infinite-scroll-reverse infinite-scroll-immediate-check="false">
-      <div v-for="item in msgLog" class="content-detail-box">
+      <div v-for="item in msgLog" class="content-detail-box" :key="item.id">
         <div class="msg-time">
           {{ item._timestamp | formatTime }}
         </div>
@@ -16,13 +16,14 @@
               <div class="msg-text">
                 <span v-if="item.content._lctype === TextMessage.TYPE">{{ item.content._lctext }}</span>
                 <img v-else-if="item.content._lctype === ImageMessage.TYPE" @click="onClickImage(item.content._lcfile.url)" style="width: 100%" :src="item.content._lcfile.url">
+                <span v-else-if="item.content._lctype === SystemMessage.TYPE">【订单消息】{{ item.content._lctext }}</span>
                 <span v-else>[不支持当前消息类型]</span>
               </div>
             </div>
             <UserAvatar v-if="memberInfoMap[item.from]" :username="memberInfoMap[item.from].name" :color="memberInfoMap[item.from].color" :online="false" :size="40"></UserAvatar>
           </div>
         </template>
-        <template v-else-if="item.from === 'system'">
+        <template v-else-if="item.from === 'temporary'">
           <div class="begin-text-wrapper">
             <div class="begin-text">{{ item.content._lctext }}</div>
           </div>
@@ -39,6 +40,7 @@
               <div class="msg-text">
                 <span v-if="item.content._lctype === TextMessage.TYPE">{{ item.content._lctext }}</span>
                 <img v-else-if="item.content._lctype === ImageMessage.TYPE" @click="onClickImage(item.content._lcfile.url)" style="width: 100%" :src="item.content._lcfile.url">
+                <span v-else-if="item.content._lctype === SystemMessage.TYPE">【订单消息】{{ item.content._lctext }}</span>
                 <span v-else>[不支持当前消息类型]</span>
               </div>
             </div>
@@ -70,12 +72,17 @@
   import infiniteScroll from './infinite-scroll-directive.js'
   import $toast from './toast.js'
 
+  const SystemMessage = { // 自定义消息类型：自动回复订单消息
+    TYPE: -101,
+  }
+
   export default {
     data() {
       return {
         ImageMessage,
         TextMessage,
         MessageStatus,
+        SystemMessage,
         imageModalData: {
           show: false,
           src: '',
@@ -93,6 +100,7 @@
         memberInfoMap: {}, // 保存聊天者信息：头像色号，用户名
         originalTitle: '', // 保存旧页面title
         unreadMessagesCount: 0, // 未读消息数
+        eventMap: {},
       }
     },
     directives: {
@@ -135,20 +143,17 @@
       client() {
         this.init()
       },
+      conversationId(newVal, oldVal) { // 异步获取对话id
+        if (!oldVal && newVal) {
+          this.init()
+        }
+      },
     },
     beforeDestroy() {
       if (this.client) {
-        [
-          Event.MESSAGE,
-          Event.UNREAD_MESSAGES_COUNT_UPDATE,
-          Event.DISCONNECT,
-          Event.OFFLINE,
-          Event.ONLINE,
-          Event.SCHEDULE,
-          Event.RETRY,
-          Event.RECONNECT,
-          Event.RECONNECT_ERROR,
-        ].forEach(event => this.client.off(event))
+        Object.keys(this.eventMap).forEach(evtType => {
+          this.client.off(evtType)
+        })
       }
       this.conversation = null
       this.messageIterator = null
@@ -189,41 +194,8 @@
             this.messageIterator = conversation.createMessagesIterator({
               limit: this.limit,
             })
-            this.initMsgLog()
+            this.initMsgLog() // 初始化聊天记录
           })
-
-        client.on(Event.MESSAGE, (message) => {
-          this.messageHandler(message)
-        })
-        client.on(Event.UNREAD_MESSAGES_COUNT_UPDATE, conversations => {
-          const conv = conversations.find(item => {
-            return item.id === conversationId
-          })
-          if (conv) {
-            this.unreadMessagesCount = conv.unreadMessagesCount
-          }
-        })
-        client.on(Event.DISCONNECT, () => {
-          $toast.show('连接已断开')
-        })
-        client.on(Event.OFFLINE, () => {
-          $toast.show('网络不可用，请检查网络设置')
-        })
-        client.on(Event.ONLINE, () => {
-          $toast.show('网络已恢复', 1500)
-        })
-        client.on(Event.SCHEDULE, (attempt, time) => {
-          $toast.show(`${time / 1000}s 后进行第 ${attempt + 1} 次重连`)
-        })
-        client.on(Event.RETRY, attempt => {
-          $toast.show(`正在进行第 ${attempt + 1} 次重连`)
-        })
-        client.on(Event.RECONNECT, () => {
-          this.conversation.join()
-        })
-        client.on(Event.RECONNECT_ERROR, () => {
-          $toast.show('重连失败，请刷新页面重试')
-        })
       },
       handleVisibilityChange() {
         if (!window.document.hidden && this.conversation.unreadMessagesCount) {
@@ -242,9 +214,10 @@
           this.members = conversation.members
         }).catch(console.error.bind(console))
       },
-      pushSystemMessage(text) { // 添加系统暂态消息，不会保存到服务器，暂时支持纯文字
+      pushSystemMessage(text) { // 添加系统临时消息，不会保存到服务器，暂时支持纯文字
         this.msgLog.push({
-          from: 'system',
+          id: `temporary_${Date.now()}`, // 消息id
+          from: 'temporary',
           content: {
             _lctext: text,
             _lctype: this.TextMessage.TYPE,
@@ -298,14 +271,16 @@
       },
       memberInfoMapper(arr) { // 遍历每一个消息，对用户头像进行映射，以防部分已退出用户没有头像
         const { conversation } = this
-        arr.forEach(item => {
-          if (!this.memberInfoMap[item.from]) {
-            this.memberInfoMap[item.from] = {
-              color: this.colors[++this.colorIndex],
-              name: conversation._attributes.attr[item.from] || '',
+        if (conversation) {
+          arr.forEach(item => {
+            if (!this.memberInfoMap[item.from]) {
+              this.memberInfoMap[item.from] = {
+                color: this.colors[++this.colorIndex],
+                name: conversation._attributes.attr[item.from] || '',
+              }
             }
-          }
-        })
+          })
+        }
         return arr
       },
       initMsgLog() {
@@ -317,7 +292,48 @@
             this.scrollToBottom()
             // 对话标记为已读
             this.conversation.read()
+            this.bindEvent() // 需要初始化聊天记录后才能绑定事件，否则会出现重复消息问题
           }
+        })
+      },
+      bindEvent() {
+        const self = this
+        this.eventMap = {
+          [Event.MESSAGE]: (message) => {
+            self.messageHandler(message)
+          },
+          [Event.UNREAD_MESSAGES_COUNT_UPDATE]: (conversations) => {
+            const conv = conversations.find(item => {
+              return item.id === self.conversationId
+            })
+            if (conv) {
+              self.unreadMessagesCount = conv.unreadMessagesCount
+            }
+          },
+          [Event.DISCONNECT]: () => {
+            $toast.show('连接已断开')
+          },
+          [Event.OFFLINE]: () => {
+            $toast.show('网络不可用，请检查网络设置')
+          },
+          [Event.ONLINE]: () => {
+            $toast.show('网络已恢复', 1500)
+          },
+          [Event.SCHEDULE]: (attempt, time) => {
+            $toast.show(`${time / 1000}s 后进行第 ${attempt + 1} 次重连`)
+          },
+          [Event.RETRY]: (attempt) => {
+            $toast.show(`正在进行第 ${attempt + 1} 次重连`)
+          },
+          [Event.RECONNECT]: () => {
+            self.conversation.join()
+          },
+          [Event.RECONNECT_ERROR]: () => {
+            $toast.show('重连失败，请刷新页面重试')
+          },
+        }
+        Object.keys(this.eventMap).forEach(evtType => {
+          this.client.on(evtType, this.eventMap[evtType])
         })
       },
       loadMore() {
