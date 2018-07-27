@@ -29,7 +29,7 @@ export const account = {
     'email': '25479932@qq.com',      // 邮箱
     'country_code': '86',            // 手机号国家区号
     'mobile': '',         // 手机号
-    'kyc_status': 'pass',             // kyc实名状态, pass: 已通过，no: 未通过
+    'kyc_status': 'no',             // kyc实名状态, pass: 已通过，no: 未通过
     'kyc_name': '吴彦祖',             // kyc实名姓名
     'is_have_totp_auth': false,       // 是否绑定谷歌验证器
     'status': 'normal',               // 账户状态，normal: 正常，forbidden: 封禁
@@ -39,6 +39,10 @@ export const account = {
       'order_count': 2,                    // 最近总单数
       'pay_time': 100,                       // 平均付款时间
       'receipt_time': 200                    // 平均放行时间
+    },
+    user_kyc: {
+      first_name: '净',
+      last_name: 'jeff'
     }
   }
 }

@@ -3,6 +3,8 @@
   @import "~assets/scss/variables.scss";
 
   .page-my-payments {
+    min-height: 460px;
+
     .icon-plus {
       display: inline-block;
       margin-top: -2px;
@@ -70,11 +72,45 @@
         color: #6f6f6f;
       }
     }
+
+    .kyc-step {
+      display: inline-block;
+      vertical-align: top;
+      width: 240px;
+      height: 120px;
+      margin-top: 20px;
+      margin-right: 20px;
+      text-align: center;
+      background-color: #f9f9f9;
+
+      .kyc-step-number {
+        display: inline-block;
+        height: 20px;
+        width: 20px;
+        margin-top: 15px;
+        border-radius: 100%;
+        background-color: #fff;
+      }
+
+      .kyc-step-title {
+        margin-top: 10px;
+        margin-bottom: 5px;
+        font-size: 18px;
+
+        &._highlight {
+          color: $brandGreen;
+        }
+      }
+
+      .kyc-step-number {
+
+      }
+    }
   }
 </style>
 
 <template>
-  <CBlock class="page-my-payments" x="0" y="0">
+  <CBlock class="page-my-payments" x="0" y="0" v-if="user.account.kyc_status === constant.KYC_STATUS.PASS">
     <h3 class="layout-my-title">
       支付方式
       <b-btn @click="onPaymentAdd" variant="plain" size="xs" class="ml-15 c-brand-green">
@@ -195,6 +231,15 @@
       </b-form>
     </b-modal>
   </CBlock>
+
+  <CBlock class="page-my-payments" y="0" v-else>
+    <h3 class="layout-my-title pl-0">2步完成添加支付方式</h3>
+
+    <KycStep :step="1" title="完成实名认证" highlight>
+      <b-link :href="`${constant.coinexDomain}/my/info/auth/realname`">去实名 ></b-link>
+    </KycStep>
+    <KycStep :step="2" title="添加支付方式"/>
+  </CBlock>
 </template>
 
 <script>
@@ -213,6 +258,23 @@
   import constant from '~/modules/constant'
 
   Vue.use(Vuelidate)
+
+  const KycStep = Vue.extend({
+    props: {
+      step: Number,
+      title: String,
+      highlight: Boolean,
+    },
+    render() {
+      return (
+        <div class="kyc-step">
+          <div class="kyc-step-number">{this.step}</div>
+          <div class={'kyc-step-title ' + (this.highlight && '_highlight')}>{this.title}</div>
+          {this.$slots['default']}
+        </div>
+      )
+    }
+  })
 
   const DEFAULT_FORM = {
     method: constant.PAYMENT_TYPES.BANKCARD,
@@ -234,6 +296,7 @@
       VerifyCode,
       EMsgs,
       ImageUploadPreview,
+      KycStep,
     },
     layout: 'my',
     data() {
@@ -301,7 +364,8 @@
       // 默认选中银行卡
       this.form.method = this.constant.PAYMENT_TYPES.BANKCARD
       // 用户名自动从用户的实名认证中取，且不可修改
-      this.form.account_name = this.user.account.user_kyc.last_name + this.user.account.user_kyc.first_name
+      const userKyc = this.user.account.user_kyc
+      this.form.account_name = userKyc && userKyc.last_name + userKyc.first_name
     },
     methods: {
       onPaymentStatusChange(payment, checked) {
