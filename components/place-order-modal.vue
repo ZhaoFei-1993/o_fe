@@ -31,7 +31,7 @@
         </div>
       </div>
     </div>
-    <div class="item-info" v-if="validAmount">
+    <div class="item-info">
       <div class="info-header">确认信息</div>
       <div class="info-detail">
         <span>单价：<span class="emphasis">{{item.price}}</span> {{balance.currentCash}}/{{item.coin_type}}
@@ -41,7 +41,7 @@
         <span>支付方式：<span class="emphasis">{{paymentMethods}}</span></span>
       </div>
       <div class="item-payment">
-        <b-form v-if="form">
+        <b-form v-if="form" @submit.prevent="">
           <div class="price-input">
             <div class="input-container">
               <div class="max-value">最多{{item.side=== constant.SIDE.BUY?'可卖':'可买'}}
@@ -80,14 +80,10 @@
           </div>
           <div class="actions">
             <button class="btn btn-outline-green btn-lg" @click="onCancel">取消</button>
-            <button class="btn btn-gradient-yellow btn-lg" :disabled="submitting" @click="onSubmit">确定</button>
+            <button class="btn btn-gradient-yellow btn-lg" :disabled="submitting||$v.$invalid" @click="onSubmit">确定</button>
           </div>
         </b-form>
       </div>
-    </div>
-    <div class="item-info" v-else>
-      <p>当前交易限定最低下单金额{{item.min_deal_cash_amount}}，您的账户不符合交易条件。</p>
-      <p>请检查您的账户余额或者进行实名认证</p>
     </div>
   </b-modal>
 </template>
@@ -254,9 +250,6 @@
         // 取以下各项的最小值（广告剩余量、广告限制最大额）
         const maxAmount = Math.min(this.item.remain_coin_amount, (this.item.max_deal_cash_amount / this.item.price || Number.MAX_SAFE_INTEGER))
         return `${maxAmount}`.setDigit(8)
-      },
-      validAmount() {
-        return this.maxDealCashAmount >= this.item.min_deal_cash_amount
       },
       sideMaxCoin() {
         // 用户买单和balance无关，卖单需要有足够余额
