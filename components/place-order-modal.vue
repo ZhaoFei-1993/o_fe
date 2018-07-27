@@ -290,7 +290,7 @@
               required: '请填写购买金额',
               minValue: `最小下单金额${this.item.min_deal_cash_amount}CNY`,
               maxValue: `最大下单金额${this.maxDealCashAmount}CNY`,
-              kycLimit: `非实名认证用户最大下单金额为${this.noKycLimit}`
+              kycLimit: `非实名认证用户最大下单金额为${this.noKycLimit}CNY`
             },
           },
           coin_amount: {
