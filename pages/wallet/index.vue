@@ -343,9 +343,11 @@
     },
     watch: {
       'historyQueryParams.coin_type'() {
+        this.historyQueryParams.page = 1
         this.fetchBalanceHistory()
       },
       'historyQueryParams.business_type'() {
+        this.historyQueryParams.page = 1
         this.fetchBalanceHistory()
       },
       'historyQueryParams.page'() {
