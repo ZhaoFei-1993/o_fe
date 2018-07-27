@@ -4,6 +4,7 @@
 
 <script>
 import VueHighcharts from 'vue2-highcharts'
+
 let pipChart
 
 export default {
@@ -242,7 +243,7 @@ export default {
       currencyRate: {
         rates: {
           BCH_to_CNY: {
-            rate: 1,
+            rate: 2,
           },
           BCH_to_BTC: {
             rate: 1,
@@ -271,24 +272,10 @@ export default {
 
   methods: {
     formatterChartTitle(y) {
-      let rate = 1
-      if (
-        this.currencyRate &&
-        this.currencyRate.rates &&
-        this.currencyRate.rates['BCH_to_' + this.asset]
-      ) {
-        rate = this.currencyRate.rates['BCH_to_' + this.asset].rate
-      }
-      if (rate && y) {
-        y = `${y}`.decimalMul(rate)
-      }
-      y = this.toDecimal2(y)
       if (y > 100000) {
         y = this.toDecimal2(y / 10000) + 'w'
-      } else {
       }
-      y = y + ' ' + this.asset
-      return y
+      return `${y} ${this.asset}`
     },
 
     /**

@@ -305,15 +305,17 @@
         if (this.balance.otcBalance) {
           const pieDatas = []
           let totalBalance = 0
+          const defaultRate = this.balance.allRate[this.defaultAsset] // 各币种CNY汇率
           this.balance.otcBalance.forEach((item, index) => {
             if (item.total > 0) {
+              const curCoinAmount = (+item.total) * defaultRate[item.coin_type]
               pieDatas.push({
                 name: item.coin_type,
-                y: +item.total,
+                y: curCoinAmount,
                 colorIndex: index,
                 virtual: false,
               })
-              totalBalance += (+item.total)
+              totalBalance += curCoinAmount
             }
           })
           this.pieDatas = pieDatas
