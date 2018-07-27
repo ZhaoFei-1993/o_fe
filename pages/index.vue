@@ -248,7 +248,7 @@
         <div :class="['list',selectedSide.toLowerCase()]">
           <div v-if="!items||!items.length" class="text-center p-20">暂无该交易对广告</div>
           <div v-else class="item-row" v-for="item in items">
-            <span class="col-narrow col-name text-left fz-16 c-6f">
+            <span class="col-narrow col-name text-left fz-14 c-6f">
               {{item.user.name}}
               <div><span v-b-tooltip.hover title="认证商家"><i class="iconfont icon-certificated-merchant"></i></span></div>
             </span>
