@@ -125,7 +125,7 @@
                                placement="top"
                                triggers="hover click focus">
                       <img style="display: block;width: 120px;height: 120px;"
-                           :src="item._selected_payment_method.qr_code_image">
+                           :src="item._selected_payment_method.qr_code_image_url">
                     </b-popover>
                     <span :id="`qr-${item.id}`" style="cursor: pointer;"
                           v-show="item._selected_payment_method.method !== constant.PAYMENT_TYPES.BANKCARD"><i

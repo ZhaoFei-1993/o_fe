@@ -244,7 +244,7 @@
     computed: {
       ...mapState(['constant', 'balance', 'user']),
       kycLimitAmount() {
-        return (this.user && this.user.account.kyc_status === this.constant.KYC_STATUS.PASS) ? Number.MAX_SAFE_INTEGER : this.noKycLimit / this.item.price
+        return (this.user && this.user.account.kyc_status === this.constant.KYC_STATUS.PASS) ? Number.MAX_SAFE_INTEGER : this.noKycLimit
       },
       currentBalance() {
         return parseFloat(this.balance.otcBalance.find(b => b.coin_type === this.item.coin_type).available)
