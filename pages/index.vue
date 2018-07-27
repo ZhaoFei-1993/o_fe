@@ -156,6 +156,15 @@
                 margin: 0 4px;
               }
             }
+            .col-name {
+              font-size: 14px;
+              color: #6f6f6f;
+              padding-left: 0;
+              .icon-certificated-merchant {
+                color: #7dd322;
+                margin-right: 4px;
+              }
+            }
           }
         }
 
@@ -169,13 +178,13 @@
         }
         .col-name {
           padding-left: 16px;
-          width: 180px;
+          width: 200px;
           overflow: hidden;
           text-overflow: ellipsis;
-          .icon-certificated-merchant {
-            color: #7dd322;
-            margin-right: 4px;
-          }
+        }
+        .col-action {
+          width: 10%;
+          padding-right: 0;
         }
       }
     }
@@ -243,12 +252,12 @@
           <b-form-select class='select-payment col-narrow' v-model="selectedPayment"
                          :options="constant.PAYMENT_OPTIONS" @change="filterPayment"></b-form-select>
           <span :class="['sort-price col-wide',sortPrice]">单价</span>
-          <span class="col-narrow">操作</span>
+          <span class="col-narrow col-action">操作</span>
         </div>
         <div :class="['list',selectedSide.toLowerCase()]">
           <div v-if="!items||!items.length" class="text-center p-20">暂无该交易对广告</div>
           <div v-else class="item-row" v-for="item in items">
-            <span class="col-narrow col-name text-left fz-14 c-6f">
+            <span class="col-name text-left">
               {{item.user.name}}
               <div><span v-b-tooltip.hover title="认证商家"><i class="iconfont icon-certificated-merchant"></i></span></div>
             </span>
@@ -273,7 +282,7 @@
             </span>
             <span
               :class="['sort-price fz-18 col-wide pr-60 text-right',sortPrice]">{{item.price + ' '+balance.currentCash}}</span>
-            <span class="col-narrow">
+            <span class="col-narrow  col-action">
               <template v-if="user && user.account && user.account.id === item.user.id">
                 <button class="btn btn-order-disabled" :id="'button-order-'+item.id" v-b-tooltip.hover title="不能与自己交易"> {{(selectedSide === constant.SIDE.BUY ? '购买' : '出售') + selectedCoin}} </button>
               </template>
