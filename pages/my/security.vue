@@ -30,20 +30,20 @@
     <p class="layout-my-desc">强烈建议完成以下设置提升账户安全等级。</p>
     <MyInfoItem title="邮箱">
       <p slot="content"><span>{{user.account.email}}</span></p>
-      <b-btn slot="action" variant="outline-green" size="xs" :href="`${coinex}/my/info/basic`" target="_blank">修改</b-btn>
+      <b-btn slot="action" variant="outline-green" size="xs" :href="`${coinexDomain}/my/info/basic`" target="_blank">修改</b-btn>
     </MyInfoItem>
     <MyInfoItem title="手机">
       <p slot="content">
         <span v-if="user.account.mobile">+{{user.account.country_code}} {{user.account.mobile}}</span>
         <span v-else class="c-red">未绑定</span>
       </p>
-      <b-btn slot="action" variant="outline-green" size="xs" :href="`${coinex}/my/info/security`" target="_blank">
+      <b-btn slot="action" variant="outline-green" size="xs" :href="`${coinexDomain}/my/info/security`" target="_blank">
         {{user.account.mobile ? '更换' : '绑定'}}
       </b-btn>
     </MyInfoItem>
     <MyInfoItem title="谷歌验证码">
       <p slot="content">{{user.account.is_have_totp_auth ? '已绑定' : '未绑定'}}</p>
-      <b-btn slot="action" variant="outline-green" size="xs" :href="`${coinex}/my/info/security`" target="_blank">
+      <b-btn slot="action" variant="outline-green" size="xs" :href="`${coinexDomain}/my/info/security`" target="_blank">
         {{user.account.is_have_totp_auth ? '更换' : '绑定'}}
       </b-btn>
     </MyInfoItem>
@@ -54,7 +54,7 @@
         <span v-if="user.account.login_password_level === constant.PASSWORD_LEVEL.MIDDLE">中</span>
         <span v-if="user.account.login_password_level === constant.PASSWORD_LEVEL.LOW">低</span>
       </p>
-      <b-btn slot="action" variant="outline-green" size="xs" :href="`${coinex}/my/info/security`" target="_blank">重置</b-btn>
+      <b-btn slot="action" variant="outline-green" size="xs" :href="`${coinexDomain}/my/info/security`" target="_blank">重置</b-btn>
     </MyInfoItem>
     <MyInfoItem title="实名认证">
       <p slot="content">
@@ -66,7 +66,7 @@
              v-if="user.account.kyc_status !== constant.KYC_STATUS.PASS"
              :disabled="user.account.kyc_status === constant.KYC_STATUS.PROCESSING"
              variant="outline-green" size="xs" target="_blank"
-             :href="`${coinex}/my/info/auth/realname`">
+             :href="`${coinexDomain}/my/info/auth/realname`">
         认证
       </b-btn>
     </MyInfoItem>
@@ -76,7 +76,7 @@
         <span v-if="user.account.trade_validate_frequency === 'each_two_hours'">2小时内不二次验证</span>
         <span v-if="user.account.trade_validate_frequency === 'each_time'">每次交易均二次验证</span>
       </p>
-      <b-btn slot="action" variant="outline-green" size="xs" target="_blank" :href="`${coinex}/my/info/security`">更换</b-btn>
+      <b-btn slot="action" variant="outline-green" size="xs" target="_blank" :href="`${coinexDomain}/my/info/security`">更换</b-btn>
     </MyInfoItem>
   </CBlock>
 </template>
@@ -87,7 +87,7 @@
   import My2Column from '~/components/my-2column.vue'
   import MyInfoItem from './_c/my-info-item.vue'
   import StarRate from '~/components/star-rate.vue'
-  import {coinex} from '~/modules/variables'
+  import {coinexDomain} from '~/modules/variables'
 
   export default {
     name: 'page-my-security',
@@ -100,7 +100,7 @@
     layout: 'my',
     data() {
       return {
-        coinex,
+        coinexDomain,
       }
     },
     fetch({app, store, req, redirect, route}) {

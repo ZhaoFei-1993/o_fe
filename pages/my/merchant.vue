@@ -162,7 +162,7 @@
             </div>
             <div v-else>
               <p class="c-red">未认证</p>
-              <b-link :href="`${coinex}/my/info/security`" target="_blank">去认证 ></b-link>
+              <b-link :href="`${coinexDomain}/my/info/security`" target="_blank">去认证 ></b-link>
             </div>
           </ContactItem>
           <ContactItem title="实名认证" icon="icon-namecard" :required="true">
@@ -171,7 +171,7 @@
             </div>
             <div v-else>
               <p class="c-red">未认证</p>
-              <b-link :href="`${coinex}/my/info/auth/realname`" target="_blank">去认证 ></b-link>
+              <b-link :href="`${coinexDomain}/my/info/auth/realname`" target="_blank">去认证 ></b-link>
             </div>
           </ContactItem>
           <ContactItem title="联系人微信" icon="icon-wechat-linear" :required="true">
@@ -198,16 +198,16 @@
         <p class="c-6f">申请成为CoinEx认证商家，需要同意冻结您交易所账户中 {{MERCHANT_REQUIRED_CET_AMOUNT|formatMoney}}
           CET作为商家保证金，钱包中冻结的保证金依然享有分红权益，但是不
           可交易和提现。取消商家认证后，商家保证金将继续冻结三个月后解冻。
-          <b-link :href="`${coinex}/token`" target="_blank">什么是 CET？</b-link>
+          <b-link :href="`${coinexDomain}/token`" target="_blank">什么是 CET？</b-link>
         </p>
         <InfoItem title="账户可用余额" v-if="balance && balance.coinexBalance">
           <span class="fz-16">{{cetAvailable}} CET</span>
           <span v-if="cetAvailable < MERCHANT_REQUIRED_CET_AMOUNT" class="ml-10">
             <span class="c-red mr-20">余额不足</span>
             请先进行
-            <b-link :href="`${coinex}/my/wallet/deposit?type=cet`" target="_blank">充值</b-link>
+            <b-link :href="`${coinexDomain}/my/wallet/deposit?type=cet`" target="_blank">充值</b-link>
             或
-            <b-link :href="`${coinex}/exchange?currency=bch&dest=cet`" target="_blank">交易</b-link>
+            <b-link :href="`${coinexDomain}/exchange?currency=bch&dest=cet`" target="_blank">交易</b-link>
           </span>
         </InfoItem>
       </ProgressItem>
@@ -235,7 +235,7 @@
   import My2Column from '~/components/my-2column.vue'
   import ProgressIndicator from '~/components/progress-indicator.vue'
   import MyInfoItem from './_c/my-info-item.vue'
-  import {coinex} from '~/modules/variables'
+  import {coinexDomain} from '~/modules/variables'
 
   const ProgressItem = Vue.extend({
     props: {
@@ -306,7 +306,7 @@
         MERCHANT_REQUIRED_CET_AMOUNT: 50000,
         VERIFY_EMAIL: 'bd@coinex.com', // todo:是这个？
         formEditing: false,
-        coinex,
+        coinexDomain,
       }
     },
     computed: {

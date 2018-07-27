@@ -31,7 +31,7 @@
         </div>
       </div>
     </div>
-    <div class="item-info" v-if="validAmount">
+    <div class="item-info">
       <div class="info-header">确认信息</div>
       <div class="info-detail">
         <span>单价：<span class="emphasis">{{item.price}}</span> {{balance.currentCash}}/{{item.coin_type}}
@@ -41,10 +41,11 @@
         <span>支付方式：<span class="emphasis">{{paymentMethods}}</span></span>
       </div>
       <div class="item-payment">
-        <b-form v-if="form" @submit.prevent="onSubmit">
+        <b-form v-if="form" @submit.prevent="">
           <div class="price-input">
             <div class="input-container">
-              <div class="max-value">最高金额{{' '+ maxDealCashAmount+ ' '+balance.currentCash}}
+              <div class="max-value">最多{{item.side=== constant.SIDE.BUY?'可卖':'可买'}}
+                {{' '+ maxDealCashAmount+ ' '+balance.currentCash}}
                 <span class="purchase-all"
                       @click="purchaseAll">全部{{sideText}}</span>
               </div>
@@ -59,9 +60,10 @@
             </div>
             <span class="separator"><i class="iconfont icon-exchange"></i></span>
             <div class="input-container">
-              <div class="max-value">最高数量{{' '+ maxDealCoinAmount + ' '+ item.coin_type}}<span
-                class="purchase-all"
-                @click="purchaseAll">全部{{sideText}}</span>
+              <div class="max-value">最多{{item.side=== constant.SIDE.BUY ?'可卖':'可买'}}{{' '+ maxDealCoinAmount + ' '+
+                item.coin_type}}<span
+                  class="purchase-all"
+                  @click="purchaseAll">全部{{sideText}}</span>
               </div>
               <b-input-group :append="item.coin_type">
                 <ExtendedInputNumber v-model="form.coin_amount" :name="item.id+'coin_amount'"
@@ -76,20 +78,12 @@
             * 提交信息即生成订单，请在15分钟内完成打款。
             <b-link href="TODO">更多交易须知 ></b-link>
           </div>
-          <div class="payment-tip" v-if="kycLimitAmount===noKycLimit">
-            * 您尚未完成实名认证，每次交易限额{{noKycLimit}}元。
-            <b-link href="TODO">去完成实名认证 ></b-link>
-          </div>
           <div class="actions">
             <button class="btn btn-outline-green btn-lg" @click="onCancel">取消</button>
-            <button class="btn btn-gradient-yellow btn-lg" :disabled="submitting" @click="onSubmit">确定</button>
+            <button class="btn btn-gradient-yellow btn-lg" :disabled="submitting||$v.$invalid" @click="onSubmit">确定</button>
           </div>
         </b-form>
       </div>
-    </div>
-    <div class="item-info" v-else>
-      <p>当前交易限定最低下单金额{{item.min_deal_cash_amount}}，您的账户不符合交易条件。</p>
-      <p>请检查您的账户余额或者进行实名认证</p>
     </div>
   </b-modal>
 </template>
@@ -236,7 +230,7 @@
           cash_amount: null,
         },
         submitting: false,
-        min_deal_coin_amount: this.item.min_deal_cash_amount / this.item.price,
+        min_deal_coin_amount: `${this.item.min_deal_cash_amount / this.item.price}`.setDigit(8),
         noKycLimit: 500,
       }
     },
@@ -252,19 +246,17 @@
         return parseFloat(this.balance.otcBalance.find(b => b.coin_type === this.item.coin_type).available)
       },
       maxDealCoinAmount() {
-        return `${this.maxDealCashAmount / this.item.price}`.setDigit(8)
+        // coin 更精确，优先用coin计算
+        // 取以下各项的最小值（广告剩余量、广告限制最大额）
+        const maxAmount = Math.min(this.item.remain_coin_amount, (this.item.max_deal_cash_amount / this.item.price || Number.MAX_SAFE_INTEGER))
+        return `${maxAmount}`.setDigit(8)
       },
-      validAmount() {
-        return this.maxDealCashAmount >= this.item.min_deal_cash_amount
-      },
-      sideMaxCash() {
+      sideMaxCoin() {
         // 用户买单和balance无关，卖单需要有足够余额
-        return this.item.side === this.constant.SIDE.SELL ? Number.MAX_SAFE_INTEGER : this.currentBalance * this.item.price
+        return this.item.side === this.constant.SIDE.SELL ? Number.MAX_SAFE_INTEGER : this.currentBalance
       },
       maxDealCashAmount() {
-        // 取以下各项的最小值（广告剩余量、广告限制最大额、如果是卖家则考虑余额、未实名验证的限额）
-        const maxAmount = Math.min(this.item.remain_coin_amount * this.item.price, (this.item.max_deal_cash_amount || Number.MAX_SAFE_INTEGER), this.sideMaxCash, this.kycLimitAmount)
-        return `${maxAmount}`.setDigit(2)
+        return `${this.maxDealCoinAmount * this.item.price}`.setDigit(2)
       },
       sideText() {
         // user看到的是与merchant反的
@@ -281,9 +273,6 @@
         })
         return payText.join('，')
       },
-      balanceTip() {
-        return this.form.coin_amount > this.balance[this.item.coin_type] ? '余额不足，' : ''
-      },
       validationConf() {
         return this.utils.processValidationConfig({
           cash_amount: {
@@ -291,11 +280,15 @@
               required,
               minValue: minValue(this.item.min_deal_cash_amount),
               maxValue: maxValue(this.maxDealCashAmount),
+              kycLimit: (value) => {
+                return value <= this.kycLimitAmount
+              }
             },
             message: {
               required: '请填写购买金额',
-              minValue: `最小下单金额为${this.item.min_deal_cash_amount}`,
-              maxValue: `最大下单金额为${this.maxDealCashAmount}`,
+              minValue: `最小下单金额${this.item.min_deal_cash_amount}元`,
+              maxValue: `最大下单金额${this.maxDealCashAmount}元`,
+              kycLimit: `非实名认证用户最大下单金额为${this.noKycLimit}`
             },
           },
           coin_amount: {
@@ -303,11 +296,15 @@
               required,
               minValue: minValue(this.min_deal_coin_amount),
               maxValue: maxValue(this.maxDealCoinAmount),
+              hasBalance: (value) => {
+                return value <= this.sideMaxCoin
+              }
             },
             message: {
               required: '请填写购买金额',
-              minValue: `最小下单数量为${this.min_deal_coin_amount}`,
-              maxValue: `${this.balanceTip}最大下单数量为${this.maxDealCoinAmount}`,
+              minValue: `最小下单数量${this.min_deal_coin_amount}`,
+              maxValue: `最大下单数量${this.maxDealCoinAmount}`,
+              hasBalance: `账户余额${this.sideMaxCoin}${this.item.coin_type}`
             },
           },
         })
@@ -321,6 +318,10 @@
         this.$v.form.$touch()
         if (this.$v.form.$invalid) {
           return this.$showTips('请检查表单并正确输入内容', 'error')
+        }
+        if (this.submitting) {
+          // disabled 可能不能完全限制？
+          return
         }
         this.submitting = true
         this.axios.order.createOrder({
@@ -356,13 +357,13 @@
       cashAmountChanged() {
         this.$v.form.cash_amount.$touch()
         if (this.form.focusInput === 'cashAmount') {
-          this.form.coin_amount = this.form.cash_amount === '' ? null : (this.form.cash_amount / this.item.price)
+          this.form.coin_amount = this.form.cash_amount === '' ? null : `${this.form.cash_amount / this.item.price}`.setDigit(8)
         }
       },
       coinAmountChanged() {
         this.$v.form.coin_amount.$touch()
         if (this.form.focusInput === 'coinAmount') {
-          this.form.cash_amount = this.form.coin_amount === '' ? null : (this.form.coin_amount * this.item.price)
+          this.form.cash_amount = this.form.coin_amount === '' ? null : `${this.form.coin_amount * this.item.price}`.setDigit(2)
         }
       },
       onFocus(inputName) {

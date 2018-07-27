@@ -143,11 +143,9 @@
       // 根据用户的数据，来判断下默认显示哪个验证码
       if (this.needGoogle) {
         this.$emit('update:codeType', this.constant.VERIFY_CODE_TYPE.GOOGLE)
-      }
-      else if (this.needSms) {
+      } else if (this.needSms) {
         this.$emit('update:codeType', this.constant.VERIFY_CODE_TYPE.SMS)
-      }
-      else {
+      } else {
         this.$emit('update:codeType', '')
       }
     },

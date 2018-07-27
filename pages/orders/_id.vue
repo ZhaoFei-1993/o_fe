@@ -18,7 +18,7 @@
           <template v-if="order.status ===constant.ORDER_STATUS.CREATED.value">
             <span v-if="isBuySide">
               <i v-if="selectedMethod.method === constant.PAYMENT_TYPES.WECHAT" class="iconfont icon-wechat-round"></i>
-              <i v-if="selectedMethod.method === constant.PAYMENT_TYPES.BANKCARD" class="iconfont icon-bank"></i>
+              <i v-if="selectedMethod.method === constant.PAYMENT_TYPES.BANKCARD" class="iconfont icon-bankcard"></i>
               <i v-if="selectedMethod.method === constant.PAYMENT_TYPES.ALIPAY" class="iconfont icon-alipay"></i>
               <select v-model="selectedMethod">
                 <option v-for="payment in order.payment_methods" :value="payment" :class="payment.method">
@@ -30,16 +30,21 @@
             </span>
           </template>
           <template v-else>
-            <span v-if="selectedMethod.method === 'bankcard'">
-            <i class="iconfont icon-bank"></i>银行转帐</span>
-            <span v-if="selectedMethod.method === 'wechat'"><i
-              class="iconfont icon-wechat-round"></i>微信支付</span>
-            <span v-if="selectedMethod.method === 'alipay'"><i
-              class="iconfont icon-wechat-round"></i>支付宝支付</span>
+            <span v-if="selectedMethod.method === constant.PAYMENT_TYPES.BANKCARD">
+            <i class="mr-10 iconfont icon-bankcard"></i>银行转帐</span>
+            <span v-if="selectedMethod.method === constant.PAYMENT_TYPES.WECHAT"><i
+              class="mr-10 iconfont icon-wechat-round"></i>微信支付</span>
+            <span v-if="selectedMethod.method === constant.PAYMENT_TYPES.ALIPAY"><i
+              class="mr-10 iconfont icon-alipay"></i>支付宝支付</span>
           </template>
           <span class="payment-account">{{selectedMethod.account_name + ' '+ selectedMethod.account_no}}</span>
-          <span class="qr-code-button" v-if="selectedMethod.qr_code_image"
-                @click="showQrCode(selectedMethod.qr_code_image)">查看支付二维码</span>
+          <span v-if="selectedMethod.method === constant.PAYMENT_TYPES.BANKCARD"
+                class="detail-text">
+            {{ selectedMethod.bank }}，{{ selectedMethod.branch }}
+          </span>
+          <span class="qr-code-button"
+                v-if="selectedMethod.method!==constant.PAYMENT_TYPES.BANKCARD && selectedMethod.qr_code_image"
+                @click="showQrCode(selectedMethod.qr_code_image_url)">查看支付二维码</span>
         </div>
         <div class="payment-status" v-html="paymentStatusMessage.message"></div>
         <div class="payment-warning">{{paymentStatusMessage.warning}}</div>
@@ -116,7 +121,11 @@
     </div>
     <div class="sidebar">
       <CBlock class="my-sidebar-info" :x="0" :y="20">
-        <UserStatsProfile :user-data="counterparty" v-if="counterparty"/>
+        <UserStatsProfile :user-data="counterparty" v-if="counterparty"
+                          :is-merchant="counterparty.id===order.merchant_id"/>
+      </CBlock>
+      <CBlock id="my-chat-box">
+        <Chat :client="chat.imClient" :conversation-id="convId" :client-id="`${user.account.id}`"></Chat>
       </CBlock>
     </div>
     <b-modal ref="appealModal"
@@ -141,14 +150,16 @@
           <span class="tip">申诉理由</span>
           <textarea class="appeal-input"
                     v-model="appealComment"
-                    placeholder="请填写十五字以上的申诉理由"
+                    placeholder="请填写15-500字以上的申诉理由"
                     rows="8">
           </textarea>
         </div>
+        <div :class="['text-right',appealCommentLength>500?'c-red':'c-gray']">{{appealCommentLength}}/500</div>
       </div>
     </b-modal>
     <ConfirmReceipt :orderId="order.id" :show-confirm-receipt-modal="showConfirmReceiptModal"
-                    @confirmReceipt="refreshOrderStatus"/>
+                    @confirmReceipt="refreshOrderStatus"
+                    @cancelReceipt="showConfirmReceiptModal=false"/>
   </div>
 </template>
 <style lang="scss">
@@ -217,6 +228,8 @@
         }
         .payment-status {
           font-size: 18px;
+          color: #27313e;
+          font-weight: 500;
         }
         .payment-warning {
           color: $red;
@@ -237,6 +250,7 @@
             position: relative;
             &.active {
               color: #192330;
+              font-weight: 500;
               div:first-child {
                 &:after {
                   position: absolute;
@@ -306,9 +320,12 @@
     .sidebar {
       width: 400px;
       margin-left: 20px;
+      #my-chat-box {
+        margin-top: 10px;
+        padding: 0 !important;
+      }
     }
     #appeal-modal {
-      width: 560px;
       .tip {
         width: 80px;
       }
@@ -343,6 +360,7 @@
 
 </style>
 <script>
+  import Chat from '~/components/chat'
   import UserStatsProfile from '~/components/user-stats-profile.vue'
   import ConfirmReceipt from './_c/confirm-receipt'
   import {mapState} from 'vuex'
@@ -367,11 +385,13 @@
         appealReason: null,
         showConfirmReceiptModal: false,
         refreshOrderTimeout: null,
+        convId: '',
       }
     },
     components: {
       UserStatsProfile,
       ConfirmReceipt,
+      Chat,
     },
     fetch({store, app, req, redirect, route}) {
       app.axios.init(req)
@@ -390,12 +410,12 @@
       this.getCurrentOrder()
     },
     computed: {
-      ...mapState(['user', 'constant']),
+      ...mapState(['user', 'constant', 'chat']),
       orderStatus() {
         return Object.values(this.constant.ORDER_STATUS).find(s => s.value === this.order.status).text
       },
       cannotSubmitAppeal() {
-        return !(this.appealReason && this.appealComment && this.appealComment.length > 15)
+        return !(this.appealReason && this.appealComment && this.appealComment.length >= 15 && this.appealComment.length <= 500)
       },
       isMerchant() {
         return this.order.merchant_id === this.user.account.id
@@ -404,9 +424,11 @@
         return this.order.merchant_side === this.constant.SIDE.BUY ? this.isMerchant : !this.isMerchant
       },
       isBuyerAppeal() {
+        if (!this.appeal) return false
         return this.order.user_side === this.constant.SIDE.BUY && this.appeal.user_id === this.order.user_id
       },
       appealSide() {
+        if (!this.appeal) return null
         return this.isBuyerAppeal ? '买家' : '卖家'
       },
       canAppeal() {
@@ -415,6 +437,9 @@
         const success = this.order.status === this.constant.ORDER_STATUS.SUCCESS.value
         return (paid && this.utils.getTimeDifference(this.order.pay_time) > PAID_CAN_APPEAL) ||
           (success && this.utils.getTimeDifference(this.order.complete_time) < SUCCESS_CAN_APPEAL)
+      },
+      appealCommentLength() {
+        return this.appealComment ? this.appealComment.length : 0
       },
       showAppeal() {
         // 支付后立即 和 完成后七天内展示申诉提示
@@ -428,9 +453,10 @@
         return this.isBuySide && orderStatusOk
       },
       showPayment() {
-        const notCancel = this.order.status !== this.constant.ORDER_STATUS.CANCEL.value
-        const notClosed = this.order.status !== this.constant.ORDER_STATUS.CLOSED.value
-        return this.selectedMethod && notClosed && notCancel && !this.expired
+        const createdBuyer = this.order.status === this.constant.ORDER_STATUS.CREATED.value && this.isBuySide
+        const paid = this.order.status === this.constant.ORDER_STATUS.PAID.value
+        const success = this.order.status === this.constant.ORDER_STATUS.SUCCESS.value
+        return this.selectedMethod && (createdBuyer || paid || success) && !this.expired
       },
       tradeText() {
         if (!this.counterparty) return {}
@@ -514,6 +540,7 @@
         this.axios.order.getOrderById(this.id).then(response => {
           if (response.code === 0) {
             this.order = response.data
+            this.convId = this.order.conversation_id // 聊天对话id
             this.selectedMethod = this.order.payment_methods[0]
             this.counterparty = this.user.account.id === this.order.user_id ? this.order.merchant : this.order.user
             this.checkOrderStatus()
@@ -558,6 +585,9 @@
               }
             }, 1000)
           }
+          if (this.order.status === this.constant.ORDER_STATUS.PAID.value) {
+            this.selectedMethod = this.order.payment_methods[0]
+          }
           this.refreshOrderTimeout = setTimeout(() => {
             this.refreshOrderStatus()
           }, REFRESH_ORDER_INTERVAL)
@@ -566,7 +596,7 @@
       confirmPay() {
         this.$showDialog({
           title: '确认付款',
-          content: (<div>确认您已向卖方付款？<span class="c-red">未付款点击“我已付款”将被冻结账户。</span></div>),
+          content: (<div class="text-left">确认您已向卖方付款？<p class="c-red">未付款点击“我已付款”将被冻结账户。</p></div>),
           onOk: () => {
             this.axios.order.confirmPay(this.order.id, this.selectedMethod).then(res => {
               this.$successTips('确认付款成功')
@@ -589,7 +619,7 @@
       cancelAppeal() {
         this.$showDialog({
           title: '取消申诉',
-          content: (<div><p>确认取消申诉？</p><p class="c-red">取消申诉后的订单将不可再次申诉。</p></div>),
+          content: (<div class="text-left"><p>确认取消申诉？</p><p class="c-red">取消申诉后的订单将不可再次申诉。</p></div>),
           onOk: () => {
             this.axios.order.cancelAppeal(this.order.id).catch(err => {
               this.axios.onError(err)
@@ -600,7 +630,7 @@
       cancelOrder() {
         this.$showDialog({
           title: '取消订单',
-          content: (<div><p>确认取消订单？</p><p class="c-red">取消的订单将不可重新打开。</p></div>),
+          content: (<div class="text-left"><p>确认取消订单？</p><p class="c-red">取消的订单将不可重新打开。</p></div>),
           onOk: () => {
             this.axios.order.cancelOrder(this.order.id)
           }

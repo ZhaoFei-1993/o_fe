@@ -8,7 +8,7 @@ const COIN_TYPES = ['BTC', 'BCH', 'ETH', 'USDT']
 const ACTUAL_PAYMENT_OPTIONS = [
   {text: '银行卡', value: 'bankcard', icon: 'icon-bankcard'},        // method, 服务端对方法的定义
   {text: '支付宝', value: 'alipay', icon: 'icon-alipay'},
-  {text: '微信', value: 'wechat', icon: 'icon-wechat-round'}
+  {text: '微信', value: 'wechat', icon: 'icon-wechat-round'},
 ]
 
 // 包括"不限"的支付方式
@@ -97,7 +97,7 @@ export default {
       value: 'created',
     },
     PAID: {
-      text: '付确认',
+      text: '待收款',
       value: 'paid',
     },
     SUCCESS: {
@@ -167,5 +167,12 @@ export default {
   DEAL_CASH_AMOUNT: {
     MIN: 100,
     MAX: 5000000
+  },
+  PLACE_ORDER_ERROR: {
+    KYC_TIMES_LIMIT: 'KYC_TIMES_LIMIT',
+    KYC_AMOUNT_LIMIT: 'KYC_AMOUNT_LIMIT',
+    CANCEL_LIMIT: 'CANCEL_LIMIT',
+    PAYMENT_LIMIT: 'PAYMENT_LIMIT',
+    BALANCE_LIMIT: 'BALANCE_LIMIT',
   },
 }

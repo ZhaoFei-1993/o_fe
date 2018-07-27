@@ -70,7 +70,7 @@
         <div style="display: inline-block;margin-left: 30px;">
           <span style="font-size: 12px;">流水类型：</span>
           <b-form-select style="width: 100px;"
-                         v-model="historyQueryParams.side"
+                         v-model="historyQueryParams.business_type"
                          :options="operationOptions">
           </b-form-select>
         </div>
@@ -143,7 +143,6 @@
           sell_order: '出售',
           transfer_in: '转入',
           transfer_out: '转出',
-          transfer_return: '转出失败退还',
         },
         totalBalance: 0,
         showTransferModal: false,
@@ -266,7 +265,7 @@
         },
         historyQueryParams: {
           coin_type: null,
-          side: null,
+          business_type: null,
           page: 1,
           total: 0,
           limit: P_LIMIT,
@@ -346,7 +345,7 @@
       'historyQueryParams.coin_type'() {
         this.fetchBalanceHistory()
       },
-      'historyQueryParams.side'() {
+      'historyQueryParams.business_type'() {
         this.fetchBalanceHistory()
       },
       'historyQueryParams.page'() {
@@ -378,12 +377,12 @@
         }
       },
       fetchBalanceHistory() {
-        const {page, limit, coin_type: coinType, side} = this.historyQueryParams
+        const {page, limit, coin_type: coinType, business_type: bussType} = this.historyQueryParams
         const query = {
           page,
           limit,
           coin_type: coinType,
-          side,
+          business_type: bussType,
         }
         this.axios.balance.history(query).then(historyData => {
           if (historyData.code === 0 && historyData.data) {

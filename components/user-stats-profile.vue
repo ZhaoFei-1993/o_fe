@@ -1,9 +1,9 @@
 <template>
   <div class="user-stats-profile">
-    <UserMiniProfile class="user-mini-profile" :username="userData.name" :online="true"/>
+    <UserMiniProfile class="user-mini-profile" :username="userData.name" :is-merchant="isMerchant" :online="true"/>
     <div class="pt-20 px-20">
       <SidebarInfoItem title="30天成交量">
-        <Language text="[t][/t] 单">
+        <Language text="[t][/t]">
           <span slot="t" class="c-brand-yellow">{{statics.deal_count || 0}}</span>
         </Language>
       </SidebarInfoItem>
@@ -62,7 +62,8 @@
       userData: {
         type: Object,
         required: true,
-      }
+      },
+      isMerchant: Boolean,
     },
     components: {
       UserMiniProfile,

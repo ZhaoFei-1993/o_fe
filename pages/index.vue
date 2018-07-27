@@ -39,10 +39,11 @@
             height: 50px;
             line-height: 50px;
             width: 120px;
-            color: white;
+            background-color: #f9f9f9;
             padding-right: 16px;
-            background-image: linear-gradient(to left, #ffe070, #ffb900);
+            color: #27313e;
             font-size: 22px;
+            cursor: pointer;
             i.iconfont {
               font-size: 22px;
               margin-right: 0.5rem;
@@ -61,6 +62,18 @@
             }
           }
           &.active {
+            &.buy {
+              .side {
+                color: white;
+                background-image: linear-gradient(to left, #ffe070, #ffb900);
+              }
+            }
+            &.sell {
+              .side {
+                color: white;
+                background-image: linear-gradient(to left, #22e6b8, #00c1ce);
+              }
+            }
             .coin-type.active {
               color: $brandYellow;
               border-bottom: 2px solid $brandYellow;
@@ -70,11 +83,7 @@
               border-bottom: 2px solid $brandGreen;
             }
           }
-          &.sell {
-            .side {
-              background-image: linear-gradient(to left, #22e6b8, #00c1ce);
-            }
-          }
+
         }
       }
       .items-list {
@@ -113,7 +122,7 @@
         }
         .list {
           &.sell .item-row:nth-of-type(even) {
-            background-color: #FFFDFA;
+            background-color: #F8FDFD;
           }
           .item-row {
             display: flex;
@@ -147,6 +156,15 @@
                 margin: 0 4px;
               }
             }
+            .col-name {
+              font-size: 14px;
+              color: #6f6f6f;
+              padding-left: 0;
+              .icon-certificated-merchant {
+                color: #7dd322;
+                margin-right: 4px;
+              }
+            }
           }
         }
 
@@ -160,14 +178,25 @@
         }
         .col-name {
           padding-left: 16px;
-          width: 180px;
+          width: 200px;
           overflow: hidden;
           text-overflow: ellipsis;
-          .icon-certificated-merchant {
-            color: #7dd322;
-            margin-right: 4px;
-          }
         }
+        .col-action {
+          width: 10%;
+          padding-right: 0;
+        }
+      }
+    }
+  }
+
+  #prevent-order-modal {
+    .actions {
+      margin-top: 24px;
+      button {
+        margin: 0 10px;
+        width: 160px;
+        height: 42px;
       }
     }
   }
@@ -188,7 +217,7 @@
       <div class="trade-choices row">
         <div class="col-6">
           <div :class="['choice-block buy', {active:constant.SIDE.BUY===selectedSide}]">
-            <div class="side"><i class="iconfont icon-arrow-down"></i>购买</div>
+            <div class="side" @click="showItems(constant.SIDE.BUY)"><i class="iconfont icon-arrow-down"></i>购买</div>
             <div class="coin-types">
               <span :class="['coin-type', {active:coin===selectedCoin}]" v-for="coin in constant.COIN_TYPES"
                     @click="showItems(constant.SIDE.BUY,coin)">{{coin}}</span>
@@ -197,7 +226,7 @@
         </div>
         <div class="col-6">
           <div :class="['choice-block sell', {active:constant.SIDE.SELL===selectedSide}]">
-            <div class="side"><i class="iconfont icon-arrow-up"></i>出售</div>
+            <div class="side" @click="showItems(constant.SIDE.SELL)"><i class="iconfont icon-arrow-up"></i>出售</div>
             <div class="coin-types">
               <span :class="['coin-type', {active:coin===selectedCoin}]" v-for="coin in constant.COIN_TYPES"
                     @click="showItems(constant.SIDE.SELL,coin)">{{coin}}</span>
@@ -223,12 +252,12 @@
           <b-form-select class='select-payment col-narrow' v-model="selectedPayment"
                          :options="constant.PAYMENT_OPTIONS" @change="filterPayment"></b-form-select>
           <span :class="['sort-price col-wide',sortPrice]">单价</span>
-          <span class="col-narrow">操作</span>
+          <span class="col-narrow col-action">操作</span>
         </div>
         <div :class="['list',selectedSide.toLowerCase()]">
           <div v-if="!items||!items.length" class="text-center p-20">暂无该交易对广告</div>
           <div v-else class="item-row" v-for="item in items">
-            <span class="col-narrow col-name text-left fz-18 c-6f">
+            <span class="col-name text-left">
               {{item.user.name}}
               <div><span v-b-tooltip.hover title="认证商家"><i class="iconfont icon-certificated-merchant"></i></span></div>
             </span>
@@ -253,12 +282,12 @@
             </span>
             <span
               :class="['sort-price fz-18 col-wide pr-60 text-right',sortPrice]">{{item.price + ' '+balance.currentCash}}</span>
-            <span class="col-narrow">
-              <template v-if="user && user.id ===item.user.id">
+            <span class="col-narrow  col-action">
+              <template v-if="user && user.account && user.account.id === item.user.id">
                 <button class="btn btn-order-disabled" :id="'button-order-'+item.id" v-b-tooltip.hover title="不能与自己交易"> {{(selectedSide === constant.SIDE.BUY ? '购买' : '出售') + selectedCoin}} </button>
               </template>
               <button
-                v-else-if="qualified(item)"
+                v-else-if="!user || !user.account || qualified(item)"
                 :class="['btn btn-order',{'btn-outline-yellow':selectedSide===constant.SIDE.BUY,'btn-outline-green':selectedSide===constant.SIDE.SELL}]"
                 @click="placeOrder(item)"
               >
@@ -289,19 +318,21 @@
       :item="selectedItem"
       v-model="showPlaceOrderModal"/>
 
-    <b-modal id="no-payment-modal" :ok-only="true"
+    <b-modal id="prevent-order-modal"
              v-model="showConstraintModal" title="交易限制"
-             ok-variant="gradient-yellow"
-             ok-title="确认"
-             button-size="sm"
+             :hide-footer="true"
              class="text-center">
       <div>
         {{currentConstraint.content}}
-        <p>
-          <b-link v-if="currentConstraint.outLink" :href="currentConstraint.outLink">{{currentConstraint.linkText}}
-          </b-link>
-          <b-link v-else :to="currentConstraint.link">{{currentConstraint.linkText}}</b-link>
-        </p>
+      </div>
+      <div class="actions">
+        <b-btn size="sm" variant="outline-green" @click="showConstraintModal=false">取消</b-btn>
+        <b-link v-if="currentConstraint.outLink" :href="currentConstraint.outLink">
+          <b-btn size="sm" variant="gradient-yellow">{{currentConstraint.buttonText}}</b-btn>
+        </b-link>
+        <b-link v-else :to="currentConstraint.link">
+          <b-btn size="sm" variant="gradient-yellow">{{currentConstraint.buttonText}}</b-btn>
+        </b-link>
       </div>
     </b-modal>
   </div>
@@ -309,10 +340,11 @@
 
 <script>
   import {mapState} from 'vuex'
-  import {coinex, loginPage, webDomain} from '~/modules/variables'
+  import {coinexDomain, loginPage, webDomain} from '~/modules/variables'
   import PlaceOrderModal from '~/components/place-order-modal'
   import UserPayments from '~/components/user-payments'
   import PublishItemButton from '~/components/publish-item-modal/publish-item-button.vue'
+  import {PlaceOrderError} from '~/modules/error-code'
 
   // 从路由数据中获取需要的列表数据
   function resolveDataFromRoute($route, constant) {
@@ -326,7 +358,7 @@
   }
 
   // const refreshInterval = 5000
-  const PAGE_SIZE = 30
+  const PAGE_SIZE = 10
   const defaultPager = {
     limit: PAGE_SIZE,
     currentPage: 1,
@@ -334,6 +366,7 @@
     totalPage: 1,
     hasNext: true
   }
+  const NO_KYC_LIMIT = 500
   export default {
     components: {
       PlaceOrderModal,
@@ -355,8 +388,9 @@
           outLink: null,
         },
         busy: false,
-        coinex,
+        coinexDomain,
         pager: defaultPager,
+        noKycLimit: NO_KYC_LIMIT,
       }
     },
     asyncData({app, store, route}) {
@@ -395,7 +429,7 @@
         this.$router.replace({
           query: {
             side,
-            coin,
+            coin: coin || this.selectedCoin,
             payment: this.selectedPayment,
           },
         })
@@ -437,11 +471,57 @@
         }
         this.verifyDynamicConstraint(item).then(res => {
           this.$store.dispatch('fetchOtcBalance').then(_ => {
+            const available = parseFloat(this.balance.otcBalance.find(b => b.coin_type === item.coin_type).available)
+            if (item.side === this.constant.SIDE.BUY && available < (item.min_deal_cash_amount / item.price)) {
+              this.currentConstraint = {
+                content: `您的余额为${available} ${item.coin_type}小于该广告最低限额`,
+                buttonText: '去划转',
+                link: `/wallet`,
+              }
+              this.showConstraintModal = true
+              return
+            }
             this.selectedItem = item
             this.showPlaceOrderModal = true
           })
         }).catch(err => {
-          this.$showTips(err.message, 'error')
+          if (err.errorType) {
+            switch (err.errorType) {
+              case this.constant.PLACE_ORDER_ERROR.PAYMENT_LIMIT:
+                this.currentConstraint = {
+                  content: '您尚未添加该广告支持的支付方式，无法下单。',
+                  buttonText: '去添加',
+                  link: '/my/payments',
+                }
+                break
+              case this.constant.PLACE_ORDER_ERROR.KYC_TIMES_LIMIT:
+                this.currentConstraint = {
+                  content: '您尚未完成实名认证，每日限制下单次数为 3 次。',
+                  buttonText: '去认证',
+                  outLink: `${this.coinexDomain}/my/info/basic?redirect=${encodeURIComponent(webDomain + this.$route.fullPath)}`,
+                }
+                break
+              case this.constant.PLACE_ORDER_ERROR.CANCEL_LIMIT:
+                this.currentConstraint = {
+                  content: '您今天累计取消超过 3 次订单，被冻结交易功能。',
+                  buttonText: '查看规则',
+                  outLink: '//support.coinex.com',
+                }
+                break
+              case this.constant.PLACE_ORDER_ERROR.KYC_AMOUNT_LIMIT:
+                this.currentConstraint = {
+                  content: `您尚未完成实名认证，每次交易限额${this.noKycLimit}元。`,
+                  buttonText: '去认证',
+                  outLink: `${this.coinexDomain}/my/info/basic?redirect=${encodeURIComponent(webDomain + this.$route.fullPath)}`,
+                }
+                break
+              default:
+                this.$showTips(err.message, 'error')
+            }
+            this.showConstraintModal = true
+          } else {
+            this.$showTips(err.message, 'error')
+          }
         })
       },
       qualified(item) {
@@ -463,35 +543,25 @@
               return Promise.resolve()
             }
           }
-          this.currentConstraint = {
-            content: '您尚未添加该广告支持的支付方式，无法下单。',
-            linkText: '添加支付方式',
-            link: '/my/payments',
-          }
-          this.showConstraintModal = true
-          return Promise.reject(new Error('获取支付方式失败'))
+          return Promise.reject(new PlaceOrderError('尚未添加该广告支持的支付方式', this.constant.PLACE_ORDER_ERROR.PAYMENT_LIMIT))
         })
       },
       verifyDynamicConstraint(item) {
+        // 不做外部验证了
+        // if (item.min_deal_cash_amount >= this.noKycLimit) {
+        //   return Promise.reject(new PlaceOrderError('未完成实名认证', this.constant.PLACE_ORDER_ERROR.KYC_AMOUNT_LIMIT))
+        // }
         if (item.side === this.constant.SIDE.BUY) {
           return this.verifyHasPayment(item)
         }
         return this.axios.user.dynamicConstraint().then(response => {
           const constraint = response.data
-          if (constraint.cancel_order_times_verified && constraint.kyc_place_order_verified) {
-            return Promise.resolve()
+          if (!constraint.kyc_place_order_verified) {
+            return Promise.reject(new PlaceOrderError('未完成实名认证', this.constant.PLACE_ORDER_ERROR.KYC_TIMES_LIMIT))
+          } else if (!constraint.cancel_order_times_verified) {
+            return Promise.reject(new PlaceOrderError('频繁取消订单', this.constant.PLACE_ORDER_ERROR.CANCEL_LIMIT))
           } else {
-            this.currentConstraint = (!constraint.kyc_place_order_verified) ? {
-              content: '您尚未完成实名认证，每日限制下单次数为 3 次。',
-              linkText: '去完成实名认证',
-              outLink: `${this.coinex}/my/info/basic?redirect=${encodeURIComponent(webDomain + this.$route.fullPath)}`,
-            } : {
-              content: '您今天累计取消超过 3 次订单，被冻结交易功能。',
-              linkText: '了解更多交易规则',
-              outLink: '//support.coinex.com',
-            }
-            this.showConstraintModal = true
-            return Promise.reject(constraint)
+            return Promise.resolve()
           }
         })
       },
