@@ -37,7 +37,9 @@
         <span v-if="user.account.mobile">+{{user.account.country_code}} {{user.account.mobile}}</span>
         <span v-else class="c-red">未绑定</span>
       </p>
-      <b-btn slot="action" variant="outline-green" size="xs" :href="`${coinex}/my/info/security`" target="_blank">更换</b-btn>
+      <b-btn slot="action" variant="outline-green" size="xs" :href="`${coinex}/my/info/security`" target="_blank">
+        {{user.account.mobile ? '更换' : '绑定'}}
+      </b-btn>
     </MyInfoItem>
     <MyInfoItem title="谷歌验证码">
       <p slot="content">{{user.account.is_have_totp_auth ? '已绑定' : '未绑定'}}</p>

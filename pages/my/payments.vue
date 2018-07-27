@@ -181,7 +181,7 @@
 
         <VerifyCode v-if="user&&user.account"
                     :needGoogle="user.account.is_have_totp_auth"
-                    :needSms="user.account.mobile"
+                    :needSms="!!user.account.mobile"
                     :needEmail="true"
                     :sms.sync="verify.sms"
                     :google.sync="verify.google"

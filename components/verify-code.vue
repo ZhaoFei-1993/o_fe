@@ -85,15 +85,15 @@
     props: {
       // 是否需要展示email
       needEmail: {
-        type: [Boolean, String],
+        type: Boolean,   // 很有趣，如果传'' 或者 0，都会被转化为 true，所以必须明确传 true/false
         default: false
       },
       needGoogle: {
-        type: [Boolean, String],
+        type: Boolean,
         default: false
       },
       needSms: {
-        type: [Boolean, String],
+        type: Boolean,
         default: false
       },
       // google验证码的具体值，通过.sync来进行同步
