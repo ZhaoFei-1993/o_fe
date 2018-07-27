@@ -15,7 +15,7 @@
     <div class="text-left">确认已收到该笔款项？<p class="c-red">如您没有收到买家付款，确认收款后，放行的数字货币将无法追回。</p></div>
     <VerifyCode v-if="needVerify"
                 :needGoogle="user.account.is_have_totp_auth"
-                :needSms="user.account.mobile"
+                :needSms="!!user.account.mobile"
                 :sms.sync="verify.sms"
                 :google.sync="verify.google"
                 :codeType.sync="verify.codeType"

@@ -63,6 +63,7 @@ export default ({app, store}) => {
         }
       } else {
         delete inst.defaults.headers.cookie
+        delete inst.defaults.headers.common['Authorization']
       }
 
       // 防止用户之间串语言

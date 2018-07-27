@@ -13,6 +13,7 @@
 
 <template>
   <input class="extended-input-number" type="number" :disabled="disabled" :value="value"
+         :step="step"
          @input="onInput" :placeholder="placeholder"
          @focus="onFocus"/>
 </template>
@@ -41,6 +42,10 @@
       decimalDigit: {
         type: Number,
         default: 8,
+      },
+      step: {
+        type: Number,
+        default: 0.1 ** 8,
       }
     },
     methods: {
