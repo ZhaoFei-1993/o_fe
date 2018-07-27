@@ -51,9 +51,9 @@
     <div class="input-box" :style="{height: `${inputHeight}px`}">
       <div class="input-group">
         <input placeholder="输入信息，回车发送" type="text" class="input-text" v-model="message" @keyup.enter="onSendMsg">
-        <input id="chat-file-image" type="file" accept="image/*" style="display: none" ref="fileSelector" @change="onUpload">
+        <input id="chat-file-image" type="file" accept="image/*" style="display: none;" ref="fileSelector" @change="onUpload">
         <button id="upload" @click="onSelectFile">
-          <span style="color: #52cbca"><i class="iconfont icon-attachment"></i></span>
+          <span style="color: #52cbca;"><i class="iconfont icon-attachment"></i></span>
         </button>
       </div>
     </div>
