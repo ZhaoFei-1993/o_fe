@@ -53,6 +53,7 @@
                 <ExtendedInputNumber v-model="form.cash_amount" :name="item.id+'cash_amount'"
                                      @focus="()=>onFocus('cashAmount')"
                                      :decimalDigit="2"
+                                     :step="0.1**2"
                                      @input="cashAmountChanged"
                                      :placeholder="'可填写想'+sideText+'的金额'"/>
               </b-input-group>
@@ -67,6 +68,7 @@
               </div>
               <b-input-group :append="item.coin_type">
                 <ExtendedInputNumber v-model="form.coin_amount" :name="item.id+'coin_amount'"
+                                     :step="0.1**8"
                                      @focus="()=>onFocus('coinAmount')"
                                      @input="coinAmountChanged"
                                      :placeholder="'可填写想'+sideText+'的数量'"/>
