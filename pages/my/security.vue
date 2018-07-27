@@ -48,7 +48,12 @@
       </b-btn>
     </MyInfoItem>
     <MyInfoItem title="登录密码">
-      <p slot="content">建议您定期更改密码以保护账户安全</p>
+      <p slot="content">
+        密码强度:
+        <span v-if="user.account.login_password_level === constant.PASSWORD_LEVEL.HIGH">高</span>
+        <span v-if="user.account.login_password_level === constant.PASSWORD_LEVEL.MIDDLE">中</span>
+        <span v-if="user.account.login_password_level === constant.PASSWORD_LEVEL.LOW">低</span>
+      </p>
       <b-btn slot="action" variant="outline-green" size="xs" :href="`${coinex}/my/info/security`" target="_blank">重置</b-btn>
     </MyInfoItem>
     <MyInfoItem title="实名认证">

@@ -214,6 +214,16 @@
 
   Vue.use(Vuelidate)
 
+  const DEFAULT_FORM = {
+    method: constant.PAYMENT_TYPES.BANKCARD,
+    // account_name: '',        // 名字是从store拿的，不修改
+    bank: null,
+    branch: '',
+    account_no: '',
+    qr_code_image: '',
+    qrCodeImage: '',          // {url, blob, file, id}
+  }
+
   export default {
     name: 'page-my-payments',
     components: {
@@ -237,15 +247,10 @@
           smsSequence: 0,
           emailSequence: 0
         },
-        form: {
+        form: Object.assign({
           method: '',
           account_name: '',
-          bank: null,
-          branch: '',
-          account_no: '',
-          qr_code_image: '',
-          qrCodeImage: '',          // {url, blob, file, id}
-        },
+        }, DEFAULT_FORM),
         modalShowing: false,
         isPaymentEditing: false,     // 是否正在被编辑payment（而不是添加）
         submitting: false,        // 正在上传支付方式
@@ -316,12 +321,7 @@
 
       clearForm() {
         // 清空之前的值
-        const form = Object.assign({}, this.form)
-        ;['method', 'account_name', 'bank', 'branch', 'account_no', 'qrCodeImage'].forEach((key) => {
-          form[key] = ''
-        })
-        form.method = this.constant.PAYMENT_TYPES.BANKCARD
-        this.form = form
+        this.form = Object.assign({}, this.form, DEFAULT_FORM)
       },
 
       onPaymentEdit(payment) {
@@ -413,6 +413,7 @@
           this.submitting = false
           this.modalShowing = false
           this.$showTips(this.isPaymentEditing ? '修改成功' : '添加成功')
+          this.clearForm()
 
           return this.$store.dispatch('fetchUserPayments')
         }).catch(err => {
