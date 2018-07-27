@@ -151,6 +151,7 @@
                     rows="8">
           </textarea>
         </div>
+        <div :class="['text-right',appealCommentLength>500?'c-red':'c-gray']">{{appealCommentLength}}/500</div>
       </div>
     </b-modal>
     <ConfirmReceipt :orderId="order.id" :show-confirm-receipt-modal="showConfirmReceiptModal"
@@ -318,7 +319,6 @@
       margin-left: 20px;
     }
     #appeal-modal {
-      width: 560px;
       .tip {
         width: 80px;
       }
@@ -405,7 +405,7 @@
         return Object.values(this.constant.ORDER_STATUS).find(s => s.value === this.order.status).text
       },
       cannotSubmitAppeal() {
-        return !(this.appealReason && this.appealComment && this.appealComment.length > 15)
+        return !(this.appealReason && this.appealComment && this.appealComment.length >= 15 && this.appealComment.length <= 500)
       },
       isMerchant() {
         return this.order.merchant_id === this.user.account.id
@@ -427,6 +427,9 @@
         const success = this.order.status === this.constant.ORDER_STATUS.SUCCESS.value
         return (paid && this.utils.getTimeDifference(this.order.pay_time) > PAID_CAN_APPEAL) ||
           (success && this.utils.getTimeDifference(this.order.complete_time) < SUCCESS_CAN_APPEAL)
+      },
+      appealCommentLength() {
+        return this.appealComment ? this.appealComment.length : 0
       },
       showAppeal() {
         // 支付后立即 和 完成后七天内展示申诉提示
