@@ -157,12 +157,12 @@
       }
       this.conversation = null
       this.messageIterator = null
+      window.document.removeEventListener('visibilitychange', this.handleVisibilityChange)
     },
     mounted() {
       this.init()
       $toast.init(this.$refs.chatWrapper) // 初始化toast
       this.originalTitle = window.document.title
-      window.document.addEventListener('visibilitychange', this.handleVisibilityChange) // 监听页面焦点事件，取消未读
     },
     methods: {
       init() { // 全部功能初始化
@@ -197,11 +197,10 @@
             this.initMsgLog() // 初始化聊天记录
           })
       },
-      handleVisibilityChange() {
-        if (!window.document.hidden && this.conversation.unreadMessagesCount) {
-          this.conversation.read().then(conversation => {
-            this.unreadMessagesCount = conversation.unreadMessagesCount
-          })
+      handleVisibilityChange() { // 监听页面隐藏事件，取消未读
+        if (!window.document.hidden) {
+          this.conversation.read()
+          this.unreadMessagesCount = 0
         }
       },
       onJoin() { // 主动加入群聊
@@ -267,7 +266,9 @@
       messageHandler(msg) {
         this.msgLog = this.msgLog.concat(this.memberInfoMapper([msg]))
         this.scrollToBottom()
-        this.conversation.read()
+        if (!window.document.hidden) {
+          this.conversation.read()
+        }
       },
       memberInfoMapper(arr) { // 遍历每一个消息，对用户头像进行映射，以防部分已退出用户没有头像
         const { conversation } = this
@@ -335,6 +336,7 @@
         Object.keys(this.eventMap).forEach(evtType => {
           this.client.on(evtType, this.eventMap[evtType])
         })
+        window.document.addEventListener('visibilitychange', this.handleVisibilityChange)
       },
       loadMore() {
         if (!this.loading && this.messageIterator && !this.loadAll) {
