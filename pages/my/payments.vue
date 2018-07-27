@@ -178,7 +178,7 @@
             <EMsgs :result="$v.form" :msgs="validationConf.messages" keyName="bank"/>
           </b-form-group>
           <b-form-group label="开户支行:" horizontal>
-            <b-form-input v-model="form.branch" size="lg" placeholder="请填写开户支行(选填)"></b-form-input>
+            <input v-model="form.branch" placeholder="请填写开户支行(选填)" type="text" class="form-control form-control-lg">
             <EMsgs :result="$v.form" :msgs="validationConf.messages" keyName="branch"/>
           </b-form-group>
           <b-form-group label="银行卡号:" horizontal>
