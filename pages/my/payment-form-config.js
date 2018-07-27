@@ -20,12 +20,10 @@ export default function getConfig($t, $tt) {
       },
       branch: {
         validation: {
-          required,
           minLength: minLength(4),
           maxLength: maxLength(30)
         },
         message: {
-          required: '请输入开户支行',
           minLength: $tt('最小长度为{0}', 4),
           maxLength: $tt('最大长度为{0}', 30)
         }

@@ -3,6 +3,8 @@
   @import "~assets/scss/variables.scss";
 
   .page-my-payments {
+    min-height: 460px;
+
     .icon-plus {
       display: inline-block;
       margin-top: -2px;
@@ -69,11 +71,45 @@
         color: #6f6f6f;
       }
     }
+
+    .kyc-step {
+      display: inline-block;
+      vertical-align: top;
+      width: 240px;
+      height: 120px;
+      margin-top: 20px;
+      margin-right: 20px;
+      text-align: center;
+      background-color: #f9f9f9;
+
+      .kyc-step-number {
+        display: inline-block;
+        height: 20px;
+        width: 20px;
+        margin-top: 15px;
+        border-radius: 100%;
+        background-color: #fff;
+      }
+
+      .kyc-step-title {
+        margin-top: 10px;
+        margin-bottom: 5px;
+        font-size: 18px;
+
+        &._highlight {
+          color: $brandGreen;
+        }
+      }
+
+      .kyc-step-number {
+
+      }
+    }
   }
 </style>
 
 <template>
-  <CBlock class="page-my-payments" x="0" y="0">
+  <CBlock class="page-my-payments" x="0" y="0" v-if="user.account.kyc_status === constant.KYC_STATUS.PASS">
     <h3 class="layout-my-title">
       支付方式
       <b-btn @click="onPaymentAdd" variant="plain" size="xs" class="ml-15 c-brand-green">
@@ -131,28 +167,29 @@
         </b-form-group>
 
         <b-form-group label="姓名:" horizontal>
-          <b-form-input v-model="form.account_name" size="lg"></b-form-input>
+          <b-form-input v-model="form.account_name" size="lg" disabled></b-form-input>
           <EMsgs :result="$v.form" :msgs="validationConf.messages" keyName="account_name"/>
         </b-form-group>
 
         <div v-if="form.method === 'bankcard'">
           <b-form-group label="开户银行:" horizontal>
-            <b-form-select v-model="form.bank" :options="constant.bankOptions"></b-form-select>
+            <b-form-select v-model="form.bank" :options="bankOptionsWithDefault">
+            </b-form-select>
             <EMsgs :result="$v.form" :msgs="validationConf.messages" keyName="bank"/>
           </b-form-group>
           <b-form-group label="开户支行:" horizontal>
-            <b-form-input v-model="form.branch" size="lg"></b-form-input>
+            <input v-model="form.branch" placeholder="请填写开户支行(选填)" type="text" class="form-control form-control-lg">
             <EMsgs :result="$v.form" :msgs="validationConf.messages" keyName="branch"/>
           </b-form-group>
           <b-form-group label="银行卡号:" horizontal>
-            <b-form-input v-model="form.account_no" size="lg"></b-form-input>
+            <b-form-input v-model="form.account_no" size="lg" placeholder="请填写银行卡号"></b-form-input>
             <EMsgs :result="$v.form" :msgs="validationConf.messages" keyName="account_no"/>
           </b-form-group>
         </div>
 
         <div v-if="form.method === 'alipay'">
           <b-form-group label="支付宝账号:" horizontal>
-            <b-form-input v-model="form.account_no" size="lg"></b-form-input>
+            <b-form-input v-model="form.account_no" size="lg" placeholder="请填写支付宝账号"></b-form-input>
             <EMsgs :result="$v.form" :msgs="validationConf.messages" keyName="account_no"/>
           </b-form-group>
           <b-form-group label="收款二维码:" horizontal>
@@ -166,7 +203,7 @@
 
         <div v-if="form.method === 'wechat'">
           <b-form-group label="微信账号:" horizontal>
-            <b-form-input v-model="form.account_no" size="lg"></b-form-input>
+            <b-form-input v-model="form.account_no" size="lg" placeholder="请填写微信账号"></b-form-input>
             <EMsgs :result="$v.form" :msgs="validationConf.messages" keyName="account_no"/>
           </b-form-group>
           <b-form-group label="收款二维码:" horizontal>
@@ -180,7 +217,7 @@
 
         <VerifyCode v-if="user&&user.account"
                     :needGoogle="user.account.is_have_totp_auth"
-                    :needSms="user.account.mobile"
+                    :needSms="!!user.account.mobile"
                     :needEmail="true"
                     :sms.sync="verify.sms"
                     :google.sync="verify.google"
@@ -192,6 +229,15 @@
                     ref="verify-code"/>
       </b-form>
     </b-modal>
+  </CBlock>
+
+  <CBlock class="page-my-payments" y="0" v-else>
+    <h3 class="layout-my-title pl-0">2步完成添加支付方式</h3>
+
+    <KycStep :step="1" title="完成实名认证" highlight>
+      <b-link :href="`${constant.coinexDomain}/my/info/auth/realname`">去实名 ></b-link>
+    </KycStep>
+    <KycStep :step="2" title="添加支付方式"/>
   </CBlock>
 </template>
 
@@ -212,6 +258,33 @@
 
   Vue.use(Vuelidate)
 
+  const KycStep = Vue.extend({
+    props: {
+      step: Number,
+      title: String,
+      highlight: Boolean,
+    },
+    render() {
+      return (
+        <div class="kyc-step">
+          <div class="kyc-step-number">{this.step}</div>
+          <div class={'kyc-step-title ' + (this.highlight && '_highlight')}>{this.title}</div>
+          {this.$slots['default']}
+        </div>
+      )
+    }
+  })
+
+  const DEFAULT_FORM = {
+    method: constant.PAYMENT_TYPES.BANKCARD,
+    // account_name: '',        // 名字是从store拿的，不修改
+    bank: null,
+    branch: '',
+    account_no: '',
+    qr_code_image: '',
+    qrCodeImage: '',          // {url, blob, file, id}
+  }
+
   export default {
     name: 'page-my-payments',
     components: {
@@ -222,6 +295,7 @@
       VerifyCode,
       EMsgs,
       ImageUploadPreview,
+      KycStep,
     },
     layout: 'my',
     data() {
@@ -235,15 +309,10 @@
           smsSequence: 0,
           emailSequence: 0
         },
-        form: {
+        form: Object.assign({
           method: '',
           account_name: '',
-          bank: '',
-          branch: '',
-          account_no: '',
-          qr_code_image: '',
-          qrCodeImage: '',          // {url, blob, file, id}
-        },
+        }, DEFAULT_FORM),
         modalShowing: false,
         isPaymentEditing: false,     // 是否正在被编辑payment（而不是添加）
         submitting: false,        // 正在上传支付方式
@@ -265,6 +334,14 @@
         } else {
           return this.utils.processValidationConfig(baseValidations)
         }
+      },
+      bankOptionsWithDefault: function () {
+        // 添加了默认选项的银行卡列表
+        return [{
+          value: null,
+          text: '-- 请选择开户银行 --',
+          disabled: true
+        }].concat(this.constant.bankOptions)
       }
     },
     validations() {
@@ -285,6 +362,9 @@
     mounted() {
       // 默认选中银行卡
       this.form.method = this.constant.PAYMENT_TYPES.BANKCARD
+      // 用户名自动从用户的实名认证中取，且不可修改
+      const userKyc = this.user.account.user_kyc
+      this.form.account_name = userKyc && userKyc.last_name + userKyc.first_name
     },
     methods: {
       onPaymentStatusChange(payment, checked) {
@@ -304,12 +384,7 @@
 
       clearForm() {
         // 清空之前的值
-        const form = Object.assign({}, this.form)
-        ;['method', 'account_name', 'bank', 'branch', 'account_no', 'qrCodeImage'].forEach((key) => {
-          form[key] = ''
-        })
-        form.method = this.constant.PAYMENT_TYPES.BANKCARD
-        this.form = form
+        this.form = Object.assign({}, this.form, DEFAULT_FORM)
       },
 
       onPaymentEdit(payment) {
@@ -401,6 +476,7 @@
           this.submitting = false
           this.modalShowing = false
           this.$showTips(this.isPaymentEditing ? '修改成功' : '添加成功')
+          this.clearForm()
 
           return this.$store.dispatch('fetchUserPayments')
         }).catch(err => {

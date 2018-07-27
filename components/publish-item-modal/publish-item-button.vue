@@ -43,19 +43,6 @@ export default {
         return
       }
 
-      if (!this.paymentEnabled) {
-        this.$showDialog({
-          title: '没有启用支付方式',
-          content: '添加并且启用至少一个支付方式后才可以发布广告',
-          okTitle: '启用支付方式',
-          onOk: () => {
-            this.$router.push('/my/payments')
-          }
-        })
-
-        return
-      }
-
       if (!(this.user.merchant && this.user.merchant.auth_status === this.constant.MERCHANT_AUTH_STATUS.PASS)) {
         this.$showDialog({
           title: '您尚未成为认证商家',    // todo:文案
@@ -69,9 +56,17 @@ export default {
         return
       }
 
-      // console.lo
-      if (!(this.user.paymentEnabled)) {
+      if (!this.paymentEnabled) {
+        this.$showDialog({
+          title: '没有启用支付方式',
+          content: '添加并且启用至少一个支付方式后才可以发布广告',
+          okTitle: '启用支付方式',
+          onOk: () => {
+            this.$router.push('/my/payments')
+          }
+        })
 
+        return
       }
 
       this.modalShowing = true

@@ -105,6 +105,9 @@
       </template>
       <template slot="price" slot-scope="{ item }">
         {{item.price}} {{item.cash_type}}
+        <span v-if="item.pricing_type === constant.PRICING_TYPE.FLOAT" style="color:#00b275">
+          ({{item.float_rate}}%)
+        </span>
       </template>
       <!--暂时不显示用户的最后编辑时间 jeff 20180721-->
       <template v-if="itemStatus === constant.ITEM_STATUS.ONLINE" slot="on_time" slot-scope="{item}">
@@ -226,7 +229,7 @@ export default {
         price: {
           label: '交易价格',
           thStyle: {
-            width: '180px'
+            width: '250px'
           },
         },
       }

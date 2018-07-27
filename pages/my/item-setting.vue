@@ -44,8 +44,9 @@
           </div>
         </div>
         <div v-else>
-          {{settings.min_deal_cash_amount}} {{settings.cash_type}} — {{settings.max_deal_cash_amount}}
-          {{settings.cash_type}}
+          {{settings.min_deal_cash_amount}} {{settings.cash_type}}
+          —
+          {{settings.max_deal_cash_amount}} {{settings.cash_type}}
         </div>
       </div>
 
