@@ -145,7 +145,7 @@
 
     <CBlock v-show="isItemAmountEditing" class="item-coin-amount-container" ref="coin-amount" x="20" y="20">
       <div class="item-coin-amount-confirm">
-        <CurrencyInput v-model="onlineItemCoinAmount" class="item-coin-amount-confirm-input" :currency="editingItem.cash_type"/>
+        <CurrencyInput v-model="onlineItemCoinAmount" class="item-coin-amount-confirm-input" :currency="editingItem.coin_type"/>
         <b-btn variant="plain-green" size="xs" class="mx-20" @click="onItemOnlineConfirm">确定</b-btn>
         <b-btn variant="plain" size="xs" @click="onItemOnlineCancel">取消</b-btn>
       </div>
@@ -338,8 +338,8 @@ export default {
     },
     onItemDelete(item) {
       this.$showDialog({
-        title: '确认删除广告',
-        content: '删除的广告将不可恢复，确定删除？',
+        title: '删除广告',
+        content: '删除的广告将不可恢复。',
         onOk: () => {
           this.axios.item.delete(item.id).then(res => {
             this.getItems()

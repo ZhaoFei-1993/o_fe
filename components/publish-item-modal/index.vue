@@ -119,7 +119,7 @@
       <b-form-group label="交易价格" class="item-price-group">
         <b-form-radio-group v-model="form.pricing_type" :options="pricingTypeOptions" class="mb-10"></b-form-radio-group>
 
-        <div v-if="form.pricing_type === constant.PRICING_TYPE.FIXED">
+        <div v-if="form.pricing_type === constant.PRICING_TYPE.FIXED" class="mt-25">
           <div class="input-label" todo="todo:应该是参考价格吧？">
             当前市场价格
             <b-btn variant="plain-yellow" size="xxs" @click="onSetPrice2MarketPrice">{{marketPrice}}</b-btn>
@@ -159,13 +159,14 @@
       </b-form-group>
 
       <b-form-group label="交易数量" class="coin-amount-group">
-        <div>
-          <Language text="最多可售[a][/a][c][/c]" v-if="form.side === 'sell'">
+        <div v-if="form.side === constant.SIDE.BUY">
+          <Language text="最多可售[a][/a][c][/c]">
             <b-btn slot="a" variant="plain-yellow" @click="onSetCoinAmount2All">{{balance.otcMap[form.coin_type].available}}</b-btn>
             <span slot="c">{{form.coin_type}}</span>
           </Language>
           <b-btn variant="plain-green" size="xxs" class="ml-10" @click="onSetCoinAmount2All">全部出售</b-btn>
         </div>
+
         <div class="coin-amount-container">
           <CurrencyInput v-model="form.coin_amount" :currency="form.coin_type" placeholder="请输入数量" class="col-left"/>
           <div class="col-right fz-22">
@@ -173,8 +174,14 @@
             <span class="c-bright-yellow ml-1"> {{totalCash}} {{balance.currentCash}}</span>
           </div>
         </div>
-        <div class="c-6f mt-2">
-          * 当日取消订单超过3次，会被冻结买入功能。
+        <div class="c-9b mt-2">
+          *
+          <span v-if="form.side === constant.SIDE.BUY">
+            当日取消订单超过3次，会被限制交易功能。
+          </span>
+          <span v-else>
+            广告上架期间，您的数字货币会被冻结。
+          </span>
           <b-link href="todo" class="ml-1" target="_blank">更多交易须知 ></b-link>
         </div>
       </b-form-group>
@@ -183,7 +190,7 @@
         <b-btn variant="plain-green" class="btn-more-setting" size="xs" @click="onClickMoreSetting">
           更多设置 <i class="iconfont icon-double-arrow-down ml-1"></i>
         </b-btn>
-        <b-btn class="c-6f fz-18" variant="plain">广告设置 <CTooltip content="交易限额、自动回复、交易方限制可在广告设置中统一编辑默认值" size="18" :x="2"/></b-btn>
+        <b-btn class="c-6f fz-18" variant="plain">广告设置 <CTooltip content="交易限额、自动回复、交易方限制可在广告设置中统一编辑默认值" size="16" :x="2"/></b-btn>
       </div>
 
       <!--更多设置-->
@@ -207,7 +214,7 @@
         </b-form-group>
 
         <b-form-group label="自动回复">
-          <b-form-textarea v-model="form.auto_reply_content" rows="3"></b-form-textarea>
+          <b-form-textarea v-model="form.auto_reply_content" rows="3" class="fz-14"></b-form-textarea>
           <EMsgs :result="$v.form" :messages="itemValidations.messages" keyName="auto_reply_content" class="ps-a"/>
           <p class="text-right" :class="{'c-red': form.auto_reply_content.length > constant.MAX_AUTO_REPLY_LENGTH}">
             {{form.auto_reply_content.length}} / {{constant.MAX_AUTO_REPLY_LENGTH}}字
@@ -310,7 +317,7 @@ export default {
     },
     // 总额
     totalCash: function () {
-      return this.form.coin_amount.decimalMul(this.form.price)
+      return this.form.coin_amount.decimalMul(this.form.price).setDigit(2)
     },
     // 当前coin当前cash下的市场参考价
     marketPrice: function () {
