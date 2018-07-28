@@ -298,18 +298,18 @@
               </div>
             </div>
             <span class="col-narrow text-right">
-              <div class="number">{{item.remain_coin_amount}}</div>
+              <div class="number">{{item.remain_coin_amount.setDigit(8)}}</div>
               <div class="unit">{{ selectedCoin}}</div>
             </span>
             <span class="col-wide text-right pr-60">
-              <div class="number">{{item.min_deal_cash_amount + '-' + item.max_deal_cash_amount}}</div>
+              <div class="number">{{item.min_deal_cash_amount.setDigit(0) + '-' + item.max_deal_cash_amount.setDigit(0)}}</div>
               <div class="unit">{{balance.currentCash}}</div>
             </span>
             <span class='payment col-narrow'>
               <UserPayments :payments="item.payment_methods"></UserPayments>
             </span>
             <span
-              :class="['price',sortPrice]">{{item.price + ' '+balance.currentCash}}</span>
+              :class="['price',sortPrice]">{{item.price.setDigit(2) + ' '+balance.currentCash}}</span>
             <span class="col-narrow  col-action">
               <template v-if="user && user.account && user.account.id === item.user.id">
                 <button class="btn btn-order-disabled" :id="'button-order-'+item.id" v-b-tooltip.hover title="不能与自己交易"> {{(selectedSide === constant.SIDE.BUY ? '购买' : '出售') + selectedCoin}} </button>
