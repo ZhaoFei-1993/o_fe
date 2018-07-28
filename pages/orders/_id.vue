@@ -456,7 +456,8 @@
       },
       canCancel() {
         const orderStatusOk = this.order.status === this.constant.ORDER_STATUS.CREATED.value || this.order.status === this.constant.ORDER_STATUS.PAID.value
-        return this.isBuySide && orderStatusOk
+        const noAppeal = !this.appeal || this.appeal.status === this.constant.APPEAL_STATUS.CANCEL
+        return this.isBuySide && orderStatusOk && noAppeal
       },
       showPayment() {
         const createdBuyer = this.order.status === this.constant.ORDER_STATUS.CREATED.value && this.isBuySide
@@ -627,7 +628,9 @@
           title: '取消申诉',
           content: (<div class="text-left"><p>确认取消申诉？</p><p class="c-red">取消申诉后的订单将不可再次申诉。</p></div>),
           onOk: () => {
-            this.axios.order.cancelAppeal(this.order.id).catch(err => {
+            this.axios.order.cancelAppeal(this.order.id).then(() => {
+              this.getAppeal()
+            }).catch(err => {
               this.axios.onError(err)
             })
           }
@@ -638,7 +641,9 @@
           title: '取消订单',
           content: (<div class="text-left"><p>确认取消订单？</p><p class="c-red">取消的订单将不可重新打开。</p></div>),
           onOk: () => {
-            this.axios.order.cancelOrder(this.order.id)
+            this.axios.order.cancelOrder(this.order.id).then(() => {
+              this.refreshOrderStatus()
+            })
           }
         })
       },

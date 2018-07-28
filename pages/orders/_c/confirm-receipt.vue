@@ -36,7 +36,7 @@
           codeType: constant.VERIFY_CODE_TYPE.GOOGLE,
           sms: '',
           google: '',
-          businessType: '',
+          businessType: constant.VERIFY_CODE_BUSINESS.CONFIRM_RECEIPT,
           smsSequence: 0,
         },
         needVerify: false,
