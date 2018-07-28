@@ -87,7 +87,7 @@
       </b-btn>
     </div>
 
-    <b-table :fields="itemTableFields" :items="items" class="items-table">
+    <b-table :fields="itemTableFields" :items="itemsCurrent" class="items-table">
       <template slot="id" slot-scope="{ item }">
         <b-link>{{ item.id }}</b-link>
       </template>
@@ -141,7 +141,7 @@
       </template>
     </b-table>
 
-    <Blank v-if="!items.length"/>
+    <Blank v-if="!itemsCurrent.length"/>
 
     <CBlock v-show="isItemAmountEditing" class="item-coin-amount-container" ref="coin-amount" x="20" y="20">
       <div class="item-coin-amount-confirm">
@@ -178,7 +178,8 @@ export default {
   },
   data() {
     return {
-      items: [],
+      itemsOnline: [],
+      itemsOffline: [],
       itemStatus: '',
       editingItem: {},        // 正在编辑or上架的广告
       onlineItemCoinAmount: 0, // 正在上架的广告的数量
@@ -188,6 +189,10 @@ export default {
   },
   computed: {
     ...mapState(['user', 'constant', 'balance']),
+    // 当前展示的广告列表
+    itemsCurrent: function () {
+      return this.itemStatus === this.constant.ITEM_STATUS.ONLINE ? this.itemsOnline : this.itemsOffline
+    },
     filterOptions: function () {
       return [{
         text: '进行中',
@@ -278,7 +283,8 @@ export default {
         res.data.forEach(item => {
           item.remain_coin_amount = parseFloat(item.remain_coin_amount) // 防止出现0E-8这种情况
         })
-        this.items = res.data
+
+        this[this.itemStatus === this.constant.ITEM_STATUS.ONLINE ? 'itemsOnline': 'itemsOffline'] = res.data
       }).catch(err => {
         this.axios.onError(err)
       })
@@ -303,6 +309,12 @@ export default {
     },
 
     onItemOnline(item, e) {
+      const onlineItems = this.itemsOnline.filter(onlineItem => onlineItem.coin_type === item.coin_type)
+
+      if (onlineItems.length >= 2) {
+        return this.$errorTips('每个币种每个类型的广告最多只能上架两条')
+      }
+
       this.editingItem = item
       this.isItemAmountEditing = true
       this.onlineItemCoinAmount = item.remain_coin_amount
