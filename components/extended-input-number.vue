@@ -12,7 +12,7 @@
 </style>
 
 <template>
-  <input class="extended-input-number" type="number" :disabled="disabled" :value="value"
+  <input class="extended-input-number" type="input" :disabled="disabled" :value="value"
          @input="onInput" :placeholder="placeholder"
          @focus="onFocus"/>
 </template>
@@ -46,7 +46,11 @@
     methods: {
       onInput(evt) {
         // 应该说全局没有负数的，所以这里武断地把0-9.以外的字符给过滤掉了。如果有需要后期可以加参数来配置这一特性
-        let value = evt.target.value.replace(/[^0-9.]/gi, '')
+        let numberExp = /[^0-9.]/gi
+        if (this.decimalDigit === 0) {
+          numberExp = /[^0-9]/gi
+        }
+        let value = evt.target.value.replace(numberExp, '')
         // 如果value为空，则直接返回，防止被转为0
         if (value === '') {
           this.setValue(value, evt)
