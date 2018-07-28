@@ -316,15 +316,15 @@
             validation: {
               required,
               minLength: minLength(2),
-              maxLength: maxLength(30),
+              maxLength: maxLength(15),
               uniqueName: () => {
                 return !this.nameDuplicated
               }
             },
             message: {
               required: '请填写昵称',
-              minLength: '昵称不能少于两个字符',
-              maxLength: '昵称不能多于三十个字符',
+              minLength: '昵称最少2个字符',
+              maxLength: '昵称最多15个字符',
               uniqueName: '该昵称已被占用',
             },
           },
