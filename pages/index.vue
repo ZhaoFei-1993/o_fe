@@ -87,6 +87,7 @@
         }
       }
       .items-list {
+        background-color: white;
         box-shadow: 0 0 10px 0 #ececec;
         .list-title {
           display: flex;
@@ -336,10 +337,11 @@
             </span>
           </div>
         </div>
+        <ViaPagination :total-rows="pager.total" :current-page="pager.currentPage" :per-page="pager.limit"
+                       @change="onPagerChange">
+        </ViaPagination>
       </div>
-      <ViaPagination :total-rows="pager.total" :current-page="pager.currentPage" :per-page="pager.limit"
-                     @change="onPagerChange">
-      </ViaPagination>
+
     </div>
     <PlaceOrderModal
       v-if="selectedItem&&user.account"
