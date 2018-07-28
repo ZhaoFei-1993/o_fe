@@ -159,7 +159,7 @@
       </b-form-group>
 
       <b-form-group label="交易数量" class="coin-amount-group">
-        <div v-if="form.side === constant.SIDE.BUY">
+        <div v-if="form.side === constant.SIDE.BUY && balance.otcMap">
           <Language text="最多可售[a][/a][c][/c]">
             <b-btn slot="a" variant="plain-yellow" @click="onSetCoinAmount2All">{{balance.otcMap[form.coin_type].available}}</b-btn>
             <span slot="c">{{form.coin_type}}</span>
