@@ -54,6 +54,10 @@
         margin-bottom: 40px;
       }
 
+      .modal-header {
+        padding-top: 10px;
+      }
+
       .modal-body {
         padding-left: 30px;
         padding-right: 90px;
@@ -126,11 +130,11 @@
       </div>
 
       <p slot="content">
-        {{payment.accouont_no}}
-        {{payment.account_name}}
+        <span class="mr-2">{{payment.account_no}}</span>
+        <span class="mr-2">{{payment.account_name}}</span>
         <template v-if="payment.method === constant.PAYMENT_TYPES.BANKCARD">
-          {{payment.bank}}
-          {{payment.branch}}
+          <span class="mr-2">{{payment.bank}}</span>
+          <span class="mr-2">{{payment.branch}}</span>
         </template>
       </p>
 
@@ -173,8 +177,7 @@
 
         <div v-if="form.method === 'bankcard'">
           <b-form-group label="开户银行:" horizontal>
-            <b-form-select v-model="form.bank" :options="bankOptionsWithDefault">
-            </b-form-select>
+            <b-form-select v-model="form.bank" :options="bankOptionsWithDefault"></b-form-select>
             <EMsgs :result="$v.form" :msgs="validationConf.messages" keyName="bank"/>
           </b-form-group>
           <b-form-group label="开户支行:" horizontal>

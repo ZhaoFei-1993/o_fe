@@ -29,9 +29,12 @@
     <b-form-group v-if="needEmail" class="email-group" label="邮箱验证码:" horizontal>
       <b-input-group class="code-input-group">
         <b-form-input class="code-input" :value="email" @input="onEmailInput" size="lg" placeholder="6位邮箱验证码"></b-form-input>
-        <b-btn slot="append" variant="plain" class="c-brand-green" :disabled="!!emailTimer" @click="onSendEmailCode">
-          <span>发送验证码</span> {{emailTimer ? `(${emailCountdown})` : ''}}
-        </b-btn>
+        <template slot="append">
+          <Language v-if="emailTimer" text="[s][/s]秒重新发送" style="line-height: 40px;" tag="div">
+            <span slot="s">{{emailCountdown}}</span>
+          </Language>
+          <b-btn v-else variant="plain-green" @click="onSendEmailCode">获取验证码</b-btn>
+        </template>
       </b-input-group>
       <EMsgs :result="$v" :msgs="invalidMessages" keyName="email"/>
     </b-form-group>
@@ -48,9 +51,12 @@
                   class="sms-group" label="短信验证码:" horizontal>
       <b-input-group class="code-input-group">
         <b-form-input class="code-input" :value="sms" @input="onSmsInput" size="lg" placeholder="6位短信验证码"></b-form-input>
-        <b-btn slot="append" variant="plain" class="c-brand-green" :disabled="!!smsTimer" @click="onSendSmsCode">
-          <span>发送验证码</span> {{smsTimer ? `(${smsCountdown})` : ''}}
-        </b-btn>
+        <template slot="append">
+          <Language v-if="smsTimer" text="[s][/s]秒重新发送" style="line-height: 40px;" tag="div">
+            <span slot="s">{{smsCountdown}}</span>
+          </Language>
+          <b-btn v-else variant="plain-green" @click="onSendSmsCode">获取验证码</b-btn>
+        </template>
       </b-input-group>
       <EMsgs :result="$v" :msgs="invalidMessages" keyName="sms" class="ps-a"/>
     </b-form-group>
