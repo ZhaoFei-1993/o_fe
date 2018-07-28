@@ -14,9 +14,10 @@
               <span>类型</span>
               <b-dropdown variant="block" no-caret class="filter-dropdown" menu-class="filter-menu">
                 <template slot="button-content">
-                  <i class="iconfont icon-filter"></i>
+                  <i class="iconfont icon-arrowdown"></i>
                 </template>
                 <b-dropdown-item-button @click="onClickHeadFilter({ key: 'side', value: option.value })"
+                                        style="outline: none;"
                                         v-for="(option, index) in orderTypeFilterOptions" :key="index">{{ option.text }}
                 </b-dropdown-item-button>
               </b-dropdown>
@@ -27,9 +28,10 @@
               <span>币种</span>
               <b-dropdown variant="block" no-caret class="filter-dropdown" menu-class="filter-menu">
                 <template slot="button-content">
-                  <i class="iconfont icon-filter"></i>
+                  <i class="iconfont icon-arrowdown"></i>
                 </template>
                 <b-dropdown-item-button @click="onClickHeadFilter({ key: 'coin_type', value: option.value })"
+                                        style="outline: none;"
                                         v-for="(option, index) in coinTypeFilterOptions" :key="index">{{ option.text }}
                 </b-dropdown-item-button>
               </b-dropdown>
@@ -74,6 +76,7 @@
                   <span>购买 {{ item.coin_type }}</span>
                 </div>
                 <div class="detail-h2">
+                  <span style="display: inline-block;width: 24px;"></span>
                   向{{ item.merchant.name }}
                 </div>
               </div>
@@ -244,6 +247,10 @@
         </b-table>
         <blank v-if="!orderTableItems.length"></blank>
         <b-pagination v-if="orderTableItems.length"
+                      align="right"
+                      size="sm"
+                      prev-text="上一页"
+                      next-text="下一页"
                       :total-rows="queryParams.totalRows"
                       v-model="queryParams.page"
                       :per-page="queryParams.limit">
@@ -307,15 +314,15 @@
               paddingLeft: '30px',
             },
             thClass: ['text-left'],
-            tdClass: ['text-center'],
+            tdClass: ['text-left', 'pl-30'],
           },
           _order_type: {
             label: '类型',
             thStyle: {
-              width: '80px',
+              width: '100px',
             },
-            thClass: ['text-right'],
-            tdClass: ['text-right'],
+            thClass: ['text-center'],
+            tdClass: ['text-center'],
             sortable: false,
           },
           coin_type: {
@@ -323,43 +330,43 @@
             thStyle: {
               width: '120px',
             },
-            thClass: ['text-right'],
-            tdClass: ['text-right'],
+            thClass: ['text-center'],
+            tdClass: ['text-center'],
             sortable: false,
           },
           coin_amount: {
             label: '数量',
             thStyle: {
-              width: '160px',
+              width: '185px',
             },
-            thClass: ['text-right'],
-            tdClass: ['text-right'],
+            thClass: ['text-center'],
+            tdClass: ['text-center'],
             sortable: false,
           },
           price: {
             label: '单价',
-            thClass: ['text-right'],
-            tdClass: ['text-right'],
+            thClass: ['text-center'],
+            tdClass: ['text-center'],
             thStyle: {
-              width: '160px',
+              width: '185px',
             },
             sortable: false,
           },
           cash_amount: {
             label: '总价',
-            thClass: ['text-right'],
-            tdClass: ['text-right'],
+            thClass: ['text-center'],
+            tdClass: ['text-center'],
             thStyle: {
-              width: '160px',
+              width: '185px',
             },
             sortable: false,
           },
           place_time: {
             label: '下单时间',
-            thClass: ['text-right'],
-            tdClass: ['text-right'],
+            thClass: ['text-center'],
+            tdClass: ['text-center'],
             thStyle: {
-              width: '180px',
+              width: '190px',
             },
             sortable: false,
           },
@@ -639,6 +646,9 @@
         display: inline-block;
         color: #feb132;
         cursor: pointer;
+        .iconfont {
+          font-size: 12px;
+        }
       }
       .show-detail {
         transform: rotate(0deg);
@@ -669,13 +679,15 @@
         display: flex;
         justify-content: space-between;
         .col1 {
-          flex: 2;
+          // flex: 2;
+          width: 200px;
           padding-left: 30px;
           text-align: left;
         }
         .col2 {
           flex: 2;
           text-align: left;
+          margin-left: 15px;
         }
         .col3 {
           flex: 2;
@@ -697,17 +709,20 @@
           display: inline-block;
           position: relative;
           border-radius: 100px;
-          width: 28px;
-          height: 28px;
+          width: 24px;
+          height: 24px;
           background-color: #fff;
           box-shadow: 0 0 10px 0 #ececec;
           text-align: center;
           color: #52cbca;
-          line-height: 28px;
+          line-height: 24px;
           margin-left: 6px;
           a.message-link {
             &:hover {
               text-decoration: none !important;
+            }
+            .iconfont {
+              font-size: 14px;
             }
           }
           .shake-rotate {
@@ -745,6 +760,9 @@
         .detail-h2 {
           font-size: 14px;
           margin-top: 10px;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          overflow: hidden;
         }
         .detail-warn-text {
           color: #e35555;

@@ -62,14 +62,14 @@
       <div class="float-right">
         <div style="display: inline-block;">
           <span style="font-size: 12px;">币种：</span>
-          <b-form-select style="width: 100px;"
+          <b-form-select class="history-filter-select"
                          v-model="historyQueryParams.coin_type"
                          :options="[{ text: '全部', value: null }, ...constant.COIN_TYPE_OPTIONS]">
           </b-form-select>
         </div>
         <div style="display: inline-block;margin-left: 30px;">
           <span style="font-size: 12px;">操作：</span>
-          <b-form-select style="width: 100px;"
+          <b-form-select class="history-filter-select"
                          v-model="historyQueryParams.business_type"
                          :options="operationOptions">
           </b-form-select>
@@ -90,6 +90,10 @@
       </b-table>
       <blank v-if="!assetHistoryItems.length"></blank>
       <b-pagination v-if="assetHistoryItems.length"
+                    align="right"
+                    size="sm"
+                    prev-text="上一页"
+                    next-text="下一页"
                     :total-rows="historyQueryParams.totalRows"
                     v-model="historyQueryParams.page"
                     :per-page="historyQueryParams.limit">
@@ -588,9 +592,11 @@
       text-align: left;
       color: #192330;
       padding-bottom: 15px;
-    }
-    .td-pl {
-      padding-left: 28px;
+      .history-filter-select {
+        width: 100px !important;
+        height: 30px !important;
+        font-size: 12px !important;
+      }
     }
     .amount-input {
       height: 100%;
