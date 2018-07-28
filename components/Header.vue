@@ -35,6 +35,14 @@
           color: $brandGreen;
         }
       }
+      .order-link {
+        color: $dark;
+        margin-right: 10px;
+        &:hover {
+          color: $brandGreen;
+          text-decoration: none;
+        }
+      }
       .message-button {
         border: none;
         background: transparent;
@@ -166,7 +174,7 @@
       </b-navbar-nav>
       <b-navbar-nav class="ml-auto">
         <div v-if="user.account">
-          <b-link class="mr-10 c-black" to="/orders">订单</b-link>
+          <b-link class="order-link" to="/orders">订单</b-link>
           <!--TODO 暂时不做-->
           <!--<b-nav-item-dropdown id="user-dropdown" text="订单">-->
 
