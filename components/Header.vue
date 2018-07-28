@@ -6,7 +6,7 @@
     z-index: 11;
     top: 0px;
     font-size: 14px;
-    &.scrolled{
+    &.scrolled {
       box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.1);
     }
     .navbar-nav {
@@ -278,6 +278,8 @@
           userName: null,
         },
         coinexDomain,
+        minNameLength: 2,
+        maxNameLength: 15,
         attentionModelShowing: false,
         attention: [],
         nameDuplicated: false,
@@ -308,23 +310,23 @@
         return 'https://support.coinex.com/hc/' + lang
       },
       invalidName() {
-        return !this.form.userName || this.form.userName.length < 2 || this.form.userName.length > 30
+        return !this.form.userName || this.form.userName.length < this.minNameLength || this.form.userName.length > this.maxNameLength
       },
       validationConf() {
         return this.utils.processValidationConfig({
           userName: {
             validation: {
               required,
-              minLength: minLength(2),
-              maxLength: maxLength(15),
+              minLength: minLength(this.minNameLength),
+              maxLength: maxLength(this.maxNameLength),
               uniqueName: () => {
                 return !this.nameDuplicated
               }
             },
             message: {
               required: '请填写昵称',
-              minLength: '昵称最少2个字符',
-              maxLength: '昵称最多15个字符',
+              minLength: `昵称最少${this.minNameLength}个字符`,
+              maxLength: `昵称最多${this.maxNameLength}个字符`,
               uniqueName: '该昵称已被占用',
             },
           },
