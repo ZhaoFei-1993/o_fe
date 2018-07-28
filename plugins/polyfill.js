@@ -8,7 +8,7 @@ String.prototype.setDigit = function (digit) {
   if (parts[1] && parts[1].length > digit) {
     return parts[0] + (digit > 0 ? "." : "") + parts[1].substr(0, digit);
   }
-  return str;
+  return str.toString();
 };
 
 String.prototype.limitDigit = function (limit, defDigit = 8) {
