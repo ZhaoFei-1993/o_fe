@@ -45,8 +45,8 @@ export default {
 
       if (!(this.user.merchant && this.user.merchant.auth_status === this.constant.MERCHANT_AUTH_STATUS.PASS)) {
         this.$showDialog({
-          title: '您尚未成为认证商家',    // todo:文案
-          content: '通过商家认证后可以发布广告，请申请并通过商家认证后再发布广告',
+          title: '商家认证',
+          content: '您需要成为认证商家后，才可以发布广告',
           okTitle: '去认证',
           onOk: () => {
             this.$router.push('/my/merchant')
@@ -58,9 +58,9 @@ export default {
 
       if (!this.paymentEnabled) {
         this.$showDialog({
-          title: '没有启用支付方式',
-          content: '添加并且启用至少一个支付方式后才可以发布广告',
-          okTitle: '启用支付方式',
+          title: '开启支付方式',
+          content: '您需要开启支付方式后，才可以发布广告',
+          okTitle: '去开启',
           onOk: () => {
             this.$router.push('/my/payments')
           }

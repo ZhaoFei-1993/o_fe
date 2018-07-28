@@ -348,11 +348,12 @@
     },
     methods: {
       onSubmit() {
-        if (this.account.kyc_status !== this.constant.KYC_STATUS.PASS) return this.$showTips(`请先完成实名认证`, 'error')
-        if (!this.account.mobile) return this.$showTips(`请先绑定手机`, 'error')
-        if (!this.isVideoSent) return this.$showTips(`请先确认发送认证视频到 bd@coinex.com`, 'error')
-        if (!this.isContractRead) return this.$showTips('请先阅读并同意服务协议', 'error')
-        if (!this.form.wechat) return this.$showTips('请填写认证微信号', 'error')
+        if (this.account.kyc_status !== this.constant.KYC_STATUS.PASS) return this.$errorTips(`请先完成实名认证`)
+        if (!this.account.mobile) return this.$errorTips(`请先绑定手机`)
+        if (!this.isVideoSent) return this.$errorTips(`请先确认发送认证视频到 bd@coinex.com`)
+        if (!this.isContractRead) return this.$errorTips('请先阅读并同意服务协议')
+        if (!this.form.wechat) return this.$errorTips('请填写联系人微信')
+        if (this.form.wechat.length > 30 || this.form.wechat.length < 5) return this.$errorTips('请输入正确的微信号')
 
         this.axios.user.applyMerchant(this.form).then(res => {
           this.$showTips('提交申请成功')
