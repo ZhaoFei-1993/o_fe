@@ -124,8 +124,8 @@
     <template v-if="merchant && !formEditing">
       <MyInfoItem v-if="merchant.auth_status === constant.MERCHANT_AUTH_STATUS.PASS" title="商家认证">
         <template slot="content">
-          <p>您已通过商家认证审核，现在可以发布广告了</p>
-          <p>商家认证已锁定 100,000 CET</p>
+          <p class="c-brand-green">您已通过商家认证审核，现在可以发布广告了</p>
+          <p>商家认证已锁定 {{MERCHANT_REQUIRED_CET_AMOUNT}} CET</p>
         </template>
       </MyInfoItem>
 
@@ -135,8 +135,10 @@
         <!--<b-btn slot="action" variant="outline-green" size="xs" @click="onCancelApply">取消申请</b-btn>-->
       </MyInfoItem>
       <MyInfoItem v-else-if="merchant.auth_status === constant.MERCHANT_AUTH_STATUS.NO" title="商家认证">
-        <p slot="content" class="c-brand-green" data-todo="文案">您未通过商家认证审核。</p>
-        <p data-todo="细化原因">驳回原因：认证审核资料不符合要求</p>
+        <template slot="content">
+          <p data-todo="文案" class="c-brand-green">您未通过商家认证审核。</p>
+          <p>驳回原因：{{merchant.remark||'认证审核资料不符合要求'}}</p>
+        </template>
         <b-btn slot="action" variant="outline-green" size="xs" @click="onReSubmit">重新提交</b-btn>
       </MyInfoItem>
       <MyInfoItem v-else-if="merchant.auth_status === constant.MERCHANT_AUTH_STATUS.CANCEL" title="商家认证">

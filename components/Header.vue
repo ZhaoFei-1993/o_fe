@@ -6,6 +6,9 @@
     z-index: 11;
     top: 0px;
     font-size: 14px;
+    &.scrolled{
+      box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.1);
+    }
     .navbar-nav {
       display: inline-block;
     }
@@ -157,7 +160,7 @@
 </style>
 
 <template>
-  <div class="page-header pr bgc-w">
+  <div :class="['page-header pr bgc-w',headerClass]">
     <b-navbar class="navbar-main" toggleable="md">
       <b-navbar-brand to="/">
         <img src="~assets/img/logo.png" alt="CoinEx OTC" height="34" width="120">
@@ -174,7 +177,7 @@
       </b-navbar-nav>
       <b-navbar-nav class="ml-auto">
         <div v-if="user.account">
-          <b-link class="order-link" to="/orders">订单</b-link>
+          <b-link class="order-link" to="/orders"><i class="iconfont icon-order-list"></i>订单</b-link>
           <!--TODO 暂时不做-->
           <!--<b-nav-item-dropdown id="user-dropdown" text="订单">-->
 
@@ -182,7 +185,7 @@
           <!--</b-nav-item-dropdown>-->
           <span style="color: #d5d5d5">|</span>
           <button class="message-button" hidden><i class="iconfont icon-message"></i></button>
-          <b-nav-item-dropdown id="user-dropdown" :text="'Hi, '+simplifyUserName(user.account.name)">
+          <b-nav-item-dropdown id="user-dropdown" :text="simplifyUserName(user.account.name)">
             <!--<b-dropdown-item :href="accountSetting">账户设置</b-dropdown-item>-->
             <b-dropdown-item to="/my/security"><i class="iconfont icon-manage-account"></i> 个人中心</b-dropdown-item>
             <b-dropdown-item to="/wallet"><i class="iconfont icon-wallet"></i> OTC钱包</b-dropdown-item>
@@ -263,7 +266,7 @@
   Vue.use(Vuelidate)
   export default {
     head: {
-      link: [{rel: 'stylesheet', href: '//at.alicdn.com/t/font_739076_x6i5224yel.css'}]
+      link: [{rel: 'stylesheet', href: '//at.alicdn.com/t/font_739076_kafaqotcyrb.css'}]
     },
     components: {
       PublishItemButton,
@@ -278,6 +281,7 @@
         attentionModelShowing: false,
         attention: [],
         nameDuplicated: false,
+        headerClass: '',
         activeAttentionIndex: 0,
         loginPage: `${loginPage}?redirect=${encodeURIComponent(webDomain + this.$route.fullPath)}`,
         registerPage: `${signupPage}?redirect=${encodeURIComponent(webDomain + this.$route.fullPath)}`,
@@ -350,6 +354,10 @@
         if (err.code === this.constant.ERROR_CODE.UNAUTHORIZED) return
         this.axios.onError(err)
       })
+      window.addEventListener('scroll', this.onScroll)
+    },
+    beforeDestroy() {
+      window.removeEventListener('scroll', this.onScroll)
     },
     methods: {
       handleUpdateName(evt) {
@@ -396,6 +404,10 @@
       },
       signOut() {
         this.$store.dispatch('signOut')
+      },
+      onScroll(e) {
+        if (!e.target === document) return
+        this.headerClass = window.scrollY > 0 ? 'scrolled' : ''
       },
     }
   }

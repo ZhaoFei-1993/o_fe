@@ -109,8 +109,7 @@ $background-red: #e45555;
   background-color: transparent;
   border-color: $brandGreen;
   color: $brandGreen;
-
-  &:hover {
+  &:hover, &:focus, &:active {
     background-image: $image-gradient-green;
     border: none;
     color: #fff;
@@ -163,9 +162,8 @@ $background-red: #e45555;
   border-color: $brightYellow;
   color: $brightYellow;
 
-  &:hover {
+  &:hover, &:focus, &:active {
     background-image: $image-gradient-yellow;
-    border-color: transparent;
     color: #fff;
     border: none;
   }
