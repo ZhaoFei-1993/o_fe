@@ -49,15 +49,13 @@
       </div>
     </div>
     <div class="input-box" :style="{height: `${inputHeight}px`}">
-      <b-input-group class="input-group">
-        <b-form-input placeholder="输入信息，回车发送" type="text" class="input-text" v-model="message" @keyup.enter.native="onSendMsg"></b-form-input>
-        <b-input-group-append>
-          <input id="chat-file-image" type="file" accept="image/jpg, image/jpeg, image/png, image/gif, image/bmp" style="display: none" ref="fileSelector" @change="onUpload">
-          <b-btn id="upload" @click="onSelectFile">
-            <span style="color: #52cbca"><i class="iconfont icon-attachment"></i></span>
-          </b-btn>
-        </b-input-group-append>
-      </b-input-group>
+      <div class="input-group">
+        <input placeholder="输入信息，回车发送" type="text" class="input-text" v-model="message" @keyup.enter="onSendMsg">
+        <input id="chat-file-image" type="file" accept="image/*" style="display: none;" ref="fileSelector" @change="onUpload">
+        <button id="upload" @click="onSelectFile">
+          <span style="color: #52cbca;"><i class="iconfont icon-attachment"></i></span>
+        </button>
+      </div>
     </div>
     <image-modal v-model="imageModalData.show" :src="imageModalData.src"></image-modal>
   </div>
@@ -587,8 +585,21 @@
       .input-text {
         height: 100%;
         border: 0;
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+        position: relative;
+        flex: 1 1 auto;
+        width: 1%;
+        margin-bottom: 0;
+        padding: 0 8px;
+        font-size: 16px;
+        outline: none;
       }
       #upload {
+        display: inline-block;
+        padding: 0 10px;
+        outline: none;
+        cursor: pointer;
         background-color: #fff;
         border: 0;
       }

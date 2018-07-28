@@ -175,8 +175,10 @@
                   </template>
                   <template v-if="item.status === constant.ORDER_STATUS.PAID.value">
                     <div class="message-btn">
-                      <i :class="['iconfont', 'icon-message', item._unreadMessageCount > 0 ? 'shake-rotate' : '']"></i>
-                      <sup class="message-badge" v-if="item._unreadMessageCount > 0"></sup>
+                      <b-link :to="`/orders/${item.id}`" class="message-link">
+                        <i :class="['iconfont', 'icon-message', item._unreadMessageCount > 0 ? 'shake-rotate' : '']"></i>
+                        <sup class="message-badge" v-if="item._unreadMessageCount > 0"></sup>
+                      </b-link>
                     </div>
                     <div class="detail-btn-wrapper detail-waiting">
                       等待卖家收款
@@ -188,8 +190,10 @@
                   </template>
                   <template v-if="item.status === constant.ORDER_STATUS.CLOSED.value">
                     <div class="message-btn">
-                      <i :class="['iconfont', 'icon-message', item._unreadMessageCount > 0 ? 'shake-rotate' : '']"></i>
-                      <sup class="message-badge" v-if="item._unreadMessageCount > 0"></sup>
+                      <b-link :to="`/orders/${item.id}`" class="message-link">
+                        <i :class="['iconfont', 'icon-message', item._unreadMessageCount > 0 ? 'shake-rotate' : '']"></i>
+                        <sup class="message-badge" v-if="item._unreadMessageCount > 0"></sup>
+                      </b-link>
                     </div>
                     <div class="detail-btn-wrapper detail-waiting">
                       已结束
@@ -203,8 +207,10 @@
                         还剩{{ item._remaining_time | formatDuration }}
                       </div>
                       <div class="message-btn">
-                        <i :class="['iconfont', 'icon-message', item._unreadMessageCount > 0 ? 'shake-rotate' : '']"></i>
-                        <sup class="message-badge" v-if="item._unreadMessageCount > 0"></sup>
+                        <b-link :to="`/orders/${item.id}`" class="message-link">
+                          <i :class="['iconfont', 'icon-message', item._unreadMessageCount > 0 ? 'shake-rotate' : '']"></i>
+                          <sup class="message-badge" v-if="item._unreadMessageCount > 0"></sup>
+                        </b-link>
                       </div>
                       <div class="detail-btn-wrapper detail-waiting">
                         等待买家付款
@@ -218,8 +224,10 @@
                   </template>
                   <template v-if="item.status === constant.ORDER_STATUS.PAID.value">
                     <div class="message-btn">
-                      <i :class="['iconfont', 'icon-message', item._unreadMessageCount > 0 ? 'shake-rotate' : '']"></i>
-                      <sup class="message-badge" v-if="item._unreadMessageCount > 0"></sup>
+                      <b-link :to="`/orders/${item.id}`" class="message-link">
+                        <i :class="['iconfont', 'icon-message', item._unreadMessageCount > 0 ? 'shake-rotate' : '']"></i>
+                        <sup class="message-badge" v-if="item._unreadMessageCount > 0"></sup>
+                      </b-link>
                     </div>
                     <div class="detail-btn-wrapper">
                       <b-btn size="xs" variant="gradient-yellow" class="detail-btn" @click="confirmReceipt(item)">确认收款
