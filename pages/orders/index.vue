@@ -140,7 +140,7 @@
                   </div>
                   <div class="detail-text detail-warn-text"
                        v-if="item._isBuySide && item.status === constant.ORDER_STATUS.CREATED.value">
-                    转账时除参考号外请不要备注任何信息，防止卡被冻结!
+                    请使用实名付款，转账时除参考号外请不要备注任何信息！
                   </div>
                 </template>
 
