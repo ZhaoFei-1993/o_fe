@@ -309,9 +309,9 @@
           </div>
         </div>
       </div>
-      <b-pagination :total-rows="pager.total" :value="pager.currentPage" :per-page="pager.limit"
+      <ViaPagination :total-rows="pager.total" :current-page="pager.currentPage" :per-page="pager.limit"
                     @change="onPagerChange">
-      </b-pagination>
+      </ViaPagination>
     </div>
     <PlaceOrderModal
       v-if="selectedItem&&user.account"
@@ -342,6 +342,7 @@
   import {mapState} from 'vuex'
   import {coinexDomain, loginPage, webDomain} from '~/modules/variables'
   import PlaceOrderModal from '~/components/place-order-modal'
+  import ViaPagination from '~/components/via-pagination'
   import UserPayments from '~/components/user-payments'
   import PublishItemButton from '~/components/publish-item-modal/publish-item-button.vue'
   import {PlaceOrderError} from '~/modules/error-code'
@@ -372,6 +373,7 @@
       PlaceOrderModal,
       UserPayments,
       PublishItemButton,
+      ViaPagination,
     },
     layout: 'fullwidth',
     data() {
