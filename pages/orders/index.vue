@@ -170,7 +170,7 @@
                     </template>
                     <template v-else>
                       <div class="detail-btn-wrapper detail-waiting">
-                        订单已超时
+                        已超时
                       </div>
                     </template>
                   </template>
