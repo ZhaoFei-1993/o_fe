@@ -7,9 +7,10 @@
            ok-variant="gradient-yellow"
            button-size="sm"
            :centered="true"
-           v-model="showConfirmReceiptModal"
+           :visible="showConfirmReceiptModal"
+           :ok-disabled="invalidCode"
            @ok="confirmReceipt"
-           @hide="cancelReceipt"
+           @cancel="cancelReceipt"
            ref="confirmReceiptModal">
     <div class="text-left">确认已收到该笔款项？<p class="c-red">如您没有收到买家付款，确认收款后，放行的数字货币将无法追回。</p></div>
     <VerifyCode v-if="needVerify"
@@ -35,7 +36,7 @@
           codeType: constant.VERIFY_CODE_TYPE.GOOGLE,
           sms: '',
           google: '',
-          businessType: '',
+          businessType: constant.VERIFY_CODE_BUSINESS.CONFIRM_RECEIPT,
           smsSequence: 0,
         },
         needVerify: false,
@@ -46,6 +47,11 @@
     },
     computed: {
       ...mapState(['user', 'constant']),
+      invalidCode() {
+        const wrongGoogle = this.user.account.is_have_totp_auth && (!this.verify.google || this.verify.google.length !== 6)
+        const wrongSMS = this.user.account.mobile && (!this.verify.sms || this.verify.sms.length !== 6)
+        return this.needVerify && (wrongGoogle || wrongSMS)
+      },
     },
     mounted() {
       if (this.user && this.user.account && this.user.account.trade_validate_frequency === this.constant.TRADE_VALIDATE_FREQUENCY.EACH_TIME) {
@@ -62,18 +68,18 @@
           validate_code_type: verify.codeType,
           validate_code: code,
           sequence: verify.smsSequence,
-        }).then(response => {
+        }).then(() => {
+          this.needVerify = false
           this.$refs.confirmReceiptModal.hide()
           this.$emit('confirmReceipt')
-          this.needVerify = false
-        }).catch(() => {
-          this.$showTips('请输入验证码', 'error')
+        }).catch(err => {
+          this.$showTips(err.message, 'error')
           this.needVerify = true
         })
       },
       cancelReceipt() {
         this.$emit('cancelReceipt')
-      }
+      },
     },
   }
 </script>

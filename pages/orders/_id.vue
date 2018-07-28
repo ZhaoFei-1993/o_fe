@@ -68,6 +68,7 @@
             <div class="step-time" v-if="order.complete_time">{{order.complete_time| getTimeText}}</div>
             <button v-if="!isBuySide&&order.status===constant.ORDER_STATUS.PAID.value"
                     class="btn btn-gradient-yellow btn-xs"
+                    :disabled="isAppealing"
                     @click="confirmReceipt()">确认收款
             </button>
           </li>
@@ -102,12 +103,14 @@
           <div v-if="appeal.status===constant.APPEAL_STATUS.CREATED"
                class="d-flex align-items-center justify-content-between">
             <span>{{appealSide}}已发起申诉，请等待申诉专员介入</span>
-            <button class="btn btn-outline-green btn-xs" @click="cancelAppeal">取消申诉</button>
+            <button v-if="isCurrentUserAppealing" class="btn btn-outline-green btn-xs" @click="cancelAppeal">取消申诉
+            </button>
           </div>
           <div v-if="appeal.status===constant.APPEAL_STATUS.PROCESSING"
                class="d-flex align-items-center justify-content-between">
             <span>申诉专员已经介入，请及时提供必要的信息</span>
-            <button class="btn btn-outline-green btn-xs" @click="cancelAppeal">取消申诉</button>
+            <button v-if="isCurrentUserAppealing" class="btn btn-outline-green btn-xs" @click="cancelAppeal">取消申诉
+            </button>
           </div>
           <div v-if="appeal.status===constant.APPEAL_STATUS.CANCEL">
             <span>{{appealSide}}已取消申诉，如果仍有问题，请</span>
@@ -431,6 +434,13 @@
         if (!this.appeal) return null
         return this.isBuyerAppeal ? '买家' : '卖家'
       },
+      isCurrentUserAppealing() {
+        if (!this.appeal) return false
+        return this.appeal.user_id === this.user.account.id
+      },
+      isAppealing() {
+        return this.appeal && this.appeal.status !== this.constant.APPEAL_STATUS.CANCEL
+      },
       canAppeal() {
         // 支付后三十分钟以后 和 完成后七天内可以申诉
         const paid = this.order.status === this.constant.ORDER_STATUS.PAID.value
@@ -450,7 +460,7 @@
       },
       canCancel() {
         const orderStatusOk = this.order.status === this.constant.ORDER_STATUS.CREATED.value || this.order.status === this.constant.ORDER_STATUS.PAID.value
-        return this.isBuySide && orderStatusOk
+        return this.isBuySide && orderStatusOk && this.isAppealing
       },
       showPayment() {
         const createdBuyer = this.order.status === this.constant.ORDER_STATUS.CREATED.value && this.isBuySide
@@ -621,7 +631,9 @@
           title: '取消申诉',
           content: (<div class="text-left"><p>确认取消申诉？</p><p class="c-red">取消申诉后的订单将不可再次申诉。</p></div>),
           onOk: () => {
-            this.axios.order.cancelAppeal(this.order.id).catch(err => {
+            this.axios.order.cancelAppeal(this.order.id).then(() => {
+              this.getAppeal()
+            }).catch(err => {
               this.axios.onError(err)
             })
           }
@@ -632,7 +644,9 @@
           title: '取消订单',
           content: (<div class="text-left"><p>确认取消订单？</p><p class="c-red">取消的订单将不可重新打开。</p></div>),
           onOk: () => {
-            this.axios.order.cancelOrder(this.order.id)
+            this.axios.order.cancelOrder(this.order.id).then(() => {
+              this.refreshOrderStatus()
+            })
           }
         })
       },

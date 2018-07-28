@@ -54,11 +54,13 @@
           display: flex;
           font-size: 14px;
           justify-content: center;
+          background-color: #fff;
           &:not(:last-child) {
             border-bottom: 1px solid #eeeeee;
           }
           &:hover {
             color: $brandGreen;
+            background-color: #f8f9fa;
           }
           i {
             display: inline-block;
@@ -66,6 +68,9 @@
             margin-right: 10px;
             text-align: center;
           }
+        }
+        a.active {
+          background-color: #007bff !important;
         }
       }
       .name-span {
