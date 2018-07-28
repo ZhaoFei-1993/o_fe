@@ -282,9 +282,11 @@ export default {
       this.axios.item.userItems(this.itemStatus).then(res => {
         res.data.forEach(item => {
           item.remain_coin_amount = parseFloat(item.remain_coin_amount) // 防止出现0E-8这种情况
+          item.max_deal_cash_amount = item.max_deal_cash_amount.setDigit(0)
+          item.min_deal_cash_amount = item.min_deal_cash_amount.setDigit(0)
         })
 
-        this[this.itemStatus === this.constant.ITEM_STATUS.ONLINE ? 'itemsOnline': 'itemsOffline'] = res.data
+        this[this.itemStatus === this.constant.ITEM_STATUS.ONLINE ? 'itemsOnline' : 'itemsOffline'] = res.data
       }).catch(err => {
         this.axios.onError(err)
       })

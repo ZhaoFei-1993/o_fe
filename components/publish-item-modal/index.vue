@@ -159,10 +159,13 @@
       </b-form-group>
 
       <b-form-group label="交易数量" class="coin-amount-group">
-        <Language text="最多可售[a][/a][c][/c]" v-if="form.side === 'sell'">
-          <b-btn slot="a" variant="plain-yellow" @click="onSetCoinAmount2All">{{balance.otcMap[form.coin_type].available}}</b-btn>
-          <span slot="c">{{form.coin_type}}</span>
-        </Language>
+        <div>
+          <Language text="最多可售[a][/a][c][/c]" v-if="form.side === 'sell'">
+            <b-btn slot="a" variant="plain-yellow" @click="onSetCoinAmount2All">{{balance.otcMap[form.coin_type].available}}</b-btn>
+            <span slot="c">{{form.coin_type}}</span>
+          </Language>
+          <b-btn variant="plain-green" size="xxs" class="ml-10" @click="onSetCoinAmount2All">全部出售</b-btn>
+        </div>
         <div class="coin-amount-container">
           <CurrencyInput v-model="form.coin_amount" :currency="form.coin_type" placeholder="请输入数量" class="col-left"/>
           <div class="col-right fz-22">
@@ -180,7 +183,7 @@
         <b-btn variant="plain-green" class="btn-more-setting" size="xs" @click="onClickMoreSetting">
           更多设置 <i class="iconfont icon-double-arrow-down ml-1"></i>
         </b-btn>
-        <span class="c-6f fz-18">广告设置 <CTooltip content="更多设置内容，可在广告设置中统一进行设置模板。" size="18" :x="2"/></span>
+        <b-btn class="c-6f fz-18" variant="plain">广告设置 <CTooltip content="交易限额、自动回复、交易方限制可在广告设置中统一编辑默认值" size="18" :x="2"/></b-btn>
       </div>
 
       <!--更多设置-->
@@ -190,7 +193,7 @@
             <Language text="最低金额 [p][/p] 元" class="input-label" tag="div">
               <span slot="p">{{constant.DEAL_CASH_AMOUNT.MIN}}</span>
             </Language>
-            <CurrencyInput v-model="form.min_deal_cash_amount" :currency="balance.currentCash" placeholder="最低单笔金额" :decimalDigit="2"/>
+            <CurrencyInput v-model="form.min_deal_cash_amount" :currency="balance.currentCash" placeholder="最低单笔金额" :decimalDigit="0"/>
             <EMsgs :result="$v.form" :messages="itemValidations.messages" keyName="min_deal_cash_amount"/>
           </div>
           <div class="order-cash-limit-separator">至</div>
@@ -198,7 +201,7 @@
             <Language text="最高金额 [p][/p] 元" class="input-label" tag="div">
               <span slot="p">{{constant.DEAL_CASH_AMOUNT.MAX.formatMoney()}}</span>
             </Language>
-            <CurrencyInput v-model="form.max_deal_cash_amount" :currency="balance.currentCash" placeholder="最高单笔金额" :decimalDigit="2"/>
+            <CurrencyInput v-model="form.max_deal_cash_amount" :currency="balance.currentCash" placeholder="最高单笔金额" :decimalDigit="0"/>
             <EMsgs :result="$v.form" :messages="itemValidations.messages" keyName="max_deal_cash_amount"/>
           </div>
         </b-form-group>
