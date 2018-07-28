@@ -48,6 +48,7 @@
         }
 
         .icon-bothway {
+          margin-top: 25px;
           width: 50px;
           text-align: center;
         }
@@ -134,7 +135,7 @@
               <b-btn variant="plain-yellow" size="xxs" @click="onSetPrice2MarketPrice">{{marketPrice}}</b-btn>
               <CTooltip content="采用Bitfinex、Coinbase和Bitstamp 三个交易所的平均价格，仅供参考。" x="4"/>
             </div>
-            <CurrencyInput v-model="form.price" :currency="balance.currentCash" :decimalDigit="2" :disabled="true" placeholder="请输入价格"/>
+            <CurrencyInput :value="(marketPrice * form.float_rate / 100).setDigit(2)" :currency="balance.currentCash" :disabled="true" plain placeholder="请输入价格"/>
           </div>
 
           <i class="iconfont icon-bothway"></i>
@@ -420,7 +421,11 @@ export default {
       // }
     },
     onCoinTypeChange() {
-      this.form.price = this.balance.currentRate[this.form.coin_type]
+      // 很奇葩，即使是数据层面改变了coin_type，也会触发b-form-select的input事件，进而调用本函数。
+      // 所以需要判断下，如果是编辑广告的时候，不能将当前广告设置为市价，需要保持原价格不变
+      if (!this.editing) {
+        this.form.price = this.balance.currentRate[this.form.coin_type]
+      }
       // usdt没有浮动定价
       if (this.form.coin_type === 'USDT') {
         this.form.pricing_type = this.constant.PRICING_TYPE.FIXED
