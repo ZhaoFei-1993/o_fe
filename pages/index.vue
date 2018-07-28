@@ -299,7 +299,7 @@
               </div>
             </div>
             <span class="col-narrow text-right">
-              <div class="number">{{item.remain_coin_amount.setDigit(8)}}</div>
+              <div class="number">{{item.remain_coin_amount}}</div>
               <div class="unit">{{ selectedCoin}}</div>
             </span>
             <span class="col-wide text-right pr-60">
