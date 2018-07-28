@@ -112,8 +112,8 @@
     <b-form v-if="balance.currentRate">
       <!--<TabButtons :tabs="tradeSideOptions" v-model="form.side"/>-->
       <b-form-group label="我想" class="group-purpose">
-        <b-form-select v-model="form.side" :disabled="editing" class="col-left" :options="tradeSideOptions"></b-form-select>
-        <b-form-select v-model="form.coin_type" :disabled="editing" class="col-right" :options="constant.COIN_TYPE_OPTIONS" @input="onCoinTypeChange"></b-form-select>
+        <b-form-select v-model="form.side" :disabled="editing" class="col-left fz-16" :options="tradeSideOptions"></b-form-select>
+        <b-form-select v-model="form.coin_type" :disabled="editing" class="col-right fz-16" :options="constant.COIN_TYPE_OPTIONS" @input="onCoinTypeChange"></b-form-select>
       </b-form-group>
 
       <b-form-group label="交易价格" class="item-price-group">
@@ -338,6 +338,14 @@ export default {
       Object.assign(this.form, newValue, {
         coin_amount: newValue.remain_coin_amount // 一个现有的广告，其amount是 remain_coin_amount
       })
+    },
+    $route: function (route) {
+      // 如果当前是首页，则会有coin/side，设为默认值
+      const {coin, side} = route.query
+      if (coin && side) {
+        this.form.coin_type = coin
+        this.form.side = side
+      }
     }
   },
   mounted() {
