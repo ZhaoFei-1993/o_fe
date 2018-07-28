@@ -104,9 +104,14 @@
         {{formatMoney(item.min_deal_cash_amount)}} - {{formatMoney(item.max_deal_cash_amount)}} {{item.cash_type}}
       </template>
       <template slot="price" slot-scope="{ item }">
-        {{item.price}} {{item.cash_type}}
-        <span v-if="item.pricing_type === constant.PRICING_TYPE.FLOAT" style="color:#00b275">
-          ({{item.float_rate}}%)
+        <!--浮动定价需要显示浮动的定价，会和price不一致（由于后台更新延迟所导致）-->
+        <!--这里先不考虑最高、最低价，简单地显示个市价*比例，等后续用户反馈和产品决定，再看怎么显示-->
+        <span v-if="item.pricing_type === constant.PRICING_TYPE.FLOAT">
+          {{(balance.currentRate[item.coin_type] * item.float_rate / 100).setDigit(2)}} {{item.cash_type}}
+          <span style="color:#00b275">({{item.float_rate}}%)</span>
+        </span>
+        <span v-else>
+          {{item.price}} {{item.cash_type}}
         </span>
       </template>
       <!--暂时不显示用户的最后编辑时间 jeff 20180721-->

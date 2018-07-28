@@ -117,7 +117,7 @@
       </b-form-group>
 
       <b-form-group label="交易价格" class="item-price-group">
-        <b-form-radio-group v-model="form.pricing_type" :options="pricingTypeOptions" class="mb-10" @input="onPricingTypeChange"></b-form-radio-group>
+        <b-form-radio-group v-model="form.pricing_type" :options="pricingTypeOptions" class="mb-10"></b-form-radio-group>
 
         <div v-if="form.pricing_type === constant.PRICING_TYPE.FIXED">
           <div class="input-label" todo="todo:应该是参考价格吧？">
@@ -323,19 +323,6 @@ export default {
     }
   },
   watch: {
-    'form.price': function (price) {
-      // 暂时只有单向变化，不做双向的 jeff 20180724
-      // const form = this.form
-      // form.float_rate = price.decimalDiv(this.balance.currentRate[form.coin_type]).decimalMul(100)
-      //
-      // if (form.side === 'buy' && form.price_limit < price && Number(price) !== 0) form.price_limit = price
-      // if (form.side === 'sell' && form.price_limit > price && Number(price) !== 0) form.price_limit = price
-    },
-    'form.float_rate': function (floatRate) {
-      if (this.form.pricing_type !== this.constant.PRICING_TYPE.FLOAT) return
-      // 价格限制2位小数
-      this.form.price = floatRate.decimalDiv(100).decimalMul(this.balance.currentRate[this.form.coin_type]).setDigit(2)
-    },
     // 用editingItem覆盖form
     editingItem: function (newValue) {
       Object.assign(this.form, newValue, {
@@ -367,13 +354,6 @@ export default {
     onSetCoinAmount2All() {
       this.form.coin_amount = this.balance.otcMap[this.form.coin_type].available
     },
-    onPricingTypeChange(pricingType) {
-      const form = this.form
-      // form.price_limit = this.marketPrice
-      form.price = this.marketPrice
-      form.float_rate = 100
-    },
-
     doCreateOrUpdateItem(isEdit) {
       const itemPromise = isEdit ? this.axios.item.updateItem : this.axios.item.createItem
 
