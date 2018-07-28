@@ -124,13 +124,15 @@
     <template v-if="merchant && !formEditing">
       <MyInfoItem v-if="merchant.auth_status === constant.MERCHANT_AUTH_STATUS.PASS" title="商家认证">
         <template slot="content">
-          <p>您已通过商家认证审核，现在可以发布广告了</p>
-          <p>商家认证已锁定 100,000 CET</p>
+          <p class="c-brand-green">您已通过商家认证审核，现在可以发布广告了</p>
+          <Language text="商家认证已锁定 [a][/a] CET" tag="p">
+            <span slot="a">{{merchant.guaranty_amount.formatMoney()}}</span>
+          </Language>
         </template>
       </MyInfoItem>
 
       <MyInfoItem v-else-if="merchant.auth_status === constant.MERCHANT_AUTH_STATUS.CREATED" title="商家认证">
-        <p slot="content" class="c-brand-green">信息已提交，审核中</p>
+        <p slot="content" class="c-brand-green lh-2">信息已提交，审核中</p>
         <!--暂时不做取消申请 jeff 20180716-->
         <!--<b-btn slot="action" variant="outline-green" size="xs" @click="onCancelApply">取消申请</b-btn>-->
       </MyInfoItem>
@@ -175,7 +177,7 @@
             </div>
           </ContactItem>
           <ContactItem title="联系人微信" icon="icon-wechat-linear" :required="true">
-            <b-form-input v-model="form.wechat" placeholder="该微信号码用于后续认证与沟通"></b-form-input>
+            <b-form-input v-model="form.wechat" placeholder="用于后续认证与沟通"></b-form-input>
           </ContactItem>
         </div>
       </ProgressItem>
@@ -207,7 +209,7 @@
             请先进行
             <b-link :href="`${coinexDomain}/my/wallet/deposit?type=cet`" target="_blank">充值</b-link>
             或
-            <b-link :href="`${coinexDomain}/exchange?currency=bch&dest=cet`" target="_blank">交易</b-link>
+            <b-link :href="`${coinexDomain}/exchange?currency=bch&dest=cet`" target="_blank">购买</b-link>
           </span>
         </InfoItem>
       </ProgressItem>

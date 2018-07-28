@@ -374,11 +374,7 @@
           payment.status = status
           this.$showTips(status === PAYMENT_STATUS.ON ? '开启成功' : '关闭成功')
         }).catch(err => {
-          if (err.code === this.constant.ERROR_CODE.ATLEAST_ONE_PAYMENT_METHOD) {
-            this.$errorTips('您有上架中的出售广告或未完成的出售订单，至少需要开启一种支付方式。')
-          } else {
-            this.axios.onError(err)
-          }
+          this.axios.onError(err)
         })
       },
 
