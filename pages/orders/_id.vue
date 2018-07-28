@@ -68,6 +68,7 @@
             <div class="step-time" v-if="order.complete_time">{{order.complete_time| getTimeText}}</div>
             <button v-if="!isBuySide&&order.status===constant.ORDER_STATUS.PAID.value"
                     class="btn btn-gradient-yellow btn-xs"
+                    :disabled="isAppealing"
                     @click="confirmReceipt()">确认收款
             </button>
           </li>
@@ -437,6 +438,9 @@
         if (!this.appeal) return false
         return this.appeal.user_id === this.user.account.id
       },
+      isAppealing() {
+        return this.appeal && this.appeal.status !== this.constant.APPEAL_STATUS.CANCEL
+      },
       canAppeal() {
         // 支付后三十分钟以后 和 完成后七天内可以申诉
         const paid = this.order.status === this.constant.ORDER_STATUS.PAID.value
@@ -456,8 +460,7 @@
       },
       canCancel() {
         const orderStatusOk = this.order.status === this.constant.ORDER_STATUS.CREATED.value || this.order.status === this.constant.ORDER_STATUS.PAID.value
-        const noAppeal = !this.appeal || this.appeal.status === this.constant.APPEAL_STATUS.CANCEL
-        return this.isBuySide && orderStatusOk && noAppeal
+        return this.isBuySide && orderStatusOk && this.isAppealing
       },
       showPayment() {
         const createdBuyer = this.order.status === this.constant.ORDER_STATUS.CREATED.value && this.isBuySide
