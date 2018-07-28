@@ -333,7 +333,7 @@
           }
           if (!this.chat.imClient) {
             const clientId = `${this.user.account.id}`
-            this.$store.dispatch('newChatClient', clientId).catch(err => {
+            this.$store.dispatch('chat/newChatClient', clientId).catch(err => {
               onApiError(err, this)
             })
           }

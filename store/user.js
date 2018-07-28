@@ -111,9 +111,11 @@ export default () => {
         commit('SET_USER_QUALIFICATION', data.data)
       })
     },
-    signOut({commit}) {
+    signOut({commit, dispatch}) {
       return this.app.axios.user.signOut().then(res => {
         commit('SIGN_OUT')
+        return dispatch('chat/logout')
+      }).then(() => {
         this.$router.push('/')
       })
     },
