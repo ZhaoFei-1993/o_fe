@@ -54,12 +54,15 @@
             {{ item.cash_amount | formatMoney }}
           </template>
           <template slot="status" slot-scope="{ item, detailsShowing, toggleDetails }">
-            {{ constant?constant.ORDER_STATUS[item.status.toUpperCase()].text:'' }}
-            <span @click.stop="fetchUnreadMessageCount({toggleDetails, item})"
-                  v-if="item.status === constant.ORDER_STATUS.CREATED.value || item.status === constant.ORDER_STATUS.PAID.value"
-                  class="detail"
-                  :class="[ detailsShowing ? 'show-detail' : 'hidden-detail' ]">
-              <i class="iconfont icon-detail"></i>
+            <span v-if="item.appeal_status && item.appeal_status === 'created' || item.appel_status === 'processing'">申诉中</span>
+            <span v-else>
+              {{ constant?constant.ORDER_STATUS[item.status.toUpperCase()].text:'' }}
+              <span @click.stop="fetchUnreadMessageCount({toggleDetails, item})"
+                    v-if="item.status === constant.ORDER_STATUS.CREATED.value || item.status === constant.ORDER_STATUS.PAID.value"
+                    class="detail"
+                    :class="[ detailsShowing ? 'show-detail' : 'hidden-detail' ]">
+                <i class="iconfont icon-detail"></i>
+              </span>
             </span>
           </template>
           <template slot="row-details" slot-scope="{ item }">
@@ -549,6 +552,7 @@
             this.queryParams.status = this.filterOptions[i].value
             this.queryParams.coin_type = null
             this.queryParams.side = null
+            this.queryParams.page = 1 // 重置分页
             this.fetchOrderList()
           }
         }
