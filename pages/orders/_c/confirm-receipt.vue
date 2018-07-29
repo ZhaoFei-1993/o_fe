@@ -10,7 +10,7 @@
            :visible="showConfirmReceiptModal"
            :ok-disabled="invalidCode"
            @ok="confirmReceipt"
-           @cancel="cancelReceipt"
+           @hide="cancelReceipt"
            ref="confirmReceiptModal">
     <div class="text-left">确认已收到该笔款项？<p class="c-red">如您没有收到买家付款，确认收款后，放行的数字货币将无法追回。</p></div>
     <VerifyCode v-if="needVerify"
@@ -36,7 +36,7 @@
           codeType: constant.VERIFY_CODE_TYPE.GOOGLE,
           sms: '',
           google: '',
-          businessType: '',
+          businessType: constant.VERIFY_CODE_BUSINESS.CONFIRM_RECEIPT,
           smsSequence: 0,
         },
         needVerify: false,
@@ -77,7 +77,8 @@
           this.needVerify = true
         })
       },
-      cancelReceipt() {
+      cancelReceipt(evt) {
+        if (evt.trigger === 'ok') return
         this.$emit('cancelReceipt')
       },
     },

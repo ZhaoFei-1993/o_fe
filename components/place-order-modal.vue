@@ -55,7 +55,7 @@
                                      :decimalDigit="2"
                                      :step="0.1**2"
                                      @input="cashAmountChanged"
-                                     :placeholder="'可填写想'+sideText+'的金额'"/>
+                                     :placeholder="'请输入'+sideText+'金额'"/>
               </b-input-group>
               <EMsgs :result="$v.form.cash_amount" :msgs="invalidMessages.cash_amount"/>
             </div>
@@ -71,7 +71,7 @@
                                      :step="0.1**8"
                                      @focus="()=>onFocus('coinAmount')"
                                      @input="coinAmountChanged"
-                                     :placeholder="'可填写想'+sideText+'的数量'"/>
+                                     :placeholder="'请输入'+sideText+'数量'"/>
               </b-input-group>
               <EMsgs :result="$v.form.coin_amount" :msgs="invalidMessages.coin_amount"/>
             </div>
@@ -361,12 +361,14 @@
         if (this.form.focusInput === 'cashAmount') {
           this.form.coin_amount = this.form.cash_amount === '' ? null : `${this.form.cash_amount / this.item.price}`.setDigit(8)
         }
+        this.$v.form.coin_amount.$touch()
       },
       coinAmountChanged() {
         this.$v.form.coin_amount.$touch()
         if (this.form.focusInput === 'coinAmount') {
           this.form.cash_amount = this.form.coin_amount === '' ? null : `${this.form.coin_amount * this.item.price}`.setDigit(2)
         }
+        this.$v.form.cash_amount.$touch()
       },
       onFocus(inputName) {
         this.form.focusInput = inputName

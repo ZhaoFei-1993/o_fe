@@ -89,15 +89,11 @@
         </template>
       </b-table>
       <blank v-if="!assetHistoryItems.length"></blank>
-      <b-pagination v-if="assetHistoryItems.length"
-                    align="right"
-                    size="sm"
-                    prev-text="上一页"
-                    next-text="下一页"
+      <ViaPagination v-if="assetHistoryItems.length"
                     :total-rows="historyQueryParams.totalRows"
                     v-model="historyQueryParams.page"
                     :per-page="historyQueryParams.limit">
-      </b-pagination>
+      </ViaPagination>
     </c-block>
 
     <b-modal title="资金划转" v-model="showTransferModal" hide-footer no-close-on-backdrop>
@@ -132,6 +128,7 @@
 <script>
   import ExtendedInputNumber from '~/components/extended-input-number'
   import cBlock from '~/components/c-block'
+  import ViaPagination from '~/components/via-pagination'
   import Blank from '~/components/blank'
   import FundPie from './_c/fund-pie'
   import {mapState} from 'vuex'
@@ -301,6 +298,7 @@
       FundPie,
       Blank,
       ExtendedInputNumber,
+      ViaPagination,
     },
     computed: {
       ...mapState(['balance', 'constant']),

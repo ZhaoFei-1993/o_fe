@@ -28,7 +28,7 @@
   <div class="user-mini-profile">
     <UserAvatar :username="username" color="#c5f0f0" :online="online" :size="avatarSize"></UserAvatar>
     <div class="profile-right">
-      <div class="username">
+      <div class="username" v-b-tooltip.hover :title="username">
         {{username}}
       </div>
       <div v-if="isMerchant"><span v-b-tooltip.hover title="认证商家"><i

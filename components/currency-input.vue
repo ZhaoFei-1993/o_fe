@@ -18,6 +18,11 @@
           color: $brandGreen;
         }
       }
+
+      &:disabled {
+        background-color: #f9f9f9;
+        border: none;
+      }
     }
 
     .input-group-append {

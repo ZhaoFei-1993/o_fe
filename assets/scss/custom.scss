@@ -10,7 +10,7 @@ a {
   text-decoration: none;
 
   &:hover {
-    color: $brandYellow;
+    color: $brandGreen;
     text-decoration: underline;
   }
 }
@@ -180,7 +180,7 @@ input.form-control {
 
   .custom-control-indicator {
     background: transparent;
-    border: solid 1px #52cbca;
+    border: solid 1px $brandGreen;
     border-radius: 0;
     width: 16px;
     height: 16px;
@@ -194,7 +194,7 @@ input.form-control {
     top: 8px;
     border-radius: 0;
     background-color: transparent;
-    border: 1px solid $brandYellow;
+    border: 1px solid $brandGreen;
   }
 
   .custom-control-label::after {
@@ -202,7 +202,7 @@ input.form-control {
   }
 
   .custom-control-input:checked ~ .custom-control-label::before {
-    background-color: $brandYellow;
+    background-color: $brandGreen;
   }
 }
 

@@ -68,6 +68,7 @@
             <div class="step-time" v-if="order.complete_time">{{order.complete_time| getTimeText}}</div>
             <button v-if="!isBuySide&&order.status===constant.ORDER_STATUS.PAID.value"
                     class="btn btn-gradient-yellow btn-xs"
+                    :disabled="isAppealing"
                     @click="confirmReceipt()">确认收款
             </button>
           </li>
@@ -370,7 +371,7 @@
   const PAID_CAN_APPEAL = 30 * 60 * 1000 // 三十分钟
   const SUCCESS_CAN_APPEAL = 7 * 24 * 3600 * 1000 // 七天
   const ORDER_PAY_TIME = 15 // 15分钟（未换算）
-  const REFRESH_ORDER_INTERVAL = 5000
+  // const REFRESH_ORDER_INTERVAL = 5000
 
   export default {
     data() {
@@ -437,6 +438,9 @@
         if (!this.appeal) return false
         return this.appeal.user_id === this.user.account.id
       },
+      isAppealing() {
+        return this.appeal && this.appeal.status !== this.constant.APPEAL_STATUS.CANCEL
+      },
       canAppeal() {
         // 支付后三十分钟以后 和 完成后七天内可以申诉
         const paid = this.order.status === this.constant.ORDER_STATUS.PAID.value
@@ -456,7 +460,7 @@
       },
       canCancel() {
         const orderStatusOk = this.order.status === this.constant.ORDER_STATUS.CREATED.value || this.order.status === this.constant.ORDER_STATUS.PAID.value
-        return this.isBuySide && orderStatusOk
+        return this.isBuySide && orderStatusOk && this.isAppealing
       },
       showPayment() {
         const createdBuyer = this.order.status === this.constant.ORDER_STATUS.CREATED.value && this.isBuySide
@@ -594,9 +598,10 @@
           if (this.order.status === this.constant.ORDER_STATUS.PAID.value) {
             this.selectedMethod = this.order.payment_methods[0]
           }
-          this.refreshOrderTimeout = setTimeout(() => {
-            this.refreshOrderStatus()
-          }, REFRESH_ORDER_INTERVAL)
+          // 暂时不自动刷新状态了，等之后引入websocket
+          // this.refreshOrderTimeout = setTimeout(() => {
+          //   this.refreshOrderStatus()
+          // }, REFRESH_ORDER_INTERVAL)
         }
       },
       confirmPay() {
@@ -627,7 +632,9 @@
           title: '取消申诉',
           content: (<div class="text-left"><p>确认取消申诉？</p><p class="c-red">取消申诉后的订单将不可再次申诉。</p></div>),
           onOk: () => {
-            this.axios.order.cancelAppeal(this.order.id).catch(err => {
+            this.axios.order.cancelAppeal(this.order.id).then(() => {
+              this.getAppeal()
+            }).catch(err => {
               this.axios.onError(err)
             })
           }
@@ -638,7 +645,9 @@
           title: '取消订单',
           content: (<div class="text-left"><p>确认取消订单？</p><p class="c-red">取消的订单将不可重新打开。</p></div>),
           onOk: () => {
-            this.axios.order.cancelOrder(this.order.id)
+            this.axios.order.cancelOrder(this.order.id).then(() => {
+              this.refreshOrderStatus()
+            })
           }
         })
       },

@@ -87,7 +87,7 @@
       </b-btn>
     </div>
 
-    <b-table :fields="itemTableFields" :items="items" class="items-table">
+    <b-table :fields="itemTableFields" :items="itemsCurrent" class="items-table">
       <template slot="id" slot-scope="{ item }">
         <b-link>{{ item.id }}</b-link>
       </template>
@@ -104,9 +104,14 @@
         {{formatMoney(item.min_deal_cash_amount)}} - {{formatMoney(item.max_deal_cash_amount)}} {{item.cash_type}}
       </template>
       <template slot="price" slot-scope="{ item }">
-        {{item.price}} {{item.cash_type}}
-        <span v-if="item.pricing_type === constant.PRICING_TYPE.FLOAT" style="color:#00b275">
-          ({{item.float_rate}}%)
+        <!--浮动定价需要显示浮动的定价，会和price不一致（由于后台更新延迟所导致）-->
+        <!--这里先不考虑最高、最低价，简单地显示个市价*比例，等后续用户反馈和产品决定，再看怎么显示-->
+        <span v-if="item.pricing_type === constant.PRICING_TYPE.FLOAT">
+          {{(balance.currentRate[item.coin_type] * item.float_rate / 100).setDigit(2)}} {{item.cash_type}}
+          <span style="color:#00b275">({{item.float_rate}}%)</span>
+        </span>
+        <span v-else>
+          {{item.price}} {{item.cash_type}}
         </span>
       </template>
       <!--暂时不显示用户的最后编辑时间 jeff 20180721-->
@@ -136,11 +141,11 @@
       </template>
     </b-table>
 
-    <Blank v-if="!items.length"/>
+    <Blank v-if="!itemsCurrent.length"/>
 
     <CBlock v-show="isItemAmountEditing" class="item-coin-amount-container" ref="coin-amount" x="20" y="20">
       <div class="item-coin-amount-confirm">
-        <CurrencyInput v-model="onlineItemCoinAmount" class="item-coin-amount-confirm-input" :currency="editingItem.cash_type"/>
+        <CurrencyInput v-model="onlineItemCoinAmount" class="item-coin-amount-confirm-input" :currency="editingItem.coin_type"/>
         <b-btn variant="plain-green" size="xs" class="mx-20" @click="onItemOnlineConfirm">确定</b-btn>
         <b-btn variant="plain" size="xs" @click="onItemOnlineCancel">取消</b-btn>
       </div>
@@ -173,7 +178,8 @@ export default {
   },
   data() {
     return {
-      items: [],
+      itemsOnline: [],
+      itemsOffline: [],
       itemStatus: '',
       editingItem: {},        // 正在编辑or上架的广告
       onlineItemCoinAmount: 0, // 正在上架的广告的数量
@@ -183,6 +189,10 @@ export default {
   },
   computed: {
     ...mapState(['user', 'constant', 'balance']),
+    // 当前展示的广告列表
+    itemsCurrent: function () {
+      return this.itemStatus === this.constant.ITEM_STATUS.ONLINE ? this.itemsOnline : this.itemsOffline
+    },
     filterOptions: function () {
       return [{
         text: '进行中',
@@ -272,8 +282,11 @@ export default {
       this.axios.item.userItems(this.itemStatus).then(res => {
         res.data.forEach(item => {
           item.remain_coin_amount = parseFloat(item.remain_coin_amount) // 防止出现0E-8这种情况
+          item.max_deal_cash_amount = item.max_deal_cash_amount.setDigit(0)
+          item.min_deal_cash_amount = item.min_deal_cash_amount.setDigit(0)
         })
-        this.items = res.data
+
+        this[this.itemStatus === this.constant.ITEM_STATUS.ONLINE ? 'itemsOnline' : 'itemsOffline'] = res.data
       }).catch(err => {
         this.axios.onError(err)
       })
@@ -298,6 +311,12 @@ export default {
     },
 
     onItemOnline(item, e) {
+      const onlineItems = this.itemsOnline.filter(onlineItem => onlineItem.coin_type === item.coin_type)
+
+      if (onlineItems.length >= 2) {
+        return this.$errorTips('每个币种每个类型的广告最多只能上架两条')
+      }
+
       this.editingItem = item
       this.isItemAmountEditing = true
       this.onlineItemCoinAmount = item.remain_coin_amount
@@ -319,8 +338,8 @@ export default {
     },
     onItemDelete(item) {
       this.$showDialog({
-        title: '确认删除广告',
-        content: '删除的广告将不可恢复，确定删除？',
+        title: '删除广告',
+        content: '删除的广告将不可恢复。',
         onOk: () => {
           this.axios.item.delete(item.id).then(res => {
             this.getItems()

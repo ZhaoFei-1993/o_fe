@@ -34,12 +34,12 @@
       <div slot="content">
         <div v-if="amountLimitEditing" class="d-flex">
           <div>
-            <CurrencyInput v-model="editingSettings.min_deal_cash_amount" :currency="settings.cash_type" :decimalDigit="2"/>
+            <CurrencyInput v-model="editingSettings.min_deal_cash_amount" :currency="settings.cash_type" :decimalDigit="0"/>
             <EMsgs :result="$v.editingSettings" :messages="editingSettingsValidation.messages" keyName="min_deal_cash_amount" class="ps-a"/>
           </div>
           <span class="fz-12 mx-2 mt-10">—</span>
           <div>
-            <CurrencyInput v-model="editingSettings.max_deal_cash_amount" :currency="settings.cash_type" :decimalDigit="2"/>
+            <CurrencyInput v-model="editingSettings.max_deal_cash_amount" :currency="settings.cash_type" :decimalDigit="0"/>
             <EMsgs :result="$v.editingSettings" :messages="editingSettingsValidation.messages" keyName="max_deal_cash_amount" class="ps-a"/>
           </div>
         </div>
