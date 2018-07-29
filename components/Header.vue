@@ -41,9 +41,17 @@
       .order-link {
         color: $dark;
         margin-right: 10px;
+        height: 60px;
+        line-height: 60px;
+        display: inline-block;
         &:hover {
           color: $brandGreen;
           text-decoration: none;
+        }
+        .icon-order-list {
+          font-size: 14px;
+          margin-right: 8px;
+          margin-bottom: -2px;
         }
       }
       .message-button {
