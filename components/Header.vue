@@ -6,6 +6,9 @@
     z-index: 11;
     top: 0px;
     font-size: 14px;
+    &.scrolled {
+      box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.1);
+    }
     .navbar-nav {
       display: inline-block;
     }
@@ -33,6 +36,14 @@
 
         &.active {
           color: $brandGreen;
+        }
+      }
+      .order-link {
+        color: $dark;
+        margin-right: 10px;
+        &:hover {
+          color: $brandGreen;
+          text-decoration: none;
         }
       }
       .message-button {
@@ -149,7 +160,7 @@
 </style>
 
 <template>
-  <div class="page-header pr bgc-w">
+  <div :class="['page-header pr bgc-w',headerClass]">
     <b-navbar class="navbar-main" toggleable="md">
       <b-navbar-brand to="/">
         <img src="~assets/img/logo.png" alt="CoinEx OTC" height="34" width="120">
@@ -166,7 +177,7 @@
       </b-navbar-nav>
       <b-navbar-nav class="ml-auto">
         <div v-if="user.account">
-          <b-link class="mr-10 c-black" to="/orders">订单</b-link>
+          <b-link class="order-link" to="/orders"><i class="iconfont icon-order-list"></i>订单</b-link>
           <!--TODO 暂时不做-->
           <!--<b-nav-item-dropdown id="user-dropdown" text="订单">-->
 
@@ -174,7 +185,7 @@
           <!--</b-nav-item-dropdown>-->
           <span style="color: #d5d5d5">|</span>
           <button class="message-button" hidden><i class="iconfont icon-message"></i></button>
-          <b-nav-item-dropdown id="user-dropdown" :text="'Hi, '+simplifyUserName(user.account.name)">
+          <b-nav-item-dropdown id="user-dropdown" :text="simplifyUserName(user.account.name)">
             <!--<b-dropdown-item :href="accountSetting">账户设置</b-dropdown-item>-->
             <b-dropdown-item to="/my/security"><i class="iconfont icon-manage-account"></i> 个人中心</b-dropdown-item>
             <b-dropdown-item to="/wallet"><i class="iconfont icon-wallet"></i> OTC钱包</b-dropdown-item>
@@ -255,7 +266,7 @@
   Vue.use(Vuelidate)
   export default {
     head: {
-      link: [{rel: 'stylesheet', href: '//at.alicdn.com/t/font_739076_x6i5224yel.css'}]
+      link: [{rel: 'stylesheet', href: '//at.alicdn.com/t/font_739076_kafaqotcyrb.css'}]
     },
     components: {
       PublishItemButton,
@@ -267,9 +278,12 @@
           userName: null,
         },
         coinexDomain,
+        minNameLength: 2,
+        maxNameLength: 15,
         attentionModelShowing: false,
         attention: [],
         nameDuplicated: false,
+        headerClass: '',
         activeAttentionIndex: 0,
         loginPage: `${loginPage}?redirect=${encodeURIComponent(webDomain + this.$route.fullPath)}`,
         registerPage: `${signupPage}?redirect=${encodeURIComponent(webDomain + this.$route.fullPath)}`,
@@ -296,23 +310,23 @@
         return 'https://support.coinex.com/hc/' + lang
       },
       invalidName() {
-        return !this.form.userName || this.form.userName.length < 2 || this.form.userName.length > 30
+        return !this.form.userName || this.form.userName.length < this.minNameLength || this.form.userName.length > this.maxNameLength
       },
       validationConf() {
         return this.utils.processValidationConfig({
           userName: {
             validation: {
               required,
-              minLength: minLength(2),
-              maxLength: maxLength(30),
+              minLength: minLength(this.minNameLength),
+              maxLength: maxLength(this.maxNameLength),
               uniqueName: () => {
                 return !this.nameDuplicated
               }
             },
             message: {
               required: '请填写昵称',
-              minLength: '昵称不能少于两个字符',
-              maxLength: '昵称不能多于三十个字符',
+              minLength: `昵称最少${this.minNameLength}个字符`,
+              maxLength: `昵称最多${this.maxNameLength}个字符`,
               uniqueName: '该昵称已被占用',
             },
           },
@@ -342,6 +356,10 @@
         if (err.code === this.constant.ERROR_CODE.UNAUTHORIZED) return
         this.axios.onError(err)
       })
+      window.addEventListener('scroll', this.onScroll)
+    },
+    beforeDestroy() {
+      window.removeEventListener('scroll', this.onScroll)
     },
     methods: {
       handleUpdateName(evt) {
@@ -388,6 +406,10 @@
       },
       signOut() {
         this.$store.dispatch('signOut')
+      },
+      onScroll(e) {
+        if (!e.target === document) return
+        this.headerClass = window.scrollY > 0 ? 'scrolled' : ''
       },
     }
   }
