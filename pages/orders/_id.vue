@@ -371,7 +371,7 @@
   const PAID_CAN_APPEAL = 30 * 60 * 1000 // 三十分钟
   const SUCCESS_CAN_APPEAL = 7 * 24 * 3600 * 1000 // 七天
   const ORDER_PAY_TIME = 15 // 15分钟（未换算）
-  const REFRESH_ORDER_INTERVAL = 5000
+  // const REFRESH_ORDER_INTERVAL = 5000
 
   export default {
     data() {
@@ -598,9 +598,10 @@
           if (this.order.status === this.constant.ORDER_STATUS.PAID.value) {
             this.selectedMethod = this.order.payment_methods[0]
           }
-          this.refreshOrderTimeout = setTimeout(() => {
-            this.refreshOrderStatus()
-          }, REFRESH_ORDER_INTERVAL)
+          // 暂时不自动刷新状态了，等之后引入websocket
+          // this.refreshOrderTimeout = setTimeout(() => {
+          //   this.refreshOrderStatus()
+          // }, REFRESH_ORDER_INTERVAL)
         }
       },
       confirmPay() {
