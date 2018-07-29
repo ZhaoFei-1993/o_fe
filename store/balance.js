@@ -37,16 +37,19 @@ export default () => {
     fetchOtcBalance({ commit }) {
       return this.app.axios.balance.otcBalance().then(res => {
         commit('SET_OTC_BALANCE', res.data)
+        return res.data
       })
     },
     fetchCoinexBalance({ commit }) {
       return this.app.axios.balance.coinexBalance().then(res => {
         commit('SET_COINEX_BALANCE', res.data)
+        return res.data
       })
     },
     fetchExchangeRate({commit}) {
       return this.app.axios.balance.exchangeRate().then(res => {
         commit('SET_EXCHANGE_RATE', res.data)
+        return res.data
       })
     }
   }

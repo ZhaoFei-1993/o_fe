@@ -45,9 +45,14 @@ export default () => {
       }
       return state.imClient
     },
+
+    logout({ state }) {
+      return state.imClient.close()
+    },
   }
 
   return {
+    namespaced: true,
     state,
     actions,
     mutations,

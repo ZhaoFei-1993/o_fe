@@ -15,7 +15,7 @@ export default {
 
     width: {
       type: Number,
-      default: 550,
+      default: 430,
     },
 
     // 饼图数据
@@ -49,7 +49,7 @@ export default {
           height: '180',
           width: this.width,
           plotShadow: false,
-          spacing: [ 0, 50, 20, 0 ],
+          spacing: [ 0, -60, 20, 0 ], // 控制币种几个圆点的四个方向margin
           events: {
             render: function (event) {
               pipChart = event.target
@@ -156,6 +156,7 @@ export default {
 
         plotOptions: {
           pie: {
+            animation: true,
             allowPointSelect: true,
             cursor: 'pointer',
             borderWidth: 0,
@@ -258,6 +259,8 @@ export default {
     formatterChartTitle(y) {
       if (y > 100000) {
         y = this.toDecimal2(y / 10000) + 'w'
+      } else {
+        y = this.toDecimal2(y)
       }
       return `${y} ${this.asset}`
     },

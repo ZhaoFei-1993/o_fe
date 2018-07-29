@@ -173,7 +173,7 @@
         <b-nav-item to="/wallet">OTC钱包</b-nav-item>
         <b-nav-item :href="helpLink" target="_blank">帮助</b-nav-item>
         <span style="color: #d5d5d5">|</span>
-        <b-nav-item :href="`${coinexDomain}?lang=${lang.lang}`">返回主站</b-nav-item>
+        <b-nav-item :href="`${coinexDomain}?lang=${lang.lang}`" style="margin-left: 15px;">返回主站</b-nav-item>
       </b-navbar-nav>
       <b-navbar-nav class="ml-auto">
         <div v-if="user.account">
@@ -266,7 +266,7 @@
   Vue.use(Vuelidate)
   export default {
     head: {
-      link: [{rel: 'stylesheet', href: '//at.alicdn.com/t/font_739076_kafaqotcyrb.css'}]
+      link: [{rel: 'stylesheet', href: '//at.alicdn.com/t/font_739076_ymkogivtf3.css'}]
     },
     components: {
       PublishItemButton,
@@ -347,7 +347,7 @@
           }
           if (!this.chat.imClient) {
             const clientId = `${this.user.account.id}`
-            this.$store.dispatch('newChatClient', clientId).catch(err => {
+            this.$store.dispatch('chat/newChatClient', clientId).catch(err => {
               onApiError(err, this)
             })
           }

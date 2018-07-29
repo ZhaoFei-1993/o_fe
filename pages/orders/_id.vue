@@ -421,7 +421,7 @@
         return !(this.appealReason && this.appealComment && this.appealComment.length >= 15 && this.appealComment.length <= 500)
       },
       isMerchant() {
-        return this.order.merchant_id === this.user.account.id
+        return this.user.account && this.order.merchant_id === this.user.account.id
       },
       isBuySide() {
         return this.order.merchant_side === this.constant.SIDE.BUY ? this.isMerchant : !this.isMerchant

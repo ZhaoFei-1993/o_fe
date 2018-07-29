@@ -20,7 +20,7 @@
                 <span v-else>[不支持当前消息类型]</span>
               </div>
             </div>
-            <UserAvatar v-if="memberInfoMap[item.from]" :username="memberInfoMap[item.from].name" :color="memberInfoMap[item.from].color" :online="false" :size="40"></UserAvatar>
+            <UserAvatar v-if="memberInfoMap[item.from]" :username="memberInfoMap[item.from].name" :color="memberInfoMap[item.from].color" :online="false" :size="30"></UserAvatar>
           </div>
         </template>
         <template v-else-if="item.from === 'temporary'">
@@ -30,7 +30,7 @@
         </template>
         <template v-else>
           <div class="msg-box-left">
-            <UserAvatar v-if="memberInfoMap[item.from]" :username="memberInfoMap[item.from].name" :color="memberInfoMap[item.from].color" :online="false" :size="40"></UserAvatar>
+            <UserAvatar v-if="memberInfoMap[item.from]" :username="memberInfoMap[item.from].name" :color="memberInfoMap[item.from].color" :online="false" :size="30"></UserAvatar>
             <div class="msg-detail-wrapper">
               <div class="msg-username username-left">{{ memberInfoMap[item.from].name }}</div>
               <div class="msg-username username-left" v-if="item.status === MessageStatus.FAILED">
@@ -512,10 +512,11 @@
             margin-top: 7px;
             float: left;
             max-width: 250px;
-            padding: 5px;
+            padding: 15px;
             border-radius: 4px;
             word-wrap: break-word;
             background-color: #f9f9f9;
+            color: #27313e;
             &::after {
               content: "";
               position: absolute;
@@ -551,10 +552,11 @@
             float: right;
             padding-right: 10px;
             max-width: 250px;
-            padding: 5px;
+            padding: 15px;
             border-radius: 4px;
             word-wrap: break-word;
             background-color: #f9f9f9;
+            color: #27313e;
             &::after {
               content: "";
               position: absolute;
@@ -591,7 +593,7 @@
         flex: 1 1 auto;
         width: 1%;
         margin-bottom: 0;
-        padding: 0 8px;
+        padding-left: 30px;
         font-size: 16px;
         outline: none;
       }
