@@ -80,6 +80,10 @@
           color: $red;
         }
       }
+
+      .contact-item-content {
+        margin-top: 12px;
+      }
     }
 
     .info-item {
@@ -125,12 +129,14 @@
       <MyInfoItem v-if="merchant.auth_status === constant.MERCHANT_AUTH_STATUS.PASS" title="商家认证">
         <template slot="content">
           <p class="c-brand-green">您已通过商家认证审核，现在可以发布广告了</p>
-          <p>商家认证已锁定 {{MERCHANT_REQUIRED_CET_AMOUNT}} CET</p>
+          <Language text="商家认证已锁定 [a][/a] CET" tag="p">
+            <span slot="a">{{merchant.guaranty_amount.formatMoney()}}</span>
+          </Language>
         </template>
       </MyInfoItem>
 
       <MyInfoItem v-else-if="merchant.auth_status === constant.MERCHANT_AUTH_STATUS.CREATED" title="商家认证">
-        <p slot="content" class="c-brand-green">信息已提交，审核中</p>
+        <p slot="content" class="c-brand-green lh-2">信息已提交，审核中</p>
         <!--暂时不做取消申请 jeff 20180716-->
         <!--<b-btn slot="action" variant="outline-green" size="xs" @click="onCancelApply">取消申请</b-btn>-->
       </MyInfoItem>
@@ -159,7 +165,7 @@
         <div class="d-flex" v-if="account">
           <ContactItem title="手机认证" icon="icon-mobile" :active="true" :required="true">
             <div v-if="account.mobile" class="c-6f">
-              <p class="mt-10">已认证</p>
+              <p>已认证</p>
               <p>+{{account.country_code}} {{account.mobile}}</p>
             </div>
             <div v-else>
@@ -169,7 +175,7 @@
           </ContactItem>
           <ContactItem title="实名认证" icon="icon-namecard" :required="true">
             <div v-if="account.kyc_status === constant.KYC_STATUS.PASS" class="c-6f">
-              <p class="mt-10">已认证</p>
+              已认证
             </div>
             <div v-else>
               <p class="c-red">未认证</p>
@@ -177,7 +183,7 @@
             </div>
           </ContactItem>
           <ContactItem title="联系人微信" icon="icon-wechat-linear" :required="true">
-            <b-form-input v-model="form.wechat" placeholder="该微信号码用于后续认证与沟通"></b-form-input>
+            <b-form-input v-model="form.wechat" class="mt-10" placeholder="用于后续认证与沟通"></b-form-input>
           </ContactItem>
         </div>
       </ProgressItem>
@@ -209,7 +215,7 @@
             请先进行
             <b-link :href="`${coinexDomain}/my/wallet/deposit?type=cet`" target="_blank">充值</b-link>
             或
-            <b-link :href="`${coinexDomain}/exchange?currency=bch&dest=cet`" target="_blank">交易</b-link>
+            <b-link :href="`${coinexDomain}/exchange?currency=bch&dest=cet`" target="_blank">购买</b-link>
           </span>
         </InfoItem>
       </ProgressItem>
@@ -348,11 +354,12 @@
     },
     methods: {
       onSubmit() {
-        if (this.account.kyc_status !== this.constant.KYC_STATUS.PASS) return this.$showTips(`请先完成实名认证`, 'error')
-        if (!this.account.mobile) return this.$showTips(`请先绑定手机`, 'error')
-        if (!this.isVideoSent) return this.$showTips(`请先确认发送认证视频到 bd@coinex.com`, 'error')
-        if (!this.isContractRead) return this.$showTips('请先阅读并同意服务协议', 'error')
-        if (!this.form.wechat) return this.$showTips('请填写认证微信号', 'error')
+        if (this.account.kyc_status !== this.constant.KYC_STATUS.PASS) return this.$errorTips(`请先完成实名认证`)
+        if (!this.account.mobile) return this.$errorTips(`请先绑定手机`)
+        if (!this.isVideoSent) return this.$errorTips(`请先确认发送认证视频到 bd@coinex.com`)
+        if (!this.isContractRead) return this.$errorTips('请先阅读并同意服务协议')
+        if (!this.form.wechat) return this.$errorTips('请填写联系人微信')
+        if (this.form.wechat.length > 30 || this.form.wechat.length < 5) return this.$errorTips('请输入正确的微信号')
 
         this.axios.user.applyMerchant(this.form).then(res => {
           this.$showTips('提交申请成功')

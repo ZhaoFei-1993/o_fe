@@ -51,6 +51,8 @@ export default () => {
       state.merchant = data
     },
     SET_USER_SETTINGS(state, data) {
+      data.max_deal_cash_amount = data.max_deal_cash_amount.setDigit(0)
+      data.min_deal_cash_amount = data.min_deal_cash_amount.setDigit(0)
       state.settings = data
     },
     SET_USER_QUALIFICATION(state, data) {
