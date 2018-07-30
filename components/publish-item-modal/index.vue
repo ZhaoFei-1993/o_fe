@@ -98,6 +98,9 @@
         font-size: 18px;
       }
     }
+
+    .btn-more-setting {
+    }
   }
 </style>
 
@@ -190,7 +193,9 @@
         <b-btn variant="plain-green" class="btn-more-setting" size="xs" @click="onClickMoreSetting">
           更多设置 <i class="iconfont icon-double-arrow-down ml-1"></i>
         </b-btn>
-        <b-btn class="c-6f fz-18" variant="plain">广告设置 <CTooltip content="交易限额、自动回复、交易方限制可在广告设置中统一编辑默认值" size="16" :x="2"/></b-btn>
+        <b-btn class="btn-item-setting" variant="plain" to="/my/item-setting" @click="onClickItemSetting">
+          广告设置 <CTooltip content="交易限额、自动回复、交易方限制可在广告设置中统一编辑默认值" size="16" :x="2"/>
+        </b-btn>
       </div>
 
       <!--更多设置-->
@@ -370,6 +375,9 @@ export default {
     },
     onClickMoreSetting() {
       this.moreSettingShowing = !this.moreSettingShowing
+    },
+    onClickItemSetting() {
+      this.$emit('input', false)
     },
     onSetPrice2MarketPrice() {
       this.form.price = this.balance.currentRate[this.form.coin_type]
