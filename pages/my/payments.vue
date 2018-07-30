@@ -167,7 +167,8 @@
         </h4>
 
         <b-form-group label="类型:" horizontal class="mb-25">
-          <b-form-select v-model="form.method" :options="constant.ACTUAL_PAYMENT_OPTIONS" size="lg"></b-form-select>
+          <b-form-select v-model="form.method" :options="constant.ACTUAL_PAYMENT_OPTIONS" :disabled="isPaymentEditing" size="lg">
+          </b-form-select>
         </b-form-group>
 
         <b-form-group label="姓名:" horizontal>
@@ -238,7 +239,7 @@
     <h3 class="layout-my-title pl-0">2步完成添加支付方式</h3>
     <KycStep :step="1" title="完成实名认证" highlight>
       <span v-if="user.account.kyc_status === constant.KYC_STATUS.PROCESSING">审核中</span>
-      <b-link v-else :href="`${constant.coinexDomain}/my/info/auth/realname`">去实名 ></b-link>
+      <b-link v-else :href="`${constant.coinexDomain}/my/info/basic`">去实名 ></b-link>
     </KycStep>
     <KycStep :step="2" title="添加支付方式"/>
   </CBlock>
@@ -476,6 +477,7 @@
           this.modalShowing = false
           this.$showTips(this.isPaymentEditing ? '修改成功' : '添加成功')
           this.clearForm()
+          this.$refs['verify-code'].resetTimer()
 
           return this.$store.dispatch('fetchUserPayments')
         }).catch(err => {
