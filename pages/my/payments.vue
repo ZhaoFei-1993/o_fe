@@ -130,10 +130,10 @@
       </div>
 
       <p slot="content">
-        <span class="mr-2">{{payment.account_no}}</span>
         <span class="mr-2">{{payment.account_name}}</span>
+        <span class="mr-2">{{payment.account_no}}</span>
         <template v-if="payment.method === constant.PAYMENT_TYPES.BANKCARD">
-          <span class="mr-2">{{payment.bank}}</span>
+          <span class="mr-2">{{payment.bank_name}}</span>
           <span class="mr-2">{{payment.branch}}</span>
         </template>
       </p>

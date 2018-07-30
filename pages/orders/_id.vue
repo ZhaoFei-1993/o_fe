@@ -40,7 +40,7 @@
           <span class="payment-account">{{selectedMethod.account_name + ' '+ selectedMethod.account_no}}</span>
           <span v-if="selectedMethod.method === constant.PAYMENT_TYPES.BANKCARD"
                 class="detail-text">
-            {{ selectedMethod.bank }}，{{ selectedMethod.branch }}
+            {{ selectedMethod.bank_name }}，{{ selectedMethod.branch }}
           </span>
           <span class="qr-code-button"
                 v-if="selectedMethod.method!==constant.PAYMENT_TYPES.BANKCARD && selectedMethod.qr_code_image"

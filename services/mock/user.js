@@ -167,7 +167,8 @@ export const paymentMethods = {
     'account_no': '1234567890978675645',       // 账号或银行卡号
     'account_name': '吴孟达',        // 账户名
     'qr_code_image': '',
-    'bank': '招商银行',              // 银行名
+    'bank': 'ICBC',              // 银行名
+    'bank_name': '招商银行',              // 银行名
     'branch': '深圳支行',            // 银行支行
     'status': 'off',                 // 状态，on: 已开启, off: 未开启
   }, {
