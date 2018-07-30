@@ -340,15 +340,12 @@ export default {
       })
     },
     $route: function (route) {
-      // 如果当前是首页，则会有coin/side，设为默认值
-      const {coin, side} = route.query
-      if (coin && side) {
-        this.form.coin_type = coin
-        this.form.side = side
-      }
+      this.onRouteChange(route)
     }
   },
   mounted() {
+    this.onRouteChange(this.$route)
+
     return Promise.all([
       this.$store.dispatch('fetchExchangeRate'),
       this.$store.dispatch('fetchOtcBalance'),
@@ -363,6 +360,14 @@ export default {
     })
   },
   methods: {
+    onRouteChange(route) {
+      // 如果当前是首页，则会有coin/side，设为默认值
+      const {coin, side} = route.query
+      if (coin && side) {
+        this.form.coin_type = coin
+        this.form.side = side
+      }
+    },
     onClickMoreSetting() {
       this.moreSettingShowing = !this.moreSettingShowing
     },
