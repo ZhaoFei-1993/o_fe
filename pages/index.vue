@@ -93,10 +93,8 @@
           justify-content: space-between;
           padding: 24px 20px 8px;
           background-color: white;
-          span:first-of-type {
-            font-size: 18px;
-          }
         }
+
         .list-header {
           padding: 0 20px;
           height: 40px;
@@ -236,7 +234,7 @@
       </div>
       <div class="items-list">
         <div class="list-title">
-          <span>广告列表</span>
+          <span class="fz-18">广告列表</span>
           <span>
             没有合适的？
             <PublishItemButton>
