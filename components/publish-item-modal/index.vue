@@ -98,6 +98,9 @@
         font-size: 18px;
       }
     }
+
+    .btn-more-setting {
+    }
   }
 </style>
 
@@ -159,7 +162,7 @@
       </b-form-group>
 
       <b-form-group label="交易数量" class="coin-amount-group">
-        <div v-if="form.side === constant.SIDE.BUY && balance.otcMap">
+        <div v-if="form.side === constant.SIDE.SELL && balance.otcMap">
           <Language text="最多可售[a][/a][c][/c]">
             <b-btn slot="a" variant="plain-yellow" @click="onSetCoinAmount2All">{{balance.otcMap[form.coin_type].available}}</b-btn>
             <span slot="c">{{form.coin_type}}</span>
@@ -190,7 +193,9 @@
         <b-btn variant="plain-green" class="btn-more-setting" size="xs" @click="onClickMoreSetting">
           更多设置 <i class="iconfont icon-double-arrow-down ml-1"></i>
         </b-btn>
-        <b-btn class="c-6f fz-18" variant="plain">广告设置 <CTooltip content="交易限额、自动回复、交易方限制可在广告设置中统一编辑默认值" size="16" :x="2"/></b-btn>
+        <b-btn class="btn-item-setting" variant="plain" to="/my/item-setting" @click="onClickItemSetting">
+          广告设置 <CTooltip content="交易限额、自动回复、交易方限制可在广告设置中统一编辑默认值" size="16" :x="2"/>
+        </b-btn>
       </div>
 
       <!--更多设置-->
@@ -269,7 +274,7 @@ export default {
         pricing_type: 'fixed',
         min_deal_cash_amount: '',
         max_deal_cash_amount: '',
-        coin_type: 'BCH',
+        coin_type: 'BTC',
         cash_type: '',
         auto_reply_content: '',
         counterparty_limit: [],
@@ -340,15 +345,12 @@ export default {
       })
     },
     $route: function (route) {
-      // 如果当前是首页，则会有coin/side，设为默认值
-      const {coin, side} = route.query
-      if (coin && side) {
-        this.form.coin_type = coin
-        this.form.side = side
-      }
+      this.onRouteChange(route)
     }
   },
   mounted() {
+    this.onRouteChange(this.$route)
+
     return Promise.all([
       this.$store.dispatch('fetchExchangeRate'),
       this.$store.dispatch('fetchOtcBalance'),
@@ -363,8 +365,19 @@ export default {
     })
   },
   methods: {
+    onRouteChange(route) {
+      // 如果当前是首页，则会有coin/side，设为默认值
+      const {coin, side} = route.query
+      if (coin && side) {
+        this.form.coin_type = coin
+        this.form.side = side
+      }
+    },
     onClickMoreSetting() {
       this.moreSettingShowing = !this.moreSettingShowing
+    },
+    onClickItemSetting() {
+      this.$emit('input', false)
     },
     onSetPrice2MarketPrice() {
       this.form.price = this.balance.currentRate[this.form.coin_type]

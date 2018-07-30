@@ -225,6 +225,7 @@
       },
       onEditCounterpartyLimitCancel() {
         this.counterpartyLimitEditing = false
+        this.editingSettings.counterparty_limit = JSON.parse(JSON.stringify(this.settings.counterparty_limit))
       },
 
       // 将数据同步到本地的editingSettings

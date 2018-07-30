@@ -283,7 +283,7 @@
     data() {
       return {
         form: {
-          userName: null,
+          userName: '',
         },
         coinexDomain,
         minNameLength: 2,
@@ -350,7 +350,6 @@
       this.$store.dispatch('fetchUserAccount').then(_ => {
         if (this.user && this.user.account) {
           if (!this.user.account.is_name_confirmed) {
-            this.form.userName = this.user.account.name
             this.$refs.updateNameModal.show()
           }
           if (!this.chat.imClient) {
