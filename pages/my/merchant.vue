@@ -161,7 +161,7 @@
     <template v-else>
       <ProgressIndicator :active="-1"/>
 
-      <ProgressItem title="完善信息">
+      <ProgressItem title="完善信息" class="pt-50">
         <div class="d-flex" v-if="account">
           <ContactItem title="手机认证" icon="icon-mobile" :active="true" :required="true">
             <div v-if="account.mobile" class="c-6f">
@@ -170,7 +170,7 @@
             </div>
             <div v-else>
               <p class="c-red">未认证</p>
-              <b-link :href="`${coinexDomain}/my/info/security`" target="_blank">去认证 ></b-link>
+              <b-link :href="`${coinexDomain}/my/info/security`" target="_blank">去认证</b-link>
             </div>
           </ContactItem>
           <ContactItem title="实名认证" icon="icon-namecard" :required="true">
@@ -179,11 +179,11 @@
             </div>
             <div v-else>
               <p class="c-red">未认证</p>
-              <b-link :href="`${coinexDomain}/my/info/auth/realname`" target="_blank">去认证 ></b-link>
+              <b-link :href="`${coinexDomain}/my/info/auth/realname`" target="_blank">去认证</b-link>
             </div>
           </ContactItem>
           <ContactItem title="联系人微信" icon="icon-wechat-linear" :required="true">
-            <b-form-input v-model="form.wechat" class="mt-10" placeholder="用于后续认证与沟通"></b-form-input>
+            <b-form-input v-model="form.wechat" placeholder="用于后续认证与沟通"></b-form-input>
           </ContactItem>
         </div>
       </ProgressItem>

@@ -383,6 +383,8 @@
       purchaseAll() {
         this.form.cash_amount = this.maxDealCashAmount
         this.form.coin_amount = this.maxDealCoinAmount
+        this.$v.form.coin_amount.$touch()
+        this.$v.form.coin_amount.$touch()
       }
     },
   }

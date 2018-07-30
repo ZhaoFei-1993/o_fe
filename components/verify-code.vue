@@ -81,6 +81,9 @@
 
   Vue.use(Vuelidate)
 
+  // localStorage里面存储的key
+  const SMS_SEQUENCE_KEY = 'sms_code_sequence_key'
+  const EMAIL_SEQUENCE_KEY = 'email_code_sequence_key'
   const COUNTDOWN = 60
 
   export default {
@@ -154,6 +157,10 @@
       } else {
         this.$emit('update:codeType', '')
       }
+
+      // 从localStorage中读取sequence，避免"用户在获取验证码之后刷新页面，然后未重新获取验证码的情况下直接输入之前验证码，导致参数错误"
+      this.$emit('update:smsSequence', Number(window.localStorage.getItem(SMS_SEQUENCE_KEY)) || 1)
+      this.$emit('update:emailSequence', Number(window.localStorage.getItem(EMAIL_SEQUENCE_KEY)) || 1)
     },
     validations: function () {
       const rules = {}
@@ -224,6 +231,14 @@
           this.$v.$reset()
         })
       },
+
+      resetTimer() {
+        clearInterval(this.smsTimer)
+        clearInterval(this.emailTimer)
+        this.emailTimer = null
+        this.smsTimer = null
+      },
+
       onSendEmailCode() {
         if (this.emailTimer) return
 
@@ -240,6 +255,8 @@
               this.emailTimer = null
             }
           }, 1000)
+
+          window.localStorage.setItem(EMAIL_SEQUENCE_KEY, data.data.sequence)
         }).catch(err => {
           this.axios.onError(err)
         })
@@ -260,6 +277,8 @@
               this.smsTimer = null
             }
           }, 1000)
+
+          window.localStorage.setItem(SMS_SEQUENCE_KEY, data.data.sequence)
         }).catch(err => {
           this.axios.onError(err)
         })
