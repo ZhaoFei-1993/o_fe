@@ -162,6 +162,7 @@
         this.messageIterator = null
       }
       window.document.removeEventListener('visibilitychange', this.handleVisibilityChange)
+      window.document.title = this.originalTitle // 还原title
     },
     mounted() {
       this.init()

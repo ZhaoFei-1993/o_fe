@@ -13,6 +13,7 @@
 
 <template>
   <input class="extended-input-number" type="input" :disabled="disabled" :value="value"
+         autocomplete="off"
          :step="step"
          @input="onInput" :placeholder="placeholder"
          @focus="onFocus"/>

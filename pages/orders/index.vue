@@ -52,13 +52,16 @@
           <template slot="coin_amount" slot-scope="{ item }">
             {{ item.coin_amount | formatMoney }}
           </template>
+          <template slot="price" slot-scope="{ item }">
+            {{ item.price }} CNY
+          </template>
           <template slot="cash_amount" slot-scope="{ item }">
-            {{ item.cash_amount | formatMoney }}
+            {{ item.cash_amount | formatMoney }} CNY
           </template>
           <template slot="status" slot-scope="{ item, detailsShowing, toggleDetails }">
             <span v-if="item.appeal_status && item.appeal_status === 'created' || item.appel_status === 'processing'">申诉中</span>
             <span v-else>
-              {{ constant?constant.ORDER_STATUS[item.status.toUpperCase()].text:'' }}
+              <span class="status-text">{{ constant?constant.ORDER_STATUS[item.status.toUpperCase()].text:'' }}</span>
               <span @click.stop="fetchUnreadMessageCount({toggleDetails, item})"
                     v-if="item.status === constant.ORDER_STATUS.CREATED.value || item.status === constant.ORDER_STATUS.PAID.value"
                     class="detail"
@@ -77,7 +80,7 @@
                 </div>
                 <div class="detail-h2">
                   <span style="display: inline-block;width: 24px;"></span>
-                  向{{ item.merchant.name }}
+                  <span style="display: inline-block;margin-right: 3px;">向</span>{{ item.merchant.name }}
                 </div>
               </div>
               <div class="col2">
@@ -109,20 +112,20 @@
                   </template>
                   <template v-else>
                     <span v-if="item._selected_payment_method.method === 'bankcard'">
-                      <i class="iconfont icon-bankcard"></i>银行转帐
+                      <i class="iconfont icon-bankcard"></i><span class="payment-text">银行转帐</span>
                     </span>
                     <span v-if="item._selected_payment_method.method === 'wechat'">
-                      <i class="iconfont icon-wechat-round"></i>微信支付
+                      <i class="iconfont icon-wechat-round"></i><span class="payment-text">微信支付</span>
                     </span>
                     <span v-if="item._selected_payment_method.method === 'alipay'">
-                      <i class="iconfont icon-wechat-round"></i>支付宝支付
+                      <i class="iconfont icon-alipay"></i><span class="payment-text">支付宝支付</span>
                     </span>
                   </template>
                 </div>
               </div>
               <div class="col4" v-if="item._selected_payment_method">
                 <template v-if="!item._expired">
-                  <div class="detail-text">
+                  <div class="detail-text" style="color: #27313e;">
                     {{ item._selected_payment_method.account_name }}
                   </div>
                   <div class="detail-text">
@@ -130,7 +133,7 @@
                     <b-popover :target="`qr-${item.id}`"
                                placement="top"
                                triggers="hover click focus">
-                      <img style="display: block;width: 120px;height: 120px;"
+                      <img style="display: block;max-width: 360px;max-height: 360px;"
                            :src="item._selected_payment_method.qr_code_image_url">
                     </b-popover>
                     <span :id="`qr-${item.id}`" style="cursor: pointer;"
@@ -374,7 +377,7 @@
           },
           status: {
             label: '状态',
-            tdClass: ['text-center'],
+            tdClass: ['text-right', 'pr-30'],
             thStyle: {
               textAlign: 'center',
             },
@@ -477,9 +480,11 @@
       fetchUnreadMessageCount({toggleDetails, item}) {
         toggleDetails()
         if (!item.conversation_id) return
-        this.chat.imClient.getConversation(item.conversation_id).then(conversation => {
-          item._unreadMessageCount = conversation.unreadMessagesCount
-        }).catch(console.error)
+        if (this.chat.imClient) {
+          this.chat.imClient.getConversation(item.conversation_id).then(conversation => {
+            item._unreadMessageCount = conversation.unreadMessagesCount
+          }).catch(console.error)
+        }
       },
       startTimer() {
         clearInterval(this.timer) // 切换到其它tab需要清除定时器
@@ -607,6 +612,10 @@
     }
     .order-table {
       margin: 20px -30px 0;
+      .status-text {
+        display: inline-block;
+        margin-right: 9px;
+      }
       .filter-menu {
         width: 100px;
         min-width: 0;
@@ -651,6 +660,8 @@
         color: #feb132;
         cursor: pointer;
         .iconfont {
+          display: inline-block;
+          transform: scale(0.775);
           font-size: 12px;
         }
       }
@@ -667,10 +678,16 @@
       .payment-method {
         margin-bottom: 20px;
         color: #6f6f6f;
+        font-size: 14px;
+        .payment-text {
+          color: #27313e;
+          display: inline-block;
+          margin-left: 9px;
+        }
         select {
           border: none;
           background-color: transparent;
-          color: #6f6f6f;
+          color: #27313e;
           &:focus {
             outline: none;
           }
@@ -680,21 +697,22 @@
         }
       }
       .detail-wrapper {
+        margin-top: 16px;
+        margin-bottom: 12px;
         display: flex;
         justify-content: space-between;
         .col1 {
-          // flex: 2;
           width: 200px;
           padding-left: 30px;
           text-align: left;
         }
         .col2 {
-          flex: 2;
+          flex: 1.2;
           text-align: left;
           margin-left: 15px;
         }
         .col3 {
-          flex: 2;
+          flex: 1.2;
           text-align: left;
         }
         .col4 {
@@ -708,18 +726,19 @@
         }
         .detail-text {
           font-size: 14px;
+          color: #9b9b9b;
         }
         .message-btn {
           display: inline-block;
           position: relative;
           border-radius: 100px;
-          width: 24px;
-          height: 24px;
+          width: 28px;
+          height: 28px;
           background-color: #fff;
           box-shadow: 0 0 10px 0 #ececec;
           text-align: center;
           color: #52cbca;
-          line-height: 24px;
+          line-height: 28px;
           margin-left: 6px;
           a.message-link {
             &:hover {
@@ -759,6 +778,7 @@
           height: 30px;
         }
         .detail-h1 {
+          color: #27313e;
           font-size: 16px;
         }
         .detail-h2 {
@@ -767,6 +787,7 @@
           white-space: nowrap;
           text-overflow: ellipsis;
           overflow: hidden;
+          color: #9b9b9b;
         }
         .detail-warn-text {
           color: #e35555;
