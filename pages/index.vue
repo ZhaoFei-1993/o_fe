@@ -105,7 +105,7 @@
           justify-content: space-between;
           background-color: #f9f9f9;
           .col-narrow, .col-wide {
-            text-align: center;
+            /*text-align: center;*/
           }
           .col-name {
             text-align: left;
@@ -157,7 +157,6 @@
               font-size: 18px;
               flex: 1;
               padding: 0 60px 0 16px;
-              text-align: right;
               font-weight: 500;
               color: $brandGreen;
             }
@@ -296,11 +295,11 @@
                 `付款时间${utils.formatDuration(item.user.user_stat.pay_time)}`}}
               </div>
             </div>
-            <span class="col-narrow text-right">
+            <span class="col-narrow">
               <div class="number">{{item.remain_coin_amount}}</div>
               <div class="unit">{{ selectedCoin}}</div>
             </span>
-            <span class="col-wide text-right pr-60">
+            <span class="col-wide pr-60">
               <div class="number">{{item.min_deal_cash_amount.setDigit(0) + '-' + item.max_deal_cash_amount.setDigit(0)}}</div>
               <div class="unit">{{balance.currentCash}}</div>
             </span>
