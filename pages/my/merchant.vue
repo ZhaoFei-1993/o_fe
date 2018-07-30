@@ -168,7 +168,7 @@
             </div>
             <div v-else>
               <p class="c-red">未认证</p>
-              <b-link :href="`${coinexDomain}/my/info/security`" target="_blank">去认证 ></b-link>
+              <b-link :href="`${coinexDomain}/my/info/security`" target="_blank">去认证</b-link>
             </div>
           </ContactItem>
           <ContactItem title="实名认证" icon="icon-namecard" :required="true">
@@ -177,7 +177,7 @@
             </div>
             <div v-else>
               <p class="c-red">未认证</p>
-              <b-link :href="`${coinexDomain}/my/info/auth/realname`" target="_blank">去认证 ></b-link>
+              <b-link :href="`${coinexDomain}/my/info/auth/realname`" target="_blank">去认证</b-link>
             </div>
           </ContactItem>
           <ContactItem title="联系人微信" icon="icon-wechat-linear" :required="true">
