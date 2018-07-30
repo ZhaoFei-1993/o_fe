@@ -82,7 +82,8 @@
           </div>
           <div class="actions">
             <button class="btn btn-outline-green btn-lg" @click="onCancel">取消</button>
-            <button class="btn btn-gradient-yellow btn-lg" :disabled="submitting||$v.$invalid" @click="onSubmit">确定</button>
+            <button class="btn btn-gradient-yellow btn-lg" :disabled="submitting||$v.$invalid" @click="onSubmit">确定
+            </button>
           </div>
         </b-form>
       </div>
@@ -232,7 +233,6 @@
           cash_amount: null,
         },
         submitting: false,
-        min_deal_coin_amount: `${this.item.min_deal_cash_amount / this.item.price}`.setDigit(8),
         noKycLimit: 500,
       }
     },
@@ -246,6 +246,9 @@
       },
       currentBalance() {
         return parseFloat(this.balance.otcBalance.find(b => b.coin_type === this.item.coin_type).available)
+      },
+      minDealCoinAmount() {
+        return `${this.item.min_deal_cash_amount / this.item.price}`.setDigit(8)
       },
       maxDealCoinAmount() {
         // coin 更精确，优先用coin计算
@@ -296,7 +299,7 @@
           coin_amount: {
             validation: {
               required,
-              minValue: minValue(this.min_deal_coin_amount),
+              minValue: minValue(this.minDealCoinAmount),
               maxValue: maxValue(this.maxDealCoinAmount),
               hasBalance: (value) => {
                 return value <= this.sideMaxCoin
@@ -304,7 +307,7 @@
             },
             message: {
               required: '请填写购买金额',
-              minValue: `最小下单数量${this.min_deal_coin_amount}${this.item.coin_type}`,
+              minValue: `最小下单数量${this.minDealCoinAmount}${this.item.coin_type}`,
               maxValue: `最大下单数量${this.maxDealCoinAmount}${this.item.coin_type}`,
               hasBalance: `账户余额${this.sideMaxCoin}${this.item.coin_type}`
             },

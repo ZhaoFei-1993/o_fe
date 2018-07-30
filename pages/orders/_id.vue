@@ -80,6 +80,7 @@
           <li :class="['step',{active:order.status===constant.ORDER_STATUS.CANCEL.value}]"
               v-if="order.status===constant.ORDER_STATUS.CANCEL.value">
             <div class="message">{{stepsMessage.cancel}}</div>
+            <div class="step-time" v-if="order.update_time">{{order.update_time| getTimeText}}</div>
           </li>
           <li :class="['step',{active:order.status===constant.ORDER_STATUS.CLOSED.value}]"
               v-if="order.status===constant.ORDER_STATUS.CLOSED.value">
