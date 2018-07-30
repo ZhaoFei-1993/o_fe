@@ -139,8 +139,8 @@
                   </div>
                   <div v-if="item._selected_payment_method.method === constant.PAYMENT_TYPES.BANKCARD"
                        class="detail-text">
-                    {{ item._selected_payment_method.bank }}<span
-                    v-if="item._selected_payment_method.branch&&item._selected_payment_method.branch.length">, {{ item._selected_payment_method.branch }}</span>
+                    {{ item._selected_payment_method.bank }}
+                    <span v-if="item._selected_payment_method.branch&&item._selected_payment_method.branch.length">, {{ item._selected_payment_method.branch }}</span>
                   </div>
                   <div class="detail-text">
                     备注参考号：<span class="detail-code">{{ `${item.id}`.substr(`${item.id}`.length - 6) }}</span>
