@@ -305,16 +305,18 @@ export default {
     onItemOffline(item) {
       this.axios.item.offline(item.id).then(res => {
         this.getItems()
+        // 每次下架之后都重新请求资产数据
+        this.$store.dispatch('fetchOtcBalance')
       }).catch(err => {
         this.axios.onError(err)
       })
     },
 
     onItemOnline(item, e) {
-      const onlineItems = this.itemsOnline.filter(onlineItem => onlineItem.coin_type === item.coin_type)
+      const onlineItems = this.itemsOnline.filter(onlineItem => onlineItem.coin_type === item.coin_type && onlineItem.side === item.side)
 
       if (onlineItems.length >= 2) {
-        return this.$errorTips('每个币种每个类型的广告最多只能上架两条')
+        return this.$errorTips('每个币种每个类型的广告最多只能上架2条')
       }
 
       this.editingItem = item
@@ -328,6 +330,8 @@ export default {
     onItemOnlineConfirm() {
       this.axios.item.online(this.editingItem.id, this.onlineItemCoinAmount).then(res => {
         this.getItems()
+        // 每次上架之后都重新请求资产数据
+        this.$store.dispatch('fetchOtcBalance')
         this.isItemAmountEditing = false
       }).catch(err => {
         this.axios.onError(err)
