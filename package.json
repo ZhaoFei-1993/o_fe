@@ -36,7 +36,6 @@
     "vue": "^2.5.16",
     "vue-clipboard2": "0.2.0",
     "vue-quill-editor": "^3.0.6",
-    "vue-scroll": "^2.1.7",
     "vue2-highcharts": "^1.2.4",
     "vuejs-datepicker": "^1.5.2",
     "vuelidate": "^0.7.4",
