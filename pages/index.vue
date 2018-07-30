@@ -317,7 +317,8 @@
       v-model="showPlaceOrderModal"/>
 
     <b-modal id="prevent-order-modal"
-             v-model="showConstraintModal" title="交易限制"
+             v-model="showConstraintModal"
+             :title="currentConstraint.title || '交易限制'"
              :hide-footer="true"
              class="text-center">
       <div>
@@ -487,8 +488,9 @@
             switch (err.errorType) {
               case this.constant.PLACE_ORDER_ERROR.PAYMENT_LIMIT:
                 this.currentConstraint = {
+                  title: '开启支付方式',
                   content: '您尚未添加该广告支持的支付方式，无法下单。',
-                  buttonText: '去添加',
+                  buttonText: '去开启',
                   link: '/my/payments',
                 }
                 break
