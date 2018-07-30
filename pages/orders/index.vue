@@ -514,7 +514,6 @@
             this.axios.order.confirmPay(item.id, item._selected_payment_method).then(res => {
               if (res.code === 0) {
                 item.status = this.constant.ORDER_STATUS.PAID.value
-
               } else {
                 this.$errorTips(`提交失败code=${res.code}`)
               }

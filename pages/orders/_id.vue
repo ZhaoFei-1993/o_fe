@@ -460,7 +460,7 @@
       },
       canCancel() {
         const orderStatusOk = this.order.status === this.constant.ORDER_STATUS.CREATED.value || this.order.status === this.constant.ORDER_STATUS.PAID.value
-        return this.isBuySide && orderStatusOk && this.isAppealing
+        return this.isBuySide && orderStatusOk && !this.isAppealing
       },
       showPayment() {
         const createdBuyer = this.order.status === this.constant.ORDER_STATUS.CREATED.value && this.isBuySide
