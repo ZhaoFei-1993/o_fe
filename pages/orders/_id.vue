@@ -40,7 +40,7 @@
           <span class="payment-account">{{selectedMethod.account_name + ' '+ selectedMethod.account_no}}</span>
           <span v-if="selectedMethod.method === constant.PAYMENT_TYPES.BANKCARD"
                 class="detail-text">
-            {{ selectedMethod.bank_name }}，{{ selectedMethod.branch }}
+            {{ selectedMethod.bank_name }}<span v-if="selectedMethod.branch&&selectedMethod.branch.length">, {{ selectedMethod.branch }}</span>
           </span>
           <span class="qr-code-button"
                 v-if="selectedMethod.method!==constant.PAYMENT_TYPES.BANKCARD && selectedMethod.qr_code_image"
@@ -421,7 +421,7 @@
         return !(this.appealReason && this.appealComment && this.appealComment.length >= 15 && this.appealComment.length <= 500)
       },
       isMerchant() {
-        return this.order.merchant_id === this.user.account.id
+        return this.user.account && this.order.merchant_id === this.user.account.id
       },
       isBuySide() {
         return this.order.merchant_side === this.constant.SIDE.BUY ? this.isMerchant : !this.isMerchant
@@ -460,7 +460,7 @@
       },
       canCancel() {
         const orderStatusOk = this.order.status === this.constant.ORDER_STATUS.CREATED.value || this.order.status === this.constant.ORDER_STATUS.PAID.value
-        return this.isBuySide && orderStatusOk && this.isAppealing
+        return this.isBuySide && orderStatusOk && !this.isAppealing
       },
       showPayment() {
         const createdBuyer = this.order.status === this.constant.ORDER_STATUS.CREATED.value && this.isBuySide
@@ -611,6 +611,7 @@
           onOk: () => {
             this.axios.order.confirmPay(this.order.id, this.selectedMethod).then(res => {
               this.$successTips('确认付款成功')
+              this.refreshOrderStatus()
             }).catch(err => {
               this.axios.onError(err)
             })
@@ -623,6 +624,7 @@
       submitAppeal() {
         this.axios.order.submitAppeal(this.order.id, this.appealReason, this.appealComment).then(_ => {
           this.getAppeal()
+          this.refreshOrderStatus()
         }).catch(err => {
           this.axios.onError(err)
         })
@@ -634,6 +636,7 @@
           onOk: () => {
             this.axios.order.cancelAppeal(this.order.id).then(() => {
               this.getAppeal()
+              this.refreshOrderStatus()
             }).catch(err => {
               this.axios.onError(err)
             })

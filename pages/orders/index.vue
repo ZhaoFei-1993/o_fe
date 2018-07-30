@@ -14,9 +14,10 @@
               <span>类型</span>
               <b-dropdown variant="block" no-caret class="filter-dropdown" menu-class="filter-menu">
                 <template slot="button-content">
-                  <i class="iconfont icon-filter"></i>
+                  <i class="iconfont icon-arrowdown"></i>
                 </template>
                 <b-dropdown-item-button @click="onClickHeadFilter({ key: 'side', value: option.value })"
+                                        style="outline: none;"
                                         v-for="(option, index) in orderTypeFilterOptions" :key="index">{{ option.text }}
                 </b-dropdown-item-button>
               </b-dropdown>
@@ -27,9 +28,10 @@
               <span>币种</span>
               <b-dropdown variant="block" no-caret class="filter-dropdown" menu-class="filter-menu">
                 <template slot="button-content">
-                  <i class="iconfont icon-filter"></i>
+                  <i class="iconfont icon-arrowdown"></i>
                 </template>
                 <b-dropdown-item-button @click="onClickHeadFilter({ key: 'coin_type', value: option.value })"
+                                        style="outline: none;"
                                         v-for="(option, index) in coinTypeFilterOptions" :key="index">{{ option.text }}
                 </b-dropdown-item-button>
               </b-dropdown>
@@ -54,12 +56,15 @@
             {{ item.cash_amount | formatMoney }}
           </template>
           <template slot="status" slot-scope="{ item, detailsShowing, toggleDetails }">
-            {{ constant?constant.ORDER_STATUS[item.status.toUpperCase()].text:'' }}
-            <span @click.stop="fetchUnreadMessageCount({toggleDetails, item})"
-                  v-if="item.status === constant.ORDER_STATUS.CREATED.value || item.status === constant.ORDER_STATUS.PAID.value"
-                  class="detail"
-                  :class="[ detailsShowing ? 'show-detail' : 'hidden-detail' ]">
-              <i class="iconfont icon-detail"></i>
+            <span v-if="item.appeal_status && item.appeal_status === 'created' || item.appel_status === 'processing'">申诉中</span>
+            <span v-else>
+              {{ constant?constant.ORDER_STATUS[item.status.toUpperCase()].text:'' }}
+              <span @click.stop="fetchUnreadMessageCount({toggleDetails, item})"
+                    v-if="item.status === constant.ORDER_STATUS.CREATED.value || item.status === constant.ORDER_STATUS.PAID.value"
+                    class="detail"
+                    :class="[ detailsShowing ? 'show-detail' : 'hidden-detail' ]">
+                <i class="iconfont icon-detail"></i>
+              </span>
             </span>
           </template>
           <template slot="row-details" slot-scope="{ item }">
@@ -71,6 +76,7 @@
                   <span>购买 {{ item.coin_type }}</span>
                 </div>
                 <div class="detail-h2">
+                  <span style="display: inline-block;width: 24px;"></span>
                   向{{ item.merchant.name }}
                 </div>
               </div>
@@ -133,7 +139,8 @@
                   </div>
                   <div v-if="item._selected_payment_method.method === constant.PAYMENT_TYPES.BANKCARD"
                        class="detail-text">
-                    {{ item._selected_payment_method.bank_name }}，{{ item._selected_payment_method.branch }}
+                    {{ item._selected_payment_method.bank_name }}
+                    <span v-if="item._selected_payment_method.branch&&item._selected_payment_method.branch.length">, {{ item._selected_payment_method.branch }}</span>
                   </div>
                   <div class="detail-text">
                     备注参考号：<span class="detail-code">{{ `${item.id}`.substr(`${item.id}`.length - 6) }}</span>
@@ -247,7 +254,8 @@
         <blank v-if="!orderTableItems.length"></blank>
         <ViaPagination v-if="orderTableItems.length"
                        :total-rows="queryParams.totalRows"
-                       v-model="queryParams.page"
+                       :current-page="queryParams.page"
+                       @change="changePage"
                        :per-page="queryParams.limit">
         </ViaPagination>
       </div>
@@ -310,15 +318,15 @@
               paddingLeft: '30px',
             },
             thClass: ['text-left'],
-            tdClass: ['text-center'],
+            tdClass: ['text-left', 'pl-30'],
           },
           _order_type: {
             label: '类型',
             thStyle: {
-              width: '80px',
+              width: '100px',
             },
-            thClass: ['text-right'],
-            tdClass: ['text-right'],
+            thClass: ['text-center'],
+            tdClass: ['text-center'],
             sortable: false,
           },
           coin_type: {
@@ -326,43 +334,43 @@
             thStyle: {
               width: '120px',
             },
-            thClass: ['text-right'],
-            tdClass: ['text-right'],
+            thClass: ['text-center'],
+            tdClass: ['text-center'],
             sortable: false,
           },
           coin_amount: {
             label: '数量',
             thStyle: {
-              width: '160px',
+              width: '185px',
             },
-            thClass: ['text-right'],
-            tdClass: ['text-right'],
+            thClass: ['text-center'],
+            tdClass: ['text-center'],
             sortable: false,
           },
           price: {
             label: '单价',
-            thClass: ['text-right'],
-            tdClass: ['text-right'],
+            thClass: ['text-center'],
+            tdClass: ['text-center'],
             thStyle: {
-              width: '160px',
+              width: '185px',
             },
             sortable: false,
           },
           cash_amount: {
             label: '总价',
-            thClass: ['text-right'],
-            tdClass: ['text-right'],
+            thClass: ['text-center'],
+            tdClass: ['text-center'],
             thStyle: {
-              width: '160px',
+              width: '185px',
             },
             sortable: false,
           },
           place_time: {
             label: '下单时间',
-            thClass: ['text-right'],
-            tdClass: ['text-right'],
+            thClass: ['text-center'],
+            tdClass: ['text-center'],
             thStyle: {
-              width: '180px',
+              width: '190px',
             },
             sortable: false,
           },
@@ -410,12 +418,11 @@
         return [{text: '全部', value: null}, ...this.constant.COIN_TYPE_OPTIONS]
       },
     },
-    watch: {
-      'queryParams.page'() {
+    methods: {
+      changePage(page) {
+        this.queryParams.page = page
         this.fetchOrderList()
       },
-    },
-    methods: {
       onClickHeadFilter(data) {
         this.queryParams[data.key] = data.value
         this.fetchOrderList()
@@ -508,10 +515,10 @@
             this.axios.order.confirmPay(item.id, item._selected_payment_method).then(res => {
               if (res.code === 0) {
                 item.status = this.constant.ORDER_STATUS.PAID.value
-                this.fetchOrderList()
               } else {
                 this.$errorTips(`提交失败code=${res.code}`)
               }
+              this.updateOrder(item.id)
             }).catch(err => {
               this.$errorTips(`提交失败: ${err}`)
             })
@@ -530,6 +537,7 @@
               } else {
                 this.$errorTips(`提交失败code=${res.code}`)
               }
+              this.updateOrder(item.id)
             }).catch(err => {
               this.$errorTips(`提交失败: ${err}`)
             })
@@ -539,13 +547,9 @@
       confirmReceipt(item) {
         this.curReceiptOrderId = item.id
         this.showConfirmReceiptModal = true
-        this.fetchOrderList()
       },
       markOrderSuccess() {
-        try {
-          this.items.find(item => item.id === this.curReceiptOrderId).status = this.constant.ORDER_STATUS.SUCCESS.value
-        } catch (err) {
-        }
+        this.updateOrder(this.curReceiptOrderId)
       },
       onClickFilter(index) {
         for (let i = 0; i < this.filterOptions.length; i++) {
@@ -556,11 +560,32 @@
             this.queryParams.status = this.filterOptions[i].value
             this.queryParams.coin_type = null
             this.queryParams.side = null
+            this.queryParams.page = 1 // 重置分页
             this.fetchOrderList()
           }
         }
         this.startTimer()
       },
+      updateOrder(orderId) {
+        // 进行中的订单才有操作
+        this.axios.order.refreshOrderStatus(orderId).then(response => {
+          const newOrder = response.data
+          if (newOrder.status === this.constant.ORDER_STATUS.SUCCESS.value || newOrder.status === this.constant.ORDER_STATUS.CANCEL.value) {
+            // 被移动到已结束的列表中
+            this.orderTableItems = this.orderTableItems.filter(i => i.id !== orderId)
+          }
+          if (newOrder.status === this.constant.ORDER_STATUS.PAID.value) {
+            newOrder._selected_payment_method = newOrder.payment_methods[0]
+            this.orderTableItems.forEach(item => {
+              if (item.id === orderId) {
+                Object.assign(item, newOrder)
+              }
+            })
+          }
+        }).catch(err => {
+          this.axios.onError(err)
+        })
+      }
     }
   }
 </script>
@@ -642,6 +667,9 @@
         display: inline-block;
         color: #feb132;
         cursor: pointer;
+        .iconfont {
+          font-size: 12px;
+        }
       }
       .show-detail {
         transform: rotate(0deg);
@@ -672,13 +700,15 @@
         display: flex;
         justify-content: space-between;
         .col1 {
-          flex: 2;
+          // flex: 2;
+          width: 200px;
           padding-left: 30px;
           text-align: left;
         }
         .col2 {
           flex: 2;
           text-align: left;
+          margin-left: 15px;
         }
         .col3 {
           flex: 2;
@@ -700,17 +730,20 @@
           display: inline-block;
           position: relative;
           border-radius: 100px;
-          width: 28px;
-          height: 28px;
+          width: 24px;
+          height: 24px;
           background-color: #fff;
           box-shadow: 0 0 10px 0 #ececec;
           text-align: center;
           color: #52cbca;
-          line-height: 28px;
+          line-height: 24px;
           margin-left: 6px;
           a.message-link {
             &:hover {
               text-decoration: none !important;
+            }
+            .iconfont {
+              font-size: 14px;
             }
           }
           .shake-rotate {
@@ -748,6 +781,9 @@
         .detail-h2 {
           font-size: 14px;
           margin-top: 10px;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          overflow: hidden;
         }
         .detail-warn-text {
           color: #e35555;

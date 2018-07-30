@@ -2,7 +2,7 @@
   .layout-default {
     min-width: 1200px;
     font-size: 14px;
-    background-color: #f2f2f2;
+    background-color: #f9f9f9;
     min-height: 100%;
     display: flex;
     flex-direction: column;

@@ -5,11 +5,11 @@
         <p class="total">总资产估值</p>
         <p class="total-tips">
           <span style="font-size:24px;">
-            {{ totalBalance | formatMoney }} CNY
+            {{ `${totalBalance}`.setDigit(2) }} CNY
           </span>
         </p>
         <div class="total-coin">
-          <span> ≈ {{ totalCoin | formatMoney }}</span>
+          <span> ≈ {{ `${totalCoin}`.setDigit(4) }}</span>
           <div class="order-menu" @mouseover="toggleDropdown(true)" @mouseout="toggleDropdown(false)">
             <div class="menu-select-wrapper">
               <span class="menu-select-label">{{ selectedCoin }}</span>
@@ -62,14 +62,14 @@
       <div class="float-right">
         <div style="display: inline-block;">
           <span style="font-size: 12px;">币种：</span>
-          <b-form-select style="width: 100px;"
+          <b-form-select class="history-filter-select"
                          v-model="historyQueryParams.coin_type"
                          :options="[{ text: '全部', value: null }, ...constant.COIN_TYPE_OPTIONS]">
           </b-form-select>
         </div>
         <div style="display: inline-block;margin-left: 30px;">
-          <span style="font-size: 12px;">流水类型：</span>
-          <b-form-select style="width: 100px;"
+          <span style="font-size: 12px;">操作：</span>
+          <b-form-select class="history-filter-select"
                          v-model="historyQueryParams.business_type"
                          :options="operationOptions">
           </b-form-select>
@@ -91,7 +91,8 @@
       <blank v-if="!assetHistoryItems.length"></blank>
       <ViaPagination v-if="assetHistoryItems.length"
                     :total-rows="historyQueryParams.totalRows"
-                    v-model="historyQueryParams.page"
+                    :current-page="historyQueryParams.page"
+                     @change="changePage"
                     :per-page="historyQueryParams.limit">
       </ViaPagination>
     </c-block>
@@ -139,7 +140,7 @@
   export default {
     data() {
       return {
-        bussinessTypeMap: { // 流水类型映射
+        bussinessTypeMap: { // 操作映射
           buy_order: '购买',
           sell_order: '出售',
           transfer_in: '转入',
@@ -164,7 +165,7 @@
         defaultAsset: 'CNY',
         availableAmount: 0, // 资金可转数量
         pieDatas: [],
-        showPieChart: true,
+        showPieChart: false,
         showCoinDropdown: false,
         totalCoin: 0,
         selectedCoin: 'BCH',
@@ -174,34 +175,33 @@
             label: '币种',
             sortable: false,
             thStyle: {
-              width: '110px',
-              paddingLeft: '28px',
+              width: '185px',
             },
-            thClass: ['text-left'],
-            tdClass: ['text-left', 'td-pl'],
+            thClass: ['text-left', 'pl-30'],
+            tdClass: ['text-left', 'pl-30'],
           },
           total: {
             label: '总额',
             thStyle: {
-              width: '250px',
+              width: '180px',
             },
-            thClass: ['text-right'],
+            thClass: ['text-right', 'pr-5'],
             tdClass: ['text-right'],
             sortable: false,
           },
           frozen: {
             label: '冻结',
             thStyle: {
-              width: '250px',
+              width: '270px',
             },
-            thClass: ['text-right'],
+            thClass: ['text-right', 'pr-5'],
             tdClass: ['text-right'],
             sortable: false,
           },
           available: {
             label: '可用',
             thStyle: {
-              width: '250px',
+              width: '270px',
             },
             thClass: ['text-right'],
             tdClass: ['text-right'],
@@ -209,57 +209,57 @@
           },
           action: {
             label: '与主站资金划转',
-            tdClass: ['text-center'],
+            tdClass: ['text-right', 'pr-30'],
             thStyle: {
-              textAlign: 'center',
+              textAlign: 'right',
+              paddingRight: '30px',
             },
             sortable: false,
           },
         },
         assetHistoryItems: [],
         assetsHistoryFields: {
+          create_time: {
+            label: '时间',
+            thStyle: {
+              width: '185px',
+            },
+            thClass: ['text-center'],
+            tdClass: ['text-left', 'pl-30'],
+            sortable: false,
+          },
+          business_type: {
+            label: '操作',
+            thStyle: {
+              width: '340px',
+            },
+            thClass: ['text-center'],
+            sortable: false,
+          },
           coin_type: {
             label: '币种',
             sortable: false,
             thStyle: {
-              width: '110px',
-              paddingLeft: '28px',
+              width: '180px',
             },
-            thClass: ['text-left'],
-            tdClass: ['text-left', 'td-pl'],
-          },
-          create_time: {
-            label: '时间',
-            thStyle: {
-              width: '250px',
-            },
-            thClass: ['text-right'],
-            tdClass: ['text-right'],
-            sortable: false,
-          },
-          business_type: {
-            label: '流水类型',
-            thStyle: {
-              width: '250px',
-            },
-            thClass: ['text-right'],
-            tdClass: ['text-right'],
-            sortable: false,
+            thClass: ['text-center'],
+            tdClass: ['text-center'],
           },
           amount: {
-            label: '金额数量',
+            label: '资产变化',
             thStyle: {
-              width: '250px',
+              width: '210px',
             },
-            thClass: ['text-right'],
+            thClass: ['text-right', 'pr-5'],
             tdClass: ['text-right'],
             sortable: false,
           },
           total: {
-            label: '余额',
-            tdClass: ['text-center'],
+            label: '账户余额',
+            tdClass: ['text-right', 'pr-30'],
             thStyle: {
-              textAlign: 'center',
+              textAlign: 'right',
+              paddingRight: '30px',
             },
             sortable: false,
           },
@@ -321,6 +321,12 @@
             }
           })
           this.pieDatas = pieDatas
+          if (pieDatas.length) {
+            const tid = setTimeout(() => {
+              this.showPieChart = true // 为了饼图有加载动画效果需要延迟显示
+              clearTimeout(tid)
+            }, 500)
+          }
           this.totalBalance = totalBalance
           const rate = this.balance.currentRate[this.selectedCoin] // 币种汇率
           this.totalCoin = rate ? this.totalBalance / rate : 0
@@ -352,11 +358,12 @@
         this.historyQueryParams.page = 1
         this.fetchBalanceHistory()
       },
-      'historyQueryParams.page'() {
-        this.fetchBalanceHistory()
-      },
     },
     methods: {
+      changePage(page) {
+        this.queryParams.page = page
+        this.fetchBalanceHistory()
+      },
       onChangeCoinType(coinType) {
         const fromBalance = this[`${this.form.from}Balance`].find(item => {
           return item.coin_type === coinType
@@ -377,6 +384,15 @@
                   this.$successTips('划转成功')
                   this.showTransferModal = false
                   this.updateAllBalance()
+
+                  const {coin_type: coinType, business_type: businessType} = this.historyQueryParams
+                  const isTransferIn = this.form.from === 'coinex' && this.form.to === 'otc'
+                  const isTransferOut = this.form.from === 'otc' && this.form.to === 'coinex'
+                  if ((coinType === this.form.coinType || coinType === null) && this.historyQueryParams.page === 1) { // 当流水筛选选择全部or当前划转币种并且处在第一页才更新流水列表
+                    if (businessType === null || (businessType === 'transfer_in' && isTransferIn) || (businessType === 'transfer_out' && isTransferOut)) { // 并且操作选择全部or转入转出才更新流水
+                      this.fetchBalanceHistory()
+                    }
+                  }
                 }
               })
               .catch(err => {
@@ -422,12 +438,12 @@
         this.form.amount = +this.availableAmount // 后端可能返回0e-8这种数字
       },
       onSwap() { // 资产流向互换
+        const tmp = this.form.from // 交换操作必须放在异步函数外面，否则不生效，因为v-model修改是先于异步函数执行
+        this.form.from = this.form.to
+        this.form.to = tmp
+
         this.updateAllBalance()
           .then(() => {
-            const tmp = this.form.to
-            this.form.to = this.form.from
-            this.form.from = tmp
-
             const {coin_type: coinType} = this.curAssetItem
             const fromBalance = this[`${this.form.from}Balance`].find(item => {
               return item.coin_type === coinType
@@ -576,9 +592,11 @@
       text-align: left;
       color: #192330;
       padding-bottom: 15px;
-    }
-    .td-pl {
-      padding-left: 28px;
+      .history-filter-select {
+        width: 100px !important;
+        height: 30px !important;
+        font-size: 12px !important;
+      }
     }
     .amount-input {
       height: 100%;
@@ -602,6 +620,7 @@
       width: 100%;
       height: 100%;
       border-radius: 100px;
+      font-size: 20px;
     }
     .space-margin {
       display: inline-block;

@@ -1,7 +1,7 @@
 <template>
   <div class="user-stats-profile">
-    <UserMiniProfile class="user-mini-profile" :username="userData.name" :is-merchant="isMerchant" :online="true"/>
-    <div class="pt-20 px-20">
+    <UserMiniProfile class="user-mini-profile" :username="userData.name" :is-merchant="isMerchant" :online="online"/>
+    <div class="pt-20 px-30">
       <SidebarInfoItem title="30天成交量">
         <Language text="[t][/t]">
           <span slot="t" class="c-brand-yellow">{{statics.deal_count || 0}}</span>
@@ -25,7 +25,7 @@
 <style lang="scss">
   .user-stats-profile {
     .user-mini-profile {
-      padding: 0 18px 18px 18px;
+      padding: 0 30px 20px 30px;
       border-bottom: solid 1px #eeeeee;
     }
     .sidebar-info-item {
@@ -58,6 +58,11 @@
   })
 
   export default {
+    data() {
+      return {
+        online: false,
+      }
+    },
     props: {
       userData: {
         type: Object,
@@ -68,6 +73,17 @@
     components: {
       UserMiniProfile,
       SidebarInfoItem,
+    },
+    mounted() {
+      if (this.userData.id) {
+        this.axios.chat.online({
+          user_ids: `${this.userData.id}`,
+        }).then(res => {
+          if (res.code === 0 && res.data) {
+            this.online = res.data[this.userData.id]
+          }
+        })
+      }
     },
     computed: {
       statics() {

@@ -41,9 +41,17 @@
       .order-link {
         color: $dark;
         margin-right: 10px;
+        height: 60px;
+        line-height: 60px;
+        display: inline-block;
         &:hover {
           color: $brandGreen;
           text-decoration: none;
+        }
+        .icon-order-list {
+          font-size: 14px;
+          margin-right: 8px;
+          margin-bottom: -2px;
         }
       }
       .message-button {
@@ -173,7 +181,7 @@
         <b-nav-item to="/wallet">OTC钱包</b-nav-item>
         <b-nav-item :href="helpLink" target="_blank">帮助</b-nav-item>
         <span style="color: #d5d5d5">|</span>
-        <b-nav-item :href="`${coinexDomain}?lang=${lang.lang}`">返回主站</b-nav-item>
+        <b-nav-item :href="`${coinexDomain}?lang=${lang.lang}`" style="margin-left: 15px;">返回主站</b-nav-item>
       </b-navbar-nav>
       <b-navbar-nav class="ml-auto">
         <div v-if="user.account">
@@ -266,7 +274,7 @@
   Vue.use(Vuelidate)
   export default {
     head: {
-      link: [{rel: 'stylesheet', href: '//at.alicdn.com/t/font_739076_kafaqotcyrb.css'}]
+      link: [{rel: 'stylesheet', href: '//at.alicdn.com/t/font_739076_ymkogivtf3.css'}]
     },
     components: {
       PublishItemButton,
@@ -275,7 +283,7 @@
     data() {
       return {
         form: {
-          userName: null,
+          userName: '',
         },
         coinexDomain,
         minNameLength: 2,
@@ -283,7 +291,7 @@
         attentionModelShowing: false,
         attention: [],
         nameDuplicated: false,
-        headerClass: '',
+        headerClass: null,
         activeAttentionIndex: 0,
         loginPage: `${loginPage}?redirect=${encodeURIComponent(webDomain + this.$route.fullPath)}`,
         registerPage: `${signupPage}?redirect=${encodeURIComponent(webDomain + this.$route.fullPath)}`,
@@ -342,12 +350,11 @@
       this.$store.dispatch('fetchUserAccount').then(_ => {
         if (this.user && this.user.account) {
           if (!this.user.account.is_name_confirmed) {
-            this.form.userName = this.user.account.name
             this.$refs.updateNameModal.show()
           }
           if (!this.chat.imClient) {
             const clientId = `${this.user.account.id}`
-            this.$store.dispatch('newChatClient', clientId).catch(err => {
+            this.$store.dispatch('chat/newChatClient', clientId).catch(err => {
               onApiError(err, this)
             })
           }
@@ -409,7 +416,13 @@
       },
       onScroll(e) {
         if (!e.target === document) return
-        this.headerClass = window.scrollY > 0 ? 'scrolled' : ''
+        if (window.scrollY > 0 && !this.headerClass) {
+          this.headerClass = 'scrolled'
+          return
+        }
+        if (window.scrollY <= 0 && this.headerClass) {
+          this.headerClass = null
+        }
       },
     }
   }

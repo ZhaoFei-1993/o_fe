@@ -48,8 +48,8 @@
     computed: {
       ...mapState(['user', 'constant']),
       invalidCode() {
-        const wrongGoogle = this.user.account.is_have_totp_auth && (!this.verify.google || this.verify.google.length !== 6)
-        const wrongSMS = this.user.account.mobile && (!this.verify.sms || this.verify.sms.length !== 6)
+        const wrongGoogle = this.verify.codeType === this.constant.VERIFY_CODE_TYPE.GOOGLE && this.user.account.is_have_totp_auth && (!this.verify.google || this.verify.google.length !== 6)
+        const wrongSMS = this.verify.codeType === this.constant.VERIFY_CODE_TYPE.SMS && this.user.account.mobile && (!this.verify.sms || this.verify.sms.length !== 6)
         return this.needVerify && (wrongGoogle || wrongSMS)
       },
     },
