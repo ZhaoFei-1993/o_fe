@@ -61,6 +61,7 @@
           <template slot="status" slot-scope="{ item, detailsShowing, toggleDetails }">
             <span v-if="item.appeal_status && item.appeal_status === 'created' || item.appel_status === 'processing'">申诉中</span>
             <span v-else>
+              <span style="display: inline-block;margin-right: 4px;"><i class="iconfont" :class="statusIconMap[item.status].class" :style="{fontSize: '12px', color: statusIconMap[item.status].color}"></i></span>
               <span class="status-text">{{ constant?constant.ORDER_STATUS[item.status.toUpperCase()].text:'' }}</span>
               <span @click.stop="fetchUnreadMessageCount({toggleDetails, item})"
                     v-if="item.status === constant.ORDER_STATUS.CREATED.value || item.status === constant.ORDER_STATUS.PAID.value"
@@ -283,6 +284,24 @@
   export default {
     data() {
       return {
+        statusIconMap: {
+          created: {
+            class: 'icon-pay-waiting-buyer',
+            color: 'rgb(223, 75, 75)',
+          },
+          paid: {
+            class: 'icon-pay-waiting-seller',
+            color: 'rgb(255, 179, 44)',
+          },
+          success: {
+            class: 'icon-pay-finish',
+            color: 'rgb(72, 196, 195)',
+          },
+          closed: {
+            class: 'icon-pay-close1',
+            color: 'rgb(100, 100, 100)',
+          },
+        },
         curReceiptOrderId: null, // 当前选中的确认收款item
         showConfirmReceiptModal: false,
         timer: null, // 剩余时间定时器
