@@ -11,30 +11,12 @@
         <b-table :fields="orderTableFields" :items="orderTableItems">
           <template slot="HEAD__order_type" slot-scope="{ item }">
             <div>
-              <span>类型</span>
-              <b-dropdown variant="block" no-caret class="filter-dropdown" menu-class="filter-menu">
-                <template slot="button-content">
-                  <i class="iconfont icon-arrowdown"></i>
-                </template>
-                <b-dropdown-item-button @click="onClickHeadFilter({ key: 'side', value: option.value })"
-                                        style="outline: none;"
-                                        v-for="(option, index) in orderTypeFilterOptions" :key="index">{{ option.text }}
-                </b-dropdown-item-button>
-              </b-dropdown>
+              <TableHeadDropdown :options="orderTypeFilterOptions" label="类型" @click="onClickSideDropdown"></TableHeadDropdown>
             </div>
           </template>
           <template slot="HEAD_coin_type" slot-scope="{ item }">
             <div>
-              <span>币种</span>
-              <b-dropdown variant="block" no-caret class="filter-dropdown" menu-class="filter-menu">
-                <template slot="button-content">
-                  <i class="iconfont icon-arrowdown"></i>
-                </template>
-                <b-dropdown-item-button @click="onClickHeadFilter({ key: 'coin_type', value: option.value })"
-                                        style="outline: none;"
-                                        v-for="(option, index) in coinTypeFilterOptions" :key="index">{{ option.text }}
-                </b-dropdown-item-button>
-              </b-dropdown>
+              <TableHeadDropdown :options="coinTypeFilterOptions" label="币种" @click="onClickCoinTypeDropdown"></TableHeadDropdown>
             </div>
           </template>
           <template slot="id" slot-scope="{ item }">
@@ -276,6 +258,7 @@
   import cBlock from '~/components/c-block'
   import Blank from '~/components/blank'
   import ConfirmReceipt from './_c/confirm-receipt'
+  import TableHeadDropdown from './_c/table-head-dropdown'
   import ViaPagination from '~/components/via-pagination'
 
   const LIMIT = 10
@@ -284,6 +267,7 @@
   export default {
     data() {
       return {
+        showSideType: false,
         statusIconMap: {
           created: {
             class: 'icon-pay-waiting-buyer',
@@ -306,12 +290,15 @@
         showConfirmReceiptModal: false,
         timer: null, // 剩余时间定时器
         orderTypeFilterOptions: [{
-          text: '全部',
+          active: true,
+          text: '不限',
           value: null,
         }, {
+          active: false,
           text: '买',
           value: 'buy',
         }, {
+          active: false,
           text: '卖',
           value: 'sell',
         }],
@@ -431,11 +418,17 @@
       Blank,
       ConfirmReceipt,
       ViaPagination,
+      TableHeadDropdown,
     },
     computed: {
       ...mapState(['user', 'constant', 'chat']),
       coinTypeFilterOptions() {
-        return [{text: '全部', value: null}, ...this.constant.COIN_TYPE_OPTIONS]
+        const defaultOption = {
+          active: true,
+          text: '不限',
+          value: null,
+        }
+        return [defaultOption, ...this.constant.COIN_TYPE_OPTIONS.map(item => ({active: false, ...item}))]
       },
     },
     watch: {
@@ -444,8 +437,12 @@
       },
     },
     methods: {
-      onClickHeadFilter(data) {
-        this.queryParams[data.key] = data.value
+      onClickSideDropdown(item) {
+        this.queryParams.side = item.value
+        this.fetchOrderList()
+      },
+      onClickCoinTypeDropdown(item) {
+        this.queryParams.coin_type = item.value
         this.fetchOrderList()
       },
       isMerchant(order) { // 是否商家
@@ -647,12 +644,6 @@
         padding: 0;
         border: 0;
         background-color: #f9f9f9;
-      }
-      .filter-dropdown {
-        display: inline-block;
-        .iconfont {
-          color: #27313e;
-        }
       }
       .table thead th {
         background: #f9f9f9;
