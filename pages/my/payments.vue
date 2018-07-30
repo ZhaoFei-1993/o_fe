@@ -236,9 +236,9 @@
 
   <CBlock class="page-my-payments" y="0" v-else>
     <h3 class="layout-my-title pl-0">2步完成添加支付方式</h3>
-
     <KycStep :step="1" title="完成实名认证" highlight>
-      <b-link :href="`${constant.coinexDomain}/my/info/auth/realname`">去实名 ></b-link>
+      <span v-if="user.account.kyc_status === constant.KYC_STATUS.PROCESSING">审核中</span>
+      <b-link v-else :href="`${constant.coinexDomain}/my/info/auth/realname`">去实名 ></b-link>
     </KycStep>
     <KycStep :step="2" title="添加支付方式"/>
   </CBlock>
