@@ -291,7 +291,7 @@
         attentionModelShowing: false,
         attention: [],
         nameDuplicated: false,
-        headerClass: '',
+        headerClass: null,
         activeAttentionIndex: 0,
         loginPage: `${loginPage}?redirect=${encodeURIComponent(webDomain + this.$route.fullPath)}`,
         registerPage: `${signupPage}?redirect=${encodeURIComponent(webDomain + this.$route.fullPath)}`,
@@ -417,7 +417,13 @@
       },
       onScroll(e) {
         if (!e.target === document) return
-        this.headerClass = window.scrollY > 0 ? 'scrolled' : ''
+        if (window.scrollY > 0 && !this.headerClass) {
+          this.headerClass = 'scrolled'
+          return
+        }
+        if (window.scrollY <= 0 && this.headerClass) {
+          this.headerClass = null
+        }
       },
     }
   }

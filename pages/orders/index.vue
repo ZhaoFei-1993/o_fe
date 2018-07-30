@@ -514,10 +514,11 @@
             this.axios.order.confirmPay(item.id, item._selected_payment_method).then(res => {
               if (res.code === 0) {
                 item.status = this.constant.ORDER_STATUS.PAID.value
-                this.fetchOrderList()
+
               } else {
                 this.$errorTips(`提交失败code=${res.code}`)
               }
+              this.fetchOrderList()
             }).catch(err => {
               this.$errorTips(`提交失败: ${err}`)
             })
@@ -536,6 +537,7 @@
               } else {
                 this.$errorTips(`提交失败code=${res.code}`)
               }
+              this.fetchOrderList()
             }).catch(err => {
               this.$errorTips(`提交失败: ${err}`)
             })

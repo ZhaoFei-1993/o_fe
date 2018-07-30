@@ -611,6 +611,7 @@
           onOk: () => {
             this.axios.order.confirmPay(this.order.id, this.selectedMethod).then(res => {
               this.$successTips('确认付款成功')
+              this.refreshOrderStatus()
             }).catch(err => {
               this.axios.onError(err)
             })
@@ -623,6 +624,7 @@
       submitAppeal() {
         this.axios.order.submitAppeal(this.order.id, this.appealReason, this.appealComment).then(_ => {
           this.getAppeal()
+          this.refreshOrderStatus()
         }).catch(err => {
           this.axios.onError(err)
         })
@@ -634,6 +636,7 @@
           onOk: () => {
             this.axios.order.cancelAppeal(this.order.id).then(() => {
               this.getAppeal()
+              this.refreshOrderStatus()
             }).catch(err => {
               this.axios.onError(err)
             })
