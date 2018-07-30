@@ -529,7 +529,7 @@
         this.$showDialog({
           hideHeader: true,
           title: '取消订单',
-          content: (<div class="text-left"><p>确认取消订单？</p><p class="c-red">取消的订单将不可重新打开。</p></div>),
+          content: (<div class="text-left"><p class="c-red">如您已向卖家付款，取消订单您将会损失付款资金。</p><p>温馨提示：买方每日累计取消订单超过3笔，将被限制当日交易功能。</p></div>),
           onOk: () => {
             this.axios.order.cancelOrder(item.id).then(res => {
               if (res.code === 0) {
