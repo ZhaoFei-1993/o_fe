@@ -139,7 +139,8 @@
                   </div>
                   <div v-if="item._selected_payment_method.method === constant.PAYMENT_TYPES.BANKCARD"
                        class="detail-text">
-                    {{ item._selected_payment_method.bank }}<span v-if="item._selected_payment_method.branch&&item._selected_payment_method.branch.length">, {{ item._selected_payment_method.branch }}</span>
+                    {{ item._selected_payment_method.bank }}<span
+                    v-if="item._selected_payment_method.branch&&item._selected_payment_method.branch.length">, {{ item._selected_payment_method.branch }}</span>
                   </div>
                   <div class="detail-text">
                     备注参考号：<span class="detail-code">{{ `${item.id}`.substr(`${item.id}`.length - 6) }}</span>
@@ -517,7 +518,7 @@
               } else {
                 this.$errorTips(`提交失败code=${res.code}`)
               }
-              this.fetchOrderList()
+              this.updateOrder(item.id)
             }).catch(err => {
               this.$errorTips(`提交失败: ${err}`)
             })
@@ -536,7 +537,7 @@
               } else {
                 this.$errorTips(`提交失败code=${res.code}`)
               }
-              this.fetchOrderList()
+              this.updateOrder(item.id)
             }).catch(err => {
               this.$errorTips(`提交失败: ${err}`)
             })
@@ -546,13 +547,9 @@
       confirmReceipt(item) {
         this.curReceiptOrderId = item.id
         this.showConfirmReceiptModal = true
-        this.fetchOrderList()
       },
       markOrderSuccess() {
-        try {
-          this.items.find(item => item.id === this.curReceiptOrderId).status = this.constant.ORDER_STATUS.SUCCESS.value
-        } catch (err) {
-        }
+        this.updateOrder(this.curReceiptOrderId)
       },
       onClickFilter(index) {
         for (let i = 0; i < this.filterOptions.length; i++) {
@@ -569,6 +566,25 @@
         }
         this.startTimer()
       },
+      updateOrder(orderId) {
+        // 进行中的订单才有操作
+        this.axios.order.refreshOrderStatus(orderId).then(response => {
+          const newOrder = response.data
+          if (newOrder.status === this.constant.ORDER_STATUS.SUCCESS.value || newOrder.status === this.constant.ORDER_STATUS.CANCEL.value) {
+            // 被移动到已结束的列表中
+            this.orderTableItems = this.orderTableItems.filter(i => i.id !== orderId)
+          }
+          if (newOrder.status === this.constant.ORDER_STATUS.PAID.value) {
+            this.orderTableItems.forEach(item => {
+              if (item.id === orderId) {
+                Object.assign(item, newOrder)
+              }
+            })
+          }
+        }).catch(err => {
+          this.axios.onError(err)
+        })
+      }
     }
   }
 </script>
