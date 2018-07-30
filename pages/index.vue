@@ -489,7 +489,7 @@
               case this.constant.PLACE_ORDER_ERROR.PAYMENT_LIMIT:
                 this.currentConstraint = {
                   title: '开启支付方式',
-                  content: '您尚未添加该广告支持的支付方式，无法下单。',
+                  content: '您需要开启该广告支持的支付方式后，才可以进行交易。',
                   buttonText: '去开启',
                   link: '/my/payments',
                 }
