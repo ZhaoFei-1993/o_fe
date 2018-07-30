@@ -91,7 +91,8 @@
       <blank v-if="!assetHistoryItems.length"></blank>
       <ViaPagination v-if="assetHistoryItems.length"
                     :total-rows="historyQueryParams.totalRows"
-                    v-model="historyQueryParams.page"
+                    :current-page="historyQueryParams.page"
+                     @change="changePage"
                     :per-page="historyQueryParams.limit">
       </ViaPagination>
     </c-block>
@@ -357,11 +358,12 @@
         this.historyQueryParams.page = 1
         this.fetchBalanceHistory()
       },
-      'historyQueryParams.page'() {
-        this.fetchBalanceHistory()
-      },
     },
     methods: {
+      changePage(page) {
+        this.queryParams.page = page
+        this.fetchBalanceHistory()
+      },
       onChangeCoinType(coinType) {
         const fromBalance = this[`${this.form.from}Balance`].find(item => {
           return item.coin_type === coinType

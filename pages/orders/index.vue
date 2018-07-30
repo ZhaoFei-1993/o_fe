@@ -254,7 +254,8 @@
         <blank v-if="!orderTableItems.length"></blank>
         <ViaPagination v-if="orderTableItems.length"
                        :total-rows="queryParams.totalRows"
-                       v-model="queryParams.page"
+                       :current-page="queryParams.page"
+                       @change="changePage"
                        :per-page="queryParams.limit">
         </ViaPagination>
       </div>
@@ -417,12 +418,11 @@
         return [{text: '全部', value: null}, ...this.constant.COIN_TYPE_OPTIONS]
       },
     },
-    watch: {
-      'queryParams.page'() {
+    methods: {
+      changePage(page) {
+        this.queryParams.page = page
         this.fetchOrderList()
       },
-    },
-    methods: {
       onClickHeadFilter(data) {
         this.queryParams[data.key] = data.value
         this.fetchOrderList()
