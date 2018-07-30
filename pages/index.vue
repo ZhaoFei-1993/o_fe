@@ -87,11 +87,12 @@
         }
       }
       .items-list {
+        background-color: white;
         box-shadow: 0 0 10px 0 #ececec;
         .list-title {
           display: flex;
           justify-content: space-between;
-          padding: 24px 20px 8px;
+          padding: 30px 20px 8px;
           background-color: white;
         }
 
@@ -101,11 +102,13 @@
           line-height: 40px;
           display: flex;
           align-items: center;
-          font-weight: 500;
           justify-content: space-between;
           background-color: #f9f9f9;
           .col-narrow, .col-wide {
             text-align: center;
+          }
+          .col-name {
+            text-align: left;
           }
           .select-payment {
             height: 24px;
@@ -119,9 +122,7 @@
           }
         }
         .list {
-          &.sell .item-row:nth-of-type(even) {
-            background-color: #F8FDFD;
-          }
+
           .item-row {
             display: flex;
             align-items: center;
@@ -129,9 +130,7 @@
             background-color: white;
             height: 90px;
             padding: 20px;
-            &:nth-of-type(even) {
-              background-color: #fffdfa;
-            }
+            border-bottom: 1px solid #eeeeee;
             .btn-order {
               width: 100px;
               height: 26px;
@@ -154,13 +153,29 @@
                 margin: 0 4px;
               }
             }
+            .price {
+              font-size: 18px;
+              flex: 1;
+              padding: 0 60px 0 16px;
+              text-align: right;
+              font-weight: 500;
+              color: $brandGreen;
+            }
             .col-name {
-              font-size: 14px;
-              color: #6f6f6f;
-              padding-left: 0;
+              font-size: 16px;
+              color: #27313e;
+              display: flex;
+              align-items: center;
+              .username {
+                max-width: 150px;
+                overflow: hidden;
+                display: inline-block;
+                text-overflow: ellipsis;
+              }
               .icon-certificated-merchant {
                 color: #7dd322;
-                margin-right: 4px;
+                margin-left: 6px;
+                font-size: 16px;
               }
             }
           }
@@ -175,14 +190,21 @@
           padding: 0 16px;
         }
         .col-name {
-          padding-left: 16px;
+          text-align: left;
+          padding-left: 0;
           width: 200px;
-          overflow: hidden;
-          text-overflow: ellipsis;
         }
         .col-action {
           width: 10%;
           padding-right: 0;
+        }
+        .number {
+          font-size: 14px;
+          color: #27313e;
+        }
+        .unit {
+          font-size: 12px;
+          color: #9b9b9b;
         }
       }
     }
@@ -247,7 +269,8 @@
           <span class="col-narrow">30天成单/完成率</span>
           <span class="col-narrow">数量</span>
           <span class="col-wide">限额</span>
-          <b-form-select class='select-payment col-narrow' v-model="selectedPayment"
+          <span class="col-narrow">支付方式</span>
+          <b-form-select hidden class='select-payment col-narrow' v-model="selectedPayment"
                          :options="constant.PAYMENT_OPTIONS" @change="filterPayment"></b-form-select>
           <span :class="['sort-price col-wide',sortPrice]">单价</span>
           <span class="col-narrow col-action">操作</span>
@@ -255,31 +278,37 @@
         <div :class="['list',selectedSide.toLowerCase()]">
           <div v-if="!items||!items.length" class="text-center p-20">暂无该交易对广告</div>
           <div v-else class="item-row" v-for="item in items">
-            <span class="col-name text-left">
-              {{item.user.name}}
-              <div><span v-b-tooltip.hover title="认证商家"><i class="iconfont icon-certificated-merchant"></i></span></div>
+            <span class="col-name">
+              <span class="username">{{item.user.name}}</span><span v-b-tooltip.hover title="认证商家"><i
+              class="iconfont icon-certificated-merchant"></i></span>
             </span>
             <div class="col-narrow" v-if="item.user && item.user.user_stat">
-              <div class="fz-14 c-4a" v-if="item.user.user_stat.order_count">
+              <div class="number" v-if="item.user.user_stat.order_count">
                 {{item.user.user_stat.deal_count}}单 /
                 {{(item.user.user_stat.deal_count / item.user.user_stat.order_count) | percentage}}
               </div>
-              <div class="fz-14 c-4a" v-else>
+              <div class="number" v-else>
                 0单 / --
               </div>
-              <div class="fz-12 c-6f">
+              <div class="unit">
                 {{selectedSide ===
                 constant.SIDE.BUY ? `放行时间${utils.formatDuration(item.user.user_stat.receipt_time)}` :
                 `付款时间${utils.formatDuration(item.user.user_stat.pay_time)}`}}
               </div>
             </div>
-            <span class="col-narrow text-right fz-14 c-6f">{{item.remain_coin_amount + ' ' + selectedCoin}}</span>
-            <span class="col-wide text-right pr-60 fz-14 c-6f">{{item.min_deal_cash_amount + '-' + item.max_deal_cash_amount + balance.currentCash}}</span>
+            <span class="col-narrow text-right">
+              <div class="number">{{item.remain_coin_amount}}</div>
+              <div class="unit">{{ selectedCoin}}</div>
+            </span>
+            <span class="col-wide text-right pr-60">
+              <div class="number">{{item.min_deal_cash_amount.setDigit(0) + '-' + item.max_deal_cash_amount.setDigit(0)}}</div>
+              <div class="unit">{{balance.currentCash}}</div>
+            </span>
             <span class='payment col-narrow'>
               <UserPayments :payments="item.payment_methods"></UserPayments>
             </span>
             <span
-              :class="['sort-price fz-18 col-wide pr-60 text-right',sortPrice]">{{item.price + ' '+balance.currentCash}}</span>
+              :class="['price',sortPrice]">{{item.price.setDigit(2) + ' '+balance.currentCash}}</span>
             <span class="col-narrow  col-action">
               <template v-if="user && user.account && user.account.id === item.user.id">
                 <button class="btn btn-order-disabled" :id="'button-order-'+item.id" v-b-tooltip.hover title="不能与自己交易"> {{(selectedSide === constant.SIDE.BUY ? '购买' : '出售') + selectedCoin}} </button>
@@ -306,10 +335,11 @@
             </span>
           </div>
         </div>
+        <ViaPagination :total-rows="pager.total" :current-page="pager.currentPage" :per-page="pager.limit"
+                       @change="onPagerChange">
+        </ViaPagination>
       </div>
-      <b-pagination :total-rows="pager.total" :value="pager.currentPage" :per-page="pager.limit"
-                    @change="onPagerChange">
-      </b-pagination>
+
     </div>
     <PlaceOrderModal
       v-if="selectedItem&&user.account"
@@ -341,6 +371,7 @@
   import {mapState} from 'vuex'
   import {coinexDomain, loginPage, webDomain} from '~/modules/variables'
   import PlaceOrderModal from '~/components/place-order-modal'
+  import ViaPagination from '~/components/via-pagination'
   import UserPayments from '~/components/user-payments'
   import PublishItemButton from '~/components/publish-item-modal/publish-item-button.vue'
   import {PlaceOrderError} from '~/modules/error-code'
@@ -371,6 +402,7 @@
       PlaceOrderModal,
       UserPayments,
       PublishItemButton,
+      ViaPagination,
     },
     layout: 'fullwidth',
     data() {
@@ -569,7 +601,7 @@
         if (!item.counterparty_limit) return true
         if (!this.user || !this.user.qualification) return false
         return item.counterparty_limit.indexOf(qualification) >= 0 && this.user.qualification.indexOf(qualification) < 0
-      }
+      },
     },
   }
 </script>

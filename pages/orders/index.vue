@@ -140,7 +140,7 @@
                   </div>
                   <div class="detail-text detail-warn-text"
                        v-if="item._isBuySide && item.status === constant.ORDER_STATUS.CREATED.value">
-                    转账时除参考号外请不要备注任何信息，防止卡被冻结!
+                    请使用实名付款，转账时除参考号外请不要备注任何信息！
                   </div>
                 </template>
 
@@ -154,7 +154,8 @@
                       </div>
                       <div class="message-btn">
                         <b-link :to="`/orders/${item.id}`" class="message-link">
-                          <i :class="['iconfont', 'icon-message', item._unreadMessageCount > 0 ? 'shake-rotate' : '']"></i>
+                          <i
+                            :class="['iconfont', 'icon-message', item._unreadMessageCount > 0 ? 'shake-rotate' : '']"></i>
                           <sup class="message-badge" v-if="item._unreadMessageCount > 0"></sup>
                         </b-link>
                       </div>
@@ -169,14 +170,15 @@
                     </template>
                     <template v-else>
                       <div class="detail-btn-wrapper detail-waiting">
-                        订单已超时
+                        已超时
                       </div>
                     </template>
                   </template>
                   <template v-if="item.status === constant.ORDER_STATUS.PAID.value">
                     <div class="message-btn">
                       <b-link :to="`/orders/${item.id}`" class="message-link">
-                        <i :class="['iconfont', 'icon-message', item._unreadMessageCount > 0 ? 'shake-rotate' : '']"></i>
+                        <i
+                          :class="['iconfont', 'icon-message', item._unreadMessageCount > 0 ? 'shake-rotate' : '']"></i>
                         <sup class="message-badge" v-if="item._unreadMessageCount > 0"></sup>
                       </b-link>
                     </div>
@@ -191,7 +193,8 @@
                   <template v-if="item.status === constant.ORDER_STATUS.CLOSED.value">
                     <div class="message-btn">
                       <b-link :to="`/orders/${item.id}`" class="message-link">
-                        <i :class="['iconfont', 'icon-message', item._unreadMessageCount > 0 ? 'shake-rotate' : '']"></i>
+                        <i
+                          :class="['iconfont', 'icon-message', item._unreadMessageCount > 0 ? 'shake-rotate' : '']"></i>
                         <sup class="message-badge" v-if="item._unreadMessageCount > 0"></sup>
                       </b-link>
                     </div>
@@ -208,7 +211,8 @@
                       </div>
                       <div class="message-btn">
                         <b-link :to="`/orders/${item.id}`" class="message-link">
-                          <i :class="['iconfont', 'icon-message', item._unreadMessageCount > 0 ? 'shake-rotate' : '']"></i>
+                          <i
+                            :class="['iconfont', 'icon-message', item._unreadMessageCount > 0 ? 'shake-rotate' : '']"></i>
                           <sup class="message-badge" v-if="item._unreadMessageCount > 0"></sup>
                         </b-link>
                       </div>
@@ -225,7 +229,8 @@
                   <template v-if="item.status === constant.ORDER_STATUS.PAID.value">
                     <div class="message-btn">
                       <b-link :to="`/orders/${item.id}`" class="message-link">
-                        <i :class="['iconfont', 'icon-message', item._unreadMessageCount > 0 ? 'shake-rotate' : '']"></i>
+                        <i
+                          :class="['iconfont', 'icon-message', item._unreadMessageCount > 0 ? 'shake-rotate' : '']"></i>
                         <sup class="message-badge" v-if="item._unreadMessageCount > 0"></sup>
                       </b-link>
                     </div>
@@ -240,11 +245,11 @@
           </template>
         </b-table>
         <blank v-if="!orderTableItems.length"></blank>
-        <b-pagination v-if="orderTableItems.length"
-                      :total-rows="queryParams.totalRows"
-                      v-model="queryParams.page"
-                      :per-page="queryParams.limit">
-        </b-pagination>
+        <ViaPagination v-if="orderTableItems.length"
+                       :total-rows="queryParams.totalRows"
+                       v-model="queryParams.page"
+                       :per-page="queryParams.limit">
+        </ViaPagination>
       </div>
     </c-block>
     <div class="bottom-tips">
@@ -261,6 +266,7 @@
   import cBlock from '~/components/c-block'
   import Blank from '~/components/blank'
   import ConfirmReceipt from './_c/confirm-receipt'
+  import ViaPagination from '~/components/via-pagination'
 
   const LIMIT = 10
   const ORDER_PAY_TIME = 15 // 订单可付款时间
@@ -396,6 +402,7 @@
       cBlock,
       Blank,
       ConfirmReceipt,
+      ViaPagination,
     },
     computed: {
       ...mapState(['user', 'constant', 'chat']),
@@ -461,7 +468,7 @@
             this.axios.onError(err)
           })
       },
-      fetchUnreadMessageCount({ toggleDetails, item }) {
+      fetchUnreadMessageCount({toggleDetails, item}) {
         toggleDetails()
         if (!item.conversation_id) return
         this.chat.imClient.getConversation(item.conversation_id).then(conversation => {
@@ -775,33 +782,42 @@
       }
     }
     @mixin shake($x, $y, $rot, $name, $steps:10, $opacity:false) {
-      $r:0deg;
-      $h:0px;
-      $v:0px;
+      $r: 0deg;
+      $h: 0px;
+      $v: 0px;
 
       $interval: $steps;
       $step: 0%;
 
       @keyframes #{$name}{
         @while $step < 100% {
-          @if ($rot != 0deg){ $r : random($rot) - $rot/2;}
-            @else { $r : 0deg; }
-          @if ($x != 0px){ $h : random($x) - $x/2; }
-            @else { $h : 0px; }
-          @if ($y != 0px){ $v : random($y) - $y/2; }
-            @else { $v : 0px; }
+          @if ($rot != 0deg) {
+            $r: random($rot) - $rot/2;
+          } @else {
+            $r: 0deg;
+          }
+          @if ($x != 0px) {
+            $h: random($x) - $x/2;
+          } @else {
+            $h: 0px;
+          }
+          @if ($y != 0px) {
+            $v: random($y) - $y/2;
+          } @else {
+            $v: 0px;
+          }
 
-          @if($step == 0%){
+          @if ($step == 0%) {
             #{$step} {
               transform: translate(0px, 0px) rotate(0deg);
-              @if($opacity){
+              @if ($opacity) {
                 opacity: random(10)*.1;
               }
             }
           } @else {
             #{$step} {
               transform: translate($h, $v) rotate($r);
-              @if($opacity){
+              @if ($opacity) {
                 opacity: random(10)*.1;
               }
             }
