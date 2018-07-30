@@ -575,6 +575,7 @@
             this.orderTableItems = this.orderTableItems.filter(i => i.id !== orderId)
           }
           if (newOrder.status === this.constant.ORDER_STATUS.PAID.value) {
+            newOrder._selected_payment_method = newOrder.payment_methods[0]
             this.orderTableItems.forEach(item => {
               if (item.id === orderId) {
                 Object.assign(item, newOrder)
