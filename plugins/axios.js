@@ -164,7 +164,7 @@ export default ({app, store}) => {
       return response.data
     },
     function (err) {
-      err.code = err.response && err.response.status
+      err.code = (err.response && err.response.status) || err.code
       if (err.response && (err.response.status === 401 || err.response.status === 403)) {
         if (process.client) {
           const token = /token=(.*?)(;|$)/gi.exec(document.cookie)

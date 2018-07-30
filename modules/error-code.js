@@ -3,6 +3,8 @@ const ATLEAST_ONE_PAYMENT_METHOD = 606    // 最少需要一种支付方式
 const REACH_ITEM_COUNT_LIMIT = 106    // 最少需要一种支付方式
 const UNAUTHORIZED = 401
 const NAME_USED = 72
+
+const ECONNABORTED = 'ECONNABORTED'   // 大部分情况下，是接口超时
 // 所有已知错误的map
 export const ERROR_CODE = {
   MISSING_PAY_METHODS,
@@ -14,7 +16,8 @@ export const ERROR_CODE = {
 
 // code对应的错误信息
 export const errorCodeMessageMap = {
-  [REACH_ITEM_COUNT_LIMIT]: '每个币种每个类型的广告最多只能上架2条'
+  [REACH_ITEM_COUNT_LIMIT]: '每个币种每个类型的广告最多只能上架2条',
+  [ECONNABORTED]: '接口超时',
 }
 
 /**
