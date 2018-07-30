@@ -23,26 +23,35 @@ export const otherUser = {
 }
 
 export const account = {
-  data: {
-    'id': 1,                         // 用户id
-    'name': 'wuyanzu',               // 用户名
-    'email': '25479932@qq.com',      // 邮箱
-    'country_code': '86',            // 手机号国家区号
-    'mobile': '',         // 手机号
-    'kyc_status': 'processing',             // kyc实名状态, pass: 已通过，no: 未通过 processing
-    'kyc_name': '吴彦祖',             // kyc实名姓名
-    'is_have_totp_auth': false,       // 是否绑定谷歌验证器
-    'status': 'normal',               // 账户状态，normal: 正常，forbidden: 封禁
-    is_name_confirmed: true,
-    user_stat: {
+  'code': 0,
+  'message': 'OK',
+  'data': {
+    'country_code': '86',
+    'create_time': 1531973376,
+    'email': 'zgayjjf@qq.com',
+    'id': 253,
+    'is_have_totp_auth': true,    // 是否绑定google
+    'is_name_confirmed': true,
+    'kyc_status': 'pass',     // pass no processing
+    'login_password_level': 'low',
+    'mobile': '17512088105',
+    'name': 'zgayjjf@qq.com',
+    'status': 'normal',      // 账户状态 normal forbidden
+    'trade_validate_frequency': 'each_time',      // never each_time each_two_hours
+    'update_time': 1532054132,
+    'user_stat': {
       'deal_count': 1,                     // 最近成交单数
       'order_count': 2,                    // 最近总单数
       'pay_time': 100,                       // 平均付款时间
       'receipt_time': 200                    // 平均放行时间
     },
-    user_kyc: {
-      first_name: '净',
-      last_name: 'jeff'
+    'user_kyc': {
+      'country': 'CHN',
+      'first_name': 'Jeff',
+      'id_number': '1234123412341234',
+      'id_type': 'id_card',
+      'last_name': 'Gin',
+      'user_id': 253
     }
   }
 }

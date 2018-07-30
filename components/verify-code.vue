@@ -226,7 +226,10 @@
         this.$emit('update:sms', '')
         this.$emit('update:google', '')
         this.$emit('update:email', '')
+        this.resetValidation()
+      },
 
+      resetValidation() {
         this.$nextTick(() => {
           this.$v.$reset()
         })
