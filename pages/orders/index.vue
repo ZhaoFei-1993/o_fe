@@ -59,11 +59,11 @@
                 <div class="detail-h1 detail-flex">
                   <span
                     :class="['arrow-icon', item._order_type === constant.SIDE.BUY ? 'buy-arrow-icon' : 'sell-arrow-icon']"></span>
-                  <span>购买 {{ item.coin_type }}</span>
+                  <span>{{ item._order_type === constant.SIDE.BUY ? '购买' : '出售' }} {{ item.coin_type }}</span>
                 </div>
                 <div class="detail-h2">
                   <span style="display: inline-block;width: 24px;"></span>
-                  <span style="display: inline-block;margin-right: 3px;">向</span>{{ item.merchant.name }}
+                  <span style="display: inline-block;margin-right: 3px;">向</span>{{ item._order_type === constant.SIDE.BUY ? item.merchant.name : item.user.name }}
                 </div>
               </div>
               <div class="col2">
@@ -131,8 +131,8 @@
                     备注参考号：<span class="detail-code">{{ `${item.id}`.substr(`${item.id}`.length - 6) }}</span>
                   </div>
                   <div class="detail-text detail-warn-text"
-                       v-if="item._isBuySide && item.status === constant.ORDER_STATUS.CREATED.value">
-                    请使用实名付款，转账时除参考号外请不要备注任何信息！
+                       v-if="item.status === constant.ORDER_STATUS.CREATED.value">
+                    转账时除参考号外请不要备注任何信息，防止卡被冻结!
                   </div>
                 </template>
 
