@@ -389,7 +389,7 @@
       onPaymentEdit(payment) {
         this.modalShowing = true
         this.isPaymentEditing = true
-        this.form = payment
+        this.form = Object.assign({}, payment)
         this.verify.businessType = this.constant.VERIFY_CODE_BUSINESS.MODIFY_PAYMENT
 
         this.$refs['verify-code'].reset()
