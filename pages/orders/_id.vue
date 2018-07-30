@@ -413,7 +413,13 @@
     mounted() {
       this.getCurrentOrder()
       this.Visibility = require('visibilityjs')
-      this.Visibility.change(this.refreshOrderStatus)
+      this.Visibility.change(() => {
+        if (this.Visibility.visible) {
+          this.startRefreshOrder()
+        } else {
+          this.stopRefreshOrder()
+        }
+      })
     },
     computed: {
       ...mapState(['user', 'constant', 'chat']),
@@ -667,7 +673,9 @@
       cancelOrder() {
         this.$showDialog({
           title: '取消订单',
-          content: (<div class="text-left"><p class="c-red">如您已向卖家付款，取消订单您将会损失付款资金。</p><p>温馨提示：买方每日累计取消订单超过3笔，将被限制当日交易功能。</p></div>),
+          content: (
+            <div class="text-left"><p class="c-red">如您已向卖家付款，取消订单您将会损失付款资金。</p><p>温馨提示：买方每日累计取消订单超过3笔，将被限制当日交易功能。</p>
+            </div>),
           onOk: () => {
             this.axios.order.cancelOrder(this.order.id).then(() => {
               this.refreshOrderStatus()
