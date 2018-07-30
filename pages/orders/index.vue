@@ -139,7 +139,7 @@
                   </div>
                   <div v-if="item._selected_payment_method.method === constant.PAYMENT_TYPES.BANKCARD"
                        class="detail-text">
-                    {{ item._selected_payment_method.bank }}
+                    {{ item._selected_payment_method.bank_name }}
                     <span v-if="item._selected_payment_method.branch&&item._selected_payment_method.branch.length">, {{ item._selected_payment_method.branch }}</span>
                   </div>
                   <div class="detail-text">
