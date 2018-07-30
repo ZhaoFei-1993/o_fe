@@ -1,7 +1,7 @@
 <template>
   <b-pagination class="via-pagination" :total-rows="totalRows" :value="currentPage" :per-page="perPage"
                 @change="onPagerChange" prev-text="上一页" next-text="下一页"
-                :hide-goto-end-buttons="true" :limit="4">
+                :hide-goto-end-buttons="true" :limit="4" align="right">
   </b-pagination>
 </template>
 <script>
