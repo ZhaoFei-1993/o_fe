@@ -8,7 +8,7 @@
         </div>
       </div>
       <div class="order-table">
-        <b-table :fields="orderTableFields" :items="orderTableItems">
+        <b-table :fields="orderTableFields" :items="orderTableItems" @row-clicked="fetchUnreadMessageCount" :tbody-tr-class="queryParams.status === 'processing' ? 'order-row-class' : ''">
           <template slot="HEAD__order_type" slot-scope="{ item }">
             <div>
               <TableHeadDropdown :options="orderTypeFilterOptions" label="类型" @click="onClickSideDropdown"></TableHeadDropdown>
@@ -20,7 +20,7 @@
             </div>
           </template>
           <template slot="id" slot-scope="{ item }">
-            <b-link :to="`/orders/${item.id}`">{{ item.id }}</b-link>
+            <b-link class="id-text" :to="`/orders/${item.id}`">{{ item.id }}</b-link>
           </template>
           <template slot="_order_type" slot-scope="{ item }">
             <span
@@ -41,15 +41,14 @@
             {{ item.cash_amount | formatMoney }} CNY
           </template>
           <template slot="status" slot-scope="{ item, detailsShowing, toggleDetails }">
-            <span v-if="item.appeal_status && item.appeal_status === 'created' || item.appel_status === 'processing'">
+            <span v-if="item.appeal_status && item.appeal_status === 'created' || item.appeal_status === 'processing'">
               <span class="status-icon"><i v-if="appealIconMap[item.appeal_status]" class="iconfont" :class="appealIconMap[item.appeal_status].class" :style="{fontSize: '12px', color: appealIconMap[item.appeal_status].color}"></i></span>
               <span>申诉中</span>
             </span>
             <span v-else>
               <span class="status-icon"><i v-if="statusIconMap[item.status]" class="iconfont" :class="statusIconMap[item.status].class" :style="{fontSize: '12px', color: statusIconMap[item.status].color}"></i></span>
-              <span class="status-text">{{ constant?constant.ORDER_STATUS[item.status.toUpperCase()].text:'' }}</span>
-              <span @click.stop="fetchUnreadMessageCount({toggleDetails, item})"
-                    v-if="item.status === constant.ORDER_STATUS.CREATED.value || item.status === constant.ORDER_STATUS.PAID.value"
+              <span>{{ constant?constant.ORDER_STATUS[item.status.toUpperCase()].text:'' }}</span>
+              <span v-if="item.status === constant.ORDER_STATUS.CREATED.value || item.status === constant.ORDER_STATUS.PAID.value"
                     class="detail"
                     :class="[ detailsShowing ? 'show-detail' : 'hidden-detail' ]">
                 <i class="iconfont icon-detail"></i>
@@ -134,12 +133,7 @@
                   <div class="detail-text">
                     备注参考号：<span class="detail-code">{{ `${item.id}`.substr(`${item.id}`.length - 6) }}</span>
                   </div>
-                  <div class="detail-text detail-warn-text"
-                       v-if="item.status === constant.ORDER_STATUS.CREATED.value">
-                    转账时除参考号外请不要备注任何信息，防止卡被冻结!
-                  </div>
                 </template>
-
               </div>
               <div class="col5">
                 <template v-if="item._order_type === constant.SIDE.BUY">
@@ -160,8 +154,7 @@
                         </b-btn>
                       </div>
                       <div class="detail-btn-wrapper">
-                        <b-btn size="xs" variant="outline-green" class="detail-btn" @click="cancelOrder(item)">取消订单
-                        </b-btn>
+                        <b-link class="cancel-order-btn" @click="cancelOrder(item)">取消订单</b-link>
                       </div>
                     </template>
                     <template v-else>
@@ -182,8 +175,7 @@
                       等待卖家收款
                     </div>
                     <div class="detail-btn-wrapper">
-                      <b-btn size="xs" variant="outline-green" class="detail-btn" @click="cancelOrder(item)">取消订单
-                      </b-btn>
+                      <b-link class="cancel-order-btn" @click="cancelOrder(item)">取消订单</b-link>
                     </div>
                   </template>
                   <template v-if="item.status === constant.ORDER_STATUS.CLOSED.value">
@@ -238,6 +230,12 @@
                 </template>
               </div>
             </div>
+            <div v-if="item._isBuySide && item.status === constant.ORDER_STATUS.CREATED.value" style="height: 24px;width: 100%;border-top: solid 1px #eeeeee;line-height: 38px;font-size: 14px;color: #e35555;text-align: left;padding-left: 30px;">
+              <span>* 请使用实名付款，转账时除参考号外请不要备注任何信息！</span>
+            </div>
+            <div v-else-if="!item._isBuySide && item.status === constant.ORDER_STATUS.PAID.value" style="height: 24px;width: 100%;border-top: solid 1px #eeeeee;line-height: 38px;font-size: 14px;color: #e35555;text-align: left;padding-left: 30px;">
+              <span><span style="margin-right: 10px;color: #27313e;">* 买方实名：{{ item.user.name }}</span>请务必确认收到款项后确认收款并核实买家是否实名付款！</span>
+            </div>
           </template>
         </b-table>
         <blank v-if="!orderTableItems.length"></blank>
@@ -272,6 +270,7 @@
   export default {
     data() {
       return {
+        fetchingTableData: false, // 是否正在获取table数据
         showSideType: false,
         statusIconMap: {
           created: {
@@ -467,7 +466,12 @@
         return order.merchant_id === this.user.account.id
       },
       fetchOrderList() {
+        if (this.fetchingTableData) return
+
+        this.fetchingTableData = true
+
         const {status, page, limit, coin_type: coinType, side} = this.queryParams
+
         this.axios.order.getOrderList({
           coin_type: coinType,
           side,
@@ -476,6 +480,7 @@
           limit,
         })
           .then((res) => {
+            this.fetchingTableData = false
             if (res.code === 0 && res.data) {
               const {data, curr_page: currentPage, total: totalRows} = res.data
               this.queryParams.page = currentPage
@@ -508,16 +513,24 @@
           })
           .catch(err => {
             console.log(err)
+            this.fetchingTableData = false
             this.axios.onError(err)
           })
       },
-      fetchUnreadMessageCount({toggleDetails, item}) {
-        toggleDetails()
-        if (!item.conversation_id) return
-        if (this.chat.imClient) {
-          this.chat.imClient.getConversation(item.conversation_id).then(conversation => {
-            item._unreadMessageCount = conversation.unreadMessagesCount
-          }).catch(console.error)
+      fetchUnreadMessageCount(record, index, event) {
+        if (event.target.tagName.toLowerCase() === 'a') return
+        if (this.queryParams.status === 'processing') {
+          if (!record._showDetails) {
+            this.$set(record, '_showDetails', true) // 首次添加属性需要调用set方法
+          } else {
+            record._showDetails = !record._showDetails
+          }
+          if (!record.conversation_id) return
+          if (this.chat.imClient) {
+            this.chat.imClient.getConversation(record.conversation_id).then(conversation => {
+              record._unreadMessageCount = conversation.unreadMessagesCount
+            }).catch(console.error)
+          }
         }
       },
       startTimer() {
@@ -662,9 +675,16 @@
     }
     .order-table {
       margin: 20px -30px 0;
-      .status-text {
-        display: inline-block;
-        margin-right: 9px;
+      .id-text {
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+      .order-row-class {
+        cursor: pointer;
+      }
+      .b-table-details {
+        cursor: default;
       }
       .status-icon {
         display: inline-block;
@@ -706,7 +726,7 @@
       .detail {
         display: inline-block;
         color: #feb132;
-        cursor: pointer;
+        margin-left: 9px;
         .iconfont {
           display: inline-block;
           transform: scale(0.775);
@@ -845,6 +865,9 @@
         }
         .detail-btn-wrapper {
           margin-top: 16px;
+          .cancel-order-btn {
+            font-size: 14px;
+          }
         }
         .detail-flex {
           display: flex;
