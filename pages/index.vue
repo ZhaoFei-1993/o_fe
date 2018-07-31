@@ -537,6 +537,7 @@
                 break
               case this.constant.PLACE_ORDER_ERROR.KYC_TIMES_LIMIT:
                 this.currentConstraint = {
+                  title: '实名认证',
                   content: '您尚未完成实名认证，每日限制下单次数为 3 次。',
                   buttonText: '去认证',
                   outLink: `${this.coinexDomain}/my/info/basic?redirect=${encodeURIComponent(webDomain + this.$route.fullPath)}`,

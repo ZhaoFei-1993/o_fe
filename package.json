@@ -35,6 +35,7 @@
     "qr.js": "0.0.0",
     "visibilityjs": "^2.0.1",
     "vue": "^2.5.16",
+    "vue-click-outside": "^1.0.7",
     "vue-clipboard2": "0.2.0",
     "vue-quill-editor": "^3.0.6",
     "vue2-highcharts": "^1.2.4",
