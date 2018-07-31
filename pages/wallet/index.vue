@@ -379,7 +379,6 @@
             })
               .then(res => {
                 if (res.code === 0) {
-                  this.form.submitting = false
                   this.$successTips('划转成功')
                   this.showTransferModal = false
                   this.updateAllBalance()
@@ -393,6 +392,7 @@
                     }
                   }
                 }
+                this.form.submitting = false
               })
               .catch(err => {
                 this.form.submitting = false
