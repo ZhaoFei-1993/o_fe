@@ -66,7 +66,7 @@
              v-if="user.account.kyc_status !== constant.KYC_STATUS.PASS"
              :disabled="user.account.kyc_status === constant.KYC_STATUS.PROCESSING"
              variant="outline-green" size="xs" target="_blank"
-             :href="`${coinexDomain}/my/info/auth/realname`">
+             :href="`${coinexDomain}/my/info/basic`">
         认证
       </b-btn>
     </MyInfoItem>

@@ -7,7 +7,7 @@
           <p class="slogan">
             <img src="~assets/img/logo-gray.svg">
           </p>
-          <p class="mt-10 fs-24 ff-light">The Global Digital Coin Exchange</p>
+          <p class="mt-10 fs-24 ff-light">CoinEx OTC 法币交易</p>
           <div class="medias mt-10">
             <a href="mailto:support@coinex.com"><i class="iconfont icon-email"></i></a>
             <a target="_blank" href="https://weibo.com/coinex"><i class="iconfont icon-weibo"></i></a>

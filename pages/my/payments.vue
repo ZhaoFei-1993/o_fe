@@ -239,7 +239,7 @@
     <h3 class="layout-my-title pl-0">2步完成添加支付方式</h3>
     <KycStep :step="1" title="完成实名认证" highlight>
       <span v-if="user.account.kyc_status === constant.KYC_STATUS.PROCESSING">审核中</span>
-      <b-link v-else :href="`${constant.coinexDomain}/my/info/basic`">去实名 ></b-link>
+      <b-link v-else :href="`${constant.coinexDomain}/my/info/basic`" target="_blank">去实名 ></b-link>
     </KycStep>
     <KycStep :step="2" title="添加支付方式"/>
   </CBlock>
@@ -398,10 +398,6 @@
       },
 
       onPaymentDelete() {
-        if (this.form.status === this.constant.PAYMENT_STATUS.ON) {
-          // 暂时前端不作处理，不然无法暴露后台问题
-          // return this.$errorTips('该条支付方式开启中，不可删除')
-        }
         this.axios.user.deletePaymentMethod(this.form.id).then(res => {
           this.$showTips('删除成功')
           this.modalShowing = false
@@ -418,7 +414,7 @@
             title: '未实名认证',
             content: '请实名认证后再添加支付方式',
             onOk: () => {
-              window.location.href = `${coinexDomain}/my/info/auth/realname`
+              window.location.href = `${coinexDomain}/my/info/basic`
             },
             okTitle: '实名认证'
           })
