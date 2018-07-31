@@ -398,8 +398,11 @@
                 _lctype: message.type,
               },
             })
-            this.message = ''
-          }).catch(console.error.bind(console))
+          }).catch(err => {
+            console.error(err)
+            $toast.show(`发送失败: ${err}`, 1500)
+          })
+          this.message = ''
         }
       },
       scrollToBottom() {
@@ -409,7 +412,7 @@
             target.scrollTop = target.scrollHeight
           }
           clearTimeout(tid)
-        }, 200)
+        }, 150)
       },
     },
     filters: {
