@@ -91,7 +91,7 @@
         box-shadow: 0 0 10px 0 #ececec;
         .list-title {
           display: flex;
-          justify-content: space-between;
+          justify-content: flex-end;
           padding: 30px 20px 8px;
           background-color: white;
         }
@@ -256,7 +256,6 @@
       </div>
       <div class="items-list">
         <div class="list-title">
-          <span class="fz-18">广告列表</span>
           <span>
             没有合适的？
             <PublishItemButton>
@@ -284,11 +283,11 @@
             </span>
             <div class="col-narrow" v-if="item.user && item.user.user_stat">
               <div class="number" v-if="item.user.user_stat.order_count">
-                {{item.user.user_stat.deal_count}}单 /
+                {{item.user.user_stat.deal_count}} /
                 {{(item.user.user_stat.deal_count / item.user.user_stat.order_count) | percentage}}
               </div>
               <div class="number" v-else>
-                0单 / --
+                0 / --
               </div>
               <div class="unit">
                 {{selectedSide ===
