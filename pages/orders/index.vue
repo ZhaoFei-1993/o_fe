@@ -41,9 +41,12 @@
             {{ item.cash_amount | formatMoney }} CNY
           </template>
           <template slot="status" slot-scope="{ item, detailsShowing, toggleDetails }">
-            <span v-if="item.appeal_status && item.appeal_status === 'created' || item.appel_status === 'processing'">申诉中</span>
+            <span v-if="item.appeal_status && item.appeal_status === 'created' || item.appel_status === 'processing'">
+              <span class="status-icon"><i v-if="appealIconMap[item.appeal_status]" class="iconfont" :class="appealIconMap[item.appeal_status].class" :style="{fontSize: '12px', color: appealIconMap[item.appeal_status].color}"></i></span>
+              <span>申诉中</span>
+            </span>
             <span v-else>
-              <span style="display: inline-block;margin-right: 4px;"><i v-if="statusIconMap[item.status]" class="iconfont" :class="statusIconMap[item.status].class" :style="{fontSize: '12px', color: statusIconMap[item.status].color}"></i></span>
+              <span class="status-icon"><i v-if="statusIconMap[item.status]" class="iconfont" :class="statusIconMap[item.status].class" :style="{fontSize: '12px', color: statusIconMap[item.status].color}"></i></span>
               <span class="status-text">{{ constant?constant.ORDER_STATUS[item.status.toUpperCase()].text:'' }}</span>
               <span @click.stop="fetchUnreadMessageCount({toggleDetails, item})"
                     v-if="item.status === constant.ORDER_STATUS.CREATED.value || item.status === constant.ORDER_STATUS.PAID.value"
@@ -281,7 +284,7 @@
           },
           success: {
             class: 'icon-pay-finish',
-            color: 'rgb(72, 196, 195)',
+            color: 'rgb(0, 178, 117)',
           },
           closed: {
             class: 'icon-pay-close',
@@ -290,6 +293,16 @@
           cancel: {
             class: 'icon-pay-cancel',
             color: 'rgb(216, 216, 216)',
+          },
+        },
+        appealIconMap: {
+          created: {
+            class: 'icon-appealing',
+            color: 'rgb(82, 203, 202)',
+          },
+          processing: {
+            class: 'icon-appealing',
+            color: 'rgb(82, 203, 202)',
           },
         },
         curReceiptOrderId: null, // 当前选中的确认收款item
@@ -652,6 +665,10 @@
       .status-text {
         display: inline-block;
         margin-right: 9px;
+      }
+      .status-icon {
+        display: inline-block;
+        margin-right: 4px;
       }
       .filter-menu {
         width: 100px;
