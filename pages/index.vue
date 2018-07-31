@@ -486,7 +486,7 @@
         this.busy = true
         this.axios.item.getItems({
           limit,
-          currentPage,
+          page: currentPage,
           // taker和maker的方向是反的
           side: this.selectedSide === this.constant.SIDE.BUY ? this.constant.SIDE.SELL : this.constant.SIDE.BUY,
           coin_type: this.selectedCoin,
