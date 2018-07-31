@@ -251,7 +251,7 @@
       </div>
     </c-block>
     <div class="bottom-tips">
-      温馨提示：每日取消订单超过三笔，将被冻结当天下单权限。
+      温馨提示：每日取消订单超过3笔，将被限制当日交易功能。
     </div>
     <ConfirmReceipt :orderId="curReceiptOrderId" :show-confirm-receipt-modal="showConfirmReceiptModal"
                     @confirmReceipt="markOrderSuccess"
