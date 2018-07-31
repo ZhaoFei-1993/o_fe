@@ -129,6 +129,7 @@ export default {
   APPEAL_STATUS: {
     CREATED: 'created',
     PROCESSING: 'processing',
+    PENDING: 'pending',
     CANCEL: 'cancel',
     COMPLETED: 'completed',
   },
