@@ -637,7 +637,9 @@
       confirmPay() {
         this.$showDialog({
           title: '确认付款',
-          content: (<div class="text-left">确认您已向卖方付款？<p class="c-red">未付款点击“我已付款”将被冻结账户。</p></div>),
+          content: (<div class="text-left">请确认已向卖方付款。<p class="c-red">未付款点击“我已付款”将被冻结账户。</p></div>),
+          okTitle: '我已付款',
+          cancelTitle: '未付款',
           onOk: () => {
             this.axios.order.confirmPay(this.order.id, this.selectedMethod).then(res => {
               this.$successTips('确认付款成功')
