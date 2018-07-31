@@ -442,6 +442,7 @@
     mounted() {
       this.getItems()
       this.requestItems = setInterval(this.getItems, refreshInterval)
+      // browser only
       this.Visibility = require('visibilityjs')
       this.Visibility.change(() => {
         if (!this.Visibility.hidden()) {

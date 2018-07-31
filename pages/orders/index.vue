@@ -456,6 +456,7 @@
       },
     },
     mounted() {
+      // browser only
       this.Visibility = require('visibilityjs')
       this.Visibility.change(() => {
         if (this.Visibility.visible) {
@@ -485,6 +486,7 @@
         return order.merchant_id === this.user.account.id
       },
       asyncFetchOrderList() {
+        // 只获取不处理数据，返回promise，调用者各自处理返回结果（init和update时候不一样）
         const {status, page, limit, coin_type: coinType, side} = this.queryParams
         return this.axios.order.getOrderList({
           coin_type: coinType,

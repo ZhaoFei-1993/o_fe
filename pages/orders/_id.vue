@@ -414,6 +414,7 @@
     },
     mounted() {
       this.getCurrentOrder()
+      // browser only
       this.Visibility = require('visibilityjs')
       this.Visibility.change(() => {
         if (this.Visibility.visible) {
