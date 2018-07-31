@@ -16,7 +16,7 @@
               <div class="msg-text">
                 <span v-if="item.content._lctype === TextMessage.TYPE">{{ item.content._lctext }}</span>
                 <img v-else-if="item.content._lctype === ImageMessage.TYPE" @click="onClickImage(item.content._lcfile.url)" style="width: 100%" :src="item.content._lcfile.url">
-                <span v-else-if="item.content._lctype === SystemMessage.TYPE">【订单消息】{{ item.content._lctext }}</span>
+                <span v-else-if="item.content._lctype === SystemMessage.TYPE">【自动回复】{{ item.content._lctext }}</span>
                 <span v-else>[不支持当前消息类型]</span>
               </div>
             </div>
@@ -40,7 +40,7 @@
               <div class="msg-text">
                 <span v-if="item.content._lctype === TextMessage.TYPE">{{ item.content._lctext }}</span>
                 <img v-else-if="item.content._lctype === ImageMessage.TYPE" @click="onClickImage(item.content._lcfile.url)" style="width: 100%" :src="item.content._lcfile.url">
-                <span v-else-if="item.content._lctype === SystemMessage.TYPE">【订单消息】{{ item.content._lctext }}</span>
+                <span v-else-if="item.content._lctype === SystemMessage.TYPE">【自动回复】{{ item.content._lctext }}</span>
                 <span v-else>[不支持当前消息类型]</span>
               </div>
             </div>
@@ -70,7 +70,7 @@
   import infiniteScroll from './infinite-scroll-directive.js'
   import $toast from './toast.js'
 
-  const SystemMessage = { // 自定义消息类型：自动回复订单消息
+  const SystemMessage = { // 自定义消息类型：自动回复
     TYPE: -101,
   }
 
