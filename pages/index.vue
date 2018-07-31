@@ -348,6 +348,7 @@
              v-model="showConstraintModal"
              :title="currentConstraint.title || '交易限制'"
              :hide-footer="true"
+             :noCloseOnBackdrop="true"
              class="text-center">
       <div>
         {{currentConstraint.content}}
@@ -572,27 +573,29 @@
         }
         return true
       },
+      /**
+       * 校验用户是否有广告对应的支付方式
+       * @param item
+       */
       verifyHasPayment(item) {
         return this.$store.dispatch('fetchUserPayments').then(() => {
           // 卖家需要有对应支付方式
-          if (!this.user.payments) {
-            return Promise.reject(new Error('获取支付方式失败'))
-          }
+          if (!this.user.payments) throw new Error('获取支付方式失败')
+
           for (const pay of item.payment_methods) {
-            if (this.user.payments.find(p => p.status === 'on' && p.method === pay)) {
-              return Promise.resolve()
-            }
+            if (this.user.payments.find(p => p.status === 'on' && p.method === pay)) return 'passed'    // 没有意义的返回值，只是为了标明通过该条件
           }
-          return Promise.reject(new PlaceOrderError('尚未添加该广告支持的支付方式', this.constant.PLACE_ORDER_ERROR.PAYMENT_LIMIT))
+
+          throw new PlaceOrderError('尚未添加该广告支持的支付方式', this.constant.PLACE_ORDER_ERROR.PAYMENT_LIMIT)
         })
       },
-      verifyDynamicConstraint(item) {
+      async verifyDynamicConstraint(item) {
         // 不做外部验证了
         // if (item.min_deal_cash_amount >= this.noKycLimit) {
         //   return Promise.reject(new PlaceOrderError('未完成实名认证', this.constant.PLACE_ORDER_ERROR.KYC_AMOUNT_LIMIT))
         // }
         if (item.side === this.constant.SIDE.BUY) {
-          return this.verifyHasPayment(item)
+          await this.verifyHasPayment(item)
         }
         return this.axios.user.dynamicConstraint().then(response => {
           const constraint = response.data
