@@ -274,7 +274,7 @@
   Vue.use(Vuelidate)
   export default {
     head: {
-      link: [{rel: 'stylesheet', href: '//at.alicdn.com/t/font_739076_ymkogivtf3.css'}]
+      link: [{rel: 'stylesheet', href: '//at.alicdn.com/t/font_739076_82w7urldxzc.css'}]
     },
     components: {
       PublishItemButton,
@@ -346,7 +346,6 @@
     },
     mounted() {
       // component 里面不能调用fetch和asyncData
-      this.$store.dispatch('fetchUserMerchant')
       this.$store.dispatch('fetchUserAccount').then(_ => {
         if (this.user && this.user.account) {
           if (!this.user.account.is_name_confirmed) {
