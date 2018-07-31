@@ -24,9 +24,9 @@ const APPEAL_RESULTS = [
 ]
 
 const ORDER_RESULTS = [
-  {text: '双方协商处理', value: 'none'},
-  {text: '订单成交', value: 'receipt_order'},
-  {text: '订单取消', value: 'cancel_order'},
+  {text: '已协调双方自行解决', value: 'none'},
+  {text: '系统已将币划给买方', value: 'receipt_order'},
+  {text: '系统已将冻结的币释放给卖家', value: 'cancel_order'},
 ]
 
 export default {
@@ -129,6 +129,7 @@ export default {
   APPEAL_STATUS: {
     CREATED: 'created',
     PROCESSING: 'processing',
+    PENDING: 'pending',
     CANCEL: 'cancel',
     COMPLETED: 'completed',
   },

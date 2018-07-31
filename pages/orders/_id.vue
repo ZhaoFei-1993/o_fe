@@ -107,7 +107,7 @@
             <button v-if="isCurrentUserAppealing" class="btn btn-outline-green btn-xs" @click="cancelAppeal">取消申诉
             </button>
           </div>
-          <div v-if="appeal.status===constant.APPEAL_STATUS.PROCESSING"
+          <div v-if="appeal.status===constant.APPEAL_STATUS.PROCESSING || appeal.status===constant.APPEAL_STATUS.PENDING"
                class="d-flex align-items-center justify-content-between">
             <span>申诉专员已经介入，请及时提供必要的信息</span>
             <button v-if="isCurrentUserAppealing" class="btn btn-outline-green btn-xs" @click="cancelAppeal">取消申诉
@@ -386,6 +386,7 @@
         refreshInterval: null,
         Visibility: null,
         payRemainTime: 0,
+        orderExpireTime: 0,
         appeal: null,
         appealComment: null,
         appealReason: null,
@@ -413,6 +414,7 @@
     },
     mounted() {
       this.getCurrentOrder()
+      // browser only
       this.Visibility = require('visibilityjs')
       this.Visibility.change(() => {
         if (this.Visibility.visible) {
@@ -563,6 +565,7 @@
             this.convId = this.order.conversation_id // 聊天对话id
             this.selectedMethod = this.order.payment_methods[0]
             this.counterparty = this.user.account.id === this.order.user_id ? this.order.merchant : this.order.user
+            this.orderExpireTime = (this.order.place_time + ORDER_PAY_TIME * 60) * 1000
             this.checkOrderStatus()
           }
         }).catch(err => {
@@ -592,14 +595,14 @@
       updateRemainTime() {
         this.stopCountDown()
         if (this.order.status === this.constant.ORDER_STATUS.CREATED.value) {
-          this.payRemainTime = Math.floor(((this.order.place_time + ORDER_PAY_TIME * 60) * 1000 - Date.now()) / 1000)
+          this.payRemainTime = Math.floor((this.orderExpireTime - Date.now()) / 1000)
           this.startCountDown()
         }
       },
       startCountDown() {
         this.secondCountdown = setInterval(() => {
           if (this.payRemainTime > 0) {
-            this.payRemainTime--
+            this.payRemainTime = Math.floor((this.orderExpireTime - Date.now()) / 1000)
           } else {
             this.stopCountDown()
           }
@@ -637,7 +640,9 @@
       confirmPay() {
         this.$showDialog({
           title: '确认付款',
-          content: (<div class="text-left">确认您已向卖方付款？<p class="c-red">未付款点击“我已付款”将被冻结账户。</p></div>),
+          content: (<div class="text-left">请确认已向卖方付款。<p class="c-red">未付款点击“我已付款”将被冻结账户。</p></div>),
+          okTitle: '我已付款',
+          cancelTitle: '取消',
           onOk: () => {
             this.axios.order.confirmPay(this.order.id, this.selectedMethod).then(res => {
               this.$successTips('确认付款成功')

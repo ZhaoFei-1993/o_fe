@@ -11,12 +11,14 @@
         <b-table :fields="orderTableFields" :items="orderTableItems">
           <template slot="HEAD__order_type" slot-scope="{ item }">
             <div>
-              <TableHeadDropdown :options="orderTypeFilterOptions" label="类型" @click="onClickSideDropdown"></TableHeadDropdown>
+              <TableHeadDropdown :options="orderTypeFilterOptions" label="类型"
+                                 @click="onClickSideDropdown"></TableHeadDropdown>
             </div>
           </template>
           <template slot="HEAD_coin_type" slot-scope="{ item }">
             <div>
-              <TableHeadDropdown :options="coinTypeFilterOptions" label="币种" @click="onClickCoinTypeDropdown"></TableHeadDropdown>
+              <TableHeadDropdown :options="coinTypeFilterOptions" label="币种"
+                                 @click="onClickCoinTypeDropdown"></TableHeadDropdown>
             </div>
           </template>
           <template slot="id" slot-scope="{ item }">
@@ -42,11 +44,15 @@
           </template>
           <template slot="status" slot-scope="{ item, detailsShowing, toggleDetails }">
             <span v-if="item.appeal_status && item.appeal_status === 'created' || item.appel_status === 'processing'">
-              <span class="status-icon"><i v-if="appealIconMap[item.appeal_status]" class="iconfont" :class="appealIconMap[item.appeal_status].class" :style="{fontSize: '12px', color: appealIconMap[item.appeal_status].color}"></i></span>
+              <span class="status-icon"><i v-if="appealIconMap[item.appeal_status]" class="iconfont"
+                                           :class="appealIconMap[item.appeal_status].class"
+                                           :style="{fontSize: '12px', color: appealIconMap[item.appeal_status].color}"></i></span>
               <span>申诉中</span>
             </span>
             <span v-else>
-              <span class="status-icon"><i v-if="statusIconMap[item.status]" class="iconfont" :class="statusIconMap[item.status].class" :style="{fontSize: '12px', color: statusIconMap[item.status].color}"></i></span>
+              <span class="status-icon"><i v-if="statusIconMap[item.status]" class="iconfont"
+                                           :class="statusIconMap[item.status].class"
+                                           :style="{fontSize: '12px', color: statusIconMap[item.status].color}"></i></span>
               <span class="status-text">{{ constant?constant.ORDER_STATUS[item.status.toUpperCase()].text:'' }}</span>
               <span @click.stop="fetchUnreadMessageCount({toggleDetails, item})"
                     v-if="item.status === constant.ORDER_STATUS.CREATED.value || item.status === constant.ORDER_STATUS.PAID.value"
@@ -66,7 +72,8 @@
                 </div>
                 <div class="detail-h2">
                   <span style="display: inline-block;width: 24px;"></span>
-                  <span style="display: inline-block;margin-right: 3px;">向</span>{{ item._order_type === constant.SIDE.BUY ? item.merchant.name : item.user.name }}
+                  <span style="display: inline-block;margin-right: 3px;">向</span>{{ item._order_type ===
+                  constant.SIDE.BUY ? item.merchant.name : item.user.name }}
                 </div>
               </div>
               <div class="col2">
@@ -268,6 +275,7 @@
 
   const LIMIT = 10
   const ORDER_PAY_TIME = 15 // 订单可付款时间
+  const REFRESH_ORDER_INTERVAL = 5000
 
   export default {
     data() {
@@ -425,12 +433,9 @@
         app.axios.needAuth(err, redirect, route.fullPath)
       })
     },
-    created() {
-      this.fetchOrderList()
-      this.startTimer()
-    },
     destroyed() {
       clearInterval(this.timer) // 清除定时器
+      this.stopRefreshOrders()
     },
     components: {
       cBlock,
@@ -450,66 +455,85 @@
         return [defaultOption, ...this.constant.COIN_TYPE_OPTIONS.map(item => ({active: false, ...item}))]
       },
     },
+    mounted() {
+      // browser only
+      this.Visibility = require('visibilityjs')
+      this.Visibility.change(() => {
+        if (this.Visibility.visible) {
+          this.startRefreshOrders()
+        } else {
+          this.stopRefreshOrders()
+        }
+      })
+      this.initOrderList()
+      this.startTimer()
+      this.startRefreshOrders()
+    },
     methods: {
       changePage(page) {
         this.queryParams.page = page
-        this.fetchOrderList()
+        this.initOrderList()
       },
       onClickSideDropdown(item) {
         this.queryParams.side = item.value
-        this.fetchOrderList()
+        this.initOrderList()
       },
       onClickCoinTypeDropdown(item) {
         this.queryParams.coin_type = item.value
-        this.fetchOrderList()
+        this.initOrderList()
       },
       isMerchant(order) { // 是否商家
         return order.merchant_id === this.user.account.id
       },
-      fetchOrderList() {
+      asyncFetchOrderList() {
+        // 只获取不处理数据，返回promise，调用者各自处理返回结果（init和update时候不一样）
         const {status, page, limit, coin_type: coinType, side} = this.queryParams
-        this.axios.order.getOrderList({
+        return this.axios.order.getOrderList({
           coin_type: coinType,
           side,
           status,
           page,
           limit,
         })
-          .then((res) => {
-            if (res.code === 0 && res.data) {
-              const {data, curr_page: currentPage, total: totalRows} = res.data
-              this.queryParams.page = currentPage
-              this.queryParams.totalRows = totalRows
-              this.orderTableItems = data.map(item => {
-                let orderType
-                if (this.isMerchant(item)) { // 商家
-                  orderType = item.merchant_side
-                } else { // 普通用户
-                  orderType = item.user_side
-                }
-                let selectedPaymentMethod = {}
-                if (item.payment_methods && item.payment_methods.length) {
-                  selectedPaymentMethod = {...item.payment_methods[0]}
-                }
-                const remainingTime = parseInt((item.place_time * 1000 + ORDER_PAY_TIME * 60000 - Date.now()) / 1000) // 订单付款截止时间 = 创建时间 + 可付款时间(15min)
-                return {
-                  ...item,
-                  _order_type: orderType, // 下划线前缀均为自定义属性（下同）订单类型
-                  _selected_payment_method: selectedPaymentMethod, // 用户选中的支付方式
-                  _remaining_time: remainingTime,
-                  _expired: remainingTime <= 0 && item.status === this.constant.ORDER_STATUS.CREATED.value,
-                  _isBuySide: (item.merchant_id === this.user.account.id) === (item.merchant_side === this.constant.SIDE.BUY),
-                  _unreadMessageCount: 0, // 未读消息数量
-                }
-              })
-            } else {
-              this.orderTableItems = []
-            }
-          })
-          .catch(err => {
-            console.log(err)
-            this.axios.onError(err)
-          })
+      },
+      initOrderList() {
+        this.asyncFetchOrderList().then((res) => {
+          if (res.code === 0 && res.data) {
+            const {data, curr_page: currentPage, total: totalRows} = res.data
+            this.queryParams.page = currentPage
+            this.queryParams.totalRows = totalRows
+            this.orderTableItems = data.map(item => this.preprocessOrder(item))
+          } else {
+            this.orderTableItems = []
+          }
+        }).catch(err => {
+          console.log(err)
+          this.axios.onError(err)
+        })
+      },
+      preprocessOrder(item) {
+        let orderType
+        if (this.isMerchant(item)) { // 商家
+          orderType = item.merchant_side
+        } else { // 普通用户
+          orderType = item.user_side
+        }
+        let selectedPaymentMethod = {}
+        if (item.payment_methods && item.payment_methods.length) {
+          selectedPaymentMethod = {...item.payment_methods[0]}
+        }
+        const expireTime = item.place_time * 1000 + ORDER_PAY_TIME * 60000
+        const remainingTime = parseInt((expireTime - Date.now()) / 1000) // 订单付款截止时间 = 创建时间 + 可付款时间(15min)
+        return {
+          ...item,
+          _order_type: orderType, // 下划线前缀均为自定义属性（下同）订单类型
+          _selected_payment_method: selectedPaymentMethod, // 用户选中的支付方式
+          _remaining_time: remainingTime,
+          _expire_time: expireTime,
+          _expired: remainingTime <= 0 && item.status === this.constant.ORDER_STATUS.CREATED.value,
+          _isBuySide: (item.merchant_id === this.user.account.id) === (item.merchant_side === this.constant.SIDE.BUY),
+          _unreadMessageCount: 0, // 未读消息数量
+        }
       },
       fetchUnreadMessageCount({toggleDetails, item}) {
         toggleDetails()
@@ -522,6 +546,7 @@
       },
       startTimer() {
         clearInterval(this.timer) // 切换到其它tab需要清除定时器
+        this.stopRefreshOrders() // 切换到其它tab需要清除刷新
         if (this.queryParams.status === 'processing') {
           // 进行中的订单启动定时器
           this.timer = setInterval(() => {
@@ -534,7 +559,7 @@
                 let {_remaining_time: remainingTime} = item // 先创建_remaining_time临时变量，防止下面逻辑频繁修改数据导致页面频繁更新
                 const {CREATED} = this.constant.ORDER_STATUS
                 if (status === CREATED.value) { // 针对待付款
-                  remainingTime -= 1 // 剩余时间，单位：秒
+                  remainingTime = Math.floor((item._expire_time - Date.now()) / 1000) // 剩余时间，单位：秒
                   if (remainingTime >= 0) {
                     item._remaining_time = remainingTime
                   }
@@ -542,13 +567,17 @@
               }
             }
           }, 1000)
+          // 刷新订单状态
+          this.startRefreshOrders()
         }
       },
       confirmPay(item) {
         this.$showDialog({
           hideHeader: true,
           title: '确认付款',
-          content: (<div class="text-left">确认您已向卖方付款？<p class="c-red">未付款点击“我已付款”将被冻结账户。</p></div>),
+          content: (<div class="text-left">请确认已向卖方付款。<p class="c-red">未付款点击“我已付款”将被冻结账户。</p></div>),
+          okTitle: '我已付款',
+          cancelTitle: '取消',
           onOk: () => {
             this.axios.order.confirmPay(item.id, item._selected_payment_method).then(res => {
               if (res.code === 0) {
@@ -556,7 +585,7 @@
               } else {
                 this.$errorTips(`提交失败code=${res.code}`)
               }
-              this.updateOrder(item.id)
+              this.refreshOrder(item.id)
             }).catch(err => {
               this.$errorTips(`提交失败: ${err}`)
             })
@@ -567,7 +596,9 @@
         this.$showDialog({
           hideHeader: true,
           title: '取消订单',
-          content: (<div class="text-left"><p class="c-red">如您已向卖家付款，取消订单您将会损失付款资金。</p><p>温馨提示：买方每日累计取消订单超过3笔，将被限制当日交易功能。</p></div>),
+          content: (
+            <div class="text-left"><p class="c-red">如您已向卖家付款，取消订单您将会损失付款资金。</p><p>温馨提示：买方每日累计取消订单超过3笔，将被限制当日交易功能。</p>
+            </div>),
           onOk: () => {
             this.axios.order.cancelOrder(item.id).then(res => {
               if (res.code === 0) {
@@ -575,7 +606,7 @@
               } else {
                 this.$errorTips(`提交失败code=${res.code}`)
               }
-              this.updateOrder(item.id)
+              this.refreshOrder(item.id)
             }).catch(err => {
               this.$errorTips(`提交失败: ${err}`)
             })
@@ -587,7 +618,7 @@
         this.showConfirmReceiptModal = true
       },
       markOrderSuccess() {
-        this.updateOrder(this.curReceiptOrderId)
+        this.refreshOrder(this.curReceiptOrderId)
       },
       onClickFilter(index) {
         for (let i = 0; i < this.filterOptions.length; i++) {
@@ -599,28 +630,66 @@
             this.queryParams.coin_type = null
             this.queryParams.side = null
             this.queryParams.page = 1 // 重置分页
-            this.fetchOrderList()
+            this.initOrderList()
           }
         }
         this.startTimer()
       },
-      updateOrder(orderId) {
+      refreshOrder(orderId) {
         // 进行中的订单才有操作
         this.axios.order.refreshOrderStatus(orderId).then(response => {
-          const newOrder = response.data
-          if (newOrder.status === this.constant.ORDER_STATUS.SUCCESS.value || newOrder.status === this.constant.ORDER_STATUS.CANCEL.value) {
-            // 被移动到已结束的列表中
-            this.orderTableItems = this.orderTableItems.filter(i => i.id !== orderId)
-          }
-          if (newOrder.status === this.constant.ORDER_STATUS.PAID.value) {
-            newOrder._selected_payment_method = newOrder.payment_methods[0]
-            this.orderTableItems.forEach(item => {
-              if (item.id === orderId) {
-                Object.assign(item, newOrder)
+          this.updateOrderInList(orderId, response.data)
+        }).catch(err => {
+          this.axios.onError(err)
+        })
+      },
+      updateOrderInList(orderId, newOrder) {
+        if (newOrder.status === this.constant.ORDER_STATUS.SUCCESS.value || newOrder.status === this.constant.ORDER_STATUS.CANCEL.value) {
+          // 被移动到已结束的列表中
+          this.orderTableItems = this.orderTableItems.filter(i => i.id !== orderId)
+        }
+        if (newOrder.status === this.constant.ORDER_STATUS.PAID.value) {
+          newOrder._selected_payment_method = newOrder.payment_methods[0]
+          this.orderTableItems.forEach(item => {
+            if (item.id === orderId) {
+              Object.assign(item, newOrder)
+            }
+          })
+        }
+      },
+      startRefreshOrders() {
+        this.stopRefreshOrders()
+        this.refreshInterval = this.Visibility.every(REFRESH_ORDER_INTERVAL, () => {
+          this.refreshOrderList()
+        })
+      },
+      stopRefreshOrders() {
+        this.Visibility.stop(this.refreshInterval)
+      },
+      refreshOrderList() {
+        // 不能直接替换整个列表，体验不好
+        this.asyncFetchOrderList().then((res) => {
+          if (res.code === 0 && res.data) {
+            const {data, curr_page: currentPage, total: totalRows} = res.data
+            this.queryParams.page = currentPage
+            this.queryParams.totalRows = totalRows
+            const newOrderIds = []
+            data.forEach(order => {
+              newOrderIds.push(order.id)
+              const oldOrder = this.orderTableItems.find(i => i.id === order.id)
+              if (!oldOrder) {
+                this.orderTableItems.unshift(this.preprocessOrder(order))
+              }
+              if (oldOrder && oldOrder.status !== order.status) {
+                this.updateOrderInList(order.id, order)
               }
             })
+            this.orderTableItems = this.orderTableItems.filter(i => newOrderIds.indexOf(i.id) >= 0)
+          } else {
+            this.orderTableItems = []
           }
         }).catch(err => {
+          console.log(err)
           this.axios.onError(err)
         })
       }
