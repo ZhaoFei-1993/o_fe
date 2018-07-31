@@ -462,6 +462,9 @@
     },
     methods: {
       showItems(side, coin) {
+        // 重置page
+        this.pager.currentPage = 1
+
         this.$router.replace({
           query: {
             side,
