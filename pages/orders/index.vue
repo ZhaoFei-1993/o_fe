@@ -438,8 +438,6 @@
         this.queryParams.page = page
         this.fetchOrderList()
       },
-    },
-    methods: {
       onClickSideDropdown(item) {
         this.queryParams.side = item.value
         this.fetchOrderList()

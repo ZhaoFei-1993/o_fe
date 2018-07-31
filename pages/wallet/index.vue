@@ -360,7 +360,7 @@
     },
     methods: {
       changePage(page) {
-        this.queryParams.page = page
+        this.historyQueryParams.page = page
         this.fetchBalanceHistory()
       },
       onChangeCoinType(coinType) {
