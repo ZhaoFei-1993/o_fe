@@ -527,7 +527,7 @@
           case this.constant.ORDER_STATUS.PAID.value:
             return {
               message: `已支付，卖方需确认收款并放行数字币，付款参考号：<span class="c-red">${this.referCode}</span>`,
-              warning: this.isBuySide ? undefined : '请务必确认收到款项后确认收款并核实买家是否实名付款。'
+              warning: this.isBuySide ? undefined : '请务必确认收到款项后确认收款，并核实买家是否实名付款。'
             }
           case this.constant.ORDER_STATUS.SUCCESS.value:
             return {message: `卖方已确认收款，付款参考号：<span class="c-red">${this.referCode}</span>`}
