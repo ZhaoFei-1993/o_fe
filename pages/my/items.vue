@@ -144,7 +144,7 @@
 
     <Blank v-if="!itemsCurrent.length"/>
 
-    <CBlock v-show="isItemAmountEditing" class="item-coin-amount-container" ref="coin-amount" x="20" y="20">
+    <CBlock v-show="isItemAmountEditing" class="item-coin-amount-container" ref="coin-amount" x="20" y="20" v-click-outside="onClickOutsideAmount">
       <div class="item-coin-amount-confirm">
         <CurrencyInput v-model="onlineItemCoinAmount" class="item-coin-amount-confirm-input" :currency="editingItem.coin_type"/>
         <b-btn variant="plain-green" size="xs" class="mx-20" @click="onItemOnlineConfirm">确定</b-btn>
@@ -161,12 +161,16 @@
 </template>
 
 <script>
+import Vue from 'vue'
 import PublishItemModal from '~/components/publish-item-modal/index.vue'
 import PublishItemButton from '~/components/publish-item-modal/publish-item-button.vue'
 import ToggleButton from '~/components/toggle-button.vue'
 import CurrencyInput from '~/components/currency-input.vue'
 import Blank from '~/components/blank.vue'
 import {mapState} from 'vuex'
+import ClickOutside from 'vue-click-outside'
+
+Vue.directive('ClickOutside', ClickOutside)
 
 export default {
   name: 'page-my-items',
@@ -315,6 +319,12 @@ export default {
       })
     },
 
+    onClickOutsideAmount() {
+      if (this.isItemAmountEditing) {
+        this.isItemAmountEditing = false
+      }
+    },
+
     onItemOnline(item, e) {
       const onlineItems = this.itemsOnline.filter(onlineItem => onlineItem.coin_type === item.coin_type && onlineItem.side === item.side)
 
@@ -334,12 +344,15 @@ export default {
       }
 
       this.editingItem = item
-      this.isItemAmountEditing = true
       this.onlineItemCoinAmount = item.remain_coin_amount
 
       const rect = e.target.getBoundingClientRect()
       this.$refs['coin-amount'].$el.style.left = rect.left - 420 + 'px'
       this.$refs['coin-amount'].$el.style.top = rect.top + window.scrollY - 30 + 'px'
+      // 为了与clickoutside兼容，所以在nextTick再显示
+      this.$nextTick(() => {
+        this.isItemAmountEditing = true
+      })
     },
     onItemOnlineConfirm() {
       this.axios.item.online(this.editingItem.id, this.onlineItemCoinAmount).then(res => {
