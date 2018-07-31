@@ -94,10 +94,8 @@
           justify-content: space-between;
           padding: 30px 20px 8px;
           background-color: white;
-          span:first-of-type {
-            font-size: 18px;
-          }
         }
+
         .list-header {
           padding: 0 20px;
           height: 40px;
@@ -258,7 +256,7 @@
       </div>
       <div class="items-list">
         <div class="list-title">
-          <span>广告列表</span>
+          <span class="fz-18">广告列表</span>
           <span>
             没有合适的？
             <PublishItemButton>
@@ -349,7 +347,8 @@
       v-model="showPlaceOrderModal"/>
 
     <b-modal id="prevent-order-modal"
-             v-model="showConstraintModal" title="交易限制"
+             v-model="showConstraintModal"
+             :title="currentConstraint.title || '交易限制'"
              :hide-footer="true"
              class="text-center">
       <div>
@@ -388,7 +387,7 @@
     }
   }
 
-  // const refreshInterval = 5000
+  const refreshInterval = 10000
   const PAGE_SIZE = 10
   const defaultPager = {
     limit: PAGE_SIZE,
@@ -423,6 +422,7 @@
         coinexDomain,
         pager: defaultPager,
         noKycLimit: NO_KYC_LIMIT,
+        requestItems: null,
       }
     },
     asyncData({app, store, route}) {
@@ -442,10 +442,16 @@
     },
     mounted() {
       this.getItems()
-      // TODO 正式环境打开刷新
-      // this.requestItems = setInterval(() => {
-      //   this.getItems()
-      // }, refreshInterval)
+      this.requestItems = setInterval(this.getItems, refreshInterval)
+      this.Visibility = require('visibilityjs')
+      this.Visibility.change(() => {
+        if (!this.Visibility.hidden()) {
+          clearInterval(this.requestItems)
+          this.requestItems = setInterval(this.getItems, refreshInterval)
+        } else {
+          clearInterval(this.requestItems)
+        }
+      })
     },
     beforeRouteUpdate(to, from, next) {
       next()
@@ -521,8 +527,9 @@
             switch (err.errorType) {
               case this.constant.PLACE_ORDER_ERROR.PAYMENT_LIMIT:
                 this.currentConstraint = {
-                  content: '您尚未添加该广告支持的支付方式，无法下单。',
-                  buttonText: '去添加',
+                  title: '开启支付方式',
+                  content: '您需要开启该广告支持的支付方式后，才可以进行交易。',
+                  buttonText: '去开启',
                   link: '/my/payments',
                 }
                 break

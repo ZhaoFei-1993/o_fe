@@ -271,7 +271,6 @@
           total: 0,
           limit: P_LIMIT,
         }, // 流水接口请求参数
-        curAssetItem: null, // 当前点击`转入``转出`的资产项目
         timer: null,
       }
     },
@@ -361,7 +360,7 @@
     },
     methods: {
       changePage(page) {
-        this.queryParams.page = page
+        this.historyQueryParams.page = page
         this.fetchBalanceHistory()
       },
       onChangeCoinType(coinType) {
@@ -444,9 +443,8 @@
 
         this.updateAllBalance()
           .then(() => {
-            const {coin_type: coinType} = this.curAssetItem
             const fromBalance = this[`${this.form.from}Balance`].find(item => {
-              return item.coin_type === coinType
+              return item.coin_type === this.form.coinType
             })
             this.availableAmount = fromBalance ? fromBalance.available : 0
             this.form.amount = 0
@@ -473,7 +471,6 @@
             })
             this.availableAmount = fromBalance ? fromBalance.available : 0
             this.showTransferModal = true
-            this.curAssetItem = item
           })
           .catch(err => {
             console.log(`资产更新失败${err}`)

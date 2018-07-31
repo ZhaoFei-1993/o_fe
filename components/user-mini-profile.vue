@@ -26,27 +26,26 @@
 
 <template>
   <div class="user-mini-profile">
-    <UserAvatar :username="username" color="#c5f0f0" :online="online" :size="avatarSize"></UserAvatar>
+    <UserAvatar :username="username" color="#c5f0f0" :online="online" :size="avatarSize"/>
+
     <div class="profile-right">
       <div class="username" v-b-tooltip.hover :title="username">
         {{username}}
       </div>
-      <div v-if="isMerchant"><span v-b-tooltip.hover title="认证商家"><i
-        class="iconfont icon-certificated-merchant"></i></span></div>
-      <UserPayments :payments="payments"></UserPayments>
+      <div v-if="isMerchant" class="lh-1">
+        <i class="iconfont icon-certificated-merchant" v-b-tooltip.hover title="认证商家"></i>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
   import UserAvatar from './user-avatar.vue'
-  import UserPayments from './user-payments.vue'
 
   export default {
     name: 'user-mini-profile',
     components: {
       UserAvatar,
-      UserPayments,
     },
     props: {
       username: String,
