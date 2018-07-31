@@ -187,7 +187,7 @@
               this.messageIterator = conversation.createMessagesIterator({
                 limit: this.limit,
               })
-              setTimeout(() => {
+              setTimeout(() => { // 加延时防止重复获取聊天记录
                 this.initMsgLog() // 初始化聊天记录
               }, 200)
               this.restartCount = 1000
