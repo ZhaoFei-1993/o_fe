@@ -117,8 +117,8 @@
                     {{ item._selected_payment_method.account_no }}
                     <b-popover :target="`qr-${item.id}`"
                                placement="top"
-                               triggers="hover click focus">
-                      <img style="display: block;max-width: 360px;max-height: 360px;"
+                               triggers="click">
+                      <img style="display: block;max-width: 360px;max-height: 360px;width: 100%;height: 100%;"
                            :src="item._selected_payment_method.qr_code_image_url">
                     </b-popover>
                     <span :id="`qr-${item.id}`" style="cursor: pointer;"
@@ -230,10 +230,10 @@
                 </template>
               </div>
             </div>
-            <div v-if="item._isBuySide && item.status === constant.ORDER_STATUS.CREATED.value" style="height: 24px;width: 100%;border-top: solid 1px #eeeeee;line-height: 38px;font-size: 14px;color: #e35555;text-align: left;padding-left: 30px;">
+            <div v-if="item._isBuySide && item.status === constant.ORDER_STATUS.CREATED.value" class="detail-warn-text">
               <span>* 请使用实名付款，转账时除参考号外请不要备注任何信息！</span>
             </div>
-            <div v-else-if="!item._isBuySide && item.status === constant.ORDER_STATUS.PAID.value" style="height: 24px;width: 100%;border-top: solid 1px #eeeeee;line-height: 38px;font-size: 14px;color: #e35555;text-align: left;padding-left: 30px;">
+            <div v-else-if="!item._isBuySide && item.status === constant.ORDER_STATUS.PAID.value" class="detail-warn-text">
               <span><span style="margin-right: 10px;color: #27313e;">* 买方实名：{{ item.user.name }}</span>请务必确认收到款项后确认收款并核实买家是否实名付款！</span>
             </div>
           </template>
@@ -675,6 +675,16 @@
     }
     .order-table {
       margin: 20px -30px 0;
+      .detail-warn-text {
+        height: 24px;
+        width: 100%;
+        border-top: solid 1px #eeeeee;
+        line-height: 38px;
+        font-size: 14px;
+        color: #e35555;
+        text-align: left;
+        padding-left: 30px;
+      }
       .id-text {
         &:hover {
           text-decoration: underline;
@@ -856,9 +866,6 @@
           text-overflow: ellipsis;
           overflow: hidden;
           color: #9b9b9b;
-        }
-        .detail-warn-text {
-          color: #e35555;
         }
         .detail-code {
           color: #ffbc32;
