@@ -187,7 +187,9 @@
               this.messageIterator = conversation.createMessagesIterator({
                 limit: this.limit,
               })
-              this.initMsgLog() // 初始化聊天记录
+              setTimeout(() => {
+                this.initMsgLog() // 初始化聊天记录
+              }, 200)
               this.restartCount = 1000
             } else {
               return Promise.reject(new Error(`getConversation error, conversation=${conversation}`))
@@ -357,6 +359,7 @@
             self.pushSystemMessage(`${payload.kickedBy} 将 ${payload.members.join('、')} 移出对话`)
           },
           [Event.KICKED]: (payload) => { // 当前用户被从某个对话中移除
+            if (payload.kickedBy === 'REST_API') return // 系统邀请信息不展示
             self.pushSystemMessage(`${payload.kickedBy} 将你移出对话`)
           },
         }
