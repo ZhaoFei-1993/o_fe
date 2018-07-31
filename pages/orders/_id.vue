@@ -141,6 +141,7 @@
              ok-title="确定"
              cancel-title="取消"
              button-size="sm"
+             :noCloseOnBackdrop="true"
              class="text-center"
     >
       <div id="appeal-modal" class="text-left fz-14 c-black">

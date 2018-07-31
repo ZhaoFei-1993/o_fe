@@ -110,6 +110,7 @@
            :title="editing ? '编辑广告' : '发布广告'"
            :okTitle="editing ? '保存' : '确定'"
            cancelTitle="取消"
+           :noCloseOnBackdrop="true"
            @ok="onSubmit">
     <b-form v-if="balance.currentRate">
       <!--<TabButtons :tabs="tradeSideOptions" v-model="form.side"/>-->

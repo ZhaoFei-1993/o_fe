@@ -9,6 +9,7 @@
            :centered="true"
            :visible="showConfirmReceiptModal"
            :ok-disabled="invalidCode"
+           :noCloseOnBackdrop="true"
            @ok="confirmReceipt"
            @hide="cancelReceipt"
            ref="confirmReceiptModal">
