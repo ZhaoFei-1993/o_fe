@@ -170,6 +170,7 @@
         </div>
 
         <div class="coin-amount-container">
+          <!--todo:coin_amount、float_rate最大值100,000,000-->
           <CurrencyInput v-model="form.coin_amount" :currency="form.coin_type" placeholder="请输入数量" class="col-left"/>
           <div class="col-right fz-22">
             <span>总金额 ≈</span>
