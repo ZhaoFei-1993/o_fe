@@ -100,6 +100,7 @@
         unreadMessagesCount: 0, // 未读消息数
         clientEventMap: {}, // 客户端级别事件
         convEventMap: {}, // 对话级别事件
+        restartCount: 0, // 初始化遇到错误尝试重新初始化次数
       }
     },
     directives: {
@@ -178,14 +179,30 @@
         client
           .getConversation(conversationId)
           .then(conversation => {
-            this.conversation = conversation
-            this.unreadMessagesCount = this.conversation.unreadMessagesCount
-            this.members = this.conversation.members
-            this.bindConversationEvent() // 绑定对话级别事件
-            this.messageIterator = conversation.createMessagesIterator({
-              limit: this.limit,
-            })
-            this.initMsgLog() // 初始化聊天记录
+            if (conversation) {
+              this.conversation = conversation
+              this.unreadMessagesCount = this.conversation.unreadMessagesCount
+              this.members = this.conversation.members
+              this.bindConversationEvent() // 绑定对话级别事件
+              this.messageIterator = conversation.createMessagesIterator({
+                limit: this.limit,
+              })
+              this.initMsgLog() // 初始化聊天记录
+              this.restartCount = 1000
+            } else {
+              return Promise.reject(new Error(`getConversation error, conversation=${conversation}`))
+            }
+          })
+          .catch(err => {
+            const maxRestartCount = 3 // 最多重新初始化次数
+            this.restartCount += 1
+            console.error(this.restartCount, err)
+            if (this.restartCount < maxRestartCount) {
+              const tid = setTimeout(() => {
+                clearTimeout(tid)
+                this.init()
+              }, 1000)
+            }
           })
       },
       handleVisibilityChange() { // 监听页面隐藏事件，取消未读
