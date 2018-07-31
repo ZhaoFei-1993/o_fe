@@ -371,7 +371,7 @@
   const PAID_CAN_APPEAL = 30 * 60 * 1000 // 三十分钟
   const SUCCESS_CAN_APPEAL = 7 * 24 * 3600 * 1000 // 七天
   const ORDER_PAY_TIME = 15 // 15分钟（未换算）
-  // const REFRESH_ORDER_INTERVAL = 5000
+  const REFRESH_ORDER_INTERVAL = 5000
 
   export default {
     data() {
@@ -382,12 +382,13 @@
         order: null,
         selectedMethod: null,
         secondCountdown: null,
+        refreshInterval: null,
+        Visibility: null,
         payRemainTime: 0,
         appeal: null,
         appealComment: null,
         appealReason: null,
         showConfirmReceiptModal: false,
-        refreshOrderTimeout: null,
         convId: '',
       }
     },
@@ -406,11 +407,19 @@
       })
     },
     beforeDestroy() {
-      clearInterval(this.secondCountdown)
-      clearTimeout(this.refreshOrderTimeout)
+      this.stopCountDown()
+      this.stopRefreshOrder()
     },
     mounted() {
       this.getCurrentOrder()
+      this.Visibility = require('visibilityjs')
+      this.Visibility.change(() => {
+        if (this.Visibility.visible) {
+          this.startRefreshOrder()
+        } else {
+          this.stopRefreshOrder()
+        }
+      })
     },
     computed: {
       ...mapState(['user', 'constant', 'chat']),
@@ -554,9 +563,6 @@
             this.selectedMethod = this.order.payment_methods[0]
             this.counterparty = this.user.account.id === this.order.user_id ? this.order.merchant : this.order.user
             this.checkOrderStatus()
-            if (this.order.status === this.constant.ORDER_STATUS.PAID.value || this.order.status === this.constant.ORDER_STATUS.SUCCESS.value) {
-              this.getAppeal()
-            }
           }
         }).catch(err => {
           if (err.code === 401) {
@@ -582,26 +588,49 @@
           this.axios.onError(err)
         })
       },
+      updateRemainTime() {
+        this.stopCountDown()
+        if (this.order.status === this.constant.ORDER_STATUS.CREATED.value) {
+          this.payRemainTime = Math.floor(((this.order.place_time + ORDER_PAY_TIME * 60) * 1000 - Date.now()) / 1000)
+          this.startCountDown()
+        }
+      },
+      startCountDown() {
+        this.secondCountdown = setInterval(() => {
+          if (this.payRemainTime > 0) {
+            this.payRemainTime--
+          } else {
+            this.stopCountDown()
+          }
+        }, 1000)
+      },
+      stopCountDown() {
+        if (!this.secondCountdown) return
+        clearInterval(this.secondCountdown)
+      },
+      startRefreshOrder() {
+        this.stopRefreshOrder()
+        this.refreshInterval = this.Visibility.every(REFRESH_ORDER_INTERVAL, () => {
+          this.refreshOrderStatus()
+        })
+      },
+      stopRefreshOrder() {
+        this.Visibility.stop(this.refreshInterval)
+      },
       checkOrderStatus() {
-        if (this.order.status === this.constant.ORDER_STATUS.CREATED.value || this.order.status === this.constant.ORDER_STATUS.PAID.value || this.order.appeal_status !== '') {
-          if (this.order.status === this.constant.ORDER_STATUS.CREATED.value) {
-            this.payRemainTime = Math.floor(((this.order.place_time + ORDER_PAY_TIME * 60) * 1000 - Date.now()) / 1000)
-            clearInterval(this.secondCountdown)
-            this.secondCountdown = setInterval(() => {
-              if (this.payRemainTime > 0) {
-                this.payRemainTime--
-              } else {
-                clearInterval(this.secondCountdown)
-              }
-            }, 1000)
-          }
-          if (this.order.status === this.constant.ORDER_STATUS.PAID.value) {
-            this.selectedMethod = this.order.payment_methods[0]
-          }
-          // 暂时不自动刷新状态了，等之后引入websocket
-          // this.refreshOrderTimeout = setTimeout(() => {
-          //   this.refreshOrderStatus()
-          // }, REFRESH_ORDER_INTERVAL)
+        this.updateRemainTime()
+        if (this.order.status === this.constant.ORDER_STATUS.PAID.value) {
+          this.selectedMethod = this.order.payment_methods[0]
+        }
+        // 未完成的订单才自动刷新
+        if (this.order.status === this.constant.ORDER_STATUS.CREATED.value || this.order.status === this.constant.ORDER_STATUS.PAID.value) {
+          this.startRefreshOrder()
+        } else {
+          this.stopRefreshOrder()
+        }
+        // 支付或完成的订单才可以申诉
+        if (this.order.status === this.constant.ORDER_STATUS.PAID.value || this.order.status === this.constant.ORDER_STATUS.SUCCESS.value) {
+          this.getAppeal()
         }
       },
       confirmPay() {
@@ -623,7 +652,6 @@
       },
       submitAppeal() {
         this.axios.order.submitAppeal(this.order.id, this.appealReason, this.appealComment).then(_ => {
-          this.getAppeal()
           this.refreshOrderStatus()
         }).catch(err => {
           this.axios.onError(err)
@@ -635,7 +663,6 @@
           content: (<div class="text-left"><p>确认取消申诉？</p><p class="c-red">取消申诉后的订单将不可再次申诉。</p></div>),
           onOk: () => {
             this.axios.order.cancelAppeal(this.order.id).then(() => {
-              this.getAppeal()
               this.refreshOrderStatus()
             }).catch(err => {
               this.axios.onError(err)
@@ -646,7 +673,9 @@
       cancelOrder() {
         this.$showDialog({
           title: '取消订单',
-          content: (<div class="text-left"><p>确认取消订单？</p><p class="c-red">取消的订单将不可重新打开。</p></div>),
+          content: (
+            <div class="text-left"><p class="c-red">如您已向卖家付款，取消订单您将会损失付款资金。</p><p>温馨提示：买方每日累计取消订单超过3笔，将被限制当日交易功能。</p>
+            </div>),
           onOk: () => {
             this.axios.order.cancelOrder(this.order.id).then(() => {
               this.refreshOrderStatus()
@@ -663,7 +692,7 @@
       },
       confirmReceipt() {
         this.showConfirmReceiptModal = true
-      }
+      },
     }
   }
 </script>

@@ -387,7 +387,7 @@
     }
   }
 
-  // const refreshInterval = 5000
+  const refreshInterval = 10000
   const PAGE_SIZE = 10
   const defaultPager = {
     limit: PAGE_SIZE,
@@ -422,6 +422,7 @@
         coinexDomain,
         pager: defaultPager,
         noKycLimit: NO_KYC_LIMIT,
+        requestItems: null,
       }
     },
     asyncData({app, store, route}) {
@@ -441,10 +442,16 @@
     },
     mounted() {
       this.getItems()
-      // TODO 正式环境打开刷新
-      // this.requestItems = setInterval(() => {
-      //   this.getItems()
-      // }, refreshInterval)
+      this.requestItems = setInterval(this.getItems, refreshInterval)
+      this.Visibility = require('visibilityjs')
+      this.Visibility.change(() => {
+        if (!this.Visibility.hidden()) {
+          clearInterval(this.requestItems)
+          this.requestItems = setInterval(this.getItems, refreshInterval)
+        } else {
+          clearInterval(this.requestItems)
+        }
+      })
     },
     beforeRouteUpdate(to, from, next) {
       next()

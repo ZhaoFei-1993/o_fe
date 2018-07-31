@@ -346,7 +346,6 @@
     },
     mounted() {
       // component 里面不能调用fetch和asyncData
-      this.$store.dispatch('fetchUserMerchant')
       this.$store.dispatch('fetchUserAccount').then(_ => {
         if (this.user && this.user.account) {
           if (!this.user.account.is_name_confirmed) {

@@ -33,6 +33,7 @@
     "nodemailer": "4.6.7",
     "nuxt": "1.4.1",
     "qr.js": "0.0.0",
+    "visibilityjs": "^2.0.1",
     "vue": "^2.5.16",
     "vue-clipboard2": "0.2.0",
     "vue-quill-editor": "^3.0.6",
