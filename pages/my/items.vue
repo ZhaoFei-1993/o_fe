@@ -322,6 +322,17 @@ export default {
         return this.$errorTips('每个币种每个类型的广告最多只能上架2条')
       }
 
+      if (!this.user.payments.some(payment => payment.status === this.constant.PAYMENT_STATUS.ON)) {
+        return this.$showDialog({
+          title: '开启支付方式',
+          content: '您需要开启支付方式后，才可以上架广告。',
+          okTitle: '去开启',
+          onOk: () => {
+            this.$router.push('/my/payments')
+          }
+        })
+      }
+
       this.editingItem = item
       this.isItemAmountEditing = true
       this.onlineItemCoinAmount = item.remain_coin_amount
