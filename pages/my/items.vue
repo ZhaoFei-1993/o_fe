@@ -4,6 +4,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      padding: 0 30px;
       font-size: 18px;
     }
     .items-header-left {
@@ -64,7 +65,7 @@
 </style>
 
 <template>
-  <CBlock class="page-my-items">
+  <CBlock class="page-my-items" x="0">
     <h2 class="items-header">
       <span class="items-header-left">
         广告管理
@@ -78,7 +79,7 @@
       </PublishItemButton>
     </h2>
 
-    <div class="mt-30">
+    <div class="my-25 px-30">
       <b-btn v-for="(status, index) in filterOptions"
              :variant="itemStatus === status.value ? 'outline-green' : 'outline-gray'"
              :key="index" size="xxs" class="mr-20"
@@ -206,28 +207,25 @@ export default {
       const fields = {
         id: {
           label: '广告编号',
-          thStyle: {
-            width: '70px'
-          },
+          thClass: ['pl-30', 'w-100'],
+          tdClass: ['pl-30', 'w-100'],
         },
         side: {
           label: '类型',
           thStyle: {
-            width: '70px'
+            width: '100px'
           },
-          sortable: true,
         },
         coin_type: {
           label: '币种',
           thStyle: {
-            width: '80px'
+            width: '100px'
           },
-          sortable: true,
         },
         remain_coin_amount: {
           label: '数量',
           thStyle: {
-            width: '100px'
+            width: '150px'
           },
         },
         cashAmountLimit: {
@@ -253,7 +251,12 @@ export default {
       }
 
       fields.action = {
-        label: '操作'
+        label: '操作',
+        thStyle: {
+          width: '150px',
+        },
+        thClass: ['text-right', 'pr-30'],
+        tdClass: ['text-right', 'pr-30'],
       }
 
       return fields

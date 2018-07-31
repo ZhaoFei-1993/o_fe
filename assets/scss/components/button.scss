@@ -109,9 +109,9 @@ $background-red: #e45555;
   background-color: transparent;
   border-color: $brandGreen;
   color: $brandGreen;
+
   &:hover, &:focus, &:active {
     background-image: $image-gradient-green;
-    border: none;
     color: #fff;
   }
 }
