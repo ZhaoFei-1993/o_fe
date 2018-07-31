@@ -10,7 +10,7 @@
     background-origin: content-box;
 
     .item-delete-image {
-      display: none;
+      display: flex;
       position: absolute;
       top: -12px;
       right: -12px;
@@ -27,10 +27,6 @@
       .icon-trash {
         font-size: 12px;
       }
-    }
-
-    &:hover .item-delete-image {
-      display: flex;
     }
   }
 </style>
