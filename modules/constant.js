@@ -19,8 +19,8 @@ const PAYMENT_OPTIONS = [
 
 const APPEAL_RESULTS = [
   {text: '取消申诉', value: 'draw'},
-  {text: '买家胜诉', value: 'buyer_win'},
-  {text: '卖家胜诉', value: 'seller_win'},
+  {text: '买方胜诉', value: 'buyer_win'},
+  {text: '卖方胜诉', value: 'seller_win'},
 ]
 
 const ORDER_RESULTS = [

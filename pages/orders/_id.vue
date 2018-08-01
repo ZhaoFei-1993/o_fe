@@ -67,7 +67,7 @@
             </b-btn>
           </li>
           <li :class="['step',{active:order.status===constant.ORDER_STATUS.PAID.value}]"
-              v-if="order.status!==constant.ORDER_STATUS.CANCEL.value&&order.status!==constant.ORDER_STATUS.CLOSED.value">
+              v-if="showConfirmReceiptStep">
             <div class="message">{{stepsMessage.payCoin}}</div>
             <div class="step-time" v-if="order.complete_time">{{order.complete_time| getTimeText}}</div>
             <button v-if="!isBuySide&&order.status===constant.ORDER_STATUS.PAID.value"
@@ -454,7 +454,8 @@
         return this.appeal.user_id === this.user.account.id
       },
       isAppealing() {
-        return this.appeal && this.appeal.status !== this.constant.APPEAL_STATUS.CANCEL
+        // 平局和取消一样处理？？？？！！！！！
+        return this.appeal && this.appeal.status !== this.constant.APPEAL_STATUS.CANCEL && this.appeal.result !== this.constant.APPEAL_RESULT_MAP.draw.value
       },
       canAppeal() {
         // 支付后三十分钟以后 和 完成后七天内可以申诉
@@ -514,11 +515,16 @@
       expired() {
         return this.order.status === this.constant.ORDER_STATUS.CREATED.value && this.payRemainTime <= 0
       },
+      showConfirmReceiptStep() {
+        // 各种状态太混乱了！！！判断逻辑详见产品原型。。。
+        const appealOk = !this.appeal || !(this.appeal.status === this.constant.APPEAL_STATUS.COMPLETED && this.appeal.result !== this.constant.APPEAL_RESULT_MAP.draw.value)
+        return appealOk && this.order.status !== this.constant.ORDER_STATUS.CANCEL.value && this.order.status !== this.constant.ORDER_STATUS.CLOSED.value
+      },
       paymentStatusMessage() {
         let payMessage = '订单已超时'
         if (this.payRemainTime > 0) {
           payMessage = `
-                待支付，买方需在
+                买方需在
                 <span class="c-red">${Math.floor(this.payRemainTime / 60)}分${this.payRemainTime % 60}秒</span>
                 内完成支付，付款参考号：<span class="c-red">${this.referCode}</span>
                 `
@@ -532,13 +538,13 @@
             }
           case this.constant.ORDER_STATUS.PAID.value:
             return {
-              message: `已支付，卖方需确认收款并放行数字币，付款参考号：<span class="c-red">${this.referCode}</span>`,
+              message: `等待卖方确认并放币，付款参考号：<span class="c-red">${this.referCode}</span>`,
               warning: this.isBuySide ? undefined : `<div>${kycName}<span class="c-red">请务必确认收到款项后确认收款，并核实买家是否实名付款。</span></div>`
             }
           case this.constant.ORDER_STATUS.SUCCESS.value:
-            return {message: `卖方已确认收款，付款参考号：<span class="c-red">${this.referCode}</span>`}
+            return {message: `${this.appeal ? '申诉裁决' : ''}卖方已确认收款，付款参考号：<span class="c-red">${this.referCode}</span>`}
           case this.constant.ORDER_STATUS.CANCEL.value:
-            return {message: `买家已取消交易，无法查看支付信息。`}
+            return {message: this.appeal ? `申诉裁决买方未付款，付款参考号：<span class="c-red">${this.referCode}</span>` : `买家已取消交易，无法查看支付信息。`}
           case this.constant.ORDER_STATUS.CLOSED.value:
             return {message: `订单超时已关闭，无法查看支付信息。`}
           default:
@@ -636,8 +642,8 @@
         } else {
           this.stopRefreshOrder()
         }
-        // 支付或完成的订单才可以申诉
-        if (this.order.status === this.constant.ORDER_STATUS.PAID.value || this.order.status === this.constant.ORDER_STATUS.SUCCESS.value) {
+        // 支付或完成的订单才可以申诉，但是取消的订单有可能是申诉过的，所以只要不是created都有可能有appeal
+        if (this.order.status !== this.constant.ORDER_STATUS.CREATED.value) {
           this.getAppeal()
         }
       },
