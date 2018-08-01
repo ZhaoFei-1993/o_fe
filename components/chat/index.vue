@@ -298,9 +298,12 @@
             this.pushSystemMessage('现在可以开始聊天')
             this.scrollToBottom() // 滚动到底部
             this.conversation.read() // 对话标记为已读
+          }
+          const tid = setTimeout(() => {
             this.bindClientEvent() // 需要初始化聊天记录后才能绑定事件，否则会出现重复消息问题
             this.bindConversationEvent() // 完成初始化后才绑定对话级别事件
-          }
+            clearTimeout(tid)
+          })
         })
       },
       bindClientEvent() {
