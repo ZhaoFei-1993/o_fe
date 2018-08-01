@@ -51,8 +51,8 @@
               <i class="iconfont icon-detail"></i>
             </span>
           </template>
-          <template slot="row-details" slot-scope="{ item }">
-            <div class="detail-wrapper">
+          <template slot="row-details" slot-scope="{ item }" class="buy-side-detail">
+            <div :class="['detail-wrapper', item._isBuySide ? 'buy-side-detail' : 'sell-side-detail']">
               <div class="col1">
                 <div class="detail-h1 detail-flex">
                   <span
@@ -718,7 +718,7 @@
     .order-table {
       margin: 20px -30px 0;
       .detail-warn-text {
-        height: 24px;
+        height: 38px;
         width: 100%;
         border-top: solid 1px #eeeeee;
         line-height: 38px;
@@ -797,7 +797,15 @@
       }
       .b-table-details {
         background-color: #f9f9f9;
-        border-top: solid 1px #ffbc32;
+        td {
+          padding: 0 !important;
+          .buy-side-detail {
+            border-top: solid 1px #ffbc32;
+          }
+          .sell-side-detail {
+            border-top: solid 1px #52cbca;
+          }
+        }
       }
       .payment-method {
         margin-bottom: 20px;
@@ -821,8 +829,7 @@
         }
       }
       .detail-wrapper {
-        margin-top: 16px;
-        margin-bottom: 12px;
+        padding: 30px 0;
         display: flex;
         justify-content: space-between;
         .col1 {
