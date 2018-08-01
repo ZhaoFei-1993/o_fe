@@ -31,8 +31,9 @@
     }
 
     .input-label {
-      color: #6f6f6f;
       margin-bottom: 5px;
+      font-size: 14px;
+      color: #6f6f6f;
     }
 
     .group-purpose {
@@ -183,7 +184,7 @@
             <span class="c-bright-yellow fz-22 ml-1"> {{totalCash}} {{balance.currentCash}}</span>
           </div>
         </div>
-        <div class="c-9b mt-2">
+        <div class="c-9b mt-2 fz-14">
           *
           <span v-if="form.side === constant.SIDE.BUY">
             当日取消订单超过3次，会被限制交易功能。
@@ -234,7 +235,8 @@
 
         <b-form-group label="交易方限制">
           <b-form-checkbox-group v-model="form.counterparty_limit"
-                                 :options="constant.COUNTERPARTY_LIMIT_OPTIONS">
+                                 :options="constant.COUNTERPARTY_LIMIT_OPTIONS"
+                                 class="fz-14" style="line-height: 21px;">
           </b-form-checkbox-group>
         </b-form-group>
       </div>
@@ -401,7 +403,7 @@ export default {
       }).catch(err => {
         const ERROR_CODE = this.constant.ERROR_CODE
         if (err.code === ERROR_CODE.MISSING_PAY_METHODS) {
-          this.$showTips('缺少支付方式，请先添加支付方式')   // todo:可能需要在点击之前就提示
+          this.$showTips('缺少支付方式，请先添加支付方式')
         } else {
           this.axios.onError(err)
         }
