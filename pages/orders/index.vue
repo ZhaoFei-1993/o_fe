@@ -43,22 +43,16 @@
             {{ item.cash_amount | formatMoney }} CNY
           </template>
           <template slot="status" slot-scope="{ item, detailsShowing, toggleDetails }">
-            <span v-if="item.appeal_status && item.appeal_status === 'created' || item.appeal_status === 'processing'">
-              <span class="status-icon"><i v-if="appealIconMap[item.appeal_status]" class="iconfont" :class="appealIconMap[item.appeal_status].class" :style="{fontSize: '12px', color: appealIconMap[item.appeal_status].color}"></i></span>
-              <span>申诉中</span>
-            </span>
-            <span v-else>
-              <span class="status-icon"><i v-if="statusIconMap[item.status]" class="iconfont" :class="statusIconMap[item.status].class" :style="{fontSize: '12px', color: statusIconMap[item.status].color}"></i></span>
-              <span>{{ constant?constant.ORDER_STATUS[item.status.toUpperCase()].text:'' }}</span>
-              <span v-if="item.status === constant.ORDER_STATUS.CREATED.value || item.status === constant.ORDER_STATUS.PAID.value"
-                    class="detail"
-                    :class="[ detailsShowing ? 'show-detail' : 'hidden-detail' ]">
-                <i class="iconfont icon-detail"></i>
-              </span>
+            <span class="status-icon"><i v-if="statusIconMap[item.status]" class="iconfont" :class="statusIconMap[item.status].class" :style="{fontSize: '12px', color: statusIconMap[item.status].color}"></i></span>
+            <span>{{ constant?constant.ORDER_STATUS[item.status.toUpperCase()].text:'' }}</span>
+            <span v-if="item.status === constant.ORDER_STATUS.CREATED.value || item.status === constant.ORDER_STATUS.PAID.value && queryParams.status === 'processing'"
+                  class="detail"
+                  :class="[ detailsShowing ? 'show-detail' : 'hidden-detail' ]">
+              <i class="iconfont icon-detail"></i>
             </span>
           </template>
-          <template slot="row-details" slot-scope="{ item }">
-            <div class="detail-wrapper">
+          <template slot="row-details" slot-scope="{ item }" class="buy-side-detail">
+            <div :class="['detail-wrapper', item._isBuySide ? 'buy-side-detail' : 'sell-side-detail']">
               <div class="col1">
                 <div class="detail-h1 detail-flex">
                   <span
@@ -79,7 +73,7 @@
                   {{ item.coin_amount | formatMoney }} {{ item.coin_type }}
                 </div>
               </div>
-              <div class="col3">
+              <div class="col3" v-if="item._selected_payment_method && (item._order_type === constant.SIDE.SELL && item.status === constant.ORDER_STATUS.PAID.value) || item._order_type === constant.SIDE.BUY">
                 <div class="payment-method"
                      v-if="item.status !== constant.ORDER_STATUS.CANCEL.value
                   && item.status !== constant.ORDER_STATUS.CLOSED.value && !item._expired">
@@ -111,20 +105,21 @@
                   </template>
                 </div>
               </div>
-              <div class="col4" v-if="item._selected_payment_method">
+              <div class="col4" v-if="item._selected_payment_method && (item._order_type === constant.SIDE.SELL && item.status === constant.ORDER_STATUS.PAID.value) || item._order_type === constant.SIDE.BUY">
                 <template v-if="!item._expired">
                   <div class="detail-text" style="color: #27313e;">
                     {{ item._selected_payment_method.account_name }}
                   </div>
                   <div class="detail-text">
-                    {{ item._selected_payment_method.account_no }}
-                    <b-popover :target="`qr-${item.id}`"
+                    <span v-if="item._selected_payment_method.method === constant.PAYMENT_TYPES.BANKCARD">{{ item._selected_payment_method.account_no | splitCardNumber }}</span>
+                    <span v-else>{{ item._selected_payment_method.account_no }}</span>
+                    <b-popover v-if="item._selected_payment_method.qr_code_image_url" :target="`qr-${item.id}`"
                                placement="top"
-                               triggers="click">
+                               triggers="hover">
                       <img style="display: block;max-width: 360px;max-height: 360px;width: 100%;height: 100%;"
                            :src="item._selected_payment_method.qr_code_image_url">
                     </b-popover>
-                    <span :id="`qr-${item.id}`" style="cursor: pointer;"
+                    <span v-if="item._selected_payment_method.qr_code_image_url" :id="`qr-${item.id}`" style="cursor: pointer;"
                           v-show="item._selected_payment_method.method !== constant.PAYMENT_TYPES.BANKCARD"><i
                       class="iconfont icon-qrcode"></i></span>
                   </div>
@@ -237,7 +232,7 @@
               <span>* 请使用实名付款，转账时除参考号外请不要备注任何信息！</span>
             </div>
             <div v-else-if="!item._isBuySide && item.status === constant.ORDER_STATUS.PAID.value" class="detail-warn-text">
-              <span><span style="margin-right: 10px;color: #27313e;" v-if="item.user.kyc_name">* 买方姓名：{{ item.user.kyc_name }} </span>请务必确认收到款项后确认收款并核实买家是否实名付款！</span>
+              <span><span style="margin-right: 10px;color: #27313e;" v-if="item.user.kyc_name">* 买方姓名：{{ item.user.kyc_name }} </span>请务必确认收到款项后确认收款，并核实买家是否实名付款！</span>
             </div>
           </template>
         </b-table>
@@ -295,16 +290,6 @@
           cancel: {
             class: 'icon-pay-cancel',
             color: 'rgb(216, 216, 216)',
-          },
-        },
-        appealIconMap: {
-          created: {
-            class: 'icon-appealing',
-            color: 'rgb(82, 203, 202)',
-          },
-          processing: {
-            class: 'icon-appealing',
-            color: 'rgb(82, 203, 202)',
           },
         },
         curReceiptOrderId: null, // 当前选中的确认收款item
@@ -733,7 +718,7 @@
     .order-table {
       margin: 20px -30px 0;
       .detail-warn-text {
-        height: 24px;
+        height: 38px;
         width: 100%;
         border-top: solid 1px #eeeeee;
         line-height: 38px;
@@ -741,6 +726,10 @@
         color: #e35555;
         text-align: left;
         padding-left: 30px;
+        .user-kyc-name {
+          margin-right: 10px;
+          color: #27313e;
+        }
       }
       .id-text {
         &:hover {
@@ -808,7 +797,15 @@
       }
       .b-table-details {
         background-color: #f9f9f9;
-        border-top: solid 1px #ffbc32;
+        td {
+          padding: 0 !important;
+          .buy-side-detail {
+            border-top: solid 1px #ffbc32;
+          }
+          .sell-side-detail {
+            border-top: solid 1px #52cbca;
+          }
+        }
       }
       .payment-method {
         margin-bottom: 20px;
@@ -832,8 +829,7 @@
         }
       }
       .detail-wrapper {
-        margin-top: 16px;
-        margin-bottom: 12px;
+        padding: 30px 0;
         display: flex;
         justify-content: space-between;
         .col1 {
