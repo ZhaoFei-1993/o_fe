@@ -155,6 +155,18 @@
           cursor: pointer;
         }
       }
+      .order-notice {
+        padding: 0 30px 30px;
+        .title {
+          font-weight: 500;
+          font-size: 16px;
+          margin: 10px 0;
+        }
+        .notices {
+          list-style-type: decimal;
+          list-style-position: inside;
+        }
+      }
     }
     .sidebar {
       width: 400px;
