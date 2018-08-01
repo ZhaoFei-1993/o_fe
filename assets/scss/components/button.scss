@@ -110,6 +110,10 @@ $background-red: #e45555;
   border-color: $brandGreen;
   color: $brandGreen;
 
+  &.btn-xxs {
+    font-size: 12px;
+  }
+
   &:hover, &:focus, &:active {
     background-image: $image-gradient-green;
     color: #fff;
@@ -120,6 +124,11 @@ $background-red: #e45555;
   background-color: transparent;
   border-color: #6f6f6f;
   color: #6f6f6f;
+
+  &.btn-xxs {
+    font-size: 12px;
+  }
+
   &:hover {
     background-color: #6f6f6f;
     color: #fff;
@@ -129,6 +138,39 @@ $background-red: #e45555;
     color: #6f6f6f;
   }
 }
+
+.btn-outline-yellow {
+  background-color: transparent;
+  border-color: $brightYellow;
+  color: $brightYellow;
+
+  &.btn-xxs {
+    font-size: 12px;
+  }
+
+  &:hover, &:focus, &:active {
+    background-image: $image-gradient-yellow;
+    color: #fff;
+    border: none;
+  }
+}
+
+.btn-outline-white {
+  background-color: transparent;
+  border-color: white;
+  color: white;
+
+  &.btn-xxs {
+    font-size: 12px;
+  }
+
+  &:hover {
+    background: white;
+    border-color: transparent;
+    color: #192330;
+  }
+}
+
 
 .btn-yellow {
   background-color: $brandYellow;
@@ -154,29 +196,6 @@ $background-red: #e45555;
   }
   &:active {
     background-image: $image-gradient-yellow !important;
-  }
-}
-
-.btn-outline-yellow {
-  background-color: transparent;
-  border-color: $brightYellow;
-  color: $brightYellow;
-
-  &:hover, &:focus, &:active {
-    background-image: $image-gradient-yellow;
-    color: #fff;
-    border: none;
-  }
-}
-
-.btn-outline-white {
-  background-color: transparent;
-  border-color: white;
-  color: white;
-  &:hover {
-    background: white;
-    border-color: transparent;
-    color: #192330;
   }
 }
 

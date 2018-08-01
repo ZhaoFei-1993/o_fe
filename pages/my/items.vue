@@ -56,6 +56,10 @@
       width: 400px;
       padding-bottom: 10px !important;
 
+      .item-coin-amount-confirm-input {
+        width: 240px;
+      }
+
       .item-coin-amount-confirm {
         display: flex;
         align-items: center;
@@ -397,6 +401,5 @@ export default {
       this.$showTips('编辑成功')
     }
   }
-
 }
 </script>

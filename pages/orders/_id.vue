@@ -1,3 +1,197 @@
+<style lang="scss">
+  @import "~assets/scss/variables.scss";
+
+  .page-order-detail {
+    padding: 40px 0 118px 0px;
+    width: 1200px;
+    margin: 0 auto;
+    min-height: 900px;
+    display: flex;
+    .main-content {
+      flex: 1;
+      padding: 0px;
+      overflow: hidden;
+      background-color: #ffffff;
+      box-shadow: 0 0 10px 0 #ececec;
+      .order-basic-info {
+        padding: 30px 30px 10px;
+        .info-header {
+          display: flex;
+          justify-content: space-between;
+          border-bottom: 1px solid #eeeeee;
+        }
+        .info-detail {
+          .title {
+            font-size: 20px;
+            color: #27313e;
+            margin-top: 20px;
+          }
+          .content {
+            font-size: 16px;
+            color: #6f6f6f;
+            margin-top: 10px;
+            a {
+              color: #6f6f6f;
+              margin: 0 0.5rem;
+            }
+          }
+        }
+
+      }
+      .payment-info {
+        padding: 20px 30px;
+        background-color: #f9f9f9;
+
+        .payment-method {
+          display: flex;
+          align-items: center;
+          margin-bottom: 20px;
+          color: #6f6f6f;
+
+          select {
+            border: none;
+            background-color: transparent;
+            color: #6f6f6f;
+            &:focus {
+              outline: none;
+            }
+            option {
+              width: 120px;
+            }
+          }
+
+          .payment-account {
+            margin-left: 10px;
+            margin-right: 4px;
+          }
+        }
+
+        .payment-status {
+          font-size: 18px;
+          color: #27313e;
+          font-weight: 500;
+        }
+        .payment-warning {
+          margin-top: 10px;
+        }
+      }
+      .order-steps {
+        padding: 25px 30px;
+        ol {
+          list-style-type: none;
+          border-bottom: 1px solid #eeeeee;
+          li {
+            counter-increment: level1;
+            font-size: 16px;
+            color: #6f6f6f;
+            margin-bottom: 50px;
+            width: 100%;
+            position: relative;
+            &.active {
+              color: #192330;
+              font-weight: 500;
+              div:first-child {
+                &:after {
+                  position: absolute;
+                  content: '';
+                  width: 11px;
+                  height: 11px;
+                  border-radius: 50%;
+                  background-color: $brandGreen;
+                  border: 1px solid $brandGreen;
+                  left: 40px;
+                  top: 8px;
+                }
+              }
+            }
+            &:before {
+              content: counter(level1) " "; /*Instead of ". " */
+              color: $brandGreen;
+              margin-right: 24px;
+              position: absolute;
+              left: 0;
+              top: 0px;
+            }
+            &:not(:last-child):after {
+              position: absolute;
+              left: 45px;
+              top: 18px;
+              content: '';
+              width: 0px;
+              height: 64px;
+              border-right: 1px solid $brandGreen;
+            }
+            div:first-child {
+              position: relative;
+              padding-left: 60px;
+              &:before {
+                position: absolute;
+                content: '';
+                width: 11px;
+                height: 11px;
+                border-radius: 50%;
+                background-color: white;
+                border: 1px solid $brandGreen;
+                left: 40px;
+                top: 8px;
+              }
+            }
+            div.step-time {
+              position: absolute;
+              left: 60px;
+            }
+            button {
+              position: absolute;
+              right: 0;
+              top: 0;
+            }
+          }
+        }
+      }
+      .order-helper {
+        padding: 0 30px 30px;
+        font-size: 16px;
+        .appeal-btn {
+          cursor: pointer;
+        }
+      }
+    }
+    .sidebar {
+      width: 400px;
+      margin-left: 20px;
+      #my-chat-box {
+        margin-top: 10px;
+        padding: 0 !important;
+      }
+    }
+    #appeal-modal {
+      .tip {
+        width: 80px;
+      }
+      .appeal-input {
+        width: 430px;
+        border: solid 1px #dddddd;
+        &:focus {
+          border: solid 1px $brandGreen;
+          outline: none;
+        }
+      }
+      textarea {
+        padding: 6px 12px;
+        height: 182px;
+        max-height: 182px;
+      }
+    }
+    .user-stats-profile {
+      .username {
+        max-width: 300px;
+      }
+      .sidebar-info-item-title {
+        width: 160px;
+      }
+    }
+  }
+</style>
 <template>
   <div v-if="order" class="page-order-detail">
     <div class="main-content">
@@ -46,9 +240,9 @@
                 class="detail-text">
             {{ selectedMethod.bank_name }}<span v-if="selectedMethod.branch&&selectedMethod.branch.length">, {{ selectedMethod.branch }}</span>
           </span>
-          <span class="qr-code-button"
-                v-if="selectedMethod.method!==constant.PAYMENT_TYPES.BANKCARD && selectedMethod.qr_code_image"
-                @click="showQrCode(selectedMethod.qr_code_image_url)">查看支付二维码</span>
+
+          <QrcodePopover v-if="selectedMethod.method!==constant.PAYMENT_TYPES.BANKCARD && selectedMethod.qr_code_image"
+                         :src="selectedMethod.qr_code_image_url"/>
         </div>
         <div class="payment-status" v-html="paymentStatusMessage.message"></div>
         <div class="payment-warning" v-if="paymentStatusMessage.warning" v-html="paymentStatusMessage.warning"></div>
@@ -172,7 +366,7 @@
           <span class="tip">申诉理由</span>
           <textarea class="appeal-input"
                     v-model="appealComment"
-                    placeholder="请填写15-500字以上的申诉理由"
+                    placeholder="请填写15-500字的申诉理由"
                     rows="8">
           </textarea>
         </div>
@@ -184,213 +378,11 @@
                     @cancelReceipt="showConfirmReceiptModal=false"/>
   </div>
 </template>
-<style lang="scss">
-  @import "~assets/scss/variables.scss";
 
-  .page-order-detail {
-    padding: 40px 0 118px 0px;
-    width: 1200px;
-    margin: 0 auto;
-    min-height: 900px;
-    display: flex;
-    .main-content {
-      flex: 1;
-      padding: 0px;
-      overflow: hidden;
-      background-color: #ffffff;
-      box-shadow: 0 0 10px 0 #ececec;
-      .order-basic-info {
-        padding: 30px 30px 10px;
-        .info-header {
-          display: flex;
-          justify-content: space-between;
-          border-bottom: 1px solid #eeeeee;
-        }
-        .info-detail {
-          .title {
-            font-size: 20px;
-            color: #27313e;
-            margin-top: 20px;
-          }
-          .content {
-            font-size: 16px;
-            color: #6f6f6f;
-            margin-top: 10px;
-            a {
-              color: #6f6f6f;
-              margin: 0 0.5rem;
-            }
-          }
-        }
-
-      }
-      .payment-info {
-        padding: 20px 30px;
-        background-color: #f9f9f9;
-        .payment-method {
-          margin-bottom: 20px;
-          color: #6f6f6f;
-          select {
-            border: none;
-            background-color: transparent;
-            color: #6f6f6f;
-            &:focus {
-              outline: none;
-            }
-            option {
-              width: 120px;
-            }
-          }
-          .payment-account {
-            margin: 0 1rem;
-          }
-          .qr-code-button {
-            cursor: pointer;
-          }
-        }
-        .payment-status {
-          font-size: 18px;
-          color: #27313e;
-          font-weight: 500;
-        }
-        .payment-warning {
-          margin-top: 10px;
-        }
-      }
-      .order-steps {
-        padding: 25px 30px;
-        ol {
-          list-style-type: none;
-          border-bottom: 1px solid #eeeeee;
-          li {
-            counter-increment: level1;
-            font-size: 16px;
-            color: #6f6f6f;
-            margin-bottom: 50px;
-            width: 100%;
-            position: relative;
-            &.active {
-              color: #192330;
-              font-weight: 500;
-              div:first-child {
-                &:after {
-                  position: absolute;
-                  content: '';
-                  width: 11px;
-                  height: 11px;
-                  border-radius: 50%;
-                  background-color: $brandGreen;
-                  border: 1px solid $brandGreen;
-                  left: 40px;
-                  top: 8px;
-                }
-              }
-            }
-            &:before {
-              content: counter(level1) " "; /*Instead of ". " */
-              color: $brandGreen;
-              margin-right: 24px;
-              position: absolute;
-              left: 0;
-              top: 0px;
-            }
-            &:not(:last-child):after {
-              position: absolute;
-              left: 45px;
-              top: 18px;
-              content: '';
-              width: 0px;
-              height: 64px;
-              border-right: 1px solid $brandGreen;
-            }
-            div:first-child {
-              position: relative;
-              padding-left: 60px;
-              &:before {
-                position: absolute;
-                content: '';
-                width: 11px;
-                height: 11px;
-                border-radius: 50%;
-                background-color: white;
-                border: 1px solid $brandGreen;
-                left: 40px;
-                top: 8px;
-              }
-            }
-            div.step-time {
-              position: absolute;
-              left: 60px;
-            }
-            button {
-              position: absolute;
-              right: 0;
-              top: 0;
-            }
-          }
-        }
-      }
-      .order-helper {
-        padding: 0 30px 30px;
-        font-size: 16px;
-        .appeal-btn {
-          cursor: pointer;
-        }
-      }
-      .order-notice{
-        .title{
-          font-weight:500;
-        }
-        ul.notices{
-          list-style-type: decimal;
-        }
-      }
-    }
-    .sidebar {
-      width: 400px;
-      margin-left: 20px;
-      #my-chat-box {
-        margin-top: 10px;
-        padding: 0 !important;
-      }
-    }
-    #appeal-modal {
-      .tip {
-        width: 80px;
-      }
-      .appeal-input {
-        width: 430px;
-        border: solid 1px #dddddd;
-        &:focus {
-          border: solid 1px $brandGreen;
-          outline: none;
-        }
-      }
-      textarea {
-        padding: 6px 12px;
-        height: 182px;
-        max-height: 182px;
-      }
-    }
-    .user-stats-profile {
-      .username {
-        max-width: 300px;
-      }
-      .sidebar-info-item-title {
-        width: 160px;
-      }
-    }
-  }
-
-  .payment-qrcode {
-    max-width: 400px;
-    max-height: 400px;
-  }
-
-</style>
 <script>
   import Chat from '~/components/chat'
   import UserStatsProfile from '~/components/user-stats-profile.vue'
+  import QrcodePopover from '~/components/qrcode-popover.vue'
   import ConfirmReceipt from './_c/confirm-receipt'
   import {mapState} from 'vuex'
 
@@ -422,6 +414,7 @@
     components: {
       UserStatsProfile,
       ConfirmReceipt,
+      QrcodePopover,
       Chat,
     },
     fetch({store, app, req, redirect, route}) {
@@ -561,7 +554,7 @@
           case this.constant.ORDER_STATUS.PAID.value:
             return {
               message: `等待卖方确认并放币，付款参考号：<span class="c-red">${this.referCode}</span>`,
-              warning: this.isBuySide ? undefined : `<div>${kycName}<span class="c-red">请务必确认收到款项后确认收款，并核实买家是否实名付款。</span></div>`
+              warning: this.isBuySide ? undefined : `<div>${kycName}<span class="c-red">请务必查看您的收款账户，并核实买家是否实名付款。</span></div>`
             }
           case this.constant.ORDER_STATUS.SUCCESS.value:
             return {message: `${this.appeal ? '申诉裁决' : ''}卖方已确认收款，付款参考号：<span class="c-red">${this.referCode}</span>`}
@@ -719,13 +712,6 @@
               this.refreshOrderStatus()
             })
           }
-        })
-      },
-      showQrCode(codeImg) {
-        this.$showDialog({
-          title: '支付二维码',
-          content: (<div><img class="payment-qrcode" src={codeImg}/></div>),
-          okOnly: true,
         })
       },
       confirmReceipt() {
