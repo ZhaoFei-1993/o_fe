@@ -65,6 +65,8 @@
       showConfirmReceiptModal: function (bool) {
         // 每次显示的时候都把error-message隐藏掉
         if (bool) {
+          this.verify.sms = ''
+          this.verify.google = ''
           this.$refs['verify-code'] && this.$refs['verify-code'].resetValidation()
         }
       }
