@@ -115,7 +115,7 @@
                     <span v-else>{{ item._selected_payment_method.account_no }}</span>
                     <b-popover :target="`qr-${item.id}`"
                                placement="top"
-                               triggers="click">
+                               triggers="hover">
                       <img style="display: block;max-width: 360px;max-height: 360px;width: 100%;height: 100%;"
                            :src="item._selected_payment_method.qr_code_image_url">
                     </b-popover>
