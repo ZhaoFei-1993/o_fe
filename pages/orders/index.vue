@@ -64,8 +64,7 @@
                 </div>
                 <div class="detail-h2">
                   <span style="display: inline-block;width: 24px;"></span>
-                  <span style="display: inline-block;margin-right: 3px;">向</span>{{ item._order_type ===
-                  constant.SIDE.BUY ? item.merchant.name : item.user.name }}
+                  <span style="display: inline-block;margin-right: 3px;">向</span>{{ item._counterparty.name }}
                 </div>
               </div>
               <div class="col2">
@@ -235,7 +234,10 @@
               <span>* 请使用实名付款，转账时除参考号外请不要备注任何信息！</span>
             </div>
             <div v-else-if="!item._isBuySide && item.status === constant.ORDER_STATUS.PAID.value" class="detail-warn-text">
-              <span><span style="margin-right: 10px;color: #27313e;" v-if="item.user.kyc_name">* 买方姓名：{{ item.user.kyc_name }} </span>请务必确认收到款项后确认收款，并核实买家是否实名付款！</span>
+              <span>
+                <span style="margin-right: 10px;color: #27313e;" v-if="item._counterparty.kyc_name">* 买方实名：{{ item._counterparty.kyc_name }} </span>
+                请务必确认收到款项后确认收款，并核实买家是否实名付款！
+              </span>
             </div>
           </template>
         </b-table>
@@ -495,10 +497,13 @@
       },
       preprocessOrder(item) {
         let orderType
+        let counterparty
         if (this.isMerchant(item)) { // 商家
           orderType = item.merchant_side
+          counterparty = item.user
         } else { // 普通用户
           orderType = item.user_side
+          counterparty = item.merchant
         }
         let selectedPaymentMethod = {}
         if (item.payment_methods && item.payment_methods.length) {
@@ -514,6 +519,7 @@
           _expire_time: expireTime,
           _expired: remainingTime <= 0 && item.status === this.constant.ORDER_STATUS.CREATED.value,
           _isBuySide: (item.merchant_id === this.user.account.id) === (item.merchant_side === this.constant.SIDE.BUY),
+          _counterparty: counterparty, // 对手方
           _unreadMessageCount: 0, // 未读消息数量
         }
       },
