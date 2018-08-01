@@ -237,7 +237,7 @@
               <span>* 请使用实名付款，转账时除参考号外请不要备注任何信息！</span>
             </div>
             <div v-else-if="!item._isBuySide && item.status === constant.ORDER_STATUS.PAID.value" class="detail-warn-text">
-              <span><span style="margin-right: 10px;color: #27313e;">* 买方实名：{{ item.user.name }}</span>请务必确认收到款项后确认收款并核实买家是否实名付款！</span>
+              <span><span style="margin-right: 10px;color: #27313e;" v-if="item.user.kyc_name">* 买方姓名：{{ item.user.kyc_name }} </span>请务必确认收到款项后确认收款并核实买家是否实名付款！</span>
             </div>
           </template>
         </b-table>

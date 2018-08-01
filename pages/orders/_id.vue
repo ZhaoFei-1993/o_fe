@@ -47,7 +47,7 @@
                 @click="showQrCode(selectedMethod.qr_code_image_url)">查看支付二维码</span>
         </div>
         <div class="payment-status" v-html="paymentStatusMessage.message"></div>
-        <div class="payment-warning">{{paymentStatusMessage.warning}}</div>
+        <div class="payment-warning" v-if="paymentStatusMessage.warning" v-html="paymentStatusMessage.warning"></div>
       </div>
       <div class="order-steps">
         <ol>
@@ -111,8 +111,6 @@
             v-if="appeal.status===constant.APPEAL_STATUS.PROCESSING || appeal.status===constant.APPEAL_STATUS.PENDING"
             class="d-flex align-items-center justify-content-between">
             <span>申诉专员已经介入，请及时提供必要的信息</span>
-            <button v-if="isCurrentUserAppealing" class="btn btn-outline-green btn-xs" @click="cancelAppeal">取消申诉
-            </button>
           </div>
           <div v-if="appeal.status===constant.APPEAL_STATUS.CANCEL">
             <span>{{appealSide}}已取消申诉，如果仍有问题，请</span>
@@ -238,7 +236,6 @@
           font-weight: 500;
         }
         .payment-warning {
-          color: $red;
           margin-top: 10px;
         }
       }
@@ -522,16 +519,17 @@
                 内完成支付，付款参考号：<span class="c-red">${this.referCode}</span>
                 `
         }
+        const kycName = `${this.counterparty.kyc_name && this.counterparty.kyc_name.length ? '<span>买方姓名： ' + this.counterparty.kyc_name + ' </span>' : ''}`
         switch (this.order.status) {
           case this.constant.ORDER_STATUS.CREATED.value:
             return {
               message: payMessage,
-              warning: this.isBuySide && !this.expired ? `请使用实名付款，转账时除参考号外请不要备注任何信息！` : null,
+              warning: this.isBuySide && !this.expired ? `<span class="c-red">请使用实名付款，转账时除参考号外请不要备注任何信息！</span>` : undefined,
             }
           case this.constant.ORDER_STATUS.PAID.value:
             return {
               message: `已支付，卖方需确认收款并放行数字币，付款参考号：<span class="c-red">${this.referCode}</span>`,
-              warning: this.isBuySide ? undefined : '请务必确认收到款项后确认收款，并核实买家是否实名付款。'
+              warning: this.isBuySide ? undefined : `<div>${kycName}<span class="c-red">请务必确认收到款项后确认收款，并核实买家是否实名付款。</span></div>`
             }
           case this.constant.ORDER_STATUS.SUCCESS.value:
             return {message: `卖方已确认收款，付款参考号：<span class="c-red">${this.referCode}</span>`}
