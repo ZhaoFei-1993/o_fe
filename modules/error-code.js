@@ -1,3 +1,4 @@
+const VALIDATE_CODE_REQUIRED = 10   // 需要输入验证码
 const MISSING_PAY_METHODS = 71      // 发广告缺少支付方式
 const ATLEAST_ONE_PAYMENT_METHOD = 606    // 最少需要一种支付方式
 const REACH_ITEM_COUNT_LIMIT = 106    // 最少需要一种支付方式
@@ -7,6 +8,7 @@ const NAME_USED = 72
 const ECONNABORTED = 'ECONNABORTED'   // 大部分情况下，是接口超时
 // 所有已知错误的map
 export const ERROR_CODE = {
+  VALIDATE_CODE_REQUIRED,
   MISSING_PAY_METHODS,
   ATLEAST_ONE_PAYMENT_METHOD,
   REACH_ITEM_COUNT_LIMIT,

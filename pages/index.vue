@@ -100,7 +100,6 @@
           padding: 0 20px;
           height: 40px;
           line-height: 40px;
-          display: flex;
           align-items: center;
           justify-content: space-between;
           background-color: #f9f9f9;
@@ -124,7 +123,6 @@
         .list {
 
           .item-row {
-            display: flex;
             align-items: center;
             justify-content: space-between;
             background-color: white;
@@ -153,17 +151,16 @@
                 margin: 0 4px;
               }
             }
-            .price {
+            .col-price {
+              width: 220px;
               font-size: 18px;
-              flex: 1;
-              padding: 0 60px 0 16px;
               font-weight: 500;
               color: $brandGreen;
             }
             .col-name {
               font-size: 16px;
               color: #27313e;
-              display: flex;
+              display: inline-flex;
               align-items: center;
               .username {
                 max-width: 150px;
@@ -181,17 +178,26 @@
         }
 
         .col-narrow {
-          width: 12%;
-          padding: 0 16px;
+          display: inline-block;
+          width: 120px;
+          padding-right: 16px;
         }
         .col-wide {
-          flex: 1;
-          padding: 0 16px;
+          display: inline-block;
+          width: 200px;
+          padding-right: 16px;
+        }
+        .col-price {
+          display: inline-block;
+          width: 220px;
+          padding: 0 60px 0 16px;
         }
         .col-name {
           text-align: left;
           padding-left: 0;
-          width: 200px;
+        }
+        .col-price-limit {
+          width: 180px;
         }
         .col-action {
           width: 10%;
@@ -263,24 +269,24 @@
           </span>
         </div>
         <div class="list-header">
-          <span class="col-narrow col-name">商家</span>
-          <span class="col-narrow">30天成单/完成率</span>
+          <span class="col-wide col-name">商家</span>
+          <span class="col-wide">30天成单/完成率</span>
           <span class="col-narrow">数量</span>
-          <span class="col-wide">限额</span>
-          <span class="col-narrow">支付方式</span>
+          <span class="col-wide col-price-limit">限额</span>
           <b-form-select hidden class='select-payment col-narrow' v-model="selectedPayment"
                          :options="constant.PAYMENT_OPTIONS" @change="filterPayment"></b-form-select>
-          <span :class="['sort-price col-wide',sortPrice]">单价</span>
+          <span :class="['col-price col-wide',sortPrice]">单价</span>
+          <span class="col-narrow">支付方式</span>
           <span class="col-narrow col-action">操作</span>
         </div>
         <div :class="['list',selectedSide.toLowerCase()]">
           <div v-if="!items||!items.length" class="text-center p-20">暂无该交易对广告</div>
           <div v-else class="item-row" v-for="item in items">
-            <span class="col-name">
+            <span class="col-wide col-name">
               <span class="username">{{item.user.name}}</span><span v-b-tooltip.hover title="认证商家"><i
               class="iconfont icon-certificated-merchant"></i></span>
             </span>
-            <div class="col-narrow" v-if="item.user && item.user.user_stat">
+            <div class="col-wide" v-if="item.user && item.user.user_stat">
               <div class="number" v-if="item.user.user_stat.order_count">
                 {{item.user.user_stat.deal_count}} /
                 {{(item.user.user_stat.deal_count / item.user.user_stat.order_count) | percentage}}
@@ -294,19 +300,23 @@
                 `付款时间${utils.formatDuration(item.user.user_stat.pay_time)}`}}
               </div>
             </div>
+
             <span class="col-narrow">
               <div class="number">{{item.remain_coin_amount}}</div>
               <div class="unit">{{ selectedCoin}}</div>
             </span>
-            <span class="col-wide pr-60">
+
+            <span class="col-wide col-price-limit">
               <div class="number">{{item.min_deal_cash_amount.setDigit(0) + '-' + item.max_deal_cash_amount.setDigit(0)}}</div>
               <div class="unit">{{balance.currentCash}}</div>
             </span>
+
+            <span :class="['col-price',sortPrice]">{{item.price.setDigit(2) + ' '+balance.currentCash}}</span>
+
             <span class='payment col-narrow'>
-              <UserPayments :payments="item.payment_methods"></UserPayments>
+              <UserPayments :payments="item.payment_methods" size="14"/>
             </span>
-            <span
-              :class="['price',sortPrice]">{{item.price.setDigit(2) + ' '+balance.currentCash}}</span>
+
             <span class="col-narrow  col-action">
               <template v-if="user && user.account && user.account.id === item.user.id">
                 <button class="btn btn-order-disabled" :id="'button-order-'+item.id" v-b-tooltip.hover title="不能与自己交易"> {{(selectedSide === constant.SIDE.BUY ? '购买' : '出售') + selectedCoin}} </button>
