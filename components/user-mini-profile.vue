@@ -60,7 +60,4 @@
   }
 </script>
 <style lang="scss">
-  .icon-certificated-merchant {
-    color: #7dd322;
-  }
 </style>
