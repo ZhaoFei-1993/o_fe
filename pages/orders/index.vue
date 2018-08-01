@@ -3,9 +3,12 @@
     <c-block>
       <header class="header">订单管理</header>
       <div class="filter-wapper">
-        <div @click="onClickFilter(index)" v-for="(item, index) in filterOptions" class="filter-item"
-             :class="{'filter-active': item.active}">{{ item.text }}
-        </div>
+        <b-btn v-for="(item, index) in filterOptions"
+               :variant="queryParams.status === item.value ? 'outline-green' : 'outline-gray'"
+               :key="index" size="xxs" class="mr-20"
+               @click="onClickFilter(index)">
+          {{item.text}}
+        </b-btn>
       </div>
       <div class="order-table">
         <b-table :fields="orderTableFields" :items="orderTableItems" @row-clicked="fetchUnreadMessageCount" :tbody-tr-class="queryParams.status === 'processing' ? 'order-row-class' : ''">
