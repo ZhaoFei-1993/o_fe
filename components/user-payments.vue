@@ -9,23 +9,38 @@
 </style>
 
 <template>
-  <!--todo:固定顺序，根据后台的返回值再确定这里怎么写-->
   <div class="user-payments">
-    <template v-for="payment in payments">
-      <i v-if="payment === 'wechat'" class="iconfont icon-wechat-round"></i>
-      <i v-if="payment === 'bankcard'" class="iconfont icon-bankcard"></i>
-      <i v-if="payment === 'alipay'" class="iconfont icon-alipay"></i>
+    <template v-for="payment in sortedPayments">
+      <i v-if="payment === 'wechat'" class="iconfont icon-wechat-round" :class="`fz-${size}`"></i>
+      <i v-if="payment === 'bankcard'" class="iconfont icon-bankcard" :class="`fz-${size}`"></i>
+      <i v-if="payment === 'alipay'" class="iconfont icon-alipay" :class="`fz-${size}`"></i>
     </template>
   </div>
 </template>
 
 <script>
+const SORT_WEIGHT = {
+  bankcard: 0,
+  alipay: 1,
+  wechat: 2,
+}
 export default {
   name: 'user-payments',
   components: {
   },
   props: {
-    payments: Array,      // payments类型未定 todo
+    payments: {
+      type: Array,        // Array<Strings>
+      default: () => []
+    },
+    size: [Number, String],
+  },
+  computed: {
+    sortedPayments: function () {
+      return this.payments.sort((a, b) => {
+        return SORT_WEIGHT[a] - SORT_WEIGHT[b]
+      })
+    }
   },
   data() {
     return {
