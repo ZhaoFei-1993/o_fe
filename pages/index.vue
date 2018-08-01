@@ -24,6 +24,7 @@
         color: $brandYellow;
       }
     }
+
     .layout-content {
       width: 1200px;
       margin: 40px auto;
@@ -92,23 +93,23 @@
         .list-title {
           display: flex;
           justify-content: flex-end;
-          padding: 30px 20px 8px;
+          padding: 20px 30px;
           background-color: white;
         }
 
         .list-header {
+          display: flex;
           padding: 0 20px;
           height: 40px;
           line-height: 40px;
           align-items: center;
           justify-content: space-between;
           background-color: #f9f9f9;
-          .col-narrow, .col-wide {
-            /*text-align: center;*/
-          }
+
           .col-name {
             text-align: left;
           }
+
           .select-payment {
             height: 24px;
             font-weight: 500;
@@ -120,9 +121,10 @@
             }
           }
         }
-        .list {
 
+        .list {
           .item-row {
+            display: flex;
             align-items: center;
             justify-content: space-between;
             background-color: white;
@@ -152,7 +154,6 @@
               }
             }
             .col-price {
-              width: 220px;
               font-size: 18px;
               font-weight: 500;
               color: $brandGreen;
@@ -169,9 +170,7 @@
                 text-overflow: ellipsis;
               }
               .icon-certificated-merchant {
-                color: #7dd322;
                 margin-left: 6px;
-                font-size: 16px;
               }
             }
           }
@@ -189,12 +188,13 @@
         }
         .col-price {
           display: inline-block;
-          width: 220px;
-          padding: 0 60px 0 16px;
+          width: 200px;
+          padding-right: 16px;
         }
         .col-name {
-          text-align: left;
-          padding-left: 0;
+        }
+        .col-amount {
+          width: 160px;
         }
         .col-price-limit {
           width: 180px;
@@ -208,6 +208,7 @@
           color: #27313e;
         }
         .unit {
+          margin-top: 5px;
           font-size: 12px;
           color: #9b9b9b;
         }
@@ -271,7 +272,7 @@
         <div class="list-header">
           <span class="col-wide col-name">商家</span>
           <span class="col-wide">30天成单/完成率</span>
-          <span class="col-narrow">数量</span>
+          <span class="col-wide col-amount">数量</span>
           <span class="col-wide col-price-limit">限额</span>
           <b-form-select hidden class='select-payment col-narrow' v-model="selectedPayment"
                          :options="constant.PAYMENT_OPTIONS" @change="filterPayment"></b-form-select>
@@ -301,7 +302,7 @@
               </div>
             </div>
 
-            <span class="col-narrow">
+            <span class="col-narrow col-amount">
               <div class="number">{{item.remain_coin_amount}}</div>
               <div class="unit">{{ selectedCoin}}</div>
             </span>
