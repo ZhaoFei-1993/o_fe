@@ -144,15 +144,20 @@
         {{payment.title}}
       </div>
 
-      <p slot="content">
+      <div slot="content">
         <span class="mr-3">{{payment.account_name}}</span>
-        <span class="mr-3" v-if="payment.method !== constant.PAYMENT_TYPES.BANKCARD">{{payment.account_no}}</span>
+
         <template v-if="payment.method === constant.PAYMENT_TYPES.BANKCARD">
-          <span class="mr-3">{{payment.account_no.formatMoney(0, '', ' ')}}</span>
+          <span class="mr-3">{{payment.account_no | splitCardNumber}}</span>
           <span class="mr-3">{{payment.bank_name}}</span>
           <span class="mr-3">{{payment.branch}}</span>
         </template>
-      </p>
+
+        <template v-else>
+          <span class="mr-3">{{payment.account_no}}</span>
+          <QrcodePopover v-if="payment.qr_code_image_url" :src="payment.qr_code_image_url" class="ml-1" style="vertical-align: -1px;"/>
+        </template>
+      </div>
 
       <div slot="action" class="payment-action">
         <div class="payment-status">
@@ -170,6 +175,7 @@
              cancel-title="取消"
              ok-variant="gradient-yellow"
              cancel-variant="outline-green"
+             noCloseOnBackdrop
              button-size="lg"
              :okDisabled="submitting"
              @ok="onFormSubmit">
@@ -270,6 +276,7 @@
   import ToggleButton from '~/components/toggle-button.vue'
   import VerifyCode from '~/components/verify-code.vue'
   import ImageUploadPreview from '~/components/image-upload-components/image-upload-preview.vue'
+  import QrcodePopover from '~/components/qrcode-popover.vue'
   import Vuelidate from 'vuelidate'
   import getPaymentFormConfig from './payment-form-config'
   import EMsgs from '~/components/error-message.vue'
@@ -315,6 +322,7 @@
       VerifyCode,
       EMsgs,
       ImageUploadPreview,
+      QrcodePopover,
       KycStep,
     },
     layout: 'my',
