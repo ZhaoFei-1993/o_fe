@@ -74,17 +74,28 @@
         evt.preventDefault()
         const verify = this.verify
         const code = verify.codeType === this.constant.VERIFY_CODE_TYPE.GOOGLE ? verify.google : verify.sms
-        this.axios.order.confirmReceipt(this.orderId, {
+
+        // 只在需要验证码的时候再传验证码数据给后端，不然无法区分后台返回的"需要二次验证"和"验证码错误"的返回值
+        const data = this.needVerify ? {
           validate_code_type: verify.codeType,
           validate_code: code,
           sequence: verify.smsSequence,
-        }).then(() => {
-          this.needVerify = false
+        } : {}
+
+        this.axios.order.confirmReceipt(this.orderId, data).then(() => {
           this.$refs.confirmReceiptModal.hide()
           this.$emit('confirmReceipt')
+
+          // 如果是每两小时验证的用户，验证过一次之后，就不需要再验证了
+          if (this.needVerify && this.user.account.trade_validate_frequency === this.constant.TRADE_VALIDATE_FREQUENCY.EACH_TWO_HOURS) {
+            this.needVerify = false
+          }
         }).catch(err => {
-          this.$showTips(err.message, 'error')
-          this.needVerify = true
+          if (err.code === this.constant.ERROR_CODE.VALIDATE_CODE_REQUIRED) {
+            this.needVerify = true
+          } else {
+            this.$showTips(err.message, 'error')
+          }
         })
       },
       cancelReceipt(evt) {
