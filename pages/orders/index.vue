@@ -115,15 +115,10 @@
                   <div class="detail-text">
                     <span v-if="item._selected_payment_method.method === constant.PAYMENT_TYPES.BANKCARD">{{ item._selected_payment_method.account_no | splitCardNumber }}</span>
                     <span v-else>{{ item._selected_payment_method.account_no }}</span>
-                    <b-popover v-if="item._selected_payment_method.qr_code_image_url" :target="`qr-${item.id}`"
-                               placement="top"
-                               triggers="hover">
-                      <img style="display: block;max-width: 360px;max-height: 360px;width: 100%;height: 100%;"
-                           :src="item._selected_payment_method.qr_code_image_url">
-                    </b-popover>
-                    <span v-if="item._selected_payment_method.qr_code_image_url" :id="`qr-${item.id}`" style="cursor: pointer;"
-                          v-show="item._selected_payment_method.method !== constant.PAYMENT_TYPES.BANKCARD"><i
-                      class="iconfont icon-qrcode"></i></span>
+
+                    <QrcodePopover v-show="item._selected_payment_method.qr_code_image_url && item._selected_payment_method.method !== constant.PAYMENT_TYPES.BANKCARD"
+                                   :src="item._selected_payment_method.qr_code_image_url"
+                                   class="ml-1"/>
                   </div>
                   <div v-if="item._selected_payment_method.method === constant.PAYMENT_TYPES.BANKCARD"
                        class="detail-text">
@@ -266,6 +261,7 @@
   import ConfirmReceipt from './_c/confirm-receipt'
   import TableHeadDropdown from './_c/table-head-dropdown'
   import ViaPagination from '~/components/via-pagination'
+  import QrcodePopover from '~/components/qrcode-popover'
 
   const LIMIT = 10
   const ORDER_PAY_TIME = 15 // 订单可付款时间
@@ -427,6 +423,7 @@
       ConfirmReceipt,
       ViaPagination,
       TableHeadDropdown,
+      QrcodePopover,
     },
     computed: {
       ...mapState(['user', 'constant', 'chat']),
