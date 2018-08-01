@@ -3,29 +3,34 @@
     <c-block>
       <header class="header">订单管理</header>
       <div class="filter-wapper">
-        <div @click="onClickFilter(index)" v-for="(item, index) in filterOptions" class="filter-item"
-             :class="{'filter-active': item.active}">{{ item.text }}
-        </div>
+        <b-btn v-for="(item, index) in filterOptions"
+               :variant="queryParams.status === item.value ? 'outline-green' : 'outline-gray'"
+               :key="index" size="xxs" class="mr-20"
+               @click="onClickFilter(index)">
+          {{item.text}}
+        </b-btn>
       </div>
       <div class="order-table">
-        <b-table :fields="orderTableFields" :items="orderTableItems">
-          <template slot="HEAD__order_type" slot-scope="{ item }">
+        <b-table :fields="orderTableFields" :items="orderTableItems" @row-clicked="fetchUnreadMessageCount" :tbody-tr-class="queryParams.status === 'processing' ? 'order-row-class' : ''">
+          <template slot="HEAD__isBuySide" slot-scope="{ item }">
             <div>
-              <TableHeadDropdown :options="orderTypeFilterOptions" label="类型" @click="onClickSideDropdown"></TableHeadDropdown>
+              <TableHeadDropdown :options="orderTypeFilterOptions" label="类型"
+                                 @click="onClickSideDropdown"></TableHeadDropdown>
             </div>
           </template>
           <template slot="HEAD_coin_type" slot-scope="{ item }">
             <div>
-              <TableHeadDropdown :options="coinTypeFilterOptions" label="币种" @click="onClickCoinTypeDropdown"></TableHeadDropdown>
+              <TableHeadDropdown :options="coinTypeFilterOptions" label="币种"
+                                 @click="onClickCoinTypeDropdown"></TableHeadDropdown>
             </div>
           </template>
           <template slot="id" slot-scope="{ item }">
-            <b-link :to="`/orders/${item.id}`">{{ item.id }}</b-link>
+            <b-link class="id-text" :to="`/orders/${item.id}`">{{ item.id }}</b-link>
           </template>
-          <template slot="_order_type" slot-scope="{ item }">
+          <template slot="_isBuySide" slot-scope="{ item }">
             <span
-              :class="['order-type', item._order_type === constant.SIDE.BUY ? 'order-type-buy' : 'order-type-sell']">
-              {{ item._order_type === constant.SIDE.BUY ? '买' : '卖' }}
+              :class="['order-type', item._isBuySide ? 'order-type-buy' : 'order-type-sell']">
+              {{ item._isBuySide ? '买' : '卖' }}
             </span>
           </template>
           <template slot="place_time" slot-scope="{ item }">
@@ -41,32 +46,25 @@
             {{ item.cash_amount | formatMoney }} CNY
           </template>
           <template slot="status" slot-scope="{ item, detailsShowing, toggleDetails }">
-            <span v-if="item.appeal_status && item.appeal_status === 'created' || item.appel_status === 'processing'">
-              <span class="status-icon"><i v-if="appealIconMap[item.appeal_status]" class="iconfont" :class="appealIconMap[item.appeal_status].class" :style="{fontSize: '12px', color: appealIconMap[item.appeal_status].color}"></i></span>
-              <span>申诉中</span>
-            </span>
-            <span v-else>
-              <span class="status-icon"><i v-if="statusIconMap[item.status]" class="iconfont" :class="statusIconMap[item.status].class" :style="{fontSize: '12px', color: statusIconMap[item.status].color}"></i></span>
-              <span class="status-text">{{ constant?constant.ORDER_STATUS[item.status.toUpperCase()].text:'' }}</span>
-              <span @click.stop="fetchUnreadMessageCount({toggleDetails, item})"
-                    v-if="item.status === constant.ORDER_STATUS.CREATED.value || item.status === constant.ORDER_STATUS.PAID.value"
-                    class="detail"
-                    :class="[ detailsShowing ? 'show-detail' : 'hidden-detail' ]">
-                <i class="iconfont icon-detail"></i>
-              </span>
+            <span class="status-icon"><i v-if="statusIconMap[item.status]" class="iconfont" :class="statusIconMap[item.status].class" :style="{fontSize: '12px', color: statusIconMap[item.status].color}"></i></span>
+            <span>{{ constant?constant.ORDER_STATUS[item.status.toUpperCase()].text:'' }}</span>
+            <span v-if="item.status === constant.ORDER_STATUS.CREATED.value || item.status === constant.ORDER_STATUS.PAID.value && queryParams.status === 'processing'"
+                  class="detail"
+                  :class="[ detailsShowing ? 'show-detail' : 'hidden-detail' ]">
+              <i class="iconfont icon-detail"></i>
             </span>
           </template>
-          <template slot="row-details" slot-scope="{ item }">
-            <div class="detail-wrapper">
+          <template slot="row-details" slot-scope="{ item }" class="buy-side-detail">
+            <div :class="['detail-wrapper', item._isBuySide ? 'buy-side-detail' : 'sell-side-detail']">
               <div class="col1">
                 <div class="detail-h1 detail-flex">
                   <span
-                    :class="['arrow-icon', item._order_type === constant.SIDE.BUY ? 'buy-arrow-icon' : 'sell-arrow-icon']"></span>
-                  <span>{{ item._order_type === constant.SIDE.BUY ? '购买' : '出售' }} {{ item.coin_type }}</span>
+                    :class="['arrow-icon', item._isBuySide ? 'buy-arrow-icon' : 'sell-arrow-icon']"></span>
+                  <span>{{ item._isBuySide ? '购买' : '出售' }} {{ item.coin_type }}</span>
                 </div>
                 <div class="detail-h2">
                   <span style="display: inline-block;width: 24px;"></span>
-                  <span style="display: inline-block;margin-right: 3px;">向</span>{{ item._order_type === constant.SIDE.BUY ? item.merchant.name : item.user.name }}
+                  <span style="display: inline-block;margin-right: 3px;">向</span>{{ item._counterparty.name }}
                 </div>
               </div>
               <div class="col2">
@@ -77,7 +75,7 @@
                   {{ item.coin_amount | formatMoney }} {{ item.coin_type }}
                 </div>
               </div>
-              <div class="col3">
+              <div class="col3" v-if="item._selected_payment_method && (!item._isBuySide && item.status === constant.ORDER_STATUS.PAID.value) || item._isBuySide">
                 <div class="payment-method"
                      v-if="item.status !== constant.ORDER_STATUS.CANCEL.value
                   && item.status !== constant.ORDER_STATUS.CLOSED.value && !item._expired">
@@ -109,20 +107,21 @@
                   </template>
                 </div>
               </div>
-              <div class="col4" v-if="item._selected_payment_method">
+              <div class="col4" v-if="item._selected_payment_method && (!item._isBuySide && item.status === constant.ORDER_STATUS.PAID.value) || item._isBuySide">
                 <template v-if="!item._expired">
                   <div class="detail-text" style="color: #27313e;">
                     {{ item._selected_payment_method.account_name }}
                   </div>
                   <div class="detail-text">
-                    {{ item._selected_payment_method.account_no }}
-                    <b-popover :target="`qr-${item.id}`"
+                    <span v-if="item._selected_payment_method.method === constant.PAYMENT_TYPES.BANKCARD">{{ item._selected_payment_method.account_no | splitCardNumber }}</span>
+                    <span v-else>{{ item._selected_payment_method.account_no }}</span>
+                    <b-popover v-if="item._selected_payment_method.qr_code_image_url" :target="`qr-${item.id}`"
                                placement="top"
-                               triggers="hover click focus">
-                      <img style="display: block;max-width: 360px;max-height: 360px;"
+                               triggers="hover">
+                      <img style="display: block;max-width: 360px;max-height: 360px;width: 100%;height: 100%;"
                            :src="item._selected_payment_method.qr_code_image_url">
                     </b-popover>
-                    <span :id="`qr-${item.id}`" style="cursor: pointer;"
+                    <span v-if="item._selected_payment_method.qr_code_image_url" :id="`qr-${item.id}`" style="cursor: pointer;"
                           v-show="item._selected_payment_method.method !== constant.PAYMENT_TYPES.BANKCARD"><i
                       class="iconfont icon-qrcode"></i></span>
                   </div>
@@ -134,15 +133,10 @@
                   <div class="detail-text">
                     备注参考号：<span class="detail-code">{{ `${item.id}`.substr(`${item.id}`.length - 6) }}</span>
                   </div>
-                  <div class="detail-text detail-warn-text"
-                       v-if="item.status === constant.ORDER_STATUS.CREATED.value">
-                    转账时除参考号外请不要备注任何信息，防止卡被冻结!
-                  </div>
                 </template>
-
               </div>
               <div class="col5">
-                <template v-if="item._order_type === constant.SIDE.BUY">
+                <template v-if="item._isBuySide">
                   <template v-if="item.status === constant.ORDER_STATUS.CREATED.value">
                     <template v-if="item._remaining_time>0">
                       <div class="detail-text detail-timer">
@@ -160,8 +154,7 @@
                         </b-btn>
                       </div>
                       <div class="detail-btn-wrapper">
-                        <b-btn size="xs" variant="outline-green" class="detail-btn" @click="cancelOrder(item)">取消订单
-                        </b-btn>
+                        <b-link class="cancel-order-btn" @click="cancelOrder(item)">取消订单</b-link>
                       </div>
                     </template>
                     <template v-else>
@@ -182,8 +175,7 @@
                       等待卖家收款
                     </div>
                     <div class="detail-btn-wrapper">
-                      <b-btn size="xs" variant="outline-green" class="detail-btn" @click="cancelOrder(item)">取消订单
-                      </b-btn>
+                      <b-link class="cancel-order-btn" @click="cancelOrder(item)">取消订单</b-link>
                     </div>
                   </template>
                   <template v-if="item.status === constant.ORDER_STATUS.CLOSED.value">
@@ -199,7 +191,7 @@
                     </div>
                   </template>
                 </template>
-                <template v-if="item._order_type === constant.SIDE.SELL">
+                <template v-if="!item._isBuySide">
                   <template v-if="item.status === constant.ORDER_STATUS.CREATED.value">
                     <template v-if="item._remaining_time>0">
                       <div class="detail-text detail-timer">
@@ -238,6 +230,15 @@
                 </template>
               </div>
             </div>
+            <div v-if="item._isBuySide && item.status === constant.ORDER_STATUS.CREATED.value" class="detail-warn-text">
+              <span>* 请使用实名付款，转账时除参考号外请不要备注任何信息！</span>
+            </div>
+            <div v-else-if="!item._isBuySide && item.status === constant.ORDER_STATUS.PAID.value" class="detail-warn-text">
+              <span>
+                <span style="margin-right: 10px;color: #27313e;" v-if="item._counterparty.kyc_name">* 买方实名：{{ item._counterparty.kyc_name }} </span>
+                请务必确认收到款项后确认收款，并核实买家是否实名付款！
+              </span>
+            </div>
           </template>
         </b-table>
         <blank v-if="!orderTableItems.length"></blank>
@@ -250,7 +251,7 @@
       </div>
     </c-block>
     <div class="bottom-tips">
-      温馨提示：每日取消订单超过三笔，将被冻结当天下单权限。
+      温馨提示：每日取消订单超过3笔，将被限制当日交易功能。
     </div>
     <ConfirmReceipt :orderId="curReceiptOrderId" :show-confirm-receipt-modal="showConfirmReceiptModal"
                     @confirmReceipt="markOrderSuccess"
@@ -268,6 +269,7 @@
 
   const LIMIT = 10
   const ORDER_PAY_TIME = 15 // 订单可付款时间
+  const REFRESH_ORDER_INTERVAL = 5000
 
   export default {
     data() {
@@ -293,16 +295,6 @@
           cancel: {
             class: 'icon-pay-cancel',
             color: 'rgb(216, 216, 216)',
-          },
-        },
-        appealIconMap: {
-          created: {
-            class: 'icon-appealing',
-            color: 'rgb(82, 203, 202)',
-          },
-          processing: {
-            class: 'icon-appealing',
-            color: 'rgb(82, 203, 202)',
           },
         },
         curReceiptOrderId: null, // 当前选中的确认收款item
@@ -346,7 +338,7 @@
             thClass: ['text-left'],
             tdClass: ['text-left', 'pl-30'],
           },
-          _order_type: {
+          _isBuySide: {
             label: '类型',
             thStyle: {
               width: '100px',
@@ -425,12 +417,9 @@
         app.axios.needAuth(err, redirect, route.fullPath)
       })
     },
-    created() {
-      this.fetchOrderList()
-      this.startTimer()
-    },
     destroyed() {
       clearInterval(this.timer) // 清除定时器
+      this.stopRefreshOrders()
     },
     components: {
       cBlock,
@@ -450,78 +439,105 @@
         return [defaultOption, ...this.constant.COIN_TYPE_OPTIONS.map(item => ({active: false, ...item}))]
       },
     },
+    mounted() {
+      // browser only
+      this.Visibility = require('visibilityjs')
+      this.Visibility.change(() => {
+        if (this.Visibility.visible) {
+          this.startRefreshOrders()
+        } else {
+          this.stopRefreshOrders()
+        }
+      })
+      this.initOrderList()
+      this.startTimer()
+      this.startRefreshOrders()
+    },
     methods: {
       changePage(page) {
         this.queryParams.page = page
-        this.fetchOrderList()
+        this.initOrderList()
       },
       onClickSideDropdown(item) {
         this.queryParams.side = item.value
-        this.fetchOrderList()
+        this.initOrderList()
       },
       onClickCoinTypeDropdown(item) {
         this.queryParams.coin_type = item.value
-        this.fetchOrderList()
+        this.initOrderList()
       },
       isMerchant(order) { // 是否商家
         return order.merchant_id === this.user.account.id
       },
-      fetchOrderList() {
+      asyncFetchOrderList() {
+        // 只获取不处理数据，返回promise，调用者各自处理返回结果（init和update时候不一样）
         const {status, page, limit, coin_type: coinType, side} = this.queryParams
-        this.axios.order.getOrderList({
+        return this.axios.order.getOrderList({
           coin_type: coinType,
           side,
           status,
           page,
           limit,
         })
-          .then((res) => {
-            if (res.code === 0 && res.data) {
-              const {data, curr_page: currentPage, total: totalRows} = res.data
-              this.queryParams.page = currentPage
-              this.queryParams.totalRows = totalRows
-              this.orderTableItems = data.map(item => {
-                let orderType
-                if (this.isMerchant(item)) { // 商家
-                  orderType = item.merchant_side
-                } else { // 普通用户
-                  orderType = item.user_side
-                }
-                let selectedPaymentMethod = {}
-                if (item.payment_methods && item.payment_methods.length) {
-                  selectedPaymentMethod = {...item.payment_methods[0]}
-                }
-                const remainingTime = parseInt((item.place_time * 1000 + ORDER_PAY_TIME * 60000 - Date.now()) / 1000) // 订单付款截止时间 = 创建时间 + 可付款时间(15min)
-                return {
-                  ...item,
-                  _order_type: orderType, // 下划线前缀均为自定义属性（下同）订单类型
-                  _selected_payment_method: selectedPaymentMethod, // 用户选中的支付方式
-                  _remaining_time: remainingTime,
-                  _expired: remainingTime <= 0 && item.status === this.constant.ORDER_STATUS.CREATED.value,
-                  _isBuySide: (item.merchant_id === this.user.account.id) === (item.merchant_side === this.constant.SIDE.BUY),
-                  _unreadMessageCount: 0, // 未读消息数量
-                }
-              })
-            } else {
-              this.orderTableItems = []
-            }
-          })
-          .catch(err => {
-            console.log(err)
-            this.axios.onError(err)
-          })
       },
-      fetchUnreadMessageCount({toggleDetails, item}) {
-        toggleDetails()
-        if (!item.conversation_id) return
-        if (this.chat.imClient) {
-          this.chat.imClient.getConversation(item.conversation_id).then(conversation => {
-            item._unreadMessageCount = conversation.unreadMessagesCount
-          }).catch(console.error)
+      initOrderList() {
+        this.asyncFetchOrderList().then((res) => {
+          if (res.code === 0 && res.data) {
+            const {data, curr_page: currentPage, total: totalRows} = res.data
+            this.queryParams.page = currentPage
+            this.queryParams.totalRows = totalRows
+            this.orderTableItems = data.map(item => this.preprocessOrder(item))
+          } else {
+            this.orderTableItems = []
+          }
+        }).catch(err => {
+          console.log(err)
+          this.axios.onError(err)
+        })
+      },
+      preprocessOrder(item) {
+        let counterparty
+        if (this.isMerchant(item)) { // 商家
+          counterparty = item.user
+        } else { // 普通用户
+          counterparty = item.merchant
+        }
+        let selectedPaymentMethod = {}
+        if (item.payment_methods && item.payment_methods.length) {
+          selectedPaymentMethod = {...item.payment_methods[0]}
+        }
+        const expireTime = item.place_time * 1000 + ORDER_PAY_TIME * 60000
+        const remainingTime = parseInt((expireTime - Date.now()) / 1000) // 订单付款截止时间 = 创建时间 + 可付款时间(15min)
+        return {
+          ...item,
+          _selected_payment_method: selectedPaymentMethod, // 下划线前缀均为自定义属性（下同）用户选中的支付方式
+          _remaining_time: remainingTime,
+          _expire_time: expireTime,
+          _expired: remainingTime <= 0 && item.status === this.constant.ORDER_STATUS.CREATED.value,
+          _isBuySide: (item.merchant_id === this.user.account.id) === (item.merchant_side === this.constant.SIDE.BUY),
+          _counterparty: counterparty, // 对手方
+          _unreadMessageCount: 0, // 未读消息数量
+        }
+      },
+      fetchUnreadMessageCount(record, index, event) {
+        if (event.target.tagName.toLowerCase() === 'a') return
+        if (this.queryParams.status === 'processing') {
+          if (!record._showDetails) {
+            this.$set(record, '_showDetails', true) // 首次添加属性需要调用set方法
+          } else {
+            record._showDetails = !record._showDetails
+          }
+          if (!record.conversation_id) return
+          if (this.chat.imClient) {
+            this.chat.imClient.getConversation(record.conversation_id).then(conversation => {
+              record._unreadMessageCount = conversation.unreadMessagesCount
+            }).catch(console.error)
+          }
         }
       },
       startTimer() {
         clearInterval(this.timer) // 切换到其它tab需要清除定时器
+        this.stopRefreshOrders() // 切换到其它tab需要清除刷新
         if (this.queryParams.status === 'processing') {
           // 进行中的订单启动定时器
           this.timer = setInterval(() => {
@@ -534,7 +550,7 @@
                 let {_remaining_time: remainingTime} = item // 先创建_remaining_time临时变量，防止下面逻辑频繁修改数据导致页面频繁更新
                 const {CREATED} = this.constant.ORDER_STATUS
                 if (status === CREATED.value) { // 针对待付款
-                  remainingTime -= 1 // 剩余时间，单位：秒
+                  remainingTime = Math.floor((item._expire_time - Date.now()) / 1000) // 剩余时间，单位：秒
                   if (remainingTime >= 0) {
                     item._remaining_time = remainingTime
                   }
@@ -542,13 +558,17 @@
               }
             }
           }, 1000)
+          // 刷新订单状态
+          this.startRefreshOrders()
         }
       },
       confirmPay(item) {
         this.$showDialog({
           hideHeader: true,
           title: '确认付款',
-          content: (<div class="text-left">确认您已向卖方付款？<p class="c-red">未付款点击“我已付款”将被冻结账户。</p></div>),
+          content: (<div class="text-left">请确认已向卖方付款。<p class="c-red">未付款点击“我已付款”将被冻结账户。</p></div>),
+          okTitle: '我已付款',
+          cancelTitle: '取消',
           onOk: () => {
             this.axios.order.confirmPay(item.id, item._selected_payment_method).then(res => {
               if (res.code === 0) {
@@ -556,7 +576,7 @@
               } else {
                 this.$errorTips(`提交失败code=${res.code}`)
               }
-              this.updateOrder(item.id)
+              this.refreshOrder(item.id)
             }).catch(err => {
               this.$errorTips(`提交失败: ${err}`)
             })
@@ -567,7 +587,9 @@
         this.$showDialog({
           hideHeader: true,
           title: '取消订单',
-          content: (<div class="text-left"><p class="c-red">如您已向卖家付款，取消订单您将会损失付款资金。</p><p>温馨提示：买方每日累计取消订单超过3笔，将被限制当日交易功能。</p></div>),
+          content: (
+            <div class="text-left"><p class="c-red">如您已向卖家付款，取消订单您将会损失付款资金。</p><p>温馨提示：买方每日累计取消订单超过3笔，将被限制当日交易功能。</p>
+            </div>),
           onOk: () => {
             this.axios.order.cancelOrder(item.id).then(res => {
               if (res.code === 0) {
@@ -575,7 +597,7 @@
               } else {
                 this.$errorTips(`提交失败code=${res.code}`)
               }
-              this.updateOrder(item.id)
+              this.refreshOrder(item.id)
             }).catch(err => {
               this.$errorTips(`提交失败: ${err}`)
             })
@@ -587,7 +609,7 @@
         this.showConfirmReceiptModal = true
       },
       markOrderSuccess() {
-        this.updateOrder(this.curReceiptOrderId)
+        this.refreshOrder(this.curReceiptOrderId)
       },
       onClickFilter(index) {
         for (let i = 0; i < this.filterOptions.length; i++) {
@@ -599,28 +621,66 @@
             this.queryParams.coin_type = null
             this.queryParams.side = null
             this.queryParams.page = 1 // 重置分页
-            this.fetchOrderList()
+            this.initOrderList()
           }
         }
         this.startTimer()
       },
-      updateOrder(orderId) {
+      refreshOrder(orderId) {
         // 进行中的订单才有操作
         this.axios.order.refreshOrderStatus(orderId).then(response => {
-          const newOrder = response.data
-          if (newOrder.status === this.constant.ORDER_STATUS.SUCCESS.value || newOrder.status === this.constant.ORDER_STATUS.CANCEL.value) {
-            // 被移动到已结束的列表中
-            this.orderTableItems = this.orderTableItems.filter(i => i.id !== orderId)
-          }
-          if (newOrder.status === this.constant.ORDER_STATUS.PAID.value) {
-            newOrder._selected_payment_method = newOrder.payment_methods[0]
-            this.orderTableItems.forEach(item => {
-              if (item.id === orderId) {
-                Object.assign(item, newOrder)
+          this.updateOrderInList(orderId, response.data)
+        }).catch(err => {
+          this.axios.onError(err)
+        })
+      },
+      updateOrderInList(orderId, newOrder) {
+        if (newOrder.status === this.constant.ORDER_STATUS.SUCCESS.value || newOrder.status === this.constant.ORDER_STATUS.CANCEL.value) {
+          // 被移动到已结束的列表中
+          this.orderTableItems = this.orderTableItems.filter(i => i.id !== orderId)
+        }
+        if (newOrder.status === this.constant.ORDER_STATUS.PAID.value) {
+          newOrder._selected_payment_method = newOrder.payment_methods[0]
+          this.orderTableItems.forEach(item => {
+            if (item.id === orderId) {
+              Object.assign(item, newOrder)
+            }
+          })
+        }
+      },
+      startRefreshOrders() {
+        this.stopRefreshOrders()
+        this.refreshInterval = this.Visibility.every(REFRESH_ORDER_INTERVAL, () => {
+          this.refreshOrderList()
+        })
+      },
+      stopRefreshOrders() {
+        this.Visibility.stop(this.refreshInterval)
+      },
+      refreshOrderList() {
+        // 不能直接替换整个列表，体验不好
+        this.asyncFetchOrderList().then((res) => {
+          if (res.code === 0 && res.data) {
+            const {data, curr_page: currentPage, total: totalRows} = res.data
+            this.queryParams.page = currentPage
+            this.queryParams.totalRows = totalRows
+            const newOrderIds = []
+            data.forEach(order => {
+              newOrderIds.push(order.id)
+              const oldOrder = this.orderTableItems.find(i => i.id === order.id)
+              if (!oldOrder) {
+                this.orderTableItems.unshift(this.preprocessOrder(order))
+              }
+              if (oldOrder && oldOrder.status !== order.status) {
+                this.updateOrderInList(order.id, order)
               }
             })
+            this.orderTableItems = this.orderTableItems.filter(i => newOrderIds.indexOf(i.id) >= 0)
+          } else {
+            this.orderTableItems = []
           }
         }).catch(err => {
+          console.log(err)
           this.axios.onError(err)
         })
       }
@@ -662,9 +722,30 @@
     }
     .order-table {
       margin: 20px -30px 0;
-      .status-text {
-        display: inline-block;
-        margin-right: 9px;
+      .detail-warn-text {
+        height: 38px;
+        width: 100%;
+        border-top: solid 1px #eeeeee;
+        line-height: 38px;
+        font-size: 14px;
+        color: #e35555;
+        text-align: left;
+        padding-left: 30px;
+        .user-kyc-name {
+          margin-right: 10px;
+          color: #27313e;
+        }
+      }
+      .id-text {
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+      .order-row-class {
+        cursor: pointer;
+      }
+      .b-table-details {
+        cursor: default;
       }
       .status-icon {
         display: inline-block;
@@ -706,7 +787,7 @@
       .detail {
         display: inline-block;
         color: #feb132;
-        cursor: pointer;
+        margin-left: 9px;
         .iconfont {
           display: inline-block;
           transform: scale(0.775);
@@ -721,7 +802,15 @@
       }
       .b-table-details {
         background-color: #f9f9f9;
-        border-top: solid 1px #ffbc32;
+        td {
+          padding: 0 !important;
+          .buy-side-detail {
+            border-top: solid 1px #ffbc32;
+          }
+          .sell-side-detail {
+            border-top: solid 1px #52cbca;
+          }
+        }
       }
       .payment-method {
         margin-bottom: 20px;
@@ -745,8 +834,7 @@
         }
       }
       .detail-wrapper {
-        margin-top: 16px;
-        margin-bottom: 12px;
+        padding: 30px 0;
         display: flex;
         justify-content: space-between;
         .col1 {
@@ -837,14 +925,14 @@
           overflow: hidden;
           color: #9b9b9b;
         }
-        .detail-warn-text {
-          color: #e35555;
-        }
         .detail-code {
           color: #ffbc32;
         }
         .detail-btn-wrapper {
           margin-top: 16px;
+          .cancel-order-btn {
+            font-size: 14px;
+          }
         }
         .detail-flex {
           display: flex;

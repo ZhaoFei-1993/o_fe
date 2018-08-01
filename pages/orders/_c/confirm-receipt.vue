@@ -1,7 +1,7 @@
 <template>
   <b-modal id="confirm-receipt-modal"
-           title="确认收款放币"
-           ok-title="确认"
+           title="确认收款"
+           ok-title="确认收款放币"
            cancel-title="取消"
            cancel-variant="outline-green"
            ok-variant="gradient-yellow"
