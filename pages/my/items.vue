@@ -4,6 +4,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      padding: 0 30px;
       font-size: 18px;
     }
     .items-header-left {
@@ -64,7 +65,7 @@
 </style>
 
 <template>
-  <CBlock class="page-my-items">
+  <CBlock class="page-my-items" x="0">
     <h2 class="items-header">
       <span class="items-header-left">
         广告管理
@@ -78,7 +79,7 @@
       </PublishItemButton>
     </h2>
 
-    <div class="mt-30">
+    <div class="my-25 px-30">
       <b-btn v-for="(status, index) in filterOptions"
              :variant="itemStatus === status.value ? 'outline-green' : 'outline-gray'"
              :key="index" size="xxs" class="mr-20"
@@ -143,7 +144,7 @@
 
     <Blank v-if="!itemsCurrent.length"/>
 
-    <CBlock v-show="isItemAmountEditing" class="item-coin-amount-container" ref="coin-amount" x="20" y="20">
+    <CBlock v-show="isItemAmountEditing" class="item-coin-amount-container" ref="coin-amount" x="20" y="20" v-click-outside="onClickOutsideAmount">
       <div class="item-coin-amount-confirm">
         <CurrencyInput v-model="onlineItemCoinAmount" class="item-coin-amount-confirm-input" :currency="editingItem.coin_type"/>
         <b-btn variant="plain-green" size="xs" class="mx-20" @click="onItemOnlineConfirm">确定</b-btn>
@@ -160,12 +161,16 @@
 </template>
 
 <script>
+import Vue from 'vue'
 import PublishItemModal from '~/components/publish-item-modal/index.vue'
 import PublishItemButton from '~/components/publish-item-modal/publish-item-button.vue'
 import ToggleButton from '~/components/toggle-button.vue'
 import CurrencyInput from '~/components/currency-input.vue'
 import Blank from '~/components/blank.vue'
 import {mapState} from 'vuex'
+import ClickOutside from 'vue-click-outside'
+
+Vue.directive('ClickOutside', ClickOutside)
 
 export default {
   name: 'page-my-items',
@@ -206,28 +211,25 @@ export default {
       const fields = {
         id: {
           label: '广告编号',
-          thStyle: {
-            width: '70px'
-          },
+          thClass: ['pl-30', 'w-100'],
+          tdClass: ['pl-30', 'w-100'],
         },
         side: {
           label: '类型',
           thStyle: {
-            width: '70px'
+            width: '100px'
           },
-          sortable: true,
         },
         coin_type: {
           label: '币种',
           thStyle: {
-            width: '80px'
+            width: '100px'
           },
-          sortable: true,
         },
         remain_coin_amount: {
           label: '数量',
           thStyle: {
-            width: '100px'
+            width: '150px'
           },
         },
         cashAmountLimit: {
@@ -253,7 +255,12 @@ export default {
       }
 
       fields.action = {
-        label: '操作'
+        label: '操作',
+        thStyle: {
+          width: '150px',
+        },
+        thClass: ['text-right', 'pr-30'],
+        tdClass: ['text-right', 'pr-30'],
       }
 
       return fields
@@ -312,6 +319,12 @@ export default {
       })
     },
 
+    onClickOutsideAmount() {
+      if (this.isItemAmountEditing) {
+        this.isItemAmountEditing = false
+      }
+    },
+
     onItemOnline(item, e) {
       const onlineItems = this.itemsOnline.filter(onlineItem => onlineItem.coin_type === item.coin_type && onlineItem.side === item.side)
 
@@ -319,13 +332,27 @@ export default {
         return this.$errorTips('每个币种每个类型的广告最多只能上架2条')
       }
 
+      if (!this.user.payments.some(payment => payment.status === this.constant.PAYMENT_STATUS.ON)) {
+        return this.$showDialog({
+          title: '开启支付方式',
+          content: '您需要开启支付方式后，才可以上架广告。',
+          okTitle: '去开启',
+          onOk: () => {
+            this.$router.push('/my/payments')
+          }
+        })
+      }
+
       this.editingItem = item
-      this.isItemAmountEditing = true
       this.onlineItemCoinAmount = item.remain_coin_amount
 
       const rect = e.target.getBoundingClientRect()
       this.$refs['coin-amount'].$el.style.left = rect.left - 420 + 'px'
       this.$refs['coin-amount'].$el.style.top = rect.top + window.scrollY - 30 + 'px'
+      // 为了与clickoutside兼容，所以在nextTick再显示
+      this.$nextTick(() => {
+        this.isItemAmountEditing = true
+      })
     },
     onItemOnlineConfirm() {
       this.axios.item.online(this.editingItem.id, this.onlineItemCoinAmount).then(res => {

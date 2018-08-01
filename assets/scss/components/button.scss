@@ -42,7 +42,7 @@ $background-red: #e45555;
 }
 
 .btn-lg {
-  min-width: 230px;
+  min-width: 220px;
   padding: 0 24px;
   font-size: 22px;
   line-height: 38px;
@@ -109,9 +109,9 @@ $background-red: #e45555;
   background-color: transparent;
   border-color: $brandGreen;
   color: $brandGreen;
+
   &:hover, &:focus, &:active {
     background-image: $image-gradient-green;
-    border: none;
     color: #fff;
   }
 }

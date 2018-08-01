@@ -105,7 +105,7 @@
           justify-content: space-between;
           background-color: #f9f9f9;
           .col-narrow, .col-wide {
-            text-align: center;
+            /*text-align: center;*/
           }
           .col-name {
             text-align: left;
@@ -157,7 +157,6 @@
               font-size: 18px;
               flex: 1;
               padding: 0 60px 0 16px;
-              text-align: right;
               font-weight: 500;
               color: $brandGreen;
             }
@@ -295,11 +294,11 @@
                 `付款时间${utils.formatDuration(item.user.user_stat.pay_time)}`}}
               </div>
             </div>
-            <span class="col-narrow text-right">
+            <span class="col-narrow">
               <div class="number">{{item.remain_coin_amount}}</div>
               <div class="unit">{{ selectedCoin}}</div>
             </span>
-            <span class="col-wide text-right pr-60">
+            <span class="col-wide pr-60">
               <div class="number">{{item.min_deal_cash_amount.setDigit(0) + '-' + item.max_deal_cash_amount.setDigit(0)}}</div>
               <div class="unit">{{balance.currentCash}}</div>
             </span>
@@ -349,6 +348,7 @@
              v-model="showConstraintModal"
              :title="currentConstraint.title || '交易限制'"
              :hide-footer="true"
+             :noCloseOnBackdrop="true"
              class="text-center">
       <div>
         {{currentConstraint.content}}
@@ -464,6 +464,9 @@
     },
     methods: {
       showItems(side, coin) {
+        // 重置page
+        this.pager.currentPage = 1
+
         this.$router.replace({
           query: {
             side,
@@ -535,6 +538,7 @@
                 break
               case this.constant.PLACE_ORDER_ERROR.KYC_TIMES_LIMIT:
                 this.currentConstraint = {
+                  title: '实名认证',
                   content: '您尚未完成实名认证，每日限制下单次数为 3 次。',
                   buttonText: '去认证',
                   outLink: `${this.coinexDomain}/my/info/basic?redirect=${encodeURIComponent(webDomain + this.$route.fullPath)}`,
@@ -571,27 +575,29 @@
         }
         return true
       },
+      /**
+       * 校验用户是否有广告对应的支付方式
+       * @param item
+       */
       verifyHasPayment(item) {
         return this.$store.dispatch('fetchUserPayments').then(() => {
           // 卖家需要有对应支付方式
-          if (!this.user.payments) {
-            return Promise.reject(new Error('获取支付方式失败'))
-          }
+          if (!this.user.payments) throw new Error('获取支付方式失败')
+
           for (const pay of item.payment_methods) {
-            if (this.user.payments.find(p => p.status === 'on' && p.method === pay)) {
-              return Promise.resolve()
-            }
+            if (this.user.payments.find(p => p.status === 'on' && p.method === pay)) return 'passed'    // 没有意义的返回值，只是为了标明通过该条件
           }
-          return Promise.reject(new PlaceOrderError('尚未添加该广告支持的支付方式', this.constant.PLACE_ORDER_ERROR.PAYMENT_LIMIT))
+
+          throw new PlaceOrderError('尚未添加该广告支持的支付方式', this.constant.PLACE_ORDER_ERROR.PAYMENT_LIMIT)
         })
       },
-      verifyDynamicConstraint(item) {
+      async verifyDynamicConstraint(item) {
         // 不做外部验证了
         // if (item.min_deal_cash_amount >= this.noKycLimit) {
         //   return Promise.reject(new PlaceOrderError('未完成实名认证', this.constant.PLACE_ORDER_ERROR.KYC_AMOUNT_LIMIT))
         // }
         if (item.side === this.constant.SIDE.BUY) {
-          return this.verifyHasPayment(item)
+          await this.verifyHasPayment(item)
         }
         return this.axios.user.dynamicConstraint().then(response => {
           const constraint = response.data

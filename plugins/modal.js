@@ -17,6 +17,7 @@ export default ({app, store}) => {
       render() {
         return (
           <b-modal ref="modal"
+            title={this.title}
             onOk={this.onOk}
             onCancel={this.onCancel}
             ok-only={this.okOnly}
@@ -28,10 +29,9 @@ export default ({app, store}) => {
             hide-footer={this.hideFooter}
             noCloseOnBackdrop={this.noCloseOnBackdrop}
             hideHeaderClose={this.hideHeaderClose}
-            button-size="sm"
+            button-size="lg"
             class="text-center">
-            <h4>{this.title}</h4>
-            <div class={this.title ? 'mt-20' : ''} style="line-height: 1.5">{this.content}</div>
+            <div style="line-height: 1.5">{this.content}</div>
           </b-modal>
         )
       },
@@ -55,7 +55,7 @@ export default ({app, store}) => {
       $modal.okTitle = config.okTitle || $modal.$t('global.misc.确定')
       $modal.cancelTitle = config.cancelTitle || $modal.$t('global.misc.取消')
       $modal.hideFooter = config.hideFooter
-      $modal.noCloseOnBackdrop = config.noCloseOnBackdrop
+      $modal.noCloseOnBackdrop = typeof config.noCloseOnBackdrop === 'boolean' ? config.noCloseOnBackdrop : false // 默认不可以点背景隐藏
       $modal.hideHeaderClose = config.hideHeaderClose
 
       $modal.$refs.modal.show()

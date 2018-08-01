@@ -7,7 +7,7 @@
           <p class="slogan">
             <img src="~assets/img/logo-gray.svg">
           </p>
-          <p class="mt-10 fs-24 ff-light">The Global Digital Coin Exchange</p>
+          <p class="mt-10 fs-24 ff-light">CoinEx OTC 法币交易</p>
           <div class="medias mt-10">
             <a href="mailto:support@coinex.com"><i class="iconfont icon-email"></i></a>
             <a target="_blank" href="https://weibo.com/coinex"><i class="iconfont icon-weibo"></i></a>
@@ -21,7 +21,7 @@
           <div class="linkBox">
             <p class="boxTitle">产品</p>
             <b-link :href="coinexDomain">币币交易</b-link>
-            <b-link to="/">OTC交易</b-link>
+            <b-link to="/">法币交易</b-link>
             <b-link target="_blank" :href="'https://pool.viabtc.com/?lang='+lang.lang">矿池</b-link>
             <b-link target="_blank" :href="'https://www.viabtc.com/?lang='+lang.lang">区块浏览器</b-link>
           </div>
@@ -29,22 +29,14 @@
             <p class="boxTitle">关于</p>
             <b-link :href="`${coinexDomain}/aboutus`">关于我们</b-link>
             <!-- <b-link to="/">加入我们</b-link> -->
-            <b-link :href="`${coinexDomain}/token`">关于CET</b-link>
-            <b-link :href="`${coinexDomain}/announcement`">公告</b-link>
+            <b-link :href="`${coinexDomain}/todo`">交易规则</b-link>
+            <b-link :href="`${coinexDomain}/todo`">费率标准</b-link>
           </div>
           <div class="linkBox">
-            <p class="boxTitle">声明</p>
-            <b-link :href="`${coinexDomain}/service`">服务协议</b-link>
-            <b-link :href="`${coinexDomain}/privacy`">隐私协议</b-link>
-            <b-link :href="`${coinexDomain}/fees`">费率</b-link>
-          </div>
-          <div class="linkBox" style="width:auto">
             <p class="boxTitle">支持</p>
-            <b-link href="https://support.coinex.com" target="_blank">常见问题</b-link>
-            <b-link :href="`${coinexDomain}/res/support/ticket`" target="_blank">提交工单</b-link>
-            <b-link target="_blank" href="https://github.com/coinexcom/coinex_exchange_api/wiki">API文档</b-link>
-            <!-- <b-link target="_blank" :href="lang.lang !== 'en_US'?'http://coinex.udesk.cn':'http://coinex-en.udesk.cn'">客服</b-link> -->
-            <b-link :href="'https://docs.google.com/forms/d/e/1FAIpQLSdA8WGHG8SJrWEDbYXJeNSzjovUtU8kmcLKSOHDfACGdgMgUQ/viewform'">上币申请</b-link>
+            <b-link :href="`${coinexDomain}/service`">新手帮助</b-link>
+            <b-link :href="`${coinexDomain}/privacy`">提交工单</b-link>
+            <b-link :href="`${coinexDomain}/privacy`">公告</b-link>
           </div>
         </div>
       </div>

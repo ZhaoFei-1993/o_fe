@@ -1,6 +1,7 @@
 <template>
   <b-modal v-if="item" :visible="value" @hide="hideModal" centered class="place-order-modal"
            hide-footer
+           :noCloseOnBackdrop="true"
            :title="title">
     <div class="merchant-info" hidden v-if="item.user">
       <div class="profile d-flex align-items-center">

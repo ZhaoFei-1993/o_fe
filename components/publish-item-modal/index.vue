@@ -9,7 +9,6 @@
     .col-form-label {
       font-size: 18px;
       margin-bottom: 5px;
-      margin-top: 30px;
     }
 
     div[role="group"] {
@@ -26,6 +25,11 @@
       margin-left: 40px;
     }
 
+    .item-total-cash {
+      display: flex;
+      align-items: center;
+    }
+
     .input-label {
       color: #6f6f6f;
       margin-bottom: 5px;
@@ -39,7 +43,7 @@
 
     .item-price-group {
       .item-float-price-container {
-        margin-top: 10px;
+        margin-top: 25px;
         display: flex;
         align-items: center;
 
@@ -111,6 +115,7 @@
            :title="editing ? '编辑广告' : '发布广告'"
            :okTitle="editing ? '保存' : '确定'"
            cancelTitle="取消"
+           :noCloseOnBackdrop="true"
            @ok="onSubmit">
     <b-form v-if="balance.currentRate">
       <!--<TabButtons :tabs="tradeSideOptions" v-model="form.side"/>-->
@@ -126,7 +131,7 @@
           <div class="input-label" todo="todo:应该是参考价格吧？">
             当前市场价格
             <b-btn variant="plain-yellow" size="xxs" @click="onSetPrice2MarketPrice">{{marketPrice}}</b-btn>
-            <CTooltip content="采用Bitfinex、Coinbase和Bitstamp 三个交易所的平均价格，仅供参考。" x="4"/>
+            <CTooltip v-if="form.coin_type !== 'USDT'" content="采用Bitfinex、Coinbase和Bitstamp 三个交易所的平均价格，仅供参考。" x="4"/>
           </div>
           <CurrencyInput v-model="form.price" :currency="balance.currentCash" :decimalDigit="2" placeholder="请输入价格" class="col-left"/>
         </div>
@@ -136,7 +141,7 @@
             <div class="input-label">
               当前市场价格
               <b-btn variant="plain-yellow" size="xxs" @click="onSetPrice2MarketPrice">{{marketPrice}}</b-btn>
-              <CTooltip content="采用Bitfinex、Coinbase和Bitstamp 三个交易所的平均价格，仅供参考。" x="4"/>
+              <CTooltip v-if="form.coin_type !== 'USDT'" content="采用Bitfinex、Coinbase和Bitstamp 三个交易所的平均价格，仅供参考。" x="4"/>
             </div>
             <CurrencyInput :value="(marketPrice * form.float_rate / 100).setDigit(2)" :currency="balance.currentCash" :disabled="true" plain placeholder="请输入价格"/>
           </div>
@@ -171,10 +176,11 @@
         </div>
 
         <div class="coin-amount-container">
+          <!--todo:coin_amount、float_rate最大值100,000,000-->
           <CurrencyInput v-model="form.coin_amount" :currency="form.coin_type" placeholder="请输入数量" class="col-left"/>
-          <div class="col-right fz-22">
-            <span>总金额 ≈</span>
-            <span class="c-bright-yellow ml-1"> {{totalCash}} {{balance.currentCash}}</span>
+          <div class="item-total-cash col-right">
+            <span class="fz-16">总金额 ≈</span>
+            <span class="c-bright-yellow fz-22 ml-1"> {{totalCash}} {{balance.currentCash}}</span>
           </div>
         </div>
         <div class="c-9b mt-2">
