@@ -37,7 +37,11 @@
             <span v-if="selectedMethod.method === constant.PAYMENT_TYPES.ALIPAY"><i
               class="mr-10 iconfont icon-alipay"></i>支付宝支付</span>
           </template>
-          <span class="payment-account">{{selectedMethod.account_name + ' '+ selectedMethod.account_no}}</span>
+          <span class="payment-account">
+            <span>{{selectedMethod.account_name + ' '}}</span>
+            <span v-if="selectedMethod.method === constant.PAYMENT_TYPES.BANKCARD">{{ selectedMethod.account_no | splitCardNumber }}</span>
+            <span v-else>{{ selectedMethod.account_no }}</span>
+          </span>
           <span v-if="selectedMethod.method === constant.PAYMENT_TYPES.BANKCARD"
                 class="detail-text">
             {{ selectedMethod.bank_name }}<span v-if="selectedMethod.branch&&selectedMethod.branch.length">, {{ selectedMethod.branch }}</span>
