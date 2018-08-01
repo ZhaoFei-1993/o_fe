@@ -12,7 +12,7 @@
       </div>
       <div class="order-table">
         <b-table :fields="orderTableFields" :items="orderTableItems" @row-clicked="fetchUnreadMessageCount" :tbody-tr-class="queryParams.status === 'processing' ? 'order-row-class' : ''">
-          <template slot="HEAD__order_type" slot-scope="{ item }">
+          <template slot="HEAD__isBuySide" slot-scope="{ item }">
             <div>
               <TableHeadDropdown :options="orderTypeFilterOptions" label="类型"
                                  @click="onClickSideDropdown"></TableHeadDropdown>
@@ -27,10 +27,10 @@
           <template slot="id" slot-scope="{ item }">
             <b-link class="id-text" :to="`/orders/${item.id}`">{{ item.id }}</b-link>
           </template>
-          <template slot="_order_type" slot-scope="{ item }">
+          <template slot="_isBuySide" slot-scope="{ item }">
             <span
-              :class="['order-type', item._order_type === constant.SIDE.BUY ? 'order-type-buy' : 'order-type-sell']">
-              {{ item._order_type === constant.SIDE.BUY ? '买' : '卖' }}
+              :class="['order-type', item._isBuySide ? 'order-type-buy' : 'order-type-sell']">
+              {{ item._isBuySide ? '买' : '卖' }}
             </span>
           </template>
           <template slot="place_time" slot-scope="{ item }">
@@ -59,8 +59,8 @@
               <div class="col1">
                 <div class="detail-h1 detail-flex">
                   <span
-                    :class="['arrow-icon', item._order_type === constant.SIDE.BUY ? 'buy-arrow-icon' : 'sell-arrow-icon']"></span>
-                  <span>{{ item._order_type === constant.SIDE.BUY ? '购买' : '出售' }} {{ item.coin_type }}</span>
+                    :class="['arrow-icon', item._isBuySide ? 'buy-arrow-icon' : 'sell-arrow-icon']"></span>
+                  <span>{{ item._isBuySide ? '购买' : '出售' }} {{ item.coin_type }}</span>
                 </div>
                 <div class="detail-h2">
                   <span style="display: inline-block;width: 24px;"></span>
@@ -75,7 +75,7 @@
                   {{ item.coin_amount | formatMoney }} {{ item.coin_type }}
                 </div>
               </div>
-              <div class="col3" v-if="item._selected_payment_method && (item._order_type === constant.SIDE.SELL && item.status === constant.ORDER_STATUS.PAID.value) || item._order_type === constant.SIDE.BUY">
+              <div class="col3" v-if="item._selected_payment_method && (!item._isBuySide && item.status === constant.ORDER_STATUS.PAID.value) || item._isBuySide">
                 <div class="payment-method"
                      v-if="item.status !== constant.ORDER_STATUS.CANCEL.value
                   && item.status !== constant.ORDER_STATUS.CLOSED.value && !item._expired">
@@ -107,7 +107,7 @@
                   </template>
                 </div>
               </div>
-              <div class="col4" v-if="item._selected_payment_method && (item._order_type === constant.SIDE.SELL && item.status === constant.ORDER_STATUS.PAID.value) || item._order_type === constant.SIDE.BUY">
+              <div class="col4" v-if="item._selected_payment_method && (!item._isBuySide && item.status === constant.ORDER_STATUS.PAID.value) || item._isBuySide">
                 <template v-if="!item._expired">
                   <div class="detail-text" style="color: #27313e;">
                     {{ item._selected_payment_method.account_name }}
@@ -136,7 +136,7 @@
                 </template>
               </div>
               <div class="col5">
-                <template v-if="item._order_type === constant.SIDE.BUY">
+                <template v-if="item._isBuySide">
                   <template v-if="item.status === constant.ORDER_STATUS.CREATED.value">
                     <template v-if="item._remaining_time>0">
                       <div class="detail-text detail-timer">
@@ -191,7 +191,7 @@
                     </div>
                   </template>
                 </template>
-                <template v-if="item._order_type === constant.SIDE.SELL">
+                <template v-if="!item._isBuySide">
                   <template v-if="item.status === constant.ORDER_STATUS.CREATED.value">
                     <template v-if="item._remaining_time>0">
                       <div class="detail-text detail-timer">
@@ -338,7 +338,7 @@
             thClass: ['text-left'],
             tdClass: ['text-left', 'pl-30'],
           },
-          _order_type: {
+          _isBuySide: {
             label: '类型',
             thStyle: {
               width: '100px',
@@ -496,13 +496,10 @@
         })
       },
       preprocessOrder(item) {
-        let orderType
         let counterparty
         if (this.isMerchant(item)) { // 商家
-          orderType = item.merchant_side
           counterparty = item.user
         } else { // 普通用户
-          orderType = item.user_side
           counterparty = item.merchant
         }
         let selectedPaymentMethod = {}
@@ -513,8 +510,7 @@
         const remainingTime = parseInt((expireTime - Date.now()) / 1000) // 订单付款截止时间 = 创建时间 + 可付款时间(15min)
         return {
           ...item,
-          _order_type: orderType, // 下划线前缀均为自定义属性（下同）订单类型
-          _selected_payment_method: selectedPaymentMethod, // 用户选中的支付方式
+          _selected_payment_method: selectedPaymentMethod, // 下划线前缀均为自定义属性（下同）用户选中的支付方式
           _remaining_time: remainingTime,
           _expire_time: expireTime,
           _expired: remainingTime <= 0 && item.status === this.constant.ORDER_STATUS.CREATED.value,
