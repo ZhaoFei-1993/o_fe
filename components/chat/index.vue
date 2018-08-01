@@ -357,7 +357,13 @@
             self.pushSystemMessage(`${invitedBy} 邀请 ${members.join('、')} 加入对话`)
           },
           [Event.MEMBERS_LEFT]: (payload) => { // 有成员被从某个对话中移除
-            self.pushSystemMessage(`${payload.kickedBy} 将 ${payload.members.join('、')} 移出对话`)
+            const memberList = payload.members.map(member => {
+              if (this.memberInfoMap[member]) {
+                return this.memberInfoMap[member].name
+              }
+              return member
+            })
+            self.pushSystemMessage(`${payload.kickedBy === 'REST_API' ? '客服' : payload.kickedBy} 将 ${memberList.join('、')} 移出对话`)
           },
           [Event.KICKED]: (payload) => { // 当前用户被从某个对话中移除
             if (payload.kickedBy === 'REST_API') return // 系统邀请信息不展示
