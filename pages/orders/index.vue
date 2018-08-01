@@ -113,13 +113,13 @@
                   <div class="detail-text">
                     <span v-if="item._selected_payment_method.method === constant.PAYMENT_TYPES.BANKCARD">{{ item._selected_payment_method.account_no | splitCardNumber }}</span>
                     <span v-else>{{ item._selected_payment_method.account_no }}</span>
-                    <b-popover :target="`qr-${item.id}`"
+                    <b-popover v-if="item._selected_payment_method.qr_code_image_url" :target="`qr-${item.id}`"
                                placement="top"
                                triggers="hover">
                       <img style="display: block;max-width: 360px;max-height: 360px;width: 100%;height: 100%;"
                            :src="item._selected_payment_method.qr_code_image_url">
                     </b-popover>
-                    <span :id="`qr-${item.id}`" style="cursor: pointer;"
+                    <span v-if="item._selected_payment_method.qr_code_image_url" :id="`qr-${item.id}`" style="cursor: pointer;"
                           v-show="item._selected_payment_method.method !== constant.PAYMENT_TYPES.BANKCARD"><i
                       class="iconfont icon-qrcode"></i></span>
                   </div>
