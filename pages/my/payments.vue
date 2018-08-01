@@ -474,7 +474,7 @@
             this.$showTips('正在上传图片...')
             const imageData = (await this.axios.misc.upload(this.form.qrCodeImage.file)).data
 
-            form.qrCodeImage.id = form.qr_code_image = imageData.file_key
+            form.qrCodeImage.id = imageData.file_key
             form.qrCodeImage.url = imageData.file_url
             delete form.qrCodeImage.file
           } catch (e) {
@@ -483,6 +483,9 @@
             return
           }
         }
+
+        form.qr_code_image = form.qrCodeImage.id
+        form.qr_code_image_url = form.qrCodeImage.url
 
         this.$showTips('正在上传数据...')
         return paymentApi({
