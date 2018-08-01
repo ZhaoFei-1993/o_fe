@@ -155,7 +155,7 @@
           <span class="tip">申诉理由</span>
           <textarea class="appeal-input"
                     v-model="appealComment"
-                    placeholder="请填写15-500字以上的申诉理由"
+                    placeholder="请填写15-500字的申诉理由"
                     rows="8">
           </textarea>
         </div>
@@ -528,7 +528,7 @@
           case this.constant.ORDER_STATUS.PAID.value:
             return {
               message: `已支付，卖方需确认收款并放行数字币，付款参考号：<span class="c-red">${this.referCode}</span>`,
-              warning: this.isBuySide ? undefined : '请务必确认收到款项后确认收款，并核实买家是否实名付款。'
+              warning: this.isBuySide ? undefined : '请务必查看您的收款账户，并核实买家是否实名付款。'
             }
           case this.constant.ORDER_STATUS.SUCCESS.value:
             return {message: `卖方已确认收款，付款参考号：<span class="c-red">${this.referCode}</span>`}
