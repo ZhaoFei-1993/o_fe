@@ -183,13 +183,10 @@
               this.conversation = conversation
               this.unreadMessagesCount = this.conversation.unreadMessagesCount
               this.members = this.conversation.members
-              this.bindConversationEvent() // 绑定对话级别事件
-              this.messageIterator = conversation.createMessagesIterator({
+              this.messageIterator = this.conversation.createMessagesIterator({
                 limit: this.limit,
               })
-              setTimeout(() => { // 加延时防止重复获取聊天记录
-                this.initMsgLog() // 初始化聊天记录
-              }, 200)
+              this.initMsgLog() // 初始化聊天记录
               this.restartCount = 1000
             } else {
               return Promise.reject(new Error(`getConversation error, conversation=${conversation}`))
@@ -302,6 +299,7 @@
             this.scrollToBottom() // 滚动到底部
             this.conversation.read() // 对话标记为已读
             this.bindClientEvent() // 需要初始化聊天记录后才能绑定事件，否则会出现重复消息问题
+            this.bindConversationEvent() // 完成初始化后才绑定对话级别事件
           }
         })
       },

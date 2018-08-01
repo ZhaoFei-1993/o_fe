@@ -43,18 +43,12 @@
             {{ item.cash_amount | formatMoney }} CNY
           </template>
           <template slot="status" slot-scope="{ item, detailsShowing, toggleDetails }">
-            <span v-if="item.appeal_status && item.appeal_status === 'created' || item.appeal_status === 'processing'">
-              <span class="status-icon"><i v-if="appealIconMap[item.appeal_status]" class="iconfont" :class="appealIconMap[item.appeal_status].class" :style="{fontSize: '12px', color: appealIconMap[item.appeal_status].color}"></i></span>
-              <span>申诉中</span>
-            </span>
-            <span v-else>
-              <span class="status-icon"><i v-if="statusIconMap[item.status]" class="iconfont" :class="statusIconMap[item.status].class" :style="{fontSize: '12px', color: statusIconMap[item.status].color}"></i></span>
-              <span>{{ constant?constant.ORDER_STATUS[item.status.toUpperCase()].text:'' }}</span>
-              <span v-if="item.status === constant.ORDER_STATUS.CREATED.value || item.status === constant.ORDER_STATUS.PAID.value"
-                    class="detail"
-                    :class="[ detailsShowing ? 'show-detail' : 'hidden-detail' ]">
-                <i class="iconfont icon-detail"></i>
-              </span>
+            <span class="status-icon"><i v-if="statusIconMap[item.status]" class="iconfont" :class="statusIconMap[item.status].class" :style="{fontSize: '12px', color: statusIconMap[item.status].color}"></i></span>
+            <span>{{ constant?constant.ORDER_STATUS[item.status.toUpperCase()].text:'' }}</span>
+            <span v-if="item.status === constant.ORDER_STATUS.CREATED.value || item.status === constant.ORDER_STATUS.PAID.value && queryParams.status === 'processing'"
+                  class="detail"
+                  :class="[ detailsShowing ? 'show-detail' : 'hidden-detail' ]">
+              <i class="iconfont icon-detail"></i>
             </span>
           </template>
           <template slot="row-details" slot-scope="{ item }">
@@ -295,16 +289,6 @@
           cancel: {
             class: 'icon-pay-cancel',
             color: 'rgb(216, 216, 216)',
-          },
-        },
-        appealIconMap: {
-          created: {
-            class: 'icon-appealing',
-            color: 'rgb(82, 203, 202)',
-          },
-          processing: {
-            class: 'icon-appealing',
-            color: 'rgb(82, 203, 202)',
           },
         },
         curReceiptOrderId: null, // 当前选中的确认收款item
