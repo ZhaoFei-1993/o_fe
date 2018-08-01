@@ -443,7 +443,7 @@
       },
       isBuyerAppeal() {
         if (!this.appeal) return false
-        return this.order.user_side === this.constant.SIDE.BUY && this.appeal.user_id === this.order.user_id
+        return (this.order.user_side === this.constant.SIDE.BUY) === (this.appeal.user_id === this.order.user_id)
       },
       appealSide() {
         if (!this.appeal) return null

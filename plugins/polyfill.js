@@ -17,6 +17,17 @@ String.prototype.limitDigit = function (limit, defDigit = 8) {
   return str.setDigit(digit);
 };
 
+String.prototype.hideMiddleChars = function (hiddenCount = 4) {
+  const str = (this || "").toString().trim();
+  const l = str.length
+  if (l <= hiddenCount) {
+    return str
+  }
+  const hidden = Array(hiddenCount).fill('*').join('')
+  const left = Math.floor((l - hiddenCount) / 2)
+  return str.slice(0, left) + hidden + str.slice(left + hiddenCount)
+}
+
 String.prototype.obtainMaxDigit = function (limit, defDigit = 8, array, keyFn) {
   array = array || [(this || "")];
   keyFn = keyFn || function (number) {

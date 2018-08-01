@@ -29,12 +29,12 @@
     </h3>
     <p class="layout-my-desc">强烈建议完成以下设置提升账户安全等级。</p>
     <MyInfoItem title="邮箱">
-      <p slot="content"><span>{{user.account.email}}</span></p>
+      <p slot="content"><span>{{user.account.email.hideMiddleChars(6)}}</span></p>
       <b-btn slot="action" variant="outline-green" size="xs" :href="`${coinexDomain}/my/info/basic`" target="_blank">修改</b-btn>
     </MyInfoItem>
     <MyInfoItem title="手机">
       <p slot="content">
-        <span v-if="user.account.mobile">+{{user.account.country_code}} {{user.account.mobile}}</span>
+        <span v-if="user.account.mobile">+{{user.account.country_code}} {{user.account.mobile.hideMiddleChars()}}</span>
         <span v-else class="c-red">未绑定</span>
       </p>
       <b-btn slot="action" variant="outline-green" size="xs" :href="`${coinexDomain}/my/info/security`" target="_blank">
