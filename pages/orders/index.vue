@@ -111,7 +111,8 @@
                     {{ item._selected_payment_method.account_name }}
                   </div>
                   <div class="detail-text">
-                    {{ item._selected_payment_method.account_no }}
+                    <span v-if="item._selected_payment_method.method === constant.PAYMENT_TYPES.BANKCARD">{{ item._selected_payment_method.account_no | splitCardNumber }}</span>
+                    <span v-else>{{ item._selected_payment_method.account_no }}</span>
                     <b-popover :target="`qr-${item.id}`"
                                placement="top"
                                triggers="click">
