@@ -73,7 +73,7 @@
                   {{ item.coin_amount | formatMoney }} {{ item.coin_type }}
                 </div>
               </div>
-              <div class="col3">
+              <div class="col3" v-if="item._selected_payment_method && (item._order_type === constant.SIDE.SELL && item.status === constant.ORDER_STATUS.PAID.value) || item._order_type === constant.SIDE.BUY">
                 <div class="payment-method"
                      v-if="item.status !== constant.ORDER_STATUS.CANCEL.value
                   && item.status !== constant.ORDER_STATUS.CLOSED.value && !item._expired">
@@ -105,7 +105,7 @@
                   </template>
                 </div>
               </div>
-              <div class="col4" v-if="item._selected_payment_method">
+              <div class="col4" v-if="item._selected_payment_method && (item._order_type === constant.SIDE.SELL && item.status === constant.ORDER_STATUS.PAID.value) || item._order_type === constant.SIDE.BUY">
                 <template v-if="!item._expired">
                   <div class="detail-text" style="color: #27313e;">
                     {{ item._selected_payment_method.account_name }}
