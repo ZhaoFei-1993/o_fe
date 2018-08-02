@@ -7,6 +7,7 @@
     margin: 0 auto;
     min-height: 900px;
     display: flex;
+    align-items: flex-start;
     .main-content {
       flex: 1;
       padding: 0px;
@@ -149,20 +150,24 @@
         }
       }
       .order-helper {
-        padding: 0 30px 30px;
+        padding: 0 30px;
         font-size: 16px;
         .appeal-btn {
           cursor: pointer;
         }
+        .divider {
+          margin-top: 25px;
+          border-bottom: 1px solid #eeeeee;
+        }
       }
       .order-notice {
-        padding: 0 30px 30px;
+        padding: 10px 30px 30px;
         .title {
-          font-weight: 500;
           font-size: 16px;
           margin: 10px 0;
         }
         .notices {
+          color: #6f6f6f;
           list-style-type: decimal;
           list-style-position: inside;
         }
@@ -330,16 +335,17 @@
             <span>申诉裁决：{{appealResult}}</span>
           </div>
         </template>
+        <div class="divider" v-if="canCancel||showAppeal||appeal"></div>
       </div>
       <div class="order-notice">
-        <div class="title">交易须知</div>
+        <div class="title c-dark">交易须知</div>
         <ul class="notices" v-if="isBuySide">
           <li>您支付的法币将直接进入卖方收款账户，交易中卖方的数字货币由平台托管冻结。</li>
           <li>请尽快完成付款，并务必<span class="c-red">点击“我已付款”</span>，卖方确认收款后，平台将数字货币划转到您的账户。</li>
           <li>买方当日取消订单达3笔（含超时未支付订单），会被限制当日交易功能。</li>
-          <li>请<span class="c-red">使用及时到账支付方式</span>，付款后1小时内未到账订单，卖方有权要求退款后取消交易，请知悉。</li>
+          <li>请<span class="c-red">使用即时到账支付方式</span>，付款后2小时内未到账订单，卖方有权要求退款后取消交易，请知悉。</li>
         </ul>
-        <ul v-else>
+        <ul class="notices" v-else>
           <li>买方支付的法币将直接进入您的收款账户，交易中您的数字货币由平台托管冻结。</li>
           <li>确认收到买方付款后，请及时<span class="c-red">点击“确认收款”</span>，放行数字货币给买方。</li>
           <li>收到到账短信后，请<span class="c-red">务必登录收款账户确认款项是否到账</span>，避免因收到诈骗短信错误释放数字货币。</li>
