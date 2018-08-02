@@ -484,8 +484,8 @@
           }
         }
 
-        form.qr_code_image = form.qrCodeImage.id
-        form.qr_code_image_url = form.qrCodeImage.url
+        form.qr_code_image = form.qrCodeImage && form.qrCodeImage.id
+        form.qr_code_image_url = form.qrCodeImage && form.qrCodeImage.url
 
         this.$showTips('正在上传数据...')
         return paymentApi({
