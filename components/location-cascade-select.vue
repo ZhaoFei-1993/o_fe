@@ -47,7 +47,6 @@
 <script>
 import AutoCompleteSelection from '~/components/auto-complete-selection.vue'
 
-// todo: 将其他几个位置选择器也用本组件代替
 export default {
   name: 'location-cascade-select',
   components: {

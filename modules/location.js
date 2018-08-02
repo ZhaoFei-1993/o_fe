@@ -26,7 +26,12 @@ export function resolveLocationText(location, countries) {
   }
 }
 
-// todo:这里不单单location用到了，其他地方也用到了，需要迁移到合适的地方
+/**
+ * 从多语言数据中获取指定的语言信息
+ * @param location {cn_name: String, en_name: String, hk_name: String} 多语言源
+ * @param lang  {lang: String}  多语言store
+ * @return String 最终的多语言文本
+ */
 export const _translateName = (location, lang) => {
   if (!location) return ''
   let name
@@ -44,7 +49,13 @@ export const _translateName = (location, lang) => {
   return name || location.name
 }
 
-// todo: 用这个来代替前面的resolveLocationText
+/**
+ * 多语言版本的获取地理位置文本
+ * @param location
+ * @param countries
+ * @param lang
+ * @return {string}
+ */
 export function resolveI18nLocationText(location, countries, lang) {
   const loc = resolveLocationText(location, countries)
 
