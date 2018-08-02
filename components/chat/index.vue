@@ -552,7 +552,7 @@
             position: relative;
             margin-top: 7px;
             float: left;
-            max-width: 250px;
+            max-width: 285px;
             padding: 15px 15px 15px 20px;
             border-radius: 4px;
             word-wrap: break-word;
@@ -591,7 +591,7 @@
             position: relative;
             margin-top: 7px;
             float: right;
-            max-width: 250px;
+            max-width: 285px;
             padding: 15px 20px 15px 15px;
             border-radius: 4px;
             word-wrap: break-word;

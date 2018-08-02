@@ -29,7 +29,7 @@
       border-bottom: solid 1px #eeeeee;
     }
     .sidebar-info-item {
-      margin-bottom: 14px;
+      margin-bottom: 12px;
       color: #6f6f6f;
 
       .sidebar-info-item-title {

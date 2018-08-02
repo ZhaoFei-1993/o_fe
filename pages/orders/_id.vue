@@ -353,7 +353,7 @@
       </div>
     </div>
     <div class="sidebar">
-      <CBlock class="my-sidebar-info" :x="0" :y="20">
+      <CBlock class="my-sidebar-info" style="padding: 30px 0 13px 0;">
         <UserStatsProfile :user-data="counterparty" v-if="counterparty"
                           :is-merchant="counterparty.id===order.merchant_id"/>
       </CBlock>

@@ -64,7 +64,8 @@
           <span style="font-size: 12px;">币种：</span>
           <b-form-select class="history-filter-select"
                          v-model="historyQueryParams.coin_type"
-                         :options="[{ text: '全部', value: null }, ...constant.COIN_TYPE_OPTIONS]">
+                         :options="constant.COIN_TYPE_OPTIONS">
+            <option slot="first" :value="null">不限</option>
           </b-form-select>
         </div>
         <div style="display: inline-block;margin-left: 30px;">
@@ -72,6 +73,7 @@
           <b-form-select class="history-filter-select"
                          v-model="historyQueryParams.business_type"
                          :options="operationOptions">
+              <option slot="first" :value="null">不限</option>
           </b-form-select>
         </div>
       </div>
@@ -340,12 +342,12 @@
         return []
       },
       operationOptions() {
-        return [{text: '全部', value: null}, ...Object.keys(this.bussinessTypeMap).map(key => {
+        return Object.keys(this.bussinessTypeMap).map(key => {
           return {
             text: this.bussinessTypeMap[key],
             value: key,
           }
-        })]
+        })
       }
     },
     watch: {
