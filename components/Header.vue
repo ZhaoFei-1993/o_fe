@@ -186,11 +186,6 @@
       <b-navbar-nav class="ml-auto">
         <div v-if="user.account">
           <b-link class="order-link" to="/orders"><i class="iconfont icon-order-list"></i>订单</b-link>
-          <!--TODO 暂时不做-->
-          <!--<b-nav-item-dropdown id="user-dropdown" text="订单">-->
-
-          <!--<b-dropdown-item v-for="order in orders">示例订单</b-dropdown-item>-->
-          <!--</b-nav-item-dropdown>-->
           <span style="color: #d5d5d5">|</span>
           <button class="message-button" hidden><i class="iconfont icon-message"></i></button>
           <b-nav-item-dropdown id="user-dropdown" :text="simplifyUserName(user.account.name)">

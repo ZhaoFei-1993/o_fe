@@ -142,18 +142,18 @@
       </MyInfoItem>
       <MyInfoItem v-else-if="merchant.auth_status === constant.MERCHANT_AUTH_STATUS.NO" title="商家认证">
         <template slot="content">
-          <p data-todo="文案" class="c-brand-green">您未通过商家认证审核。</p>
+          <p class="c-brand-green">您未通过商家认证审核。</p>
           <p>驳回原因：{{merchant.remark||'认证审核资料不符合要求'}}</p>
         </template>
         <b-btn slot="action" variant="outline-green" size="xs" @click="onReSubmit">重新提交</b-btn>
       </MyInfoItem>
       <MyInfoItem v-else-if="merchant.auth_status === constant.MERCHANT_AUTH_STATUS.CANCEL" title="商家认证">
-        <p slot="content" class="c-brand-green" data-todo="文案">审核申请已取消</p>
+        <p slot="content" class="c-brand-green">审核申请已取消</p>
 
         <b-btn slot="action" variant="outline-green" size="xs" @click="onReSubmit">重新提交</b-btn>
       </MyInfoItem>
       <MyInfoItem v-else title="商家认证">
-        <p slot="content" class="c-brand-green" data-todo="文案">未认证</p>
+        <p slot="content" class="c-brand-green">未认证</p>
 
         <b-btn slot="action" variant="outline-green" size="xs" @click="onReSubmit">提交认证信息</b-btn>
       </MyInfoItem>
@@ -312,7 +312,7 @@
         isVideoSent: false,
         isContractRead: false,
         MERCHANT_REQUIRED_CET_AMOUNT: 50000,
-        VERIFY_EMAIL: 'bd@coinex.com', // todo:是这个？
+        VERIFY_EMAIL: 'bd@coinex.com',
         formEditing: false,
         coinexDomain,
       }
