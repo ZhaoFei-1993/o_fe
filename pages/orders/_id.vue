@@ -329,7 +329,7 @@
           </div>
           <div v-if="appeal.status===constant.APPEAL_STATUS.CANCEL">
             <span>{{appealSide}}已取消申诉，如果仍有问题，请</span>
-            <b-link href="https://otc.coinex.com/res/support/ticket" target="_blank">提交工单</b-link>
+            <b-link :href="`${coinexDomain}/res/support/ticket`" target="_blank">提交工单</b-link>
           </div>
           <div v-if="appeal.status===constant.APPEAL_STATUS.COMPLETED">
             <span>申诉裁决：{{appealResult}}</span>
@@ -402,6 +402,7 @@
   import UserStatsProfile from '~/components/user-stats-profile.vue'
   import QrcodePopover from '~/components/qrcode-popover.vue'
   import ConfirmReceipt from './_c/confirm-receipt'
+  import {coinexDomain} from '~/modules/variables'
   import {mapState} from 'vuex'
 
   const PAID_CAN_APPEAL = 30 * 60 * 1000 // 三十分钟
@@ -426,6 +427,7 @@
         appealComment: null,
         appealReason: null,
         showConfirmReceiptModal: false,
+        coinexDomain,
       }
     },
     components: {
