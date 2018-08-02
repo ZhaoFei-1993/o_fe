@@ -1,5 +1,5 @@
 <template>
-  <div class="th-filter">
+  <div class="th-filter" v-click-outside="hide">
     <span style="cursor: pointer;" @click="showSideType = !showSideType"><span>{{ title }}</span><i class="iconfont icon-arrowdown"></i></span>
     <div class="filter-dropdown-wrapper" v-show="showSideType">
       <ul>
@@ -13,6 +13,8 @@
 </template>
 
 <script>
+  import ClickOutside from 'vue-click-outside'
+
   export default {
     props: {
       options: {
@@ -35,10 +37,16 @@
         activeId: 0,
       }
     },
+    directives: {
+      ClickOutside,
+    },
     mounted() {
       this.title = this.label
     },
     methods: {
+      hide() {
+        this.showSideType = false
+      },
       onClickDropdown({ index, option }) {
         this.showSideType = false
         if (this.activeId === index) return // 重复点击同一个item不触发事件

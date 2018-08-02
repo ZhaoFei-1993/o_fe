@@ -352,7 +352,7 @@
                           :is-merchant="counterparty.id===order.merchant_id"/>
       </CBlock>
       <CBlock id="my-chat-box">
-        <Chat :client="chat.imClient" :conversation-id="convId" :client-id="`${user.account.id}`"></Chat>
+        <Chat :client="chat.imClient" :conversation-id="order.conversation_id" :client-id="`${user.account.id}`"></Chat>
       </CBlock>
     </div>
     <b-modal ref="appealModal"
@@ -420,7 +420,6 @@
         appealComment: null,
         appealReason: null,
         showConfirmReceiptModal: false,
-        convId: '',
       }
     },
     components: {
@@ -599,7 +598,6 @@
         this.axios.order.getOrderById(this.id).then(response => {
           if (response.code === 0) {
             this.order = response.data
-            this.convId = this.order.conversation_id // 聊天对话id
             this.selectedMethod = this.order.payment_methods[0]
             this.counterparty = this.user.account.id === this.order.user_id ? this.order.merchant : this.order.user
             this.orderExpireTime = (this.order.place_time + ORDER_PAY_TIME * 60) * 1000
