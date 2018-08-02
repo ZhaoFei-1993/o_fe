@@ -136,7 +136,7 @@
         添加支付方式
       </b-btn>
     </h3>
-    <p class="layout-my-desc" data-todo="同类最多激活一种吧？">必须使用您本人的实名账户，被开启的支付方式将在交易时向买方展示，最多开启3种</p>
+    <p class="layout-my-desc">必须使用您本人的实名账户，被开启的支付方式将在交易时向买方展示，最多开启3个</p>
 
     <MyInfoItem v-for="(payment, index) in user.payments" :key="index">
       <div slot="title">

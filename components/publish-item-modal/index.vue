@@ -144,8 +144,8 @@
         <b-form-radio-group v-model="form.pricing_type" :options="pricingTypeOptions" class="mb-10"></b-form-radio-group>
 
         <div v-if="form.pricing_type === constant.PRICING_TYPE.FIXED" class="mt-25">
-          <div class="input-label" todo="todo:应该是参考价格吧？">
-            当前市场价格
+          <div class="input-label">
+            当前参考价格
             <b-btn variant="plain-yellow" size="xxs" @click="onSetPrice2MarketPrice">{{marketPrice}}</b-btn>
             <CTooltip v-if="form.coin_type !== 'USDT'" content="采用Bitfinex、Coinbase和Bitstamp 三个交易所的平均价格，仅供参考。" x="4"/>
           </div>
@@ -155,7 +155,7 @@
         <div v-else class="item-float-price-container">
           <div class="item-price-container">
             <div class="input-label">
-              当前市场价格
+              当前参考价格
               <b-btn variant="plain-yellow" size="xxs" @click="onSetPrice2MarketPrice">{{marketPrice}}</b-btn>
               <CTooltip v-if="form.coin_type !== 'USDT'" content="采用Bitfinex、Coinbase和Bitstamp 三个交易所的平均价格，仅供参考。" x="4"/>
             </div>

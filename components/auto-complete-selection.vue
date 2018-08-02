@@ -99,9 +99,6 @@
         type: String,
         default: 'id',
       },
-      onSelect: {
-        type: Function,
-      },
       disabled: {
         type: Boolean,
         default: false,
@@ -127,8 +124,6 @@
         }
         this.showOptions = false
 
-        // todo:暂时两种方式共存，后面要只留事件形式的
-        this.onSelect && this.onSelect(option)
         this.$emit('change', option)
       },
       onBlur() {
@@ -167,8 +162,7 @@
 <style lang="scss">
   .auto-complete-selection {
     position: relative;
-    /*padding: 4px 0;*/
-    // 这里为什么有padding了？todo
+
     input {
       height: 32px;
       background-color: transparent;

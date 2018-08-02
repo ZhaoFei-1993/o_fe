@@ -11,7 +11,6 @@
     </div>
     <PublishModal v-model="modalShowing" @published="onPublished"/>
   </div>
-  <!--todo: 根据现在状态发布币种、方向-->
 </template>
 
 <script>
