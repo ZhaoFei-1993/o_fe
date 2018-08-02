@@ -35,7 +35,7 @@
           <div class="linkBox">
             <p class="boxTitle">支持</p>
             <b-link :href="`${coinexDomain}/service`">新手帮助</b-link>
-            <b-link :href="`${coinexDomain}/privacy`">提交工单</b-link>
+            <b-link :href="`${coinexDomain}/res/support/ticket`">提交工单</b-link>
             <b-link :href="`${coinexDomain}/privacy`">公告</b-link>
           </div>
         </div>
