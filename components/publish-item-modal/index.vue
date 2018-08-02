@@ -11,9 +11,10 @@
       margin-bottom: 5px;
     }
 
-    div[role="group"] {
-      /*display: flex;*/
+    .b-form-group {
+      margin-bottom: 30px;
     }
+
     // layout
     .col-left,
     .col-right {
@@ -94,6 +95,23 @@
       }
     }
 
+    .auto-reply-group {
+      position: relative;
+
+      .auto-reply-content-limit {
+        margin-top: 2px;
+        position: absolute;
+        width: 100%;
+        text-align: right;
+        font-size: 14px;
+        color: #6f6f6f;
+      }
+    }
+
+    .counterparty-limit-group {
+      margin-bottom: -5px;
+    }
+
     .more-setting-container {
       display: flex;
       justify-content: space-between;
@@ -102,9 +120,6 @@
       .btn-more-setting {
         font-size: 18px;
       }
-    }
-
-    .btn-more-setting {
     }
   }
 </style>
@@ -225,15 +240,15 @@
           </div>
         </b-form-group>
 
-        <b-form-group label="自动回复">
+        <b-form-group label="自动回复" class="auto-reply-group">
           <b-form-textarea v-model="form.auto_reply_content" rows="3" class="fz-14"></b-form-textarea>
           <EMsgs :result="$v.form" :messages="itemValidations.messages" keyName="auto_reply_content" class="ps-a"/>
-          <p class="text-right" :class="{'c-red': form.auto_reply_content.length > constant.MAX_AUTO_REPLY_LENGTH}">
+          <p class="auto-reply-content-limit" :class="{'c-red': form.auto_reply_content.length > constant.MAX_AUTO_REPLY_LENGTH}">
             {{form.auto_reply_content.length}} / {{constant.MAX_AUTO_REPLY_LENGTH}}字
           </p>
         </b-form-group>
 
-        <b-form-group label="交易方限制">
+        <b-form-group label="交易方限制" class="counterparty-limit-group">
           <b-form-checkbox-group v-model="form.counterparty_limit"
                                  :options="constant.COUNTERPARTY_LIMIT_OPTIONS"
                                  class="fz-14" style="line-height: 21px;">
