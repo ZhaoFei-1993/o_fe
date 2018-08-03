@@ -6,18 +6,31 @@
       width: 100%;
       height: 40px;
       background-color: #fffcf6;
-      .container {
-        height: 100%;
+
+      .announcement-container {
+        display: flex;
+        align-items: center;
         position: relative;
+        max-width: 1200px;
+        margin: 0 auto;
+        height: 100%;
+        line-height: 16px;
       }
+
       .announcement-title {
+        display: inline-block;
+        max-width: 300px;
+        padding: 0 25px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
         color: $brandYellow;
-        margin-left: 1rem;
-        padding: 0 10px;
-        &:not(:last-of-type) {
-          border-right: 1px solid $brandYellow;
+
+        &:not(:first-of-type) {
+          border-left: 1px solid $brandYellow;
         }
       }
+
       .more {
         position: absolute;
         right: 0;
@@ -231,12 +244,12 @@
 <template>
   <div class="page-index">
     <div class="announcement-bar">
-      <div class="container d-flex align-items-center">
-        <span><i class="iconfont icon-announcement"></i>公告:</span>
-        <span class="announcement-title">公告1</span>
-        <span class="announcement-title">公告2</span>
-        <span class="announcement-title">公告3</span>
-        <b-link class="more" href="#">更多 &gt;</b-link>
+      <div class="announcement-container">
+        <i class="iconfont icon-announcement mr-10"></i>公告：
+        <b-link v-for="(announcement, index) in announcements" class="announcement-title" :href="announcement.href" target="_blank" :key="index">
+          {{announcement.title}}
+        </b-link>
+        <b-link class="more" href="todo">更多 &gt;</b-link>
       </div>
     </div>
     <div class="layout-content">
@@ -433,6 +446,7 @@
         pager: defaultPager,
         noKycLimit: NO_KYC_LIMIT,
         requestItems: null,
+        announcements: []
       }
     },
     asyncData({app, store, route}) {
@@ -452,6 +466,7 @@
     },
     mounted() {
       this.getItems()
+      this.getAnnouncements()
       this.requestItems = setInterval(this.getItems, refreshInterval)
       // browser only
       this.Visibility = require('visibilityjs')
@@ -474,6 +489,11 @@
       clearInterval(this.requestItems)
     },
     methods: {
+      getAnnouncements() {
+        this.axios.misc.announcements().then(data => {
+          this.announcements = data.announcements.slice(0, 3)
+        })
+      },
       showItems(side, coin) {
         // 重置page
         this.pager.currentPage = 1

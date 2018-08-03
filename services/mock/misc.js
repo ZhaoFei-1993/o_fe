@@ -20,3 +20,34 @@ export const constant = {
     ]
   }
 }
+
+export const announcements = {
+  data: {
+    announcements: [{
+      title: '这是一个公告',
+      cn_title: '这是一个公告',
+      en_title: '这是一个公告',
+      href: 'http://dev.otc.coinex.com/',
+    }, {
+      title: '这是一个公告',
+      cn_title: '这是一个公告',
+      en_title: '这是一个公告',
+      href: 'http://dev.otc.coinex.com/',
+    }, {
+      title: '这是一个公告',
+      cn_title: '这是一个公告',
+      en_title: '这是一个公告',
+      href: 'http://dev.otc.coinex.com/',
+    }, {
+      title: '这是一个公告',
+      cn_title: '这是一个公告',
+      en_title: '这是一个公告',
+      href: 'http://dev.otc.coinex.com/',
+    }, {
+      title: '这是一个公告',
+      cn_title: '这是一个公告',
+      en_title: '这是一个公告',
+      href: 'http://dev.otc.coinex.com/',
+    }]
+  }
+}
