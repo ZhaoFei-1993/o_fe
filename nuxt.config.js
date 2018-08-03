@@ -31,6 +31,12 @@ module.exports = {
     ],
     link: [
       {rel: 'icon', type: 'image/ico', sizes: '48x48', href: '/favicon.ico'},
+      {
+        rel: 'stylesheet',
+        type: 'text/css',
+        charset: 'utf-8',
+        href: '//cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/6.0.0/sanitize.min.css'
+      },
     ],
   },
   render: {

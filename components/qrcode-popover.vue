@@ -19,10 +19,10 @@
 
 <template>
   <div class="qrcode-popover">
-    <span :id="`qr-${id}`">
+    <span :id="`qr-${targetId}`">
       <i class="iconfont icon-qrcode"></i>
     </span>
-    <b-popover :target="`qr-${id}`" placement="top" triggers="hover">
+    <b-popover :target="`qr-${targetId}`" placement="top" triggers="hover">
       <img class="qrcode-popover-image" :src="src">
     </b-popover>
   </div>
@@ -35,12 +35,10 @@ export default {
   },
   props: {
     src: String,
+    targetId: {
+      type: [Number, String],
+      default: Date.now(),
+    },
   },
-  data() {
-    return {
-      // 随机生成一个id待用
-      id: (Math.random() * 10000).toFixed(0)
-    }
-  }
 }
 </script>

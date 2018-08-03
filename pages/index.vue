@@ -249,7 +249,7 @@
         <b-link v-for="(announcement, index) in announcements" class="announcement-title" :href="announcement.href" target="_blank" :key="index">
           {{announcement.title}}
         </b-link>
-        <b-link class="more" href="todo">更多 &gt;</b-link>
+        <b-link class="more" href="https://support.coinex.com/hc/zh-cn/sections/360001631693" target="_blank">更多 &gt;</b-link>
       </div>
     </div>
     <div class="layout-content">

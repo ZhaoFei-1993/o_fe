@@ -46,6 +46,10 @@
       .switch {
         margin-bottom: 0;
       }
+      .payment-status-text {
+        display: inline-block;
+        width: 30px;
+      }
     }
 
     .payment-modal {
@@ -119,10 +123,6 @@
           color: $brandGreen;
         }
       }
-
-      .kyc-step-number {
-
-      }
     }
   }
 </style>
@@ -155,13 +155,13 @@
 
         <template v-else>
           <span class="mr-3">{{payment.account_no}}</span>
-          <QrcodePopover v-if="payment.qr_code_image_url" :src="payment.qr_code_image_url" class="ml-1" style="vertical-align: -1px;"/>
+          <QrcodePopover :target-id="payment.id" v-if="payment.qr_code_image_url" :src="payment.qr_code_image_url" class="ml-1" style="vertical-align: -1px;"/>
         </template>
       </div>
 
       <div slot="action" class="payment-action">
         <div class="payment-status">
-          {{payment.status.toUpperCase()}}
+          <span class="payment-status-text">{{payment.status.toUpperCase()}}</span>
           <ToggleButton class="ml-2" :value="payment.status === constant.PAYMENT_STATUS.ON"
                         @change="(checked) => onPaymentStatusChange(payment, checked)"/>
         </div>

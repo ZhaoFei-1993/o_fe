@@ -1,6 +1,6 @@
 /* eslint-disable */
 
-if (process.env.NODE_ENV === 'production') {
+if (process.env.MODE === 'production') {
   /*
   ** Include Google Analytics Script
   */
@@ -14,7 +14,7 @@ if (process.env.NODE_ENV === 'production') {
   ** Set the current page
   */
   // debugger
-  ga('create', 'UA-74680231-8', {siteSpeedSampleRate: 100})
+  ga('create', 'UA-74680231-9', {siteSpeedSampleRate: 100})
   /*
   ** Every time the route changes (fired on initialization too)
   */
