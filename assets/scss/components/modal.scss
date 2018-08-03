@@ -1,37 +1,50 @@
 /* 定制 bootstrap-vue 的 modal 的样式 */
 .modal {
-  &.show .modal-dialog{
+  &.show .modal-dialog {
     margin-top: 50px;
   }
 }
 
-.modal-dialog {
+.modal-dialog.modal-md {
   @media screen and (min-width: 620px) {
     max-width: 560px;
   }
 
   @media screen and (min-width: 660px) {
-    max-width: 600px;
+    max-width: 560px;
   }
 }
 
 .modal-content {
   padding-bottom: 20px;
+  border-radius: 0;
 }
 
 .modal-header {
-  padding: 30px 15px 10px 15px;
   border-bottom: 0;
-  font-size:22px;
-
+  padding-top: 40px;
+  padding-bottom: 10px;
+  font-size: 22px;
+  color: #192330;
+  font-family: PingFangSC, sans-serif;
+  position: relative;
+  &:before {
+    content: '';
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 6px;
+    background-image: linear-gradient(to left, #ffc21e, #00c1ce);
+  }
   .close {
-    font-size: 40px;
     font-weight: 400;
     line-height: 40px;
     position: absolute;
     top: -2px;
     right: 10px;
     outline: 0;
+    font-size: 24px !important;
   }
 
   .modal-title {
@@ -43,21 +56,17 @@
 }
 
 .modal-body {
-  padding: 15px 50px;
+  padding: 20px 50px;
 }
 
 .modal-footer {
   border-top: 0;
   justify-content: center;
 
-  // 确定按钮，在前
-  .btn-yellow {
-
+  .btn-outline-green {
+    margin-right: 20px;
   }
 
-  // 取消按钮在后
-  .btn-outline-green {
-    order: 1;
-    margin-left: 20px;
+  .btn-gradient-yellow {
   }
 }

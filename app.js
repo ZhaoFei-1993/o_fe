@@ -28,14 +28,6 @@ const nuxt = new Nuxt(config)
 
 // Build only in dev mode
 if (config.dev) {
-  // logger
-  app.use(async function (ctx, next) {
-    const start = new Date()
-    await next()
-    const ms = new Date() - start
-    console.info(`koa:render ${ctx.method} ${ctx.url} - ${ms}ms`)
-  })
-
   if (!isApiDev && !isPm2Dev) {
     // API调试模式下，不build
     const builder = new Builder(nuxt)
@@ -44,29 +36,6 @@ if (config.dev) {
       process.exit(1)
     })
   }
-}
-
-if (config.dev) { // 本地开发mock接口
-  const jsonServer = require('json-server') // 基于express的，我们的server是koa，不过同时存在也不太影响
-  const cookieParser = require('cookie-parser')
-  const db = require('./server/mock/db')
-  const middleware = require('./server/mock/middleware')
-  const server = jsonServer.create()
-  const router = jsonServer.router(db())
-  const defaultMiddlewares = jsonServer.defaults()
-  server.use(jsonServer.rewriter({
-    '/api/*': '/$1',
-  }))
-  server.use(cookieParser())
-  server.use((req, res, next) => {
-    return middleware(req, res, next)
-  })
-  server.use(defaultMiddlewares)
-  server.use(router)
-
-  server.listen(4006, () => {
-    console.log('JSON Server is running on localhost:4006')
-  })
 }
 
 // http路由

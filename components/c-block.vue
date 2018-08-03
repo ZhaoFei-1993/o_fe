@@ -6,7 +6,7 @@
 </style>
 
 <template>
-  <div class="c-block" :style="{padding: `${x}px ${y}px`}">
+  <div class="c-block default-box-shadow" :style="{padding: `${y}px ${x}px`}">
     <slot/>
   </div>
 </template>
@@ -15,12 +15,14 @@
 export default {
   name: 'c-block',
   props: {
+    // 横向padding
     x: {
-      type: Number,
+      type: [Number, String],
       default: 30,
     },
+    // 纵向padding
     y: {
-      type: Number,
+      type: [Number, String],
       default: 30,
     },
   },

@@ -9,7 +9,7 @@
 
 <template>
   <div class="tab-buttons">
-    <b-button v-for="(tab, index) in tabs" class="tab-button" :variant="active === index ? 'yellow' : 'outline-yellow'" size="sm" @click="onClick(index)">
+    <b-button v-for="(tab, index) in tabs" class="tab-button" :variant="value === tab.value ? 'yellow' : 'outline-yellow'" size="sm" @click="onClick(index)" :key="index">
       {{tab.text}}
     </b-button>
   </div>
@@ -21,13 +21,13 @@ export default {
   components: {
   },
   props: {
-    active: Number,
-    tabs: Array,
+    value: [Number, String],
+    tabs: Array,      // Array<{text:String, value:String}>
   },
   methods: {
     onClick(index) {
-      // this.$emit('input', index)
-      this.$emit('click', index)
+      this.$emit('input', index)
+      // this.$emit('click', index)
     },
   },
 }

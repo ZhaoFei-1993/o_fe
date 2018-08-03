@@ -9,27 +9,80 @@ $background-red: #e45555;
   padding-top: 0;
   padding-bottom: 0;
   border-width: 2px;
+  box-sizing: border-box;
   color: #fff;
   transition: color 0.15s ease-in-out,
-              background-color 0.15s ease-in-out,
-              border-color 0.15s ease-in-out,
-              box-shadow 0.15s ease-in-out;
+  background-color 0.15s ease-in-out,
+  border-color 0.15s ease-in-out,
+  box-shadow 0.15s ease-in-out;
 
   &:focus,
   &.focus {
     box-shadow: 0 0 0 !important;
   }
-
   &[disabled] {
-    cursor: default !important;
+    cursor: not-allowed;
+    border: 2px solid $gray;
+    color: $gray;
+    background: none;
+    &:hover {
+      border: 2px solid $gray;
+      color: $gray;
+      background: none;
+    }
   }
+}
+
+.btn-xl {
+  min-width: 360px;
+  line-height: 44px;
+  font-size: 22px;
+  border-radius: 48px;
+  height: 48px;
+}
+
+.btn-lg {
+  min-width: 220px;
+  padding: 0 24px;
+  font-size: 22px;
+  line-height: 38px;
+  border-radius: 44px;
+  height: 42px;
+}
+
+.btn-sm {
+  min-width: 160px;
+  padding-left: 20px;
+  padding-right: 20px;
+  line-height: 30px;
+  font-size: 22px;
+  border-width: 2px;
+  border-radius: 34px;
+  height: 34px;
+}
+
+.btn-xs {
+  min-width: 100px;
+  line-height: 26px;
+  font-size: 16px;
+  border-radius: 30px;
+  height: 30px;
+}
+
+.btn-xxs {
+  min-width: 40px;
+  line-height: 22px;
+  font-size: 14px;
+  border-width: 1px;
+  border-radius: 100px;
+  height: 26px;
 }
 
 .btn-green {
   background-color: $brandGreen;
   border: none;
   &:hover {
-    box-shadow:0 5px 20px 0 #d3d3d3;
+    box-shadow: 0 5px 20px 0 #d3d3d3;
     color: #ffffff;
   }
   &:active {
@@ -41,7 +94,7 @@ $background-red: #e45555;
   background-image: $image-gradient-green;
   border: none;
   &:hover {
-    box-shadow:0 5px 20px 0 #d3d3d3;
+    box-shadow: 0 5px 20px 0 #d3d3d3;
     color: white;
   }
   &[disabled]:hover {
@@ -57,15 +110,13 @@ $background-red: #e45555;
   border-color: $brandGreen;
   color: $brandGreen;
 
-  &:hover {
-    background-color: $brandGreen;
-    border-color: transparent;
-    color: #fff;
+  &.btn-xxs {
+    font-size: 12px;
   }
-  &[disabled]:hover {
-    background-color: transparent;
-    border-color: $brandGreen;
-    color: $brandGreen;
+
+  &:hover, &:focus, &:active {
+    background-image: $image-gradient-green;
+    color: #fff;
   }
 }
 
@@ -73,6 +124,11 @@ $background-red: #e45555;
   background-color: transparent;
   border-color: #6f6f6f;
   color: #6f6f6f;
+
+  &.btn-xxs {
+    font-size: 12px;
+  }
+
   &:hover {
     background-color: #6f6f6f;
     color: #fff;
@@ -83,12 +139,45 @@ $background-red: #e45555;
   }
 }
 
+.btn-outline-yellow {
+  background-color: transparent;
+  border-color: $brightYellow;
+  color: $brightYellow;
+
+  &.btn-xxs {
+    font-size: 12px;
+  }
+
+  &:hover, &:focus, &:active {
+    background-image: $image-gradient-yellow;
+    color: #fff;
+    border: none;
+  }
+}
+
+.btn-outline-white {
+  background-color: transparent;
+  border-color: white;
+  color: white;
+
+  &.btn-xxs {
+    font-size: 12px;
+  }
+
+  &:hover {
+    background: white;
+    border-color: transparent;
+    color: #192330;
+  }
+}
+
+
 .btn-yellow {
   background-color: $brandYellow;
   border-color: $brandYellow;
 
   &:hover {
-    box-shadow:0 5px 20px 0 #d3d3d3;
+    box-shadow: 0 5px 20px 0 #d3d3d3;
     color: #fff;
   }
   &:active {
@@ -98,46 +187,60 @@ $background-red: #e45555;
 
 .btn-gradient-yellow {
   background-image: $image-gradient-yellow;
-
+  border: none;
   &:hover {
-    box-shadow:0 5px 20px 0 #d3d3d3;
-    color: #fff;
+    box-shadow: 0 5px 20px 0 #d3d3d3;
   }
   &[disabled]:hover {
     box-shadow: none;
   }
   &:active {
-    background-image: $image-gradient-yellow;
-  }
-}
-
-.btn-outline-yellow {
-  background-color: transparent;
-  border-color: $brandYellow;
-  color: $brandYellow;
-
-  &:hover {
-    background-color: $brandYellow;
-    border-color: transparent;
-    color: #fff;
-  }
-}
-
-.btn-outline-white {
-  background-color: transparent;
-  border-color: white;
-  color: white;
-  &:hover {
-    background:white;
-    border-color: transparent;
-    color: #192330;
+    background-image: $image-gradient-yellow !important;
   }
 }
 
 .btn-plain {
-  padding: 0 2px;
+  padding: 0;
+  min-width: 0;
   color: $gray;
   background-color: transparent;
+  vertical-align: unset;
+
+  &:hover {
+    color: $brandGreen;
+  }
+}
+
+.btn-plain-gray {
+  @extend .btn-plain;
+  color: $gray;
+
+  &:hover {
+    color: $gray;
+  }
+}
+
+.btn-plain-light-gray {
+  @extend .btn-plain;
+  color: $lightGray;
+
+  &:hover {
+    color: $lightGray;
+  }
+}
+
+.btn-plain-yellow {
+  @extend .btn-plain;
+  color: $brandYellow;
+
+  &:hover {
+    color: $brandYellow;
+  }
+}
+
+.btn-plain-green {
+  @extend .btn-plain;
+  color: $brandGreen;
 
   &:hover {
     color: $brandGreen;
@@ -148,49 +251,10 @@ $background-red: #e45555;
   background-color: $background-red;
   border: none;
   &:hover {
-    box-shadow:0 5px 20px 0 #d3d3d3;
+    box-shadow: 0 5px 20px 0 #d3d3d3;
   }
   &:active {
     background-color: $background-red;
   }
 }
 
-.btn-xl {
-  min-width: 360px;
-  line-height: 48px;
-  font-size: 22px;
-  border-radius: 48px;
-}
-
-.btn-lg {
-  min-width: 230px;
-  padding: 0 24px;
-  font-size: 22px;
-  line-height: 42px;
-  border-radius: 44px;
-}
-
-.btn-sm {
-  min-width: 160px;
-  padding-left: 20px;
-  padding-right: 20px;
-  line-height: 34px;
-  font-size: 22px;
-  border-width: 2px;
-  border-radius: 34px;
-}
-
-.btn-xs {
-  min-width: 100px;
-  line-height: 28px;
-  font-size: 16px;
-  border-radius: 28px;
-}
-
-.btn-xxs {
-  min-width: 40px;
-  line-height: 26px;
-  font-size: 14px;
-  border-width: 1px;
-  border-radius: 100px;
-}

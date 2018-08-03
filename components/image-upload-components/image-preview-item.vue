@@ -3,14 +3,14 @@
 
   .image-preview-item {
     position: relative;
-    height: 130px;
-    width: 190px;
+    height: 120px;
+    width: 120px;
     background: rgba(0, 0, 0, 0.1) no-repeat center;
     background-size: cover;
     background-origin: content-box;
 
     .item-delete-image {
-      display: none;
+      display: flex;
       position: absolute;
       top: -12px;
       right: -12px;
@@ -27,10 +27,6 @@
       .icon-trash {
         font-size: 12px;
       }
-    }
-
-    &:hover .item-delete-image {
-      display: flex;
     }
   }
 </style>

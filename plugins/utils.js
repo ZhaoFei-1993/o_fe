@@ -26,7 +26,84 @@ const emailDomainMap = {
 
 const imgTypeArr = ['JPEG', 'TIFF', 'RAW', 'BMP', 'GIF', 'PNG', 'JPG']
 
+/**
+ * 格式化时间
+ * @param  {Number} timestamp 时间戳，秒为单位
+ * @param  {String} precision 精确度
+ * @return {String}           格式化后的时间字符串
+ */
+export const getTimeText = (timestamp, precision = 'second') => {
+  const time = new Date(timestamp * 1000)
+  let timeText = ''
+  switch (precision) {
+    case 'second':
+      timeText =
+        time.getSeconds() > 9 ? time.getSeconds() : '0' + time.getSeconds()
+    case 'minute': // eslint-disable-line no-fallthrough
+      if (precision !== 'minute') {
+        timeText = ':' + timeText
+      }
+      timeText =
+        (time.getMinutes() > 9
+          ? time.getMinutes()
+          : '0' + time.getMinutes()) + timeText
+    case 'hour': // eslint-disable-line no-fallthrough
+      if (precision !== 'hour') {
+        timeText = ':' + timeText
+      }
+      timeText =
+        (time.getHours() > 9 ? time.getHours() : '0' + time.getHours()) +
+        timeText
+    case 'day': // eslint-disable-line no-fallthrough
+      if (precision !== 'day') {
+        timeText = ' ' + timeText
+      }
+      timeText =
+        (time.getDate() > 9 ? time.getDate() : '0' + time.getDate()) +
+        timeText
+    case 'month': // eslint-disable-line no-fallthrough
+      if (precision !== 'month') {
+        timeText = '-' + timeText
+      }
+      timeText =
+        (time.getMonth() + 1 > 9
+          ? time.getMonth() + 1
+          : '0' + (time.getMonth() + 1)) + timeText
+    case 'year': // eslint-disable-line no-fallthrough
+      if (precision !== 'year') {
+        timeText = '-' + timeText
+      }
+      timeText = time.getFullYear() + timeText
+      break
+    default:
+      break
+  }
+  return timeText
+}
+
+/**
+ * 显示时长
+ * @param  {Number} durationNum 时间秒数
+ * @param  {String} format 格式
+ * @return {String} 时间长度，例如 1天2小时3分钟4秒
+ */
+export const formatDuration = (durationNum, format = null) => {
+  if (!durationNum) {
+    return '--'
+  }
+  const day = Math.floor(durationNum / 86400)
+  const hour = Math.floor((durationNum % 86400) / 3600)
+  const minute = Math.floor((durationNum % 3600) / 60)
+  const second = Math.floor(durationNum % 60)
+  if (format) {
+    return format.replace(/d/i, day).replace(/h/i, hour).replace(/m/i, minute).replace(/s/i, second)
+  }
+  return (day ? (day + '天') : '') + (hour ? (hour + '小时') : '') + (durationNum < 86400 && minute ? (minute + '分钟') : '') + (durationNum < 3600 && second ? (second + '秒') : '')
+}
+
 const utils = {
+  getTimeText,
+  formatDuration,
   isImage(fileName) {
     const arr = fileName.split('.')
     if (!arr.length) return false
@@ -175,6 +252,37 @@ const utils = {
         }, delay)
       }
     }
+  },
+  /**
+   * 将放在一起的validator 和 message 分开（放在一起是方便管理，分开是方便使用）
+   * @param validationConfig
+   * @return {{validations: {}, invalidMessages: {}}}
+   */
+  processValidationConfig(validationConfig) {
+    const validations = {}
+    const invalidMessages = {}
+
+    for (const key in validationConfig) {
+      validations[key] = validationConfig[key].validation
+      invalidMessages[key] = validationConfig[key].message
+    }
+
+    return {
+      validations,
+      invalidMessages,
+      messages: invalidMessages,
+    }
+  },
+  /**
+   * 计算时间距离
+   * @param  {String} origin 起始时间
+   * @param  {String} target 目标时间（默认当前时间）
+   * @return {Number}    换算成毫秒差距返回， ('2018-08-08T08:08:08','2018-08-08T08:08:09') 将返回 1000,负数代表origin在将来
+   */
+  getTimeDifference(originTimeStamp, target = null) {
+    const originTime = new Date(originTimeStamp * 1000).getTime()
+    const targetTime = target ? new Date(target).getTime() : Date.now()
+    return targetTime - originTime
   },
 }
 

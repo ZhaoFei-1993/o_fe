@@ -1,3 +1,4 @@
+<!--一个用于 文本中有占位符需要被替换 的组件-->
 <style lang="scss">
   .component-language {
     /*display: inline-block;*/

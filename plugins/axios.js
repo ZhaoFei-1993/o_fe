@@ -1,8 +1,9 @@
 import Vue from 'vue'
 import axios from 'axios'
-import { serverApiDomain, clientApiDomain, loginPage, webDomain } from '../modules/variables'
+import {serverApiDomain, clientApiDomain, loginPage, webDomain} from '../modules/variables'
 import cookieParser from '~/plugins/cookies'
 import injectServices from '../services/index'
+import {onApiError} from '~/modules/error-code'
 
 function sleep(ms = 100) {
   return new Promise(function (resolve, reject) {
@@ -12,9 +13,13 @@ function sleep(ms = 100) {
   })
 }
 
-export default ({ app, store }) => {
+export default ({app, store}) => {
   const options = {
     baseURL: process.client ? clientApiDomain : serverApiDomain,
+    // proxy: {
+    //   host: '127.0.0.1',
+    //   port: '80'
+    // }
   }
   const inst = axios.create(options)
 
@@ -27,9 +32,11 @@ export default ({ app, store }) => {
   // 初始化
   inst.init = function (req) {
     if (process.client) {
-      const lang = /lang=(.*?)(;|$)/gi.exec(document.cookie)
-      if (lang && lang.length) {
-        inst.defaults.headers.common['Accept-Language'] = lang[1] || store.state.lang.lang
+      const cookieString = document.cookie
+      if (cookieString) {
+        const cookies = cookieParser.parse(cookieString)
+        inst.defaults.headers.common['Accept-Language'] = cookies.lang || store.state.lang.lang
+        inst.defaults.headers.common['Authorization'] = cookies.token
       }
       // if (token && token.length) {
       //   inst.defaults.headers.common['Authorization'] = token[1]
@@ -37,20 +44,24 @@ export default ({ app, store }) => {
       //   console.log('delete Authorization')
       //   delete inst.defaults.headers.common['Authorization']
       // }
+
+      return inst
     } else {
+      if (!req) throw new Error('没有传入 req 参数')
       const cookieString = req.headers.cookie
       const cookies = cookieString ? cookieParser.parse(cookieString) : {}
       const lang = cookies.lang || store.state.lang.lang || req.headers['Accept-Language']
-
-      // todo:感觉这种用户信息(cookie)挂载到全局的方式，会有安全隐患。
-      // 用户可能会串cookie，因为每个用户的cookie都会走一遍全局，因此可能不知道什么时候因为异步的存在，就串了cookie了
-      // 回来仔细研究下应该怎么做鉴权，感觉这种 init 并不是最好的方式，感觉最佳方式应该是对于每个用户都初始化一个单独的axios实例，或者cookie挂在不同的请求里面，而不是全局里面
+      // 回来仔细研究下应该怎么做鉴权，感觉这种 init 并不是最好的方式。可以用下vue-axios代替
 
       // 防止用户之间串cookie
       if (cookieString) {
         inst.defaults.headers.cookie = cookieString
+        if (cookies && cookies.token) {
+          inst.defaults.headers.common['Authorization'] = cookies.token
+        }
       } else {
         delete inst.defaults.headers.cookie
+        delete inst.defaults.headers.common['Authorization']
       }
 
       // 防止用户之间串语言
@@ -85,7 +96,7 @@ export default ({ app, store }) => {
 
   inst.needAuth = function (err, redirect, path = '/') {
     if (err.code && (err.code === 401 || err.code === 403)) {
-      const loginUrl = `${loginPage}?next=${encodeURIComponent(webDomain + path)}`
+      const loginUrl = `${loginPage}?redirect=${encodeURIComponent(webDomain + path)}`
       try {
         // nuxt的redirect在客户端使用了 window.location.replace，会导致无法回到之前页面，这里处理下
         if (process.client) {
@@ -105,6 +116,9 @@ export default ({ app, store }) => {
 
     console.error(err)
   }
+
+  // 挂载一下api错误处理函数
+  inst.onError = (error) => onApiError(error, app)
 
   inst.interceptors.request.use(
     function (config) {
@@ -148,7 +162,7 @@ export default ({ app, store }) => {
       return response.data
     },
     function (err) {
-      err.code = err.response && err.response.status
+      err.code = (err.response && err.response.status) || err.code
       if (err.response && (err.response.status === 401 || err.response.status === 403)) {
         if (process.client) {
           const token = /token=(.*?)(;|$)/gi.exec(document.cookie)
