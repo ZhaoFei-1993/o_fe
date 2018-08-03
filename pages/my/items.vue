@@ -157,7 +157,7 @@
         <b-btn variant="plain-green" size="xs" class="mx-20" @click="onItemOnlineConfirm">确定</b-btn>
         <b-btn variant="plain" size="xs" @click="onItemOnlineCancel">取消</b-btn>
       </div>
-      <Language v-if="editingItem.coin_type && editingItem.side === constant.SIDE.SELL" text="最多可售[a][/a][c][/c]" class="mt-1" :class="{'c-red': +onlineItemCoinAmount > +balance.otcMap[editingItem.coin_type].available}" tag="div">
+      <Language v-if="editingItem.coin_type && editingItem.side === constant.SIDE.SELL" text="最多可售[a][/a][c][/c]" class="mt-1" :class="{'c-red': !editingAmountValid}" tag="div">
         <span slot="a"> {{balance.otcMap[editingItem.coin_type].available}} </span>
         <span slot="c">{{editingItem.coin_type}}</span>
       </Language>
@@ -213,6 +213,10 @@ export default {
         text: '已下架',
         value: this.constant.ITEM_STATUS.OFFLINE,
       }]
+    },
+    // 正在编辑的广告是否有效
+    editingAmountValid: function () {
+      return Number(this.onlineItemCoinAmount) <= Number(this.balance.otcMap[this.editingItem.coin_type].available)
     },
     itemTableFields: function () {
       const fields = {
@@ -362,7 +366,7 @@ export default {
       })
     },
     onItemOnlineConfirm() {
-      if (Number(this.onlineItemCoinAmount) > Number(this.balance.otcMap[this.editingItem.coin_type].available)) return
+      if (!this.editingAmountValid) return
 
       this.axios.item.online(this.editingItem.id, this.onlineItemCoinAmount).then(res => {
         this.getItems()
