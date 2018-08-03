@@ -1,6 +1,6 @@
 /* eslint-disable */
 
-if (process.env.NODE_ENV === 'production') {
+if (process.env.MODE === 'production') {
   /*
   ** Include Google Analytics Script
   */

@@ -1,6 +1,6 @@
 const log4js = require('log4js')
 
-const isDev = process.env.NODE_ENV !== 'production'
+const isDev = process.env.MODE !== 'production'
 const globalLevel = isDev ? 'TRACE' : 'INFO'
 
 const smtpAppender = {
