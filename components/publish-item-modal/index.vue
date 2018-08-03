@@ -120,6 +120,15 @@
       .btn-more-setting {
         font-size: 18px;
       }
+
+      .icon-double-arrow-down {
+        display: inline-block;
+        transition: 0.4s transform;
+
+        &.upsideDown {
+          transform: rotateZ(180deg);
+        }
+      }
     }
   }
 </style>
@@ -213,7 +222,7 @@
 
       <div class="more-setting-container">
         <b-btn variant="plain-green" class="btn-more-setting" size="xs" @click="onClickMoreSetting">
-          更多设置 <i class="iconfont icon-double-arrow-down ml-1"></i>
+          更多设置 <i class="iconfont icon-double-arrow-down" :class="{'upsideDown': moreSettingShowing}"></i>
         </b-btn>
         <b-btn class="btn-item-setting" variant="plain" to="/my/item-setting" @click="onClickItemSetting">
           广告设置 <CTooltip content="交易限额、自动回复、交易方限制可在广告设置中统一编辑默认值" size="16" :x="2"/>
