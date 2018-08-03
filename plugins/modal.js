@@ -55,7 +55,7 @@ export default ({app, store}) => {
       $modal.okTitle = config.okTitle || $modal.$t('global.misc.确定')
       $modal.cancelTitle = config.cancelTitle || $modal.$t('global.misc.取消')
       $modal.hideFooter = config.hideFooter
-      $modal.noCloseOnBackdrop = typeof config.noCloseOnBackdrop === 'boolean' ? config.noCloseOnBackdrop : false // 默认不可以点背景隐藏
+      $modal.noCloseOnBackdrop = typeof config.noCloseOnBackdrop === 'boolean' ? config.noCloseOnBackdrop : true // 默认不可以点背景隐藏
       $modal.hideHeaderClose = config.hideHeaderClose
 
       $modal.$refs.modal.show()

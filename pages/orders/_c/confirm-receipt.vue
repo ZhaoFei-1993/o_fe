@@ -1,7 +1,7 @@
 <template>
   <b-modal id="confirm-receipt-modal"
-           title="确认收款"
-           ok-title="确认收款放币"
+           title="确认收款放币"
+           ok-title="确认"
            cancel-title="取消"
            cancel-variant="outline-green"
            ok-variant="gradient-yellow"
@@ -13,9 +13,14 @@
            @ok="confirmReceipt"
            @hide="cancelReceipt"
            ref="confirmReceiptModal">
-    <div class="text-left">请务必登录网银、手机银行或者第三方支付账号确认已收到该笔款项。<p class="c-red">如您没有收到买家付款，确认收款后，放行的数字货币将无法追回。</p></div>
+    <div class="text-left tips">
+      请务必登录网银、手机银行或者第三方支付账号确认已收到该笔款项。
+      <p class="c-red">如您没有收到买家付款，确认收款后，放行的数字货币将无法追回。</p>
+    </div>
     <VerifyCode v-if="needVerify"
+                class="verify-code-component"
                 ref="verify-code"
+                :hide-label="true"
                 :needGoogle="user.account.is_have_totp_auth"
                 :needSms="!!user.account.mobile"
                 :sms.sync="verify.sms"
@@ -65,6 +70,8 @@
       showConfirmReceiptModal: function (bool) {
         // 每次显示的时候都把error-message隐藏掉
         if (bool) {
+          this.verify.sms = ''
+          this.verify.google = ''
           this.$refs['verify-code'] && this.$refs['verify-code'].resetValidation()
         }
       }
@@ -105,3 +112,17 @@
     },
   }
 </script>
+<style lang="scss">
+  #confirm-receipt-modal {
+    .tips {
+      font-size: 18px;
+      margin-bottom: 20px;
+      p.c-red {
+        margin-top: 10px;
+      }
+    }
+    .verify-code-component {
+      margin-bottom: 10px;
+    }
+  }
+</style>

@@ -7,6 +7,7 @@
     margin: 0 auto;
     min-height: 900px;
     display: flex;
+    align-items: flex-start;
     .main-content {
       flex: 1;
       padding: 0px;
@@ -149,10 +150,26 @@
         }
       }
       .order-helper {
-        padding: 0 30px 30px;
+        padding: 0 30px;
         font-size: 16px;
         .appeal-btn {
           cursor: pointer;
+        }
+        .divider {
+          margin-top: 25px;
+          border-bottom: 1px solid #eeeeee;
+        }
+      }
+      .order-notice {
+        padding: 10px 30px 30px;
+        .title {
+          font-size: 16px;
+          margin: 10px 0;
+        }
+        .notices {
+          color: #6f6f6f;
+          list-style-type: decimal;
+          list-style-position: inside;
         }
       }
     }
@@ -312,21 +329,36 @@
           </div>
           <div v-if="appeal.status===constant.APPEAL_STATUS.CANCEL">
             <span>{{appealSide}}已取消申诉，如果仍有问题，请</span>
-            <b-link href="https://otc.coinex.com/res/support/ticket" target="_blank">提交工单</b-link>
+            <b-link :href="`${coinexDomain}/res/support/ticket`" target="_blank">提交工单</b-link>
           </div>
           <div v-if="appeal.status===constant.APPEAL_STATUS.COMPLETED">
             <span>申诉裁决：{{appealResult}}</span>
           </div>
         </template>
+        <div class="divider" v-if="canCancel||showAppeal||appeal"></div>
+      </div>
+      <div class="order-notice">
+        <div class="title c-dark">交易须知</div>
+        <ul class="notices" v-if="isBuySide">
+          <li>您支付的法币将直接进入卖方收款账户，交易中卖方的数字货币由平台托管冻结。</li>
+          <li>请尽快完成付款，并务必<span class="c-red">点击“我已付款”</span>，卖方确认收款后，平台将数字货币划转到您的账户。</li>
+          <li>买方当日取消订单达3笔（含超时未支付订单），会被限制当日交易功能。</li>
+          <li>请<span class="c-red">使用即时到账支付方式</span>，付款后2小时内未到账订单，卖方有权要求退款后取消交易，请知悉。</li>
+        </ul>
+        <ul class="notices" v-else>
+          <li>买方支付的法币将直接进入您的收款账户，交易中您的数字货币由平台托管冻结。</li>
+          <li>确认收到买方付款后，请及时<span class="c-red">点击“确认收款”</span>，放行数字货币给买方。</li>
+          <li>收到到账短信后，请<span class="c-red">务必登录收款账户确认款项是否到账</span>，避免因收到诈骗短信错误释放数字货币。</li>
+        </ul>
       </div>
     </div>
     <div class="sidebar">
-      <CBlock class="my-sidebar-info" :x="0" :y="20">
+      <CBlock class="my-sidebar-info" style="padding: 30px 0 13px 0;">
         <UserStatsProfile :user-data="counterparty" v-if="counterparty"
                           :is-merchant="counterparty.id===order.merchant_id"/>
       </CBlock>
       <CBlock id="my-chat-box">
-        <Chat :client="chat.imClient" :conversation-id="convId" :client-id="`${user.account.id}`"></Chat>
+        <Chat :client="chat.imClient" :conversation-id="order.conversation_id" :client-id="`${user.account.id}`"></Chat>
       </CBlock>
     </div>
     <b-modal ref="appealModal"
@@ -370,6 +402,7 @@
   import UserStatsProfile from '~/components/user-stats-profile.vue'
   import QrcodePopover from '~/components/qrcode-popover.vue'
   import ConfirmReceipt from './_c/confirm-receipt'
+  import {coinexDomain} from '~/modules/variables'
   import {mapState} from 'vuex'
 
   const PAID_CAN_APPEAL = 30 * 60 * 1000 // 三十分钟
@@ -394,7 +427,7 @@
         appealComment: null,
         appealReason: null,
         showConfirmReceiptModal: false,
-        convId: '',
+        coinexDomain,
       }
     },
     components: {
@@ -444,7 +477,7 @@
       },
       isBuyerAppeal() {
         if (!this.appeal) return false
-        return this.order.user_side === this.constant.SIDE.BUY && this.appeal.user_id === this.order.user_id
+        return (this.order.user_side === this.constant.SIDE.BUY) === (this.appeal.user_id === this.order.user_id)
       },
       appealSide() {
         if (!this.appeal) return null
@@ -573,7 +606,6 @@
         this.axios.order.getOrderById(this.id).then(response => {
           if (response.code === 0) {
             this.order = response.data
-            this.convId = this.order.conversation_id // 聊天对话id
             this.selectedMethod = this.order.payment_methods[0]
             this.counterparty = this.user.account.id === this.order.user_id ? this.order.merchant : this.order.user
             this.orderExpireTime = (this.order.place_time + ORDER_PAY_TIME * 60) * 1000

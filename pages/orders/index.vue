@@ -231,7 +231,7 @@
             <div v-else-if="!item._isBuySide && item.status === constant.ORDER_STATUS.PAID.value" class="detail-warn-text">
               <span>
                 <span style="margin-right: 10px;color: #27313e;" v-if="item._counterparty.kyc_name">* 买方实名：{{ item._counterparty.kyc_name }} </span>
-                请务必确认收到款项后确认收款，并核实买家是否实名付款！
+                请务必查看您的收款账户，并核实买家是否实名付款！
               </span>
             </div>
           </template>

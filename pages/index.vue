@@ -345,7 +345,7 @@
               <template v-else>
                 <button class="btn btn-order-disabled"
                         :id="'button-order-'+item.id"> {{(selectedSide === constant.SIDE.BUY ? '购买' : '出售') + selectedCoin}} </button>
-                <b-popover triggers="hover click" :target="'button-order-'+item.id"
+                <b-popover triggers="hover" :target="'button-order-'+item.id"
                            title="商家交易限制">
                   <ol v-if="user && user.qualification">
                     <li v-if="checkQualification(item,constant.QUALIFICATIONS.ONE_DEAL)">交易方必须完成过1次交易</li>
