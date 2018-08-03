@@ -20,7 +20,6 @@ if (MODE === 'pre') {
   serverApiDomain = '//test.otc.coinex.com/res'
 }
 
-
 if (MODE === 'development') {
   webDomain = '//dev.otc.coinex.com'
   clientApiDomain = '//dev.otc.coinex.com/res'
