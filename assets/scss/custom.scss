@@ -355,9 +355,16 @@ a.dropdown-item {
   content: ">";
 }
 
+$sideList: top right bottom left;
 /* tooltip */
-.tooltip .arrow::before {
-  border-top-color: #fdf5e6;
+.tooltip  {
+  @each $side in $sideList {
+    &.bs-tooltip-#{$side}{
+      .arrow::before,.arrow::after {
+        border-#{$side}-color: #fdf5e6;
+      }
+    }
+  }
 }
 
 .tooltip-inner {
@@ -395,7 +402,7 @@ a.dropdown-item {
 }
 
 // popover
-$sideList: top right bottom left;
+
 .popover {
   padding: 8px;
   border-radius: 4px;
