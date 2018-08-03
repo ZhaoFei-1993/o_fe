@@ -127,21 +127,24 @@
         <b-btn v-if="itemStatus === constant.ITEM_STATUS.ONLINE" variant="plain-green" size="xxs" @click="onItemOffline(item)">下架</b-btn>
         <div v-else>
           <b-btn variant="plain-green" size="xxs" @click="onItemEdit(item)">编辑</b-btn>
+
           <b-btn v-if="user.payments && user.payments.length"
                  variant="plain-green" size="xxs" class="mx-10" @click="onItemOnline(item, $event)">
             上架
           </b-btn>
-          <b-btn v-else
-                 :id="`deleteDisabled_${item.id}`"
-                 variant="plain-light-gray" size="xxs" class="mx-10">
-            上架
-          </b-btn>
-          <b-btn variant="plain-green" size="xxs" @click="onItemDelete(item)">删除</b-btn>
 
-          <b-tooltip :target="`deleteDisabled_${item.id}`">
-            您尚未激活支付方式，请先激活再上架广告。
-            <b-link to="/my/payments">去激活支付方式</b-link>
-          </b-tooltip>
+          <template v-else>
+            <b-btn :id="`deleteDisabled_${item.id}`"
+                   variant="plain-light-gray" size="xxs" class="mx-10">
+              上架
+            </b-btn>
+            <b-tooltip :target="`deleteDisabled_${item.id}`">
+              您尚未激活支付方式，请先激活再上架广告。
+              <b-link to="/my/payments">去激活支付方式</b-link>
+            </b-tooltip>
+          </template>
+
+          <b-btn variant="plain-green" size="xxs" @click="onItemDelete(item)">删除</b-btn>
         </div>
       </template>
     </b-table>
@@ -154,7 +157,7 @@
         <b-btn variant="plain-green" size="xs" class="mx-20" @click="onItemOnlineConfirm">确定</b-btn>
         <b-btn variant="plain" size="xs" @click="onItemOnlineCancel">取消</b-btn>
       </div>
-      <Language v-if="editingItem.coin_type && editingItem.side === constant.SIDE.SELL" text="最多可售[a][/a][c][/c]" class="c-red mt-1" tag="div">
+      <Language v-if="editingItem.coin_type && editingItem.side === constant.SIDE.SELL" text="最多可售[a][/a][c][/c]" class="mt-1" :class="{'c-red': +onlineItemCoinAmount > +balance.otcMap[editingItem.coin_type].available}" tag="div">
         <span slot="a"> {{balance.otcMap[editingItem.coin_type].available}} </span>
         <span slot="c">{{editingItem.coin_type}}</span>
       </Language>
@@ -359,6 +362,8 @@ export default {
       })
     },
     onItemOnlineConfirm() {
+      if (Number(this.onlineItemCoinAmount) > Number(this.balance.otcMap[this.editingItem.coin_type].available)) return
+
       this.axios.item.online(this.editingItem.id, this.onlineItemCoinAmount).then(res => {
         this.getItems()
         // 每次上架之后都重新请求资产数据
