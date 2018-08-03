@@ -29,9 +29,9 @@
             <p class="boxTitle">关于</p>
             <b-link :href="`${coinexDomain}/aboutus`">关于我们</b-link>
             <!-- <b-link to="/">加入我们</b-link> -->
+            <b-link href="https://support.coinex.com/hc/zh-cn/articles/360007642234" target="_blank">用户协议</b-link>
             <b-link href="https://support.coinex.com/hc/zh-cn/articles/360007643734" target="_blank">交易规则</b-link>
             <b-link href="https://support.coinex.com/hc/zh-cn/articles/360007736293" target="_blank">费率标准</b-link>
-            <b-link href="https://support.coinex.com/hc/zh-cn/articles/360007642234" target="_blank">用户协议</b-link>
           </div>
           <div class="linkBox">
             <p class="boxTitle">支持</p>
