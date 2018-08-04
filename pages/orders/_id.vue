@@ -569,7 +569,7 @@
                 内完成支付，付款参考号：<span class="c-red">${this.referCode}</span>
                 `
         }
-        const kycName = `${this.counterparty.kyc_name && this.counterparty.kyc_name.length ? '<span>买方姓名： ' + this.counterparty.kyc_name + ' </span>' : ''}`
+        const kycName = `${this.counterparty.kyc_name && this.counterparty.kyc_name.length ? '<span>买方实名： ' + this.counterparty.kyc_name + ' </span>' : ''}`
         switch (this.order.status) {
           case this.constant.ORDER_STATUS.CREATED.value:
             return {
