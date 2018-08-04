@@ -30,6 +30,7 @@
         line-height: 60px;
         padding-top: 0;
         color: #27313e;
+        padding: 0 20px !important;
         &:hover {
           color: $brandGreen;
         }
@@ -174,7 +175,7 @@
       <b-navbar-brand to="/">
         <img src="~assets/img/logo.svg" alt="CoinEx OTC" height="34" width="120">
       </b-navbar-brand>
-      <b-navbar-nav class="ml-30">
+      <b-navbar-nav style="margin-left: 70px;">
         <b-nav-item to="/" exact>法币交易</b-nav-item>
         <PublishItemButton>
           <b-nav-item>发布广告</b-nav-item>
@@ -182,7 +183,7 @@
         <b-nav-item to="/wallet">OTC钱包</b-nav-item>
         <b-nav-item :href="helpLink" target="_blank">帮助</b-nav-item>
         <span style="color: #d5d5d5">|</span>
-        <b-nav-item :href="`${coinexDomain}?lang=${lang.lang}`" style="margin-left: 15px;">返回主站</b-nav-item>
+        <b-nav-item :href="`${coinexDomain}?lang=${lang.lang}`">返回主站</b-nav-item>
       </b-navbar-nav>
       <b-navbar-nav class="ml-auto">
         <div v-if="user.account">
