@@ -165,7 +165,7 @@
           <ContactItem title="手机认证" icon="icon-mobile" :active="true" :required="true">
             <div v-if="account.mobile" class="c-6f">
               <p>已认证</p>
-              <p>+{{account.country_code}} {{account.mobile}}</p>
+              <p>+{{account.country_code}} {{account.mobile.hideMiddleChars()}}</p>
             </div>
             <div v-else>
               <p class="c-red">未认证</p>
