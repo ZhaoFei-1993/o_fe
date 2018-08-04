@@ -440,7 +440,8 @@
         this.showCoinDropdown = false
       },
       onShowhand() {
-        this.form.amount = +this.availableAmount // 后端可能返回0e-8这种数字
+        console.log(this.availableAmount)
+        this.form.amount = +this.availableAmount === 0 ? 0 : this.availableAmount // 后端可能返回0e-8或者0.00000000这种数字，统一转0
       },
       onSwap() { // 资产流向互换
         const tmp = this.form.from // 交换操作必须放在异步函数外面，否则不生效，因为v-model修改是先于异步函数执行
