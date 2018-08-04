@@ -172,7 +172,7 @@
   <div :class="['page-header pr bgc-w',headerClass]">
     <b-navbar class="navbar-main" toggleable="md">
       <b-navbar-brand to="/">
-        <img src="~assets/img/logo.png" alt="CoinEx OTC" height="34" width="120">
+        <img src="~assets/img/logo.svg" alt="CoinEx OTC" height="34" width="120">
       </b-navbar-brand>
       <b-navbar-nav class="ml-30">
         <b-nav-item to="/" exact>法币交易</b-nav-item>

@@ -216,7 +216,7 @@
           <span v-else>
             广告上架期间，您的数字货币会被冻结。
           </span>
-          <b-link href="https://support.coinex.com/hc/zh-cn/articles/360007643734" class="ml-1" target="_blank">更多交易须知 ></b-link>
+          <b-link href="https://support.coinex.com/hc/articles/360007643734" class="ml-1" target="_blank">更多交易须知 ></b-link>
         </div>
       </b-form-group>
 
@@ -306,7 +306,7 @@ export default {
         pricing_type: 'fixed',
         min_deal_cash_amount: '',
         max_deal_cash_amount: '',
-        coin_type: 'BTC',
+        coin_type: 'BCH',
         cash_type: '',
         auto_reply_content: '',
         counterparty_limit: [],

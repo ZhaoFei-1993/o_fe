@@ -165,7 +165,7 @@
           <ContactItem title="手机认证" icon="icon-mobile" :active="true" :required="true">
             <div v-if="account.mobile" class="c-6f">
               <p>已认证</p>
-              <p>+{{account.country_code}} {{account.mobile}}</p>
+              <p>+{{account.country_code}} {{account.mobile.hideMiddleChars()}}</p>
             </div>
             <div v-else>
               <p class="c-red">未认证</p>
@@ -223,7 +223,7 @@
         <p class="c-6f">我们将在3个工作日内对您的商家申请资料进行审核。请保持通讯畅通，我们会主动与您取得联系。审核通过后，您即可在OTC平台发布广告。</p>
         <b-form-checkbox v-model="isContractRead" class="c-6f" id="contract-checkbox">
           我已阅读并同意
-          <b-link href="https://support.coinex.com/hc/zh-cn/articles/360007737113" target="_blank">《认证商家服务协议》</b-link>
+          <b-link href="https://support.coinex.com/hc/articles/360007737113" target="_blank">《认证商家服务协议》</b-link>
           ，并冻结{{MERCHANT_REQUIRED_CET_AMOUNT|formatMoney}} CET作为商家保证金。
         </b-form-checkbox>
       </ProgressItem>

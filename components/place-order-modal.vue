@@ -80,7 +80,7 @@
           <div class="payment-tip">
             <span v-if="this.item.side === this.constant.SIDE.SELL">* 提交信息即生成订单，请在15分钟内完成打款。</span>
             <span v-else>* 提交信息即生成订单，在订单结算期间您的数字货币会被冻结。</span>
-            <b-link href="https://support.coinex.com/hc/zh-cn/articles/360007643734" target="_blank">更多交易须知 ></b-link>
+            <b-link href="https://support.coinex.com/hc/articles/360007643734" target="_blank">更多交易须知 ></b-link>
           </div>
           <div class="actions">
             <button class="btn btn-outline-green btn-lg" @click="onCancel">取消</button>

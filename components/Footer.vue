@@ -5,7 +5,7 @@
       <div class="ft_content container">
         <div class="mediaBox">
           <p class="slogan">
-            <img src="~assets/img/logo-gray.svg">
+            <img src="~assets/img/logo-gray.svg" width="120">
           </p>
           <p class="mt-10 fs-24 ff-light">CoinEx OTC 法币交易</p>
           <div class="medias mt-10">

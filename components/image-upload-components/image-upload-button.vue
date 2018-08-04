@@ -15,7 +15,7 @@
     .icon-plus {
       display: inline-block;
       margin-right: 1px;
-      vertical-align: 1px;
+      vertical-align: middle;
     }
 
     input[type=file] {
