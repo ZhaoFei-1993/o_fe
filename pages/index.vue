@@ -304,7 +304,7 @@
           <span class="col-narrow col-action">操作</span>
         </div>
         <div :class="['list',selectedSide.toLowerCase()]">
-          <div v-if="!items||!items.length" class="text-center p-20">暂无该交易对广告</div>
+          <Blank v-if="!items||!items.length"/>
           <div v-else class="item-row" v-for="item in items">
             <span class="col-wide col-name">
               <span class="username">{{item.user.name}}</span><span v-b-tooltip.hover title="认证商家"><i
@@ -407,6 +407,7 @@
   import ViaPagination from '~/components/via-pagination'
   import UserPayments from '~/components/user-payments'
   import PublishItemButton from '~/components/publish-item-modal/publish-item-button.vue'
+  import Blank from '~/components/blank.vue'
   import {PlaceOrderError} from '~/modules/error-code'
 
   // 从路由数据中获取需要的列表数据
@@ -436,6 +437,7 @@
       UserPayments,
       PublishItemButton,
       ViaPagination,
+      Blank,
     },
     layout: 'fullwidth',
     data() {
