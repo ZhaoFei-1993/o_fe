@@ -311,7 +311,7 @@
           default:
             break
         }
-        return 'https://support.coinex.com/hc/' + lang
+        return 'https://support.coinex.com/hc/' + lang + '/sections/360001604474'
       },
       invalidName() {
         return !this.form.userName || this.form.userName.length < this.minNameLength || this.form.userName.length > this.maxNameLength
