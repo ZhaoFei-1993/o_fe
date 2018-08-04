@@ -185,7 +185,7 @@
           total: {
             label: '总额',
             thStyle: {
-              width: '180px',
+              width: '185px',
             },
             thClass: ['text-right', 'pr-5'],
             tdClass: ['text-right'],
@@ -194,7 +194,7 @@
           frozen: {
             label: '冻结',
             thStyle: {
-              width: '270px',
+              width: '260px',
             },
             thClass: ['text-right', 'pr-5'],
             tdClass: ['text-right'],
@@ -203,7 +203,7 @@
           available: {
             label: '可用',
             thStyle: {
-              width: '270px',
+              width: '275px',
             },
             thClass: ['text-right'],
             tdClass: ['text-right'],
@@ -309,16 +309,20 @@
           const pieDatas = []
           let totalBalance = 0
           const defaultRate = this.balance.allRate[this.defaultAsset] // 各币种CNY汇率
-          this.balance.otcBalance.forEach((item, index) => {
-            if (item.total > 0) {
-              const curCoinAmount = (+item.total) * defaultRate[item.coin_type]
-              pieDatas.push({
-                name: item.coin_type,
-                y: curCoinAmount,
-                colorIndex: index,
-                virtual: false,
-              })
-              totalBalance += curCoinAmount
+          const sortedBalance = this.constant.COIN_TYPES.map((coin, index) => { // 必须根据constant配置的币种顺序输出数组
+            const item = this.balance.otcMap[coin]
+            if (item) {
+              if (item.total > 0) {
+                const curCoinAmount = (+item.total) * defaultRate[item.coin_type]
+                pieDatas.push({
+                  name: item.coin_type,
+                  y: curCoinAmount,
+                  colorIndex: index,
+                  virtual: false,
+                })
+                totalBalance += curCoinAmount
+              }
+              return item
             }
           })
           this.pieDatas = pieDatas
@@ -331,7 +335,7 @@
           this.totalBalance = totalBalance
           const rate = this.balance.currentRate[this.selectedCoin] // 币种汇率
           this.totalCoin = rate ? this.totalBalance / rate : 0
-          return this.balance.otcBalance
+          return sortedBalance || []
         }
         return []
       },
