@@ -124,7 +124,9 @@
         {{utils.getTimeText(item.on_time)}}
       </template>
       <template slot="action" slot-scope="{ item }">
-        <b-btn v-if="itemStatus === constant.ITEM_STATUS.ONLINE" variant="plain-green" size="xxs" @click="onItemOffline(item)">下架</b-btn>
+        <b-btn v-if="itemStatus === constant.ITEM_STATUS.ONLINE" variant="plain-green" size="xxs"
+               @click="onItemOffline(item)">下架
+        </b-btn>
         <div v-else>
           <b-btn variant="plain-green" size="xxs" @click="onItemEdit(item)">编辑</b-btn>
 
@@ -151,13 +153,16 @@
 
     <Blank v-if="!itemsCurrent.length"/>
 
-    <CBlock v-show="isItemAmountEditing" class="item-coin-amount-container" ref="coin-amount" x="20" y="20" v-click-outside="onClickOutsideAmount">
+    <CBlock v-show="isItemAmountEditing" class="item-coin-amount-container" ref="coin-amount" x="20" y="20"
+            v-click-outside="onClickOutsideAmount">
       <div class="item-coin-amount-confirm">
-        <CurrencyInput v-model="onlineItemCoinAmount" class="item-coin-amount-confirm-input" :currency="editingItem.coin_type"/>
+        <CurrencyInput v-model="onlineItemCoinAmount" class="item-coin-amount-confirm-input"
+                       :currency="editingItem.coin_type"/>
         <b-btn variant="plain-green" size="xs" class="mx-20" @click="onItemOnlineConfirm">确定</b-btn>
         <b-btn variant="plain" size="xs" @click="onItemOnlineCancel">取消</b-btn>
       </div>
-      <Language v-if="editingItem.coin_type && editingItem.side === constant.SIDE.SELL" text="最多可售[a][/a][c][/c]" class="mt-1" :class="{'c-red': !editingAmountValid}" tag="div">
+      <Language v-if="editingItem.coin_type && editingItem.side === constant.SIDE.SELL" text="最多可售[a][/a][c][/c]"
+                class="mt-1" :class="{'c-red': !editingAmountValid}" tag="div">
         <span slot="a"> {{balance.otcMap[editingItem.coin_type].available}} </span>
         <span slot="c">{{editingItem.coin_type}}</span>
       </Language>
@@ -168,247 +173,246 @@
 </template>
 
 <script>
-import Vue from 'vue'
-import PublishItemModal from '~/components/publish-item-modal/index.vue'
-import PublishItemButton from '~/components/publish-item-modal/publish-item-button.vue'
-import ToggleButton from '~/components/toggle-button.vue'
-import CurrencyInput from '~/components/currency-input.vue'
-import Blank from '~/components/blank.vue'
-import {mapState} from 'vuex'
-import ClickOutside from 'vue-click-outside'
+  import Vue from 'vue'
+  import PublishItemModal from '~/components/publish-item-modal/index.vue'
+  import PublishItemButton from '~/components/publish-item-modal/publish-item-button.vue'
+  import ToggleButton from '~/components/toggle-button.vue'
+  import CurrencyInput from '~/components/currency-input.vue'
+  import Blank from '~/components/blank.vue'
+  import {mapState} from 'vuex'
+  import ClickOutside from 'vue-click-outside'
 
-Vue.directive('ClickOutside', ClickOutside)
+  Vue.directive('ClickOutside', ClickOutside)
 
-export default {
-  name: 'page-my-items',
-  components: {
-    PublishItemModal,
-    CurrencyInput,
-    ToggleButton,
-    Blank,
-    PublishItemButton,
-  },
-  data() {
-    return {
-      itemsOnline: [],
-      itemsOffline: [],
-      itemStatus: '',
-      editingItem: {},        // 正在编辑or上架的广告
-      onlineItemCoinAmount: 0, // 正在上架的广告的数量
-      isItemAmountEditing: false,   // 正在上架的广告的币量，是否在编辑
-      isItemEditing: false,   // 是否在编辑广告
-    }
-  },
-  computed: {
-    ...mapState(['user', 'constant', 'balance']),
-    // 当前展示的广告列表
-    itemsCurrent: function () {
-      return this.itemStatus === this.constant.ITEM_STATUS.ONLINE ? this.itemsOnline : this.itemsOffline
+  export default {
+    name: 'page-my-items',
+    components: {
+      PublishItemModal,
+      CurrencyInput,
+      ToggleButton,
+      Blank,
+      PublishItemButton,
     },
-    filterOptions: function () {
-      return [{
-        text: '进行中',
-        value: this.constant.ITEM_STATUS.ONLINE,
-      }, {
-        text: '已下架',
-        value: this.constant.ITEM_STATUS.OFFLINE,
-      }]
-    },
-    // 正在编辑的广告是否有效
-    editingAmountValid: function () {
-      return Number(this.onlineItemCoinAmount) <= Number(this.balance.otcMap[this.editingItem.coin_type].available)
-    },
-    itemTableFields: function () {
-      const fields = {
-        id: {
-          label: '广告编号',
-          thClass: ['pl-30', 'w-100'],
-          tdClass: ['pl-30', 'w-100'],
-        },
-        side: {
-          label: '类型',
-          thStyle: {
-            width: '100px'
-          },
-        },
-        coin_type: {
-          label: '币种',
-          thStyle: {
-            width: '100px'
-          },
-        },
-        remain_coin_amount: {
-          label: '数量',
-          thStyle: {
-            width: '150px'
-          },
-        },
-        cashAmountLimit: {
-          label: '限额',
-          thStyle: {
-            width: '200px'
-          },
-        },
-        price: {
-          label: '交易价格',
-          thStyle: {
-            width: '250px'
-          },
-        },
+    data() {
+      return {
+        itemsOnline: [],
+        itemsOffline: [],
+        itemStatus: '',
+        editingItem: {},        // 正在编辑or上架的广告
+        onlineItemCoinAmount: 0, // 正在上架的广告的数量
+        isItemAmountEditing: false,   // 正在上架的广告的币量，是否在编辑
+        isItemEditing: false,   // 是否在编辑广告
       }
-
-      if (this.itemStatus === this.constant.ITEM_STATUS.ONLINE) {
-        fields.on_time = {
-          label: '上架时间',
-          thStyle: {
+    },
+    computed: {
+      ...mapState(['user', 'constant', 'balance']),
+      // 当前展示的广告列表
+      itemsCurrent: function () {
+        return this.itemStatus === this.constant.ITEM_STATUS.ONLINE ? this.itemsOnline : this.itemsOffline
+      },
+      filterOptions: function () {
+        return [{
+          text: '进行中',
+          value: this.constant.ITEM_STATUS.ONLINE,
+        }, {
+          text: '已下架',
+          value: this.constant.ITEM_STATUS.OFFLINE,
+        }]
+      },
+      // 正在编辑的广告是否有效
+      editingAmountValid: function () {
+        return this.editingItem.side === this.constant.SIDE.BUY || Number(this.onlineItemCoinAmount) <= Number(this.balance.otcMap[this.editingItem.coin_type].available)
+      },
+      itemTableFields: function () {
+        const fields = {
+          id: {
+            label: '广告编号',
+            thClass: ['pl-30', 'w-100'],
+            tdClass: ['pl-30', 'w-100'],
+          },
+          side: {
+            label: '类型',
+            thStyle: {
+              width: '100px'
+            },
+          },
+          coin_type: {
+            label: '币种',
+            thStyle: {
+              width: '100px'
+            },
+          },
+          remain_coin_amount: {
+            label: '数量',
+            thStyle: {
+              width: '150px'
+            },
+          },
+          cashAmountLimit: {
+            label: '限额',
+            thStyle: {
+              width: '200px'
+            },
+          },
+          price: {
+            label: '交易价格',
+            thStyle: {
+              width: '250px'
+            },
           },
         }
-      }
 
-      fields.action = {
-        label: '操作',
-        thStyle: {
-          width: '150px',
-        },
-        thClass: ['text-right', 'pr-30'],
-        tdClass: ['text-right', 'pr-30'],
-      }
-
-      return fields
-    }
-  },
-
-  fetch({app, store, redirect, route, req}) {
-    app.axios.init(req)
-    return Promise.all([
-      store.dispatch('fetchUserMerchant'),
-      store.dispatch('fetchOtcBalance'),
-      store.dispatch('fetchUserPayments'),
-    ]).catch(err => {
-      app.axios.needAuth(err, redirect, route.fullPath)
-    })
-  },
-  mounted() {
-    this.itemStatus = this.constant.ITEM_STATUS.ONLINE
-    this.getItems()
-
-    // 覆盖默认的position，以使得amount输入框可以相对于document.body定位
-    document.querySelector('.layout-content').style.position = 'static'
-  },
-  methods: {
-    getItems() {
-      this.axios.item.userItems(this.itemStatus).then(res => {
-        res.data.forEach(item => {
-          item.remain_coin_amount = parseFloat(item.remain_coin_amount) // 防止出现0E-8这种情况
-          item.max_deal_cash_amount = item.max_deal_cash_amount.setDigit(0)
-          item.min_deal_cash_amount = item.min_deal_cash_amount.setDigit(0)
-        })
-
-        this[this.itemStatus === this.constant.ITEM_STATUS.ONLINE ? 'itemsOnline' : 'itemsOffline'] = res.data
-      }).catch(err => {
-        this.axios.onError(err)
-      })
-    },
-    onUserStatusChange(bool) {
-      this.axios.user.changeMerchantAvailable(bool).then(res => {
-        return this.$store.dispatch('fetchUserMerchant')
-      }).catch(err => {
-        this.axios.onError(err)
-      })
-    },
-    onSetItemStatus(itemStatus) {
-      this.itemStatus = itemStatus
-      this.getItems()
-    },
-    onItemOffline(item) {
-      this.axios.item.offline(item.id).then(res => {
-        this.getItems()
-        // 每次下架之后都重新请求资产数据
-        this.$store.dispatch('fetchOtcBalance')
-      }).catch(err => {
-        this.axios.onError(err)
-      })
-    },
-
-    onClickOutsideAmount() {
-      if (this.isItemAmountEditing) {
-        this.isItemAmountEditing = false
-      }
-    },
-
-    onItemOnline(item, e) {
-      const onlineItems = this.itemsOnline.filter(onlineItem => onlineItem.coin_type === item.coin_type && onlineItem.side === item.side)
-
-      if (onlineItems.length >= 2) {
-        return this.$errorTips('每个币种每个类型的广告最多只能上架2条')
-      }
-
-      if (!this.user.payments.some(payment => payment.status === this.constant.PAYMENT_STATUS.ON)) {
-        return this.$showDialog({
-          title: '开启支付方式',
-          content: '您需要开启支付方式后，才可以上架广告。',
-          okTitle: '去开启',
-          onOk: () => {
-            this.$router.push('/my/payments')
+        if (this.itemStatus === this.constant.ITEM_STATUS.ONLINE) {
+          fields.on_time = {
+            label: '上架时间',
+            thStyle: {},
           }
-        })
+        }
+
+        fields.action = {
+          label: '操作',
+          thStyle: {
+            width: '150px',
+          },
+          thClass: ['text-right', 'pr-30'],
+          tdClass: ['text-right', 'pr-30'],
+        }
+
+        return fields
       }
+    },
 
-      this.editingItem = item
-      this.onlineItemCoinAmount = item.remain_coin_amount
-
-      const rect = e.target.getBoundingClientRect()
-      this.$refs['coin-amount'].$el.style.left = rect.left - 420 + 'px'
-      this.$refs['coin-amount'].$el.style.top = rect.top + window.scrollY - 30 + 'px'
-      // 为了与clickoutside兼容，所以在nextTick再显示
-      this.$nextTick(() => {
-        this.isItemAmountEditing = true
+    fetch({app, store, redirect, route, req}) {
+      app.axios.init(req)
+      return Promise.all([
+        store.dispatch('fetchUserMerchant'),
+        store.dispatch('fetchOtcBalance'),
+        store.dispatch('fetchUserPayments'),
+      ]).catch(err => {
+        app.axios.needAuth(err, redirect, route.fullPath)
       })
     },
-    onItemOnlineConfirm() {
-      if (!this.editingAmountValid) return
+    mounted() {
+      this.itemStatus = this.constant.ITEM_STATUS.ONLINE
+      this.getItems()
 
-      this.axios.item.online(this.editingItem.id, this.onlineItemCoinAmount).then(res => {
+      // 覆盖默认的position，以使得amount输入框可以相对于document.body定位
+      document.querySelector('.layout-content').style.position = 'static'
+    },
+    methods: {
+      getItems() {
+        this.axios.item.userItems(this.itemStatus).then(res => {
+          res.data.forEach(item => {
+            item.remain_coin_amount = parseFloat(item.remain_coin_amount) // 防止出现0E-8这种情况
+            item.max_deal_cash_amount = item.max_deal_cash_amount.setDigit(0)
+            item.min_deal_cash_amount = item.min_deal_cash_amount.setDigit(0)
+          })
+
+          this[this.itemStatus === this.constant.ITEM_STATUS.ONLINE ? 'itemsOnline' : 'itemsOffline'] = res.data
+        }).catch(err => {
+          this.axios.onError(err)
+        })
+      },
+      onUserStatusChange(bool) {
+        this.axios.user.changeMerchantAvailable(bool).then(res => {
+          return this.$store.dispatch('fetchUserMerchant')
+        }).catch(err => {
+          this.axios.onError(err)
+        })
+      },
+      onSetItemStatus(itemStatus) {
+        this.itemStatus = itemStatus
         this.getItems()
-        // 每次上架之后都重新请求资产数据
-        this.$store.dispatch('fetchOtcBalance')
-        this.isItemAmountEditing = false
-      }).catch(err => {
-        this.axios.onError(err)
-      })
-    },
-    onItemOnlineCancel() {
-      this.isItemAmountEditing = false
-    },
-    onItemDelete(item) {
-      this.$showDialog({
-        title: '删除广告',
-        content: '删除的广告将不可恢复。',
-        onOk: () => {
-          this.axios.item.delete(item.id).then(res => {
-            this.getItems()
-            this.$showTips('删除成功')
-          }).catch(err => {
-            this.axios.onError(err)
+      },
+      onItemOffline(item) {
+        this.axios.item.offline(item.id).then(res => {
+          this.getItems()
+          // 每次下架之后都重新请求资产数据
+          this.$store.dispatch('fetchOtcBalance')
+        }).catch(err => {
+          this.axios.onError(err)
+        })
+      },
+
+      onClickOutsideAmount() {
+        if (this.isItemAmountEditing) {
+          this.isItemAmountEditing = false
+        }
+      },
+
+      onItemOnline(item, e) {
+        const onlineItems = this.itemsOnline.filter(onlineItem => onlineItem.coin_type === item.coin_type && onlineItem.side === item.side)
+
+        if (onlineItems.length >= 2) {
+          return this.$errorTips('每个币种每个类型的广告最多只能上架2条')
+        }
+
+        if (!this.user.payments.some(payment => payment.status === this.constant.PAYMENT_STATUS.ON)) {
+          return this.$showDialog({
+            title: '开启支付方式',
+            content: '您需要开启支付方式后，才可以上架广告。',
+            okTitle: '去开启',
+            onOk: () => {
+              this.$router.push('/my/payments')
+            }
           })
         }
-      })
-    },
 
-    onItemPublished() {
-      this.itemStatus === this.constant.ITEM_STATUS.ONLINE && this.getItems()
-    },
+        this.editingItem = item
+        this.onlineItemCoinAmount = item.remain_coin_amount
 
-    onItemEdit(item) {
-      this.isItemEditing = true
-      this.editingItem = item
-    },
+        const rect = e.target.getBoundingClientRect()
+        this.$refs['coin-amount'].$el.style.left = rect.left - 420 + 'px'
+        this.$refs['coin-amount'].$el.style.top = rect.top + window.scrollY - 30 + 'px'
+        // 为了与clickoutside兼容，所以在nextTick再显示
+        this.$nextTick(() => {
+          this.isItemAmountEditing = true
+        })
+      },
+      onItemOnlineConfirm() {
+        if (!this.editingAmountValid) return
 
-    onItemEdited() {
-      this.isItemEditing = false
-      this.getItems()
-      this.$showTips('编辑成功')
+        this.axios.item.online(this.editingItem.id, this.onlineItemCoinAmount).then(res => {
+          this.getItems()
+          // 每次上架之后都重新请求资产数据
+          this.$store.dispatch('fetchOtcBalance')
+          this.isItemAmountEditing = false
+        }).catch(err => {
+          this.axios.onError(err)
+        })
+      },
+      onItemOnlineCancel() {
+        this.isItemAmountEditing = false
+      },
+      onItemDelete(item) {
+        this.$showDialog({
+          title: '删除广告',
+          content: '删除的广告将不可恢复。',
+          onOk: () => {
+            this.axios.item.delete(item.id).then(res => {
+              this.getItems()
+              this.$showTips('删除成功')
+            }).catch(err => {
+              this.axios.onError(err)
+            })
+          }
+        })
+      },
+
+      onItemPublished() {
+        this.itemStatus === this.constant.ITEM_STATUS.ONLINE && this.getItems()
+      },
+
+      onItemEdit(item) {
+        this.isItemEditing = true
+        this.editingItem = item
+      },
+
+      onItemEdited() {
+        this.isItemEditing = false
+        this.getItems()
+        this.$showTips('编辑成功')
+      }
     }
   }
-}
 </script>

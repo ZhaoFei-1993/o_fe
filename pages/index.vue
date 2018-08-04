@@ -19,9 +19,11 @@
       .announcement-titles-container {
         position: relative;
         width: 1000px;
+        height: 20px;
         .announcement-title {
           display: inline-block;
           padding: 0 20px;
+          line-height: 20px;
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
@@ -247,7 +249,7 @@
   <div class="page-index">
     <div class="announcement-bar">
       <div class="announcement-container">
-        <div class="announcement-tip"><i class="iconfont icon-announcement mr-10"></i>公告：</div>
+        <i class="iconfont icon-announcement mr-10"></i>公告：
         <div class="announcement-titles-container">
           <b-link v-for="(announcement, index) in announcements" class="announcement-title"
                   :style="{maxWidth:announcements.length?`${Math.floor(100/announcements.length)}%`:'600px'}"
