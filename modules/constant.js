@@ -2,7 +2,7 @@
  * 避免直接使用，统一export，然后通过store里面的constant来引用，保证单一数据来源
  */
 
-const COIN_TYPES = ['BTC', 'BCH', 'ETH', 'USDT']
+const COIN_TYPES = ['BCH', 'BTC', 'ETH', 'USDT']
 
 // 实际支持的支付方式
 const ACTUAL_PAYMENT_OPTIONS = [

@@ -403,7 +403,7 @@
   function resolveDataFromRoute($route, constant) {
     const side = $route.query.side || constant.SIDE.BUY
     return {
-      selectedCoin: $route.query.coin || 'BTC',
+      selectedCoin: $route.query.coin || 'BCH',
       selectedSide: side,
       selectedPayment: $route.query.payment || 'ALL',
       sortPrice: $route.query.sort || side === constant.SIDE.BUY ? 'ASC' : 'DESC',

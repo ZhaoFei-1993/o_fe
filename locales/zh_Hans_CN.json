@@ -10,13 +10,13 @@
         "区块浏览器": "区块浏览器",
         "关于": "关于",
         "关于我们": "关于我们",
+        "用户协议": "用户协议",
         "交易规则": "交易规则",
         "费率标准": "费率标准",
         "支持": "支持",
         "新手帮助": "新手帮助",
         "提交工单": "提交工单",
-        "公告": "公告",
-        "用户协议": "用户协议"
+        "公告": "公告"
     },
     "components_Header_vue": {
         "法币交易": "法币交易",
@@ -192,7 +192,7 @@
         "您需要开启支付方_07a4": "您需要开启支付方式后，才可以发布广告",
         "去开启": "去开启"
     },
-    "components_qrcode-popover_vue": {},
+    "components_qrcode-popover_vue****DEPRECATED****": {},
     "components_star-rate_vue": {},
     "components_user-avatar_vue": {},
     "components_user-mini-profile_vue": {

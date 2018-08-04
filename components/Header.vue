@@ -67,6 +67,7 @@
       #user-dropdown {
         .dropdown-menu {
           padding: 0;
+          border-radius: 2px;
         }
         a.dropdown-item {
           padding: 12px 20px 12px 0;
@@ -89,7 +90,7 @@
           }
         }
         a.active {
-          background-color: #007bff !important;
+          color: $brandGreen;
         }
       }
       .name-span {
