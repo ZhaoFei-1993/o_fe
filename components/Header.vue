@@ -15,7 +15,7 @@
 
     .nav-item {
       display: inline-block;
-      margin: 0 15px 0 0;
+      margin: 0;
     }
 
     .navbar-main {
@@ -24,7 +24,7 @@
       height: 60px;
       margin: 0 auto;
       font-size: 14px;
-
+      padding: 0;
       .nav-link {
         height: 60px;
         line-height: 60px;
@@ -70,7 +70,7 @@
           border-radius: 2px;
         }
         a.dropdown-item {
-          padding: 12px 20px 12px 0;
+          padding: 12px 18px 12px 12px;
           display: flex;
           font-size: 14px;
           justify-content: center;
