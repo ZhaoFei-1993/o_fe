@@ -185,7 +185,7 @@
           total: {
             label: '总额',
             thStyle: {
-              width: '180px',
+              width: '185px',
             },
             thClass: ['text-right', 'pr-5'],
             tdClass: ['text-right'],
@@ -194,7 +194,7 @@
           frozen: {
             label: '冻结',
             thStyle: {
-              width: '270px',
+              width: '260px',
             },
             thClass: ['text-right', 'pr-5'],
             tdClass: ['text-right'],
@@ -203,7 +203,7 @@
           available: {
             label: '可用',
             thStyle: {
-              width: '270px',
+              width: '275px',
             },
             thClass: ['text-right'],
             tdClass: ['text-right'],
@@ -309,16 +309,20 @@
           const pieDatas = []
           let totalBalance = 0
           const defaultRate = this.balance.allRate[this.defaultAsset] // 各币种CNY汇率
-          this.balance.otcBalance.forEach((item, index) => {
-            if (item.total > 0) {
-              const curCoinAmount = (+item.total) * defaultRate[item.coin_type]
-              pieDatas.push({
-                name: item.coin_type,
-                y: curCoinAmount,
-                colorIndex: index,
-                virtual: false,
-              })
-              totalBalance += curCoinAmount
+          const sortedBalance = this.constant.COIN_TYPES.map((coin, index) => { // 必须根据constant配置的币种顺序输出数组
+            const item = this.balance.otcMap[coin]
+            if (item) {
+              if (item.total > 0) {
+                const curCoinAmount = (+item.total) * defaultRate[item.coin_type]
+                pieDatas.push({
+                  name: item.coin_type,
+                  y: curCoinAmount,
+                  colorIndex: index,
+                  virtual: false,
+                })
+                totalBalance += curCoinAmount
+              }
+              return item
             }
           })
           this.pieDatas = pieDatas
@@ -331,7 +335,7 @@
           this.totalBalance = totalBalance
           const rate = this.balance.currentRate[this.selectedCoin] // 币种汇率
           this.totalCoin = rate ? this.totalBalance / rate : 0
-          return this.balance.otcBalance
+          return sortedBalance || []
         }
         return []
       },
@@ -436,7 +440,8 @@
         this.showCoinDropdown = false
       },
       onShowhand() {
-        this.form.amount = +this.availableAmount // 后端可能返回0e-8这种数字
+        console.log(this.availableAmount)
+        this.form.amount = +this.availableAmount === 0 ? 0 : this.availableAmount // 后端可能返回0e-8或者0.00000000这种数字，统一转0
       },
       onSwap() { // 资产流向互换
         const tmp = this.form.from // 交换操作必须放在异步函数外面，否则不生效，因为v-model修改是先于异步函数执行
