@@ -5,6 +5,7 @@
   "author": "jeffjing <jingjinafu@viabtc.com>",
   "private": true,
   "dependencies": {
+    "@log4js-node/smtp": "^1.0.1",
     "axios": "0.18.0",
     "blueimp-md5": "2.10.0",
     "bootstrap": "4.1.1",
@@ -27,9 +28,9 @@
     "qr.js": "0.0.0",
     "visibilityjs": "2.0.1",
     "vue": "2.5.17",
+    "vue-click-outside": "1.0.7",
     "vue-server-renderer": "2.5.17",
     "vue-template-compiler": "2.5.17",
-    "vue-click-outside": "1.0.7",
     "vue2-highcharts": "1.2.5",
     "vuelidate": "0.7.4",
     "vuex": "3.0.1"

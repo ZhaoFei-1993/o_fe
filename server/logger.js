@@ -4,7 +4,7 @@ const isDev = process.env.MODE !== 'production'
 const globalLevel = isDev ? 'TRACE' : 'INFO'
 
 const smtpAppender = {
-  type: 'smtp',
+  type: '@log4js-node/smtp',
   recipients: 'jingjianfu@viabtc.com,dengshen@viabtc.com,linjunfeng@viabtc.com',
   sender: 'alert@viabtc.com',
   attachment: {
@@ -58,7 +58,7 @@ const logConfig = {
   },
   categories: {
     default: {
-      appenders: ['common', 'error', 'errorEmail', 'commonEmail'],
+      appenders: ['common', 'error'],
       level: globalLevel,
     },
   },
@@ -106,6 +106,7 @@ if (+process.env.OTC === 0) { // 只发送一个实例的log
       appender: 'commonEmailSender',
     },
   }
+  logConfig.categories.default.appenders.push('commonEmail', 'errorEmail')
 }
 
 log4js.configure(logConfig)
