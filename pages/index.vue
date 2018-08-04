@@ -16,21 +16,23 @@
         height: 100%;
         line-height: 16px;
       }
+      .announcement-titles-container {
+        position: relative;
+        width: 1000px;
+        .announcement-title {
+          display: inline-block;
+          padding: 0 20px;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          color: $brandYellow;
 
-      .announcement-title {
-        display: inline-block;
-        max-width: 300px;
-        padding: 0 25px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        color: $brandYellow;
-
-        &:not(:first-of-type) {
-          border-left: 1px solid $brandYellow;
+          &:not(:first-of-type) {
+            border-left: 1px solid $brandYellow;
+          }
         }
-      }
 
+      }
       .more {
         position: absolute;
         right: 0;
@@ -245,11 +247,17 @@
   <div class="page-index">
     <div class="announcement-bar">
       <div class="announcement-container">
-        <i class="iconfont icon-announcement mr-10"></i>公告：
-        <b-link v-for="(announcement, index) in announcements" class="announcement-title" :href="announcement.href" target="_blank" :key="index">
-          {{announcement.title}}
+        <div class="announcement-tip"><i class="iconfont icon-announcement mr-10"></i>公告：</div>
+        <div class="announcement-titles-container">
+          <b-link v-for="(announcement, index) in announcements" class="announcement-title"
+                  :style="{maxWidth:announcements.length?`${Math.floor(100/announcements.length)}%`:'600px'}"
+                  :href="announcement.href"
+                  target="_blank" :key="index">
+            {{announcement.title}}
+          </b-link>
+        </div>
+        <b-link class="more" href="https://support.coinex.com/hc/zh-cn/sections/360001631693" target="_blank">更多 &gt;
         </b-link>
-        <b-link class="more" href="https://support.coinex.com/hc/zh-cn/sections/360001631693" target="_blank">更多 &gt;</b-link>
       </div>
     </div>
     <div class="layout-content">
