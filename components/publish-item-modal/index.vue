@@ -306,7 +306,7 @@ export default {
         pricing_type: 'fixed',
         min_deal_cash_amount: '',
         max_deal_cash_amount: '',
-        coin_type: 'BTC',
+        coin_type: 'BCH',
         cash_type: '',
         auto_reply_content: '',
         counterparty_limit: [],
