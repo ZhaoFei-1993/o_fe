@@ -15,7 +15,7 @@ let webDomain = '//otc.coinex.com'
 
 // pre
 if (MODE === 'pre') {
-  webDomain = '//test.otc.coinex.com'
+  webDomain = '//test.otc.coinex.com:443'
   clientApiDomain = '//test.otc.coinex.com:443/res'
   serverApiDomain = '//test.otc.coinex.com:443/res'
 }
