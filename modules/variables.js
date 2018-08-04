@@ -1,5 +1,5 @@
 // 默认都是正式环境的变量
-let serverApiDomain = '//otc.coinex.com/res'
+let serverApiDomain = 'http://otc.coinex.com:443/res'
 let clientApiDomain = '//otc.coinex.com/res'
 
 let coinexDomain = '//www.coinex.com'       // 尽量不要用coinex，而是用coinexDomain。coinex语义并不明确
@@ -16,8 +16,8 @@ let webDomain = '//otc.coinex.com'
 // pre
 if (MODE === 'pre') {
   webDomain = '//test.otc.coinex.com'
-  clientApiDomain = '//test.otc.coinex.com/res'
-  serverApiDomain = '//test.otc.coinex.com/res'
+  clientApiDomain = '//test.otc.coinex.com:443/res'
+  serverApiDomain = '//test.otc.coinex.com:443/res'
 }
 
 if (MODE === 'development') {
