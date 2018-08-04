@@ -258,7 +258,7 @@
             {{announcement.title}}
           </b-link>
         </div>
-        <b-link class="more" href="https://support.coinex.com/hc/zh-cn/sections/360001631693" target="_blank">更多 &gt;
+        <b-link class="more" href="https://support.coinex.com/hc/sections/360001631693" target="_blank">更多 &gt;
         </b-link>
       </div>
     </div>
