@@ -1,5 +1,5 @@
 // 默认都是正式环境的变量
-let serverApiDomain = 'http://otc.coinex.com:443/res'
+let serverApiDomain = '//otc.coinex.com:443/res'
 let clientApiDomain = '//otc.coinex.com/res'
 
 let coinexDomain = '//www.coinex.com'       // 尽量不要用coinex，而是用coinexDomain。coinex语义并不明确
@@ -31,7 +31,7 @@ const protocol = process.client ? window.location.protocol : 'http:'
 webDomain = protocol + webDomain
 signupPage = protocol + signupPage
 loginPage = protocol + loginPage
-serverApiDomain = protocol + serverApiDomain
+serverApiDomain = 'http:' + serverApiDomain
 clientApiDomain = protocol + clientApiDomain
 
 export {
