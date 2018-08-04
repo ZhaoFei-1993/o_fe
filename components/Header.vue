@@ -300,7 +300,7 @@
     computed: {
       ...mapState(['lang', 'user', 'messages', 'constant', 'chat']),
       helpLink() {
-        return 'https://support.coinex.com/hc/sections/360001604474'
+        return 'https://support.coinex.com/hc/categories/360000724513'
       },
       invalidName() {
         return !this.form.userName || this.form.userName.length < this.minNameLength || this.form.userName.length > this.maxNameLength
