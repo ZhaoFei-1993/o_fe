@@ -15,7 +15,7 @@
 
     .nav-item {
       display: inline-block;
-      margin: 0 15px 0 0;
+      margin: 0;
     }
 
     .navbar-main {
@@ -24,7 +24,7 @@
       height: 60px;
       margin: 0 auto;
       font-size: 14px;
-
+      padding: 0;
       .nav-link {
         height: 60px;
         line-height: 60px;
@@ -67,9 +67,10 @@
       #user-dropdown {
         .dropdown-menu {
           padding: 0;
+          border-radius: 2px;
         }
         a.dropdown-item {
-          padding: 12px 20px 12px 0;
+          padding: 12px 18px 12px 12px;
           display: flex;
           font-size: 14px;
           justify-content: center;
@@ -89,7 +90,7 @@
           }
         }
         a.active {
-          background-color: #007bff !important;
+          color: $brandGreen;
         }
       }
       .name-span {
@@ -231,7 +232,7 @@
 
     <b-modal id="update-name"
              ref="updateNameModal"
-             title="设置昵称"
+             title="设置OTC昵称"
              :hide-header-close="true"
              :no-close-on-esc="true"
              :no-close-on-backdrop="true"
@@ -298,19 +299,7 @@
     computed: {
       ...mapState(['lang', 'user', 'messages', 'constant', 'chat']),
       helpLink() {
-        let lang = 'en-us'
-        switch (this.lang.lang) {
-          case 'zh_Hans_CN':
-            lang = 'zh-cn'
-            break
-          case 'zh_Hant_HK':
-            lang = 'zh-tw'
-            break
-          case 'en_US':
-          default:
-            break
-        }
-        return 'https://support.coinex.com/hc/' + lang
+        return 'https://support.coinex.com/hc/sections/360001604474'
       },
       invalidName() {
         return !this.form.userName || this.form.userName.length < this.minNameLength || this.form.userName.length > this.maxNameLength

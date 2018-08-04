@@ -5,7 +5,6 @@
   .page-my-payments {
     min-height: 460px;
 
-
     .my-info-item {
       height: 80px;
       align-items: center;
@@ -93,6 +92,18 @@
         font-size: 16px;
         color: #6f6f6f;
       }
+      .kyc-name {
+        margin-bottom: 25px;
+        .name {
+          border: solid 1px #d1d1d1;
+          font-size: 14px;
+          border-radius: 0px !important;
+          background-color: #f9f9f9;
+          height: 40px;
+          line-height: 40px;
+          padding-left: 12px;
+        }
+      }
     }
 
     .kyc-step {
@@ -155,7 +166,8 @@
 
         <template v-else>
           <span class="mr-3">{{payment.account_no}}</span>
-          <QrcodePopover :target-id="payment.id" v-if="payment.qr_code_image_url" :src="payment.qr_code_image_url" class="ml-1" style="vertical-align: -1px;"/>
+          <QrcodePopover :target-id="payment.id" v-if="payment.qr_code_image_url" :src="payment.qr_code_image_url"
+                         class="ml-1" style="vertical-align: -1px;"/>
         </template>
       </div>
 
@@ -189,15 +201,21 @@
         </h4>
 
         <b-form-group label="类型:" horizontal class="mb-25">
-          <b-form-select v-model="form.method" :options="constant.ACTUAL_PAYMENT_OPTIONS" :disabled="isPaymentEditing" size="lg">
+          <b-form-select v-model="form.method" :options="constant.ACTUAL_PAYMENT_OPTIONS" :disabled="isPaymentEditing"
+                         size="lg">
           </b-form-select>
         </b-form-group>
-
-        <b-form-group label="姓名:" horizontal>
-          <b-form-input v-model="form.account_name" size="lg" disabled></b-form-input>
-          <EMsgs :result="$v.form" :msgs="validationConf.messages" keyName="account_name"/>
-        </b-form-group>
-
+        <!--这里显示有bug 刚好也不需要填写 所以用div-->
+        <!--<b-form-group label="姓名:" horizontal>-->
+        <!--<b-form-input v-model="form.account_name" size="lg" disabled></b-form-input>-->
+        <!--<EMsgs :result="$v.form" :msgs="validationConf.messages" keyName="account_name"/>-->
+        <!--</b-form-group>-->
+        <div class="kyc-name form-row">
+          <label class="col-sm-3 col-form-label">姓名:</label>
+          <div class="col-sm-9">
+            <div class="name">{{form.account_name}}</div>
+          </div>
+        </div>
         <div v-if="form.method === 'bankcard'">
           <b-form-group label="开户银行:" horizontal>
             <b-form-select v-model="form.bank" :options="bankOptionsWithDefault"></b-form-select>

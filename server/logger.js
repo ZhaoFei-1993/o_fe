@@ -52,6 +52,31 @@ const logConfig = {
       level: 'ERROR',
       appender: 'errorFile',
     },
+    debug: {
+      type: 'console',
+    },
+  },
+  categories: {
+    default: {
+      appenders: ['common', 'error', 'errorEmail', 'commonEmail'],
+      level: globalLevel,
+    },
+  },
+}
+
+if (isDev) {
+  // 非生产环境下，所有日志打印到console
+  logConfig.categories = {
+    default: {
+      appenders: ['debug'],
+      level: globalLevel,
+    },
+  }
+}
+
+if (process.env.OTC === 0) { // 只发送一个实例的log
+  logConfig.appenders = {
+    ...logConfig.appenders,
     errorEmailSender: {
       ...smtpAppender,
       subject: '[❌Error] OTC最近1小时错误日志',
@@ -79,25 +104,6 @@ const logConfig = {
       type: 'logLevelFilter',
       level: 'INFO',
       appender: 'commonEmailSender',
-    },
-    debug: {
-      type: 'console',
-    },
-  },
-  categories: {
-    default: {
-      appenders: ['common', 'error', 'errorEmail', 'commonEmail'],
-      level: globalLevel,
-    },
-  },
-}
-
-if (isDev) {
-  // 非生产环境下，所有日志打印到console
-  logConfig.categories = {
-    default: {
-      appenders: ['debug'],
-      level: globalLevel,
     },
   }
 }

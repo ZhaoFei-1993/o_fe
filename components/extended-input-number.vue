@@ -12,9 +12,8 @@
 </style>
 
 <template>
-  <input class="extended-input-number" type="input" :disabled="disabled" :value="value"
+  <input class="extended-input-number" :disabled="disabled" :value="value"
          autocomplete="off"
-         :step="step"
          @input="onInput" :placeholder="placeholder"
          @focus="onFocus"/>
 </template>
@@ -44,10 +43,6 @@
         type: Number,
         default: 8,
       },
-      step: {
-        type: Number,
-        default: 0.1 ** 8,
-      }
     },
     methods: {
       onInput(evt) {
@@ -70,7 +65,7 @@
         if (value < this.min) {
           value = `${this.min}`.setDigit(this.decimalDigit)
         }
-        this.setValue(value, evt)
+        this.setValue(value.toLowerCase().scientificToDecimal(), evt) // 需要把类似1e-8这种转成0.00000001
       },
       setValue(value, evt) {
         evt.target.value = value

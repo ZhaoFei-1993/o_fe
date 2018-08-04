@@ -42,14 +42,17 @@
       </b-btn>
     </MyInfoItem>
     <MyInfoItem title="谷歌验证码">
-      <p slot="content">{{user.account.is_have_totp_auth ? '已绑定' : '未绑定'}}</p>
+      <p slot="content">
+        <span v-if="user.account.is_have_totp_auth">已绑定</span>
+        <span v-else class="c-red">未绑定</span>
+      </p>
       <b-btn slot="action" variant="outline-green" size="xs" :href="`${coinexDomain}/my/info/security`" target="_blank">
         {{user.account.is_have_totp_auth ? '更换' : '绑定'}}
       </b-btn>
     </MyInfoItem>
     <MyInfoItem title="登录密码">
-      <p slot="content">
-        密码强度:
+      <p slot="content" :class="{'c-red': user.account.login_password_level === constant.PASSWORD_LEVEL.LOW}">
+        <span class="mr-1">密码强度:</span>
         <span v-if="user.account.login_password_level === constant.PASSWORD_LEVEL.HIGH">高</span>
         <span v-if="user.account.login_password_level === constant.PASSWORD_LEVEL.MIDDLE">中</span>
         <span v-if="user.account.login_password_level === constant.PASSWORD_LEVEL.LOW">低</span>
@@ -72,9 +75,9 @@
     </MyInfoItem>
     <MyInfoItem title="交易验证">
       <p slot="content">
-        <span v-if="user.account.trade_validate_frequency === 'never'">从不二次验证</span>
-        <span v-if="user.account.trade_validate_frequency === 'each_two_hours'">2小时内不二次验证</span>
-        <span v-if="user.account.trade_validate_frequency === 'each_time'">每次交易均二次验证</span>
+        <span v-if="user.account.trade_validate_frequency === TRADE_VALIDATE_FREQUENCY.NEVER" class="c-red">从不二次验证</span>
+        <span v-if="user.account.trade_validate_frequency === TRADE_VALIDATE_FREQUENCY.EACH_TWO_HOURS">2小时内不二次验证</span>
+        <span v-if="user.account.trade_validate_frequency === TRADE_VALIDATE_FREQUENCY.EACH_TIME">每次交易均二次验证</span>
       </p>
       <b-btn slot="action" variant="outline-green" size="xs" target="_blank" :href="`${coinexDomain}/my/info/security`">更换</b-btn>
     </MyInfoItem>
@@ -110,7 +113,10 @@
       })
     },
     computed: {
-      ...mapState(['user', 'constant'])
+      ...mapState(['user', 'constant']),
+      'TRADE_VALIDATE_FREQUENCY': function () {
+        return this.constant.TRADE_VALIDATE_FREQUENCY
+      }
     }
   }
 </script>
