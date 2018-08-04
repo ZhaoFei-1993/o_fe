@@ -110,7 +110,6 @@
     }
 
     .info-item-content-example {
-      height: 60px;
       border: solid 1px #ffbc32;
       padding: 6px 12px;
       line-height: 1.71;
