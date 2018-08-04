@@ -204,6 +204,12 @@
         isItemEditing: false,   // 是否在编辑广告
       }
     },
+    head() {
+      return {
+        title: '广告管理' +
+        this.$t('global.pageTitle.common')
+      }
+    },
     computed: {
       ...mapState(['user', 'constant', 'balance']),
       // 当前展示的广告列表

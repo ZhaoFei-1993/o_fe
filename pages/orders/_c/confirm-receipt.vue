@@ -115,7 +115,7 @@
 <style lang="scss">
   #confirm-receipt-modal {
     .tips {
-      font-size: 18px;
+      font-size: 16px;
       margin-bottom: 20px;
       p.c-red {
         margin-top: 10px;

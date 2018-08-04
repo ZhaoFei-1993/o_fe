@@ -465,6 +465,12 @@
     computed: {
       ...mapState(['constant', 'user', 'balance']),
     },
+    head() {
+      return {
+        title: '首页' +
+        this.$t('global.pageTitle.common')
+      }
+    },
     fetch({store, app, req}) {
       app.axios.init(req)
       return Promise.all([

@@ -417,6 +417,12 @@
       clearInterval(this.timer) // 清除定时器
       this.stopRefreshOrders()
     },
+    head() {
+      return {
+        title: '订单管理' +
+        this.$t('global.pageTitle.common')
+      }
+    },
     components: {
       cBlock,
       Blank,

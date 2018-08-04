@@ -34,13 +34,17 @@
       <div slot="content">
         <div v-if="amountLimitEditing" class="d-flex">
           <div>
-            <CurrencyInput v-model="editingSettings.min_deal_cash_amount" :currency="settings.cash_type" :decimalDigit="0"/>
-            <EMsgs :result="$v.editingSettings" :messages="editingSettingsValidation.messages" keyName="min_deal_cash_amount" class="ps-a"/>
+            <CurrencyInput v-model="editingSettings.min_deal_cash_amount" :currency="settings.cash_type"
+                           :decimalDigit="0"/>
+            <EMsgs :result="$v.editingSettings" :messages="editingSettingsValidation.messages"
+                   keyName="min_deal_cash_amount" class="ps-a"/>
           </div>
           <span class="fz-12 mx-2 mt-10">—</span>
           <div>
-            <CurrencyInput v-model="editingSettings.max_deal_cash_amount" :currency="settings.cash_type" :decimalDigit="0"/>
-            <EMsgs :result="$v.editingSettings" :messages="editingSettingsValidation.messages" keyName="max_deal_cash_amount" class="ps-a"/>
+            <CurrencyInput v-model="editingSettings.max_deal_cash_amount" :currency="settings.cash_type"
+                           :decimalDigit="0"/>
+            <EMsgs :result="$v.editingSettings" :messages="editingSettingsValidation.messages"
+                   keyName="max_deal_cash_amount" class="ps-a"/>
           </div>
         </div>
         <div v-else>
@@ -63,10 +67,12 @@
       <template slot="content">
         <div slot="content" v-if="autoReplyEditing">
           <b-form-textarea v-model="editingSettings.auto_reply_content" rows="3"></b-form-textarea>
-          <p class="text-right" :class="{'c-red': editingSettings.auto_reply_content.length > constant.MAX_AUTO_REPLY_LENGTH}">
+          <p class="text-right"
+             :class="{'c-red': editingSettings.auto_reply_content.length > constant.MAX_AUTO_REPLY_LENGTH}">
             {{editingSettings.auto_reply_content.length}} / {{constant.MAX_AUTO_REPLY_LENGTH}}字
           </p>
-          <EMsgs :result="$v.editingSettings" :messages="editingSettingsValidation.messages" keyName="auto_reply_content" style="margin-top: -20px;"/>
+          <EMsgs :result="$v.editingSettings" :messages="editingSettingsValidation.messages"
+                 keyName="auto_reply_content" style="margin-top: -20px;"/>
         </div>
         <p v-else class="auto-reply-content">{{settings.auto_reply_content ? settings.auto_reply_content : '无'}}</p>
       </template>
@@ -130,6 +136,12 @@
         autoReplyEditing: false,
         counterpartyLimitEditing: false,
         editingSettings: {},            // settings的缓存，仅在编辑设置的时候使用
+      }
+    },
+    head() {
+      return {
+        title: '广告设置' +
+        this.$t('global.pageTitle.common')
       }
     },
     layout: 'my',

@@ -106,6 +106,12 @@
         coinexDomain,
       }
     },
+    head() {
+      return {
+        title: '账户安全' +
+        this.$t('global.pageTitle.common')
+      }
+    },
     fetch({app, store, req, redirect, route}) {
       app.axios.init(req)
       return store.dispatch('fetchUserAccount').catch(err => {

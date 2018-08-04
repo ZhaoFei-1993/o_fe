@@ -436,6 +436,12 @@
       QrcodePopover,
       Chat,
     },
+    head() {
+      return {
+        title: '订单详情' +
+        this.$t('global.pageTitle.common')
+      }
+    },
     fetch({store, app, req, redirect, route}) {
       app.axios.init(req)
       return Promise.all([

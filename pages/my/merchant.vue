@@ -303,6 +303,12 @@
       MyInfoItem,
     },
     layout: 'my',
+    head() {
+      return {
+        title: '商家认证' +
+        this.$t('global.pageTitle.common')
+      }
+    },
     data() {
       return {
         form: {

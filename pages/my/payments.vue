@@ -344,6 +344,12 @@
       KycStep,
     },
     layout: 'my',
+    head() {
+      return {
+        title: '支付方式' +
+        this.$t('global.pageTitle.common')
+      }
+    },
     data() {
       return {
         verify: {
