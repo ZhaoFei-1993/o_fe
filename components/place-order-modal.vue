@@ -150,9 +150,9 @@
             .input-container {
               width: 390px;
               input {
-                background-color: #f9f9f9;
                 border: solid 1px #dddddd;
                 padding-right: 60px;
+                font-size: 16px;
                 height: 40px;
                 &:focus {
                   border: solid 1px $brandGreen;
@@ -166,6 +166,7 @@
                 z-index: 100;
                 .input-group-text {
                   border: none;
+                  background-color: transparent;
                   color: $brandGreen;
                 }
               }

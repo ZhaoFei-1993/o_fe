@@ -30,7 +30,7 @@
           width: 10px;
           font-size: 18px;
           border-radius: 100%;
-          background-color: $brandYellow;
+          background-color: $brightYellow;
         }
       }
 
@@ -54,17 +54,23 @@
       }
 
       .iconfont {
-        font-size: 20px;
+        font-size: 16px;
+        color: $gray;
       }
 
       .icon-mobile._active {
         color: $brandYellow;
       }
-
+      .icon-namecard{
+        font-size:14px;
+      }
       .icon-namecard._active {
         color: $brandYellow;
       }
-
+      .icon-wechat-linear {
+        /* 这几个图标本身大小有点不太一样 */
+        font-size: 20px;
+      }
       .icon-wechat-linear._active {
         color: $brandGreen;
       }
