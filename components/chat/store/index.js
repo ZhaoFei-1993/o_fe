@@ -4,8 +4,8 @@ import AV from 'leancloud-storage'
 const MODE = process.env.MODE || 'production'
 
 export default () => {
-  let APP_ID = 'XXfwCSLsOXhw0p44dq8f8R43-9Nh9j0Va' // 华东测试key
-  let APP_KEY = 'upNarPTHhl0i2aYNnFrVvvb4'
+  let APP_ID = 'OibOYNHFsWoqChdhAlebT7rS-gzGzoHsz' // 测试key
+  let APP_KEY = 'IEIfsx2I6LkRajvtP2jcoCIW'
   if (MODE === 'production') {
     APP_ID = 'yeIzHy3DnjcFwsBXWg61onrU-gzGzoHsz' // 正式key
     APP_KEY = '3ncyYb7rdSog1Yyvj0UVwydU'
