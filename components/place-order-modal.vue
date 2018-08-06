@@ -150,9 +150,9 @@
             .input-container {
               width: 390px;
               input {
-                background-color: #f9f9f9;
                 border: solid 1px #dddddd;
                 padding-right: 60px;
+                font-size: 16px;
                 height: 40px;
                 &:focus {
                   border: solid 1px $brandGreen;
@@ -166,6 +166,7 @@
                 z-index: 100;
                 .input-group-text {
                   border: none;
+                  background-color: transparent;
                   color: $brandGreen;
                 }
               }
@@ -298,7 +299,7 @@
               }
             },
             message: {
-              required: '请填写购买金额',
+              required: `请填写${this.sideText}金额`,
               minValue: `最小下单金额${this.item.min_deal_cash_amount} CNY`,
               maxValue: `最大下单金额${this.maxDealCashAmount} CNY`,
               kycLimit: `非实名认证用户最大下单金额为${this.noKycLimit} CNY`
@@ -314,7 +315,7 @@
               }
             },
             message: {
-              required: '请填写购买金额',
+              required: `请填写${this.sideText}金额`,
               minValue: `最小下单数量${this.minDealCoinAmount} ${this.item.coin_type}`,
               maxValue: `最大下单数量${this.maxDealCoinAmount} ${this.item.coin_type}`,
               hasBalance: `账户余额${this.sideMaxCoin} ${this.item.coin_type}`
@@ -351,7 +352,7 @@
           this.$router.push(`/orders/${response.data.id}`)
         }).catch(err => {
           this.submitting = false
-          this.$showTips(`下单失败 ${err.message}，请重新下单`, 'error')
+          this.$showTips(`下单失败 ${err.message}`, 'error')
           this.hideModal()
         })
       },
