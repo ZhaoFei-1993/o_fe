@@ -195,5 +195,6 @@ module.exports = {
     {src: '~/plugins/tips', ssr: false},
     {src: '~/plugins/vue-components'},
     '~/plugins/filter',
+    '~/plugins/vuex-action-debouncer',
   ],
 }
