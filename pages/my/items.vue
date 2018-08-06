@@ -70,7 +70,7 @@
 
 <template>
   <CBlock class="page-my-items" x="0">
-    <h2 class="items-header">
+    <h2 class="items-header" v-if="user.merchant">
       <span class="items-header-left">
         广告管理
         <ToggleButton :value="user.merchant.is_available" class="mb-0 mx-5" @input="onUserStatusChange"/>
