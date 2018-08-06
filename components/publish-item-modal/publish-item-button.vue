@@ -32,8 +32,8 @@
       ...mapGetters(['paymentEnabled']),
     },
     mounted() {
-      this.$store.dispatch('fetchUserMerchant')
-      this.$store.dispatch('fetchUserPayments')
+      this.$store.dispatch('fetchUserMerchant').catch(() => {})
+      this.$store.dispatch('fetchUserPayments').catch(() => {})
     },
     methods: {
       onShowModal() {

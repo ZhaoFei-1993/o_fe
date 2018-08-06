@@ -13,21 +13,23 @@ function sleep(ms = 100) {
   })
 }
 
+// 全局处理
+axios.defaults.timeout = 5000
+axios.defaults.headers.common['platform'] = 'web'
+axios.defaults.headers.common['timezone'] = new Date().getTimezoneOffset() / 60
+
+const options = {
+  baseURL: process.client ? clientApiDomain : serverApiDomain,
+  // proxy: {
+  //   host: '127.0.0.1',
+  //   port: '80'
+  // }
+}
+
 export default ({app, store}) => {
-  const options = {
-    baseURL: process.client ? clientApiDomain : serverApiDomain,
-    // proxy: {
-    //   host: '127.0.0.1',
-    //   port: '80'
-    // }
-  }
   const inst = axios.create(options)
 
-  // 全局处理
-  inst.defaults.timeout = 5000
-  inst.defaults.headers.common['platform'] = 'web'
   inst.defaults.headers.common['Accept-Language'] = store.state.lang.lang || 'zh_Hans_CN'
-  inst.defaults.headers.common['timezone'] = new Date().getTimezoneOffset() / 60
 
   // 初始化
   inst.init = function (req) {
