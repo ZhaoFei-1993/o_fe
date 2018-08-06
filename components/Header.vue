@@ -49,6 +49,16 @@
           color: $brandGreen;
           text-decoration: none;
         }
+        .order-count-text {
+          display: inline-block;
+          position: absolute;
+          min-width: 20px;
+          text-align: center;
+          right: -15px;
+          top: -10px;
+          font-size: 12px;
+          color: #e35555;
+        }
         .icon-order-list {
           font-size: 14px;
           margin-right: 8px;
@@ -186,8 +196,12 @@
         <b-nav-item :href="`${coinexDomain}?lang=${lang.lang}`">返回主站</b-nav-item>
       </b-navbar-nav>
       <b-navbar-nav class="ml-auto">
-        <div v-if="user.account">
-          <b-link class="order-link" to="/orders"><i class="iconfont icon-order-list"></i>订单</b-link>
+        <div v-if="user.account" class="pr">
+          <b-link class="order-link" to="/orders" style="position: relative;"><i class="iconfont icon-order-list"></i>
+            <span>订单</span>
+            <span v-if="orderCount > 0" class="order-count-text">{{ orderCount > 99 ? '99+' : orderCount }}</span>
+          </b-link>
+          <!-- <div style="position: absolute;top: 60px;left: 0;width: 320px;height: 340px;background-color: #fff;"></div> -->
           <span style="color: #d5d5d5">|</span>
           <button class="message-button" hidden><i class="iconfont icon-message"></i></button>
           <b-nav-item-dropdown id="user-dropdown" :text="simplifyUserName(user.account.name)">
@@ -279,6 +293,8 @@
     },
     data() {
       return {
+        orderCount: 0, // 进行中订单数量
+        timer: null,
         form: {
           userName: '',
         },
@@ -342,6 +358,9 @@
               onApiError(err, this)
             })
           }
+
+          this.fetchOrderCount() // 马上执行一次
+          this.timer = setInterval(this.fetchOrderCount, 30000) // 30s请求一次订单数量
         }
       }).catch(err => {
         if (err.code === this.constant.ERROR_CODE.UNAUTHORIZED) return
@@ -351,8 +370,16 @@
     },
     beforeDestroy() {
       window.removeEventListener('scroll', this.onScroll)
+      clearInterval(this.timer)
     },
     methods: {
+      fetchOrderCount() {
+        this.axios.order.getOrderCount().then(res => {
+          if (res.code === 0) {
+            this.orderCount = res.data.count
+          }
+        })
+      },
       handleUpdateName(evt) {
         this.$v.form.$touch()
         if (this.$v.form.$invalid) {

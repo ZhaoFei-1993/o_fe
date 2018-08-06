@@ -41,6 +41,9 @@ export default (axios) => {
     },
     cancelOrder(id) {
       return axios.post(`/orders/${id}/cancel`)
-    }
+    },
+    getOrderCount() {
+      return axios.get('/orders/count')
+    },
   }
 }
