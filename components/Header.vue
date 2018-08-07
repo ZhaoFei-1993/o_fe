@@ -39,6 +39,59 @@
           color: $brandGreen;
         }
       }
+      .order-list-wrapper {
+        z-index: 1001;
+        position: absolute;
+        top: 60px;
+        left: -120px;
+        width: 320px;
+        height: 340px;
+        background-color: #fff;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 0 20px 0 #dddddd;
+        .order-list-header {
+          flex-grow: 0;
+          flex-shrink: 0;
+          background-color: #fff;
+          border-bottom: solid 1px #eeeeee;
+          .order-list-header-text {
+            padding: 0 21px;
+            height: 38px;
+            font-size: 14px;
+            color: #27313e;
+            line-height: 38px;
+          }
+        }
+        .order-list-body {
+          flex-grow: 1;
+          flex-shrink: 1;
+          background-color: #fff;
+          overflow-y: auto;
+          .order-list-item {
+            padding: 10px 0 10px 20px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            border-bottom: solid 1px #eeeeee;
+            .order-list-item-detail {
+              margin-left: 10px;
+            }
+          }
+        }
+        .order-list-footer {
+          flex-grow: 0;
+          flex-shrink: 0;
+          background-color: #fff;
+          border-top: solid 1px #eeeeee;
+          .order-list-footer-text {
+            padding: 0 21px;
+            height: 49px;
+            line-height: 49px;
+            text-align: center;
+          }
+        }
+      }
       .order-link {
         color: $dark;
         margin-right: 10px;
@@ -186,12 +239,43 @@
         <b-nav-item :href="`${coinexDomain}?lang=${lang.lang}`">返回主站</b-nav-item>
       </b-navbar-nav>
       <b-navbar-nav class="ml-auto">
-        <div v-if="user.account">
-          <b-link class="order-link" to="/orders"><i class="iconfont icon-order-list"></i>订单</b-link>
+        <div v-if="user.account" class="ps-r">
+          <div @mouseover="toggleShowOrders" @mouseout="toggleShowOrders" class="d-inline-block">
+            <b-link class="order-link ps-r" to="/orders">
+              <i class="iconfont icon-order-list"></i>
+              <span>订单</span>
+            </b-link>
+            <div v-show="showOrders" class="order-list-wrapper">
+              <div class="order-list-header">
+                <div class="order-list-header-text">进行中订单</div>
+              </div>
+              <div class="order-list-body">
+                <ul>
+                  <li class="order-list-item" v-for="item in orderList" @click="onLinkToOrderDetail(item.id)">
+                    <div>
+                      <UserAvatar :username="item._counterparty.name" :online="false" :size="40" :color="colors[item._counterparty.id % 10]"></UserAvatar>
+                    </div>
+                    <div class="order-list-item-detail">
+                      <div style="color: #9b9b9b;">
+                        <span style="display: inline-block;margin-right: 5px;">{{ item._isBuySide ? '购买' : '出售' }}{{ item.coin_type }}</span>
+                        <span>总价：{{ item.cash_amount | formatMoney(2) }} CNY</span>
+                      </div>
+                      <div style="color: #27313e;">{{ constant ? constant.ORDER_STATUS[item.status.toUpperCase()].text : '' }}</div>
+                    </div>
+                  </li>
+                </ul>
+                <Blank v-if="!orderList.length" text="暂无进行中的订单"></Blank>
+              </div>
+              <div class="order-list-footer">
+                <div class="order-list-footer-text">
+                  <b-link to="/orders">查看全部订单 ></b-link>
+                </div>
+              </div>
+            </div>
+          </div>
           <span style="color: #d5d5d5">|</span>
           <button class="message-button" hidden><i class="iconfont icon-message"></i></button>
           <b-nav-item-dropdown id="user-dropdown" :text="simplifyUserName(user.account.name)">
-            <!--<b-dropdown-item :href="accountSetting">账户设置</b-dropdown-item>-->
             <b-dropdown-item to="/my/security"><i class="iconfont icon-manage-account"></i> 个人中心</b-dropdown-item>
             <b-dropdown-item to="/wallet"><i class="iconfont icon-wallet"></i> OTC钱包</b-dropdown-item>
             <b-dropdown-item v-if="user.merchant && user.merchant.auth_status === constant.MERCHANT_AUTH_STATUS.PASS"
@@ -267,18 +351,25 @@
   import {loginPage, webDomain, signupPage, coinexDomain} from '~/modules/variables'
   import {onApiError} from '~/modules/error-code'
   import PublishItemButton from '~/components/publish-item-modal/publish-item-button.vue'
+  import UserAvatar from '~/components/user-avatar'
+  import Blank from '~/components/blank'
 
   Vue.use(Vuelidate)
   export default {
     head: {
-      link: [{rel: 'stylesheet', href: '//at.alicdn.com/t/font_739076_75dnwyr92qi.css'}]
+      link: [{rel: 'stylesheet', href: '//at.alicdn.com/t/font_739076_u3kh7zsyaxf.css'}]
     },
     components: {
       PublishItemButton,
       EMsgs,
+      UserAvatar,
+      Blank,
     },
     data() {
       return {
+        colors: ['#b2d9fd', '#fae7a3', '#ceeaaf', '#ffddd3', '#d4bfe8', '#b1ebde', '#ffd5bb', '#a9b2e0', '#e0a9cf', '#e0d0a9'],
+        orderList: [],
+        showOrders: false,
         form: {
           userName: '',
         },
@@ -329,6 +420,13 @@
         return this.validationConf.invalidMessages
       },
     },
+    watch: {
+      showOrders(newVal, oldVal) {
+        if (newVal && !oldVal) {
+          this.fetchOrderList()
+        }
+      },
+    },
     mounted() {
       // component 里面不能调用fetch和asyncData
       this.$store.dispatch('fetchUserAccount').then(_ => {
@@ -353,6 +451,45 @@
       window.removeEventListener('scroll', this.onScroll)
     },
     methods: {
+      isMerchant(order) { // 是否商家
+        return order.merchant_id === this.user.account.id
+      },
+      preprocessOrder(item) {
+        let counterparty
+        if (this.isMerchant(item)) { // 商家
+          counterparty = item.user
+        } else { // 普通用户
+          counterparty = item.merchant
+        }
+        return {
+          ...item,
+          _counterparty: counterparty, // 对手方
+          _isBuySide: (item.merchant_id === this.user.account.id) === (item.merchant_side === this.constant.SIDE.BUY),
+        }
+      },
+      fetchOrderList() {
+        this.axios.order.getOrderList({
+          status: 'processing',
+          page: 1,
+          limit: 20,
+        }).then(res => {
+          if (res.data) {
+            const { data } = res.data
+            this.orderList = data.map(item => this.preprocessOrder(item))
+          } else {
+            this.orderList = []
+          }
+        }).catch(err => {
+          this.orderList = []
+          this.axios.onError(err)
+        })
+      },
+      toggleShowOrders() {
+        this.showOrders = !this.showOrders
+      },
+      onLinkToOrderDetail(id) {
+        this.$router.push(`/orders/${id}`)
+      },
       handleUpdateName(evt) {
         this.$v.form.$touch()
         if (this.$v.form.$invalid) {

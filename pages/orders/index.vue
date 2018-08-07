@@ -11,7 +11,7 @@
         </b-btn>
       </div>
       <div class="order-table">
-        <b-table :fields="orderTableFields" :items="orderTableItems" @row-clicked="fetchUnreadMessageCount" :tbody-tr-class="queryParams.status === 'processing' ? 'order-row-class' : ''">
+        <b-table :fields="orderTableFields" :items="orderTableItems" @row-clicked="onRowClick" :tbody-tr-class="queryParams.status === 'processing' ? 'order-row-class' : ''">
           <template slot="HEAD__isBuySide" slot-scope="{ item }">
             <div>
               <TableHeadDropdown :options="orderTypeFilterOptions" label="类型"
@@ -25,7 +25,14 @@
             </div>
           </template>
           <template slot="id" slot-scope="{ item }">
-            <b-link class="id-text" :to="`/orders/${item.id}`">{{ item.id }}</b-link>
+            <b-link class="id-text" :to="`/orders/${item.id}`">
+              <span>{{ item.id }}</span>
+              <span class="message-btn">
+                <i
+                  :class="['iconfont', 'icon-message', item._unreadMessageCount > 0 ? 'shake-rotate' : '']"></i>
+                <sup class="message-badge" v-if="item._unreadMessageCount > 0"></sup>
+              </span>
+            </b-link>
           </template>
           <template slot="_isBuySide" slot-scope="{ item }">
             <span
@@ -137,13 +144,6 @@
                       <div class="detail-text detail-timer">
                         还剩{{ item._remaining_time | formatDuration }}
                       </div>
-                      <div class="message-btn">
-                        <b-link :to="`/orders/${item.id}`" class="message-link">
-                          <i
-                            :class="['iconfont', 'icon-message', item._unreadMessageCount > 0 ? 'shake-rotate' : '']"></i>
-                          <sup class="message-badge" v-if="item._unreadMessageCount > 0"></sup>
-                        </b-link>
-                      </div>
                       <div class="detail-btn-wrapper">
                         <b-btn size="xs" variant="gradient-yellow" class="detail-btn" @click="confirmPay(item)">我已付款
                         </b-btn>
@@ -159,13 +159,6 @@
                     </template>
                   </template>
                   <template v-if="item.status === constant.ORDER_STATUS.PAID.value">
-                    <div class="message-btn">
-                      <b-link :to="`/orders/${item.id}`" class="message-link">
-                        <i
-                          :class="['iconfont', 'icon-message', item._unreadMessageCount > 0 ? 'shake-rotate' : '']"></i>
-                        <sup class="message-badge" v-if="item._unreadMessageCount > 0"></sup>
-                      </b-link>
-                    </div>
                     <div class="detail-btn-wrapper detail-waiting">
                       等待卖家收款
                     </div>
@@ -174,13 +167,6 @@
                     </div>
                   </template>
                   <template v-if="item.status === constant.ORDER_STATUS.CLOSED.value">
-                    <div class="message-btn">
-                      <b-link :to="`/orders/${item.id}`" class="message-link">
-                        <i
-                          :class="['iconfont', 'icon-message', item._unreadMessageCount > 0 ? 'shake-rotate' : '']"></i>
-                        <sup class="message-badge" v-if="item._unreadMessageCount > 0"></sup>
-                      </b-link>
-                    </div>
                     <div class="detail-btn-wrapper detail-waiting">
                       已结束
                     </div>
@@ -191,13 +177,6 @@
                     <template v-if="item._remaining_time>0">
                       <div class="detail-text detail-timer">
                         还剩{{ item._remaining_time | formatDuration }}
-                      </div>
-                      <div class="message-btn">
-                        <b-link :to="`/orders/${item.id}`" class="message-link">
-                          <i
-                            :class="['iconfont', 'icon-message', item._unreadMessageCount > 0 ? 'shake-rotate' : '']"></i>
-                          <sup class="message-badge" v-if="item._unreadMessageCount > 0"></sup>
-                        </b-link>
                       </div>
                       <div class="detail-btn-wrapper detail-waiting">
                         等待买家付款
@@ -210,13 +189,6 @@
                     </template>
                   </template>
                   <template v-if="item.status === constant.ORDER_STATUS.PAID.value">
-                    <div class="message-btn">
-                      <b-link :to="`/orders/${item.id}`" class="message-link">
-                        <i
-                          :class="['iconfont', 'icon-message', item._unreadMessageCount > 0 ? 'shake-rotate' : '']"></i>
-                        <sup class="message-badge" v-if="item._unreadMessageCount > 0"></sup>
-                      </b-link>
-                    </div>
                     <div class="detail-btn-wrapper">
                       <b-btn size="xs" variant="gradient-yellow" class="detail-btn" @click="confirmReceipt(item)">确认收款
                       </b-btn>
@@ -483,6 +455,27 @@
           limit,
         })
       },
+      getUnreadMsgCount() {
+        const handler = () => {
+          const task = this.orderTableItems.map(item => {
+            if (item.conversation_id) {
+              return this.chat.imClient.getConversation(item.conversation_id)
+            }
+            return Promise.resolve({ unreadMessagesCount: 0 })
+          })
+          Promise.all(task).then(res => {
+            res.forEach((item, index) => {
+              this.orderTableItems[index]._unreadMessageCount = item.unreadMessagesCount
+            })
+          }).catch(console.error)
+        }
+
+        if (!this.chat.imClient) {
+          setTimeout(handler, 1500) // 直接刷新页面情况可能出现im还没初始化，需要延迟获取未读消息
+        } else {
+          handler()
+        }
+      },
       initOrderList() {
         this.asyncFetchOrderList().then((res) => {
           if (res.code === 0 && res.data) {
@@ -490,6 +483,7 @@
             this.queryParams.page = currentPage
             this.queryParams.totalRows = totalRows
             this.orderTableItems = data.map(item => this.preprocessOrder(item))
+            this.getUnreadMsgCount()
           } else {
             this.orderTableItems = []
           }
@@ -522,19 +516,13 @@
           _unreadMessageCount: 0, // 未读消息数量
         }
       },
-      fetchUnreadMessageCount(record, index, event) {
-        if (event.target.tagName.toLowerCase() === 'a') return
+      onRowClick(record, index, event) {
+        if (event.target.parentNode.tagName.toLowerCase() === 'a') return
         if (this.queryParams.status === 'processing') {
           if (!record._showDetails) {
             this.$set(record, '_showDetails', true) // 首次添加属性需要调用set方法
           } else {
             record._showDetails = !record._showDetails
-          }
-          if (!record.conversation_id) return
-          if (this.chat.imClient) {
-            this.chat.imClient.getConversation(record.conversation_id).then(conversation => {
-              record._unreadMessageCount = conversation.unreadMessagesCount
-            }).catch(console.error)
           }
         }
       },
@@ -679,6 +667,7 @@
               }
             })
             this.orderTableItems = this.orderTableItems.filter(i => newOrderIds.indexOf(i.id) >= 0)
+            this.getUnreadMsgCount()
           } else {
             this.orderTableItems = []
           }
@@ -725,6 +714,39 @@
     }
     .order-table {
       margin: 20px -30px 0;
+      .message-btn {
+        display: inline-block;
+        position: relative;
+        width: 28px;
+        height: 28px;
+        text-align: center;
+        color: #52cbca;
+        line-height: 28px;
+        .iconfont {
+          font-size: 13px;
+        }
+        .shake-rotate {
+          display: inline-block;
+          transform-origin: center center;
+          animation-name: shake-rotate;
+          animation-duration: 100ms;
+          animation-iteration-count: infinite;
+          animation-timing-function: ease-in-out;
+          animation-delay: 0s;
+        }
+        .message-badge {
+          position: absolute;
+          right: 12px;
+          height: 6px;
+          width: 6px;
+          border-radius: 50%;
+          top: 8px;
+          transform: translate3d(100%, -50%, 0);
+          background-color: #e35555;
+          border: solid 1px #fff;
+          display: inline-block;
+        }
+      }
       .detail-warn-text {
         height: 38px;
         width: 100%;
@@ -866,47 +888,6 @@
         .detail-text {
           font-size: 14px;
           color: #9b9b9b;
-        }
-        .message-btn {
-          display: inline-block;
-          position: relative;
-          border-radius: 100px;
-          width: 28px;
-          height: 28px;
-          background-color: #fff;
-          box-shadow: 0 0 10px 0 #ececec;
-          text-align: center;
-          color: #52cbca;
-          line-height: 28px;
-          margin-left: 6px;
-          a.message-link {
-            &:hover {
-              text-decoration: none !important;
-            }
-            .iconfont {
-              font-size: 14px;
-            }
-          }
-          .shake-rotate {
-            display: inline-block;
-            transform-origin: center center;
-            animation-name: shake-rotate;
-            animation-duration: 100ms;
-            animation-iteration-count: infinite;
-            animation-timing-function: ease-in-out;
-            animation-delay: 0s;
-          }
-          .message-badge {
-            position: absolute;
-            right: 8px;
-            height: 8px;
-            width: 8px;
-            border-radius: 50%;
-            top: 3px;
-            transform: translate3d(100%, -50%, 0);
-            background-color: #f56c6c;
-            display: inline-block;
-          }
         }
         .detail-timer {
           display: inline-block;
