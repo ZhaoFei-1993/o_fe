@@ -25,7 +25,7 @@
             </div>
           </template>
           <template slot="id" slot-scope="{ item }">
-            <b-link class="id-text" :to="`/orders/${item.id}`">
+            <b-link class="id-text" @click.stop="onClickItemId(item.id)">
               <span>{{ item.id }}</span>
               <span class="message-btn">
                 <i
@@ -516,8 +516,10 @@
           _unreadMessageCount: 0, // 未读消息数量
         }
       },
+      onClickItemId(id) {
+        this.$router.push(`/orders/${id}`)
+      },
       onRowClick(record, index, event) {
-        if (event.target.parentNode.tagName.toLowerCase() === 'a') return
         if (this.queryParams.status === 'processing') {
           if (!record._showDetails) {
             this.$set(record, '_showDetails', true) // 首次添加属性需要调用set方法
