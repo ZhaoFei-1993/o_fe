@@ -102,16 +102,6 @@
           color: $brandGreen;
           text-decoration: none;
         }
-        .order-count-text {
-          display: inline-block;
-          position: absolute;
-          min-width: 20px;
-          text-align: center;
-          right: -15px;
-          top: -10px;
-          font-size: 12px;
-          color: #e35555;
-        }
         .icon-order-list {
           font-size: 14px;
           margin-right: 8px;
@@ -254,7 +244,6 @@
             <b-link class="order-link ps-r" to="/orders">
               <i class="iconfont icon-order-list"></i>
               <span>订单</span>
-              <span v-if="orderCount > 0" class="order-count-text">{{ orderCount > 99 ? '99+' : orderCount }}</span>
             </b-link>
             <div v-show="showOrders" class="order-list-wrapper">
               <div class="order-list-header">
@@ -275,7 +264,7 @@
                     </div>
                   </li>
                 </ul>
-                <Blank v-if="!orderList.length"></Blank>
+                <Blank v-if="!orderList.length" text="暂无进行中的订单"></Blank>
               </div>
               <div class="order-list-footer">
                 <div class="order-list-footer-text">
@@ -381,8 +370,6 @@
         colors: ['#b2d9fd', '#fae7a3', '#ceeaaf', '#ffddd3', '#d4bfe8', '#b1ebde', '#ffd5bb', '#a9b2e0', '#e0a9cf', '#e0d0a9'],
         orderList: [],
         showOrders: false,
-        orderCount: 0, // 进行中订单数量
-        timer: null,
         form: {
           userName: '',
         },
@@ -453,9 +440,6 @@
               onApiError(err, this)
             })
           }
-
-          this.fetchOrderCount() // 马上执行一次
-          this.timer = setInterval(this.fetchOrderCount, 30000) // 30s请求一次订单数量
         }
       }).catch(err => {
         if (err.code === this.constant.ERROR_CODE.UNAUTHORIZED) return
@@ -465,7 +449,6 @@
     },
     beforeDestroy() {
       window.removeEventListener('scroll', this.onScroll)
-      clearInterval(this.timer)
     },
     methods: {
       isMerchant(order) { // 是否商家
@@ -505,13 +488,6 @@
       },
       onLinkToOrderDetail(id) {
         this.$router.push(`/orders/${id}`)
-      },
-      fetchOrderCount() {
-        this.axios.order.getOrderCount().then(res => {
-          if (res.code === 0) {
-            this.orderCount = res.data.count
-          }
-        })
       },
       handleUpdateName(evt) {
         this.$v.form.$touch()
