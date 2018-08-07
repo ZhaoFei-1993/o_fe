@@ -251,7 +251,7 @@
         return parseFloat(this.balance.otcBalance.find(b => b.coin_type === this.item.coin_type).available)
       },
       itemLimit() {
-        return this.utils.getItemLimit(this.item, this.sideMaxCoin)
+        return this.helpers.getItemLimit(this.item, this.sideMaxCoin)
       },
       sideMaxCoin() {
         // 用户买单和balance无关，卖单需要有足够余额

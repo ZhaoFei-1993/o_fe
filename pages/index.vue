@@ -547,7 +547,7 @@
           const data = response.data
           this.busy = false
           data.data.forEach(item => {
-            item.itemLimit = this.utils.getItemLimit(item)
+            item.itemLimit = this.helpers.getItemLimit(item)
           })
           this.items = data.data
           this.pager = this.utils.extractPager(data)

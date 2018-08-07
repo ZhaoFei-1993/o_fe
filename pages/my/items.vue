@@ -310,7 +310,7 @@
       getItems() {
         this.axios.item.userItems(this.itemStatus).then(res => {
           res.data.forEach(item => {
-            item.itemLimit = this.utils.getItemLimit(item)
+            item.itemLimit = this.helpers.getItemLimit(item)
           })
           this[this.itemStatus === this.constant.ITEM_STATUS.ONLINE ? 'itemsOnline' : 'itemsOffline'] = res.data
         }).catch(err => {
