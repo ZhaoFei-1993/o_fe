@@ -378,7 +378,7 @@
         maxNameLength: 15,
         attentionModelShowing: false,
         attention: [],
-        nameDuplicated: false,
+        nameInvalid: false,
         headerClass: null,
         activeAttentionIndex: 0,
         loginPage: `${loginPage}?redirect=${encodeURIComponent(webDomain + this.$route.fullPath)}`,
@@ -403,15 +403,15 @@
               required,
               minLength: minLength(this.minNameLength),
               maxLength: maxLength(this.maxNameLength),
-              uniqueName: () => {
-                return !this.nameDuplicated
+              validName: () => {
+                return !this.nameInvalid
               }
             },
             message: {
               required: '请填写昵称',
               minLength: `昵称最少${this.minNameLength}个字符`,
               maxLength: `昵称最多${this.maxNameLength}个字符`,
-              uniqueName: '该昵称已被占用',
+              validName: '仅允许中英文、数字、下划线，不支持重复昵称',
             },
           },
         })
@@ -500,8 +500,8 @@
           this.$refs.updateNameModal.hide()
           this.$store.dispatch('fetchUserAccount')
         }).catch(err => {
-          if (err.code === this.constant.ERROR_CODE.NAME_USED) {
-            this.nameDuplicated = true
+          if (err.code) {
+            this.nameInvalid = true
           } else {
             onApiError(err, this)
           }
@@ -509,7 +509,7 @@
       },
       inputUserName() {
         this.$v.form.userName.$touch()
-        this.nameDuplicated = false
+        this.nameInvalid = false
       },
       simplifyUserName(str = '') {
         if (isNaN(str)) {

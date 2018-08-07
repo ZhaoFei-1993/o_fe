@@ -191,6 +191,7 @@ module.exports = {
     {src: '~/plugins/ga', ssr: false},
     {src: '~/plugins/webp'},
     {src: '~/plugins/utils'},
+    {src: '~/plugins/helpers'},
     {src: '~/plugins/modal', ssr: false},
     {src: '~/plugins/tips', ssr: false},
     {src: '~/plugins/vue-components'},

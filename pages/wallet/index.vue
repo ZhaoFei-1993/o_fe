@@ -364,6 +364,12 @@
         this.fetchBalanceHistory()
       },
     },
+    head() {
+      return {
+        title: 'OTC钱包' +
+        this.$t('global.pageTitle.common')
+      }
+    },
     methods: {
       changePage(page) {
         this.historyQueryParams.page = page
