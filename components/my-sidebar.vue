@@ -31,7 +31,7 @@
           border-color: #fff;
           border-top-color: #eee;
           border-bottom-color: #eee;
-          border-left: 4px solid #00c1ce;
+          border-left: 4px solid #52cbca;
           background-color: #fff;
           color: #162331;
 
