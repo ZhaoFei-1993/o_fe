@@ -70,7 +70,7 @@
 
 <template>
   <CBlock class="page-my-items" x="0">
-    <h2 class="items-header">
+    <h2 class="items-header" v-if="user.merchant">
       <span class="items-header-left">
         广告管理
         <ToggleButton :value="user.merchant.is_available" class="mb-0 mx-5" @input="onUserStatusChange"/>
@@ -95,6 +95,7 @@
     <b-table :fields="itemTableFields" :items="itemsCurrent" class="items-table">
       <template slot="id" slot-scope="{ item }">
         <b-link>{{ item.id }}</b-link>
+        <span class="ml-5 c-red" v-b-tooltip.hover title="可售数量不足，无法在首页中展示"><i class="iconfont icon-error"></i></span>
       </template>
       <template slot="side" slot-scope="{ item }">
         <!-- 自定义的属性 -->
@@ -106,7 +107,7 @@
         {{ formatMoney(item.remain_coin_amount) }}
       </template>
       <template slot="cashAmountLimit" slot-scope="{ item }">
-        {{formatMoney(item.min_deal_cash_amount)}} - {{formatMoney(item.max_deal_cash_amount)}} {{item.cash_type}}
+        {{formatMoney(item.itemLimit.minDealCashAmount,2)}} - {{formatMoney(item.itemLimit.maxDealCashAmount,2)}} {{item.cash_type}}
       </template>
       <template slot="price" slot-scope="{ item }">
         <!--浮动定价需要显示浮动的定价，会和price不一致（由于后台更新延迟所导致）-->
@@ -309,11 +310,8 @@
       getItems() {
         this.axios.item.userItems(this.itemStatus).then(res => {
           res.data.forEach(item => {
-            item.remain_coin_amount = parseFloat(item.remain_coin_amount) // 防止出现0E-8这种情况
-            item.max_deal_cash_amount = item.max_deal_cash_amount.setDigit(0)
-            item.min_deal_cash_amount = item.min_deal_cash_amount.setDigit(0)
+            item.itemLimit = this.helpers.getItemLimit(item)
           })
-
           this[this.itemStatus === this.constant.ITEM_STATUS.ONLINE ? 'itemsOnline' : 'itemsOffline'] = res.data
         }).catch(err => {
           this.axios.onError(err)

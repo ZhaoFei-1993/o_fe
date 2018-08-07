@@ -406,7 +406,7 @@
   import {mapState} from 'vuex'
 
   const PAID_CAN_APPEAL = 30 * 60 * 1000 // 三十分钟
-  const SUCCESS_CAN_APPEAL = 7 * 24 * 3600 * 1000 // 七天
+  const SUCCESS_CAN_APPEAL = 24 * 3600 * 1000 // 二十四小时
   const ORDER_PAY_TIME = 15 // 15分钟（未换算）
   const REFRESH_ORDER_INTERVAL = 5000
 

@@ -1,8 +1,8 @@
 import Vue from 'vue'
-import { getTimeText, formatDuration } from './utils'
+import {getTimeText, formatDuration} from './utils'
 
-export function formatMoney(str = '') {
-  return `${str}`.formatMoney(8, '.', ',', true)
+export function formatMoney(str = '', digit = 8) {
+  return `${str}`.formatMoney(digit, '.', ',', true)
 }
 
 export function percentage(num) {
