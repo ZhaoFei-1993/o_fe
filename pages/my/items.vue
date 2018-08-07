@@ -95,7 +95,7 @@
     <b-table :fields="itemTableFields" :items="itemsCurrent" class="items-table">
       <template slot="id" slot-scope="{ item }">
         <b-link>{{ item.id }}</b-link>
-        <span class="ml-5 c-red" v-b-tooltip.hover title="可售数量不足，无法在首页中展示"><i class="iconfont icon-error"></i></span>
+        <span class="ml-5 c-red" v-b-tooltip.hover title="可交易数量不足最小限额，无法在首页中展示"><i class="iconfont icon-error"></i></span>
       </template>
       <template slot="side" slot-scope="{ item }">
         <!-- 自定义的属性 -->
