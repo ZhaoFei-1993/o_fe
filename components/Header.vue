@@ -275,6 +275,7 @@
                     </div>
                   </li>
                 </ul>
+                <Blank v-if="!orderList.length"></Blank>
               </div>
               <div class="order-list-footer">
                 <div class="order-list-footer-text">
@@ -362,6 +363,7 @@
   import {onApiError} from '~/modules/error-code'
   import PublishItemButton from '~/components/publish-item-modal/publish-item-button.vue'
   import UserAvatar from '~/components/user-avatar'
+  import Blank from '~/components/blank'
 
   Vue.use(Vuelidate)
   export default {
@@ -372,6 +374,7 @@
       PublishItemButton,
       EMsgs,
       UserAvatar,
+      Blank,
     },
     data() {
       return {
