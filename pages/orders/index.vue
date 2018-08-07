@@ -691,6 +691,10 @@
       justify-content: space-between;
       width: 255px;
       margin-top: 28px;
+      button{
+        /* 这种border变gradient的按钮如果不指定高宽会抖动 */
+        width:62px;
+      }
     }
     .filter-item {
       width: 70px;
