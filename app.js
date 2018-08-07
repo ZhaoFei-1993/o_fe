@@ -1,5 +1,5 @@
 process.SERVER_BUILD = true
-
+// console.log(1)
 const Koa = require('koa')
 const Nuxt = require('nuxt').Nuxt
 const Builder = require('nuxt').Builder
