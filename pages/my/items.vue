@@ -106,7 +106,7 @@
         {{ formatMoney(item.remain_coin_amount) }}
       </template>
       <template slot="cashAmountLimit" slot-scope="{ item }">
-        {{formatMoney(item.min_deal_cash_amount)}} - {{formatMoney(item.max_deal_cash_amount)}} {{item.cash_type}}
+        {{formatMoney(item.itemLimit.minDealCashAmount,2)}} - {{formatMoney(item.itemLimit.maxDealCashAmount,2)}} {{item.cash_type}}
       </template>
       <template slot="price" slot-scope="{ item }">
         <!--浮动定价需要显示浮动的定价，会和price不一致（由于后台更新延迟所导致）-->
@@ -309,11 +309,8 @@
       getItems() {
         this.axios.item.userItems(this.itemStatus).then(res => {
           res.data.forEach(item => {
-            item.remain_coin_amount = parseFloat(item.remain_coin_amount) // 防止出现0E-8这种情况
-            item.max_deal_cash_amount = item.max_deal_cash_amount.setDigit(0)
-            item.min_deal_cash_amount = item.min_deal_cash_amount.setDigit(0)
+            item.itemLimit = this.utils.getItemLimit(item)
           })
-
           this[this.itemStatus === this.constant.ITEM_STATUS.ONLINE ? 'itemsOnline' : 'itemsOffline'] = res.data
         }).catch(err => {
           this.axios.onError(err)

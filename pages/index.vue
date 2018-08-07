@@ -331,11 +331,11 @@
             </span>
 
             <span class="col-wide col-price-limit">
-              <div class="number">{{item.min_deal_cash_amount.setDigit(0) + '-' + item.max_deal_cash_amount.setDigit(0)}}</div>
+              <div class="number">{{item.itemLimit.minDealCashAmount + '-' + item.itemLimit.maxDealCashAmount}}</div>
               <div class="unit">{{balance.currentCash}}</div>
             </span>
 
-            <span :class="['col-price',sortPrice]">{{item.price.setDigit(2) + ' '+balance.currentCash}}</span>
+            <span :class="['col-price',sortPrice]">{{item.price + ' '+balance.currentCash}}</span>
 
             <span class='payment col-narrow'>
               <UserPayments :payments="item.payment_methods" size="14"/>
@@ -546,6 +546,9 @@
         }).then(response => {
           const data = response.data
           this.busy = false
+          data.data.forEach(item => {
+            item.itemLimit = this.utils.getItemLimit(item)
+          })
           this.items = data.data
           this.pager = this.utils.extractPager(data)
         })

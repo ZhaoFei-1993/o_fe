@@ -38,7 +38,7 @@
         <span>单价：<span class="emphasis">{{item.price}}</span> {{balance.currentCash}}/{{item.coin_type}}
           <i v-if="item.pricing_type===constant.PRICING_TYPE.FLOAT" class="iconfont icon-tooltip" v-b-tooltip.hover
              title="当前数字货币价格为系统自动计算，实际价格以发起时的价格为准。"></i> </span>
-        <span>限额：<span class="emphasis">{{item.min_deal_cash_amount + '-' + item.max_deal_cash_amount}}</span> {{balance.currentCash}}</span>
+        <span>限额：<span class="emphasis">{{itemLimit.minDealCashAmount + '-' + itemLimit.maxDealCashAmount}}</span> {{balance.currentCash}}</span>
         <span>支付方式：<span class="emphasis">{{paymentMethods}}</span></span>
       </div>
       <div class="item-payment">
@@ -46,7 +46,7 @@
           <div class="price-input">
             <div class="input-container">
               <div class="max-value">最多{{item.side=== constant.SIDE.BUY?'可卖':'可买'}}
-                {{' '+ maxDealCashAmount+ ' '+balance.currentCash}}
+                {{' '+ itemLimit.maxAvailableCashAmount+ ' '+balance.currentCash}}
                 <span class="purchase-all"
                       @click="purchaseAll">全部{{sideText}}</span>
               </div>
@@ -62,7 +62,7 @@
             </div>
             <span class="separator"><i class="iconfont icon-exchange"></i></span>
             <div class="input-container">
-              <div class="max-value">最多{{item.side=== constant.SIDE.BUY ?'可卖':'可买'}}{{' '+ maxDealCoinAmount + ' '+
+              <div class="max-value">最多{{item.side=== constant.SIDE.BUY ?'可卖':'可买'}}{{' '+ itemLimit.maxAvailableCoinAmount + ' '+
                 item.coin_type}}<span
                   class="purchase-all"
                   @click="purchaseAll">全部{{sideText}}</span>
@@ -250,27 +250,12 @@
       currentBalance() {
         return parseFloat(this.balance.otcBalance.find(b => b.coin_type === this.item.coin_type).available)
       },
-      minDealCoinAmount() {
-        return `${this.item.min_deal_cash_amount / this.item.price}`.setDigit(8)
-      },
-      maxDealCoinAmount() {
-        // coin 更精确，优先用coin计算
-        // 取以下各项的最小值（广告剩余量、广告限制最大额）
-        const maxAmount = Math.min(this.item.remain_coin_amount, (this.item.max_deal_cash_amount / this.item.price || Number.MAX_SAFE_INTEGER))
-        return `${maxAmount}`.setDigit(8)
+      itemLimit() {
+        return this.utils.getItemLimit(this.item, this.sideMaxCoin)
       },
       sideMaxCoin() {
         // 用户买单和balance无关，卖单需要有足够余额
         return this.item.side === this.constant.SIDE.SELL ? Number.MAX_SAFE_INTEGER : this.currentBalance
-      },
-      maxDealCashAmount() {
-        let maxCash = this.maxDealCoinAmount * this.item.price
-        // 最大值可能因为取小数位数的问题导致误差
-        if (this.item.max_deal_cash_amount - maxCash <= 0.01) {
-          // 不存在更大的情况
-          maxCash = this.item.max_deal_cash_amount
-        }
-        return `${maxCash}`.setDigit(2)
       },
       sideText() {
         // user看到的是与merchant反的
@@ -292,33 +277,31 @@
           cash_amount: {
             validation: {
               required,
-              minValue: minValue(this.item.min_deal_cash_amount),
-              maxValue: maxValue(this.maxDealCashAmount),
+              minValue: minValue(this.itemLimit.minDealCashAmount),
+              maxValue: maxValue(this.itemLimit.maxDealCashAmount),
               kycLimit: (value) => {
                 return value <= this.kycLimitAmount
               }
             },
             message: {
               required: `请填写${this.sideText}金额`,
-              minValue: `最小下单金额${this.item.min_deal_cash_amount} CNY`,
-              maxValue: `最大下单金额${this.maxDealCashAmount} CNY`,
+              minValue: `最小下单金额${this.itemLimit.minDealCashAmount} CNY`,
+              maxValue: `最大下单金额${this.itemLimit.maxDealCashAmount} CNY`,
               kycLimit: `非实名认证用户最大下单金额为${this.noKycLimit} CNY`
             },
           },
           coin_amount: {
             validation: {
               required,
-              minValue: minValue(this.minDealCoinAmount),
-              maxValue: maxValue(this.maxDealCoinAmount),
-              hasBalance: (value) => {
-                return value <= this.sideMaxCoin
-              }
+              minValue: minValue(this.itemLimit.minDealCoinAmount),
+              maxValue: maxValue(this.itemLimit.maxDealCoinAmount),
+              maxAvailable: maxValue(this.itemLimit.maxAvailableCoinAmount),
             },
             message: {
               required: `请填写${this.sideText}金额`,
-              minValue: `最小下单数量${this.minDealCoinAmount} ${this.item.coin_type}`,
-              maxValue: `最大下单数量${this.maxDealCoinAmount} ${this.item.coin_type}`,
-              hasBalance: `账户余额${this.sideMaxCoin} ${this.item.coin_type}`
+              minValue: `最小下单数量${this.itemLimit.minDealCoinAmount} ${this.item.coin_type}`,
+              maxValue: `最大下单数量${this.itemLimit.maxDealCoinAmount} ${this.item.coin_type}`,
+              maxAvailable: `账户余额${this.itemLimit.maxAvailableCoinAmount} ${this.item.coin_type}`,
             },
           },
         })
@@ -386,10 +369,10 @@
         this.form.focusInput = inputName
       },
       purchaseAll() {
-        this.form.cash_amount = this.maxDealCashAmount
-        this.form.coin_amount = this.maxDealCoinAmount
+        this.form.cash_amount = this.itemLimit.maxAvailableCashAmount
+        this.form.coin_amount = this.itemLimit.maxAvailableCoinAmount
         this.$v.form.coin_amount.$touch()
-        this.$v.form.coin_amount.$touch()
+        this.$v.form.cash_amount.$touch()
       }
     },
   }
