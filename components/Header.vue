@@ -271,7 +271,7 @@
   Vue.use(Vuelidate)
   export default {
     head: {
-      link: [{rel: 'stylesheet', href: '//at.alicdn.com/t/font_739076_kxv6h9mezzb.css'}]
+      link: [{rel: 'stylesheet', href: '//at.alicdn.com/t/font_739076_75dnwyr92qi.css'}]
     },
     components: {
       PublishItemButton,
