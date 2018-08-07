@@ -40,7 +40,7 @@
         }
       }
       .order-list-wrapper {
-        z-index: 9999999;
+        z-index: 1001;
         position: absolute;
         top: 60px;
         left: -120px;
@@ -240,7 +240,7 @@
       </b-navbar-nav>
       <b-navbar-nav class="ml-auto">
         <div v-if="user.account" class="ps-r">
-          <div @mouseover="toggleShowOrders()" @mouseout="toggleShowOrders()" style="display: inline-block;">
+          <div @mouseover="toggleShowOrders" @mouseout="toggleShowOrders" class="d-inline-block">
             <b-link class="order-link ps-r" to="/orders">
               <i class="iconfont icon-order-list"></i>
               <span>订单</span>
@@ -258,7 +258,7 @@
                     <div class="order-list-item-detail">
                       <div style="color: #9b9b9b;">
                         <span style="display: inline-block;margin-right: 5px;">{{ item._isBuySide ? '购买' : '出售' }}{{ item.coin_type }}</span>
-                        <span>总价：{{ item.cash_amount | formatMoney }} CNY</span>
+                        <span>总价：{{ item.cash_amount | formatMoney(2) }} CNY</span>
                       </div>
                       <div style="color: #27313e;">{{ constant ? constant.ORDER_STATUS[item.status.toUpperCase()].text : '' }}</div>
                     </div>
@@ -473,14 +473,15 @@
           page: 1,
           limit: 20,
         }).then(res => {
-          if (res.code === 0 && res.data) {
+          if (res.data) {
             const { data } = res.data
             this.orderList = data.map(item => this.preprocessOrder(item))
           } else {
             this.orderList = []
           }
-        }).catch(() => {
+        }).catch(err => {
           this.orderList = []
+          this.axios.onError(err)
         })
       },
       toggleShowOrders() {
