@@ -43,7 +43,7 @@
         z-index: 9999999;
         position: absolute;
         top: 60px;
-        left: -110px;
+        left: -120px;
         width: 320px;
         height: 340px;
         background-color: #fff;
@@ -366,7 +366,7 @@
   Vue.use(Vuelidate)
   export default {
     head: {
-      link: [{rel: 'stylesheet', href: '//at.alicdn.com/t/font_739076_kxv6h9mezzb.css'}]
+      link: [{rel: 'stylesheet', href: '//at.alicdn.com/t/font_739076_u3kh7zsyaxf.css'}]
     },
     components: {
       PublishItemButton,
