@@ -435,6 +435,9 @@
       },
     },
     mounted() {
+      // 页面加载完成之后，设置一下多语言版的常量
+      this.$store.dispatch('setConstantI18n')
+
       // component 里面不能调用fetch和asyncData
       this.$store.dispatch('fetchUserAccount').then(_ => {
         if (this.user && this.user.account) {
