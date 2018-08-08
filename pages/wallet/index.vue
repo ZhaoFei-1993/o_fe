@@ -73,7 +73,7 @@
           <b-form-select class="history-filter-select"
                          v-model="historyQueryParams.business_type"
                          :options="operationOptions">
-              <option slot="first" :value="null">不限</option>
+            <option slot="first" :value="null">不限</option>
           </b-form-select>
         </div>
       </div>
@@ -92,17 +92,18 @@
       </b-table>
       <blank v-if="!assetHistoryItems.length"></blank>
       <ViaPagination v-if="assetHistoryItems.length"
-                    :total-rows="historyQueryParams.totalRows"
-                    :current-page="historyQueryParams.page"
+                     :total-rows="historyQueryParams.totalRows"
+                     :current-page="historyQueryParams.page"
                      @change="changePage"
-                    :per-page="historyQueryParams.limit">
+                     :per-page="historyQueryParams.limit">
       </ViaPagination>
     </c-block>
 
     <b-modal title="资金划转" v-model="showTransferModal" hide-footer no-close-on-backdrop>
       <b-form>
         <b-form-group label="选择币种" horizontal>
-          <b-form-select v-model="form.coinType" :options="constant.COIN_TYPE_OPTIONS" @change="onChangeCoinType"></b-form-select>
+          <b-form-select v-model="form.coinType" :options="constant.COIN_TYPE_OPTIONS"
+                         @change="onChangeCoinType"></b-form-select>
         </b-form-group>
         <b-form-group label="从" horizontal>
           <b-form-select v-model="form.from" :options="walletOptions" @change="onSwap"></b-form-select>
@@ -116,7 +117,9 @@
         <b-form-group horizontal>
           <div class="amount-available">
             <span>可转数量：</span>
-            <span>{{ availableAmount | formatMoney }}</span>
+            <span>{{ availableAmountShown | formatMoney }}</span>
+            <span v-if="showTransferTooltip" class="ml-5 c-gray fz-12" v-b-tooltip.hover title="存在充值未完全确认或挂单冻结的情况，部分金额无法划转"><i
+              class="iconfont icon-tooltip"></i></span>
             <b-link class="float-right" @click="onShowhand">全部划转</b-link>
           </div>
         </b-form-group>
@@ -166,6 +169,7 @@
         historyFilterCoin: null,
         defaultAsset: 'CNY',
         availableAmount: 0, // 资金可转数量
+        coinexCanWidthDraw: null, // coinex可提现金额，用null避免恰好为零的时候不好判断
         pieDatas: [],
         showPieChart: false,
         showCoinDropdown: false,
@@ -352,7 +356,13 @@
             value: key,
           }
         })
-      }
+      },
+      showTransferTooltip() {
+        return this.form.from === 'coinex' && this.coinexCanWidthDraw !== null && this.coinexCanWidthDraw.setDigit(8) !== this.availableAmount.setDigit(8)
+      },
+      availableAmountShown() {
+        return this.showTransferTooltip ? this.coinexCanWidthDraw : this.availableAmount
+      },
     },
     watch: {
       'historyQueryParams.coin_type'() {
@@ -380,6 +390,16 @@
           return item.coin_type === coinType
         })
         this.availableAmount = fromBalance ? fromBalance.available : 0
+        if (this.form.from === 'coinex') {
+          this.updateCanWithDraw(this.form.coinType)
+        }
+      },
+      updateCanWithDraw(coinType) {
+        // 先置空然后请求实时数据
+        this.coinexCanWidthDraw = null
+        this.axios.balance.getCanWithdrawAmount(coinType).then(response => {
+          this.coinexCanWidthDraw = parseFloat(response.data.can_withdraw_amount)
+        })
       },
       onTransfer() {
         if (this.form.amount > 0) {
@@ -446,14 +466,15 @@
         this.showCoinDropdown = false
       },
       onShowhand() {
-        console.log(this.availableAmount)
         this.form.amount = +this.availableAmount === 0 ? 0 : this.availableAmount // 后端可能返回0e-8或者0.00000000这种数字，统一转0
       },
       onSwap() { // 资产流向互换
         const tmp = this.form.from // 交换操作必须放在异步函数外面，否则不生效，因为v-model修改是先于异步函数执行
         this.form.from = this.form.to
         this.form.to = tmp
-
+        if (this.form.from === 'coinex') {
+          this.updateCanWithDraw(this.form.coinType)
+        }
         this.updateAllBalance()
           .then(() => {
             const fromBalance = this[`${this.form.from}Balance`].find(item => {
@@ -469,11 +490,12 @@
       onShowTransferModal(type, item) {
         this.updateAllBalance()
           .then(() => {
-            const { coin_type: coinType } = item
+            const {coin_type: coinType} = item
             this.form.coinType = coinType // 设置划转币种
             if (type === 'in') {
               this.form.from = 'coinex'
               this.form.to = 'otc'
+              this.updateCanWithDraw(coinType) // coinex提现才需要
             } else if (type === 'out') {
               this.form.from = 'otc'
               this.form.to = 'coinex'

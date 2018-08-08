@@ -31,6 +31,13 @@ export default (axios) => {
     exchangeRate() {
       // return Promise.resolve(require('./mock/balance').exchangeRate)
       return axios.get('/system/market/price')
-    }
+    },
+    getCanWithdrawAmount(coinType) {
+      return axios.get('/balance/can_withdraw_amount', {
+        params: {
+          coin_type: coinType
+        }
+      })
+    },
   }
 }

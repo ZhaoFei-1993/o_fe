@@ -49,6 +49,11 @@
       .order-type-sell {
         color: #52cbca;
       }
+      .unavailable-tooltip i {
+        color: #e35555;
+        font-size: 12px;
+        margin-left: 5px;
+      }
     }
 
     .item-coin-amount-container {
@@ -95,7 +100,8 @@
     <b-table :fields="itemTableFields" :items="itemsCurrent" class="items-table">
       <template slot="id" slot-scope="{ item }">
         <b-link>{{ item.id }}</b-link>
-        <span class="ml-5 c-red" v-b-tooltip.hover title="可交易数量不足最小限额，无法在首页中展示"><i class="iconfont icon-error"></i></span>
+        <span v-if="!item.itemLimit.available" class="unavailable-tooltip"
+              v-b-tooltip.hover title="可交易数量不足最小限额，无法在首页中展示"><i class="iconfont icon-error"></i></span>
       </template>
       <template slot="side" slot-scope="{ item }">
         <!-- 自定义的属性 -->
@@ -107,7 +113,8 @@
         {{ formatMoney(item.remain_coin_amount) }}
       </template>
       <template slot="cashAmountLimit" slot-scope="{ item }">
-        {{formatMoney(item.itemLimit.minDealCashAmount,2)}} - {{formatMoney(item.itemLimit.maxDealCashAmount,2)}} {{item.cash_type}}
+        {{formatMoney(item.itemLimit.minDealCashAmount,2)}} - {{formatMoney(item.itemLimit.maxDealCashAmount,2)}}
+        {{item.cash_type}}
       </template>
       <template slot="price" slot-scope="{ item }">
         <!--浮动定价需要显示浮动的定价，会和price不一致（由于后台更新延迟所导致）-->

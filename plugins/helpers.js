@@ -16,15 +16,16 @@ const helpers = {
     let maxDealCoinAmount = Math.min(item.remain_coin_amount, (item.max_deal_cash_amount / item.price || Number.MAX_SAFE_INTEGER))
     maxDealCoinAmount = `${maxDealCoinAmount}`.setDigit(8)
     let maxDealCashAmount = maxDealCoinAmount * item.price
+    const minDealCashAmount = item.min_deal_cash_amount.setDigit(2)
     // 最大值可能因为取小数位数的问题导致误差
     if (item.max_deal_cash_amount - maxDealCashAmount <= 0.01) {
       // 不存在更大的情况
       maxDealCashAmount = item.max_deal_cash_amount
     }
     maxDealCashAmount = `${maxDealCashAmount}`.setDigit(2)
-    // 实际可成交额为广告可成交额与余额见的较小值
+    // 实际可成交额为广告可成交额与余额间的较小值
     const maxAvailableCoinAmount = `${Math.min(maxDealCoinAmount, availableCoin)}`.setDigit(8)
-    let maxAvailableCashAmount = `${availableCoin * item.price}`.setDigit(2)
+    let maxAvailableCashAmount = `${maxAvailableCoinAmount * item.price}`.setDigit(2)
     if (maxAvailableCashAmount > maxDealCashAmount) {
       maxAvailableCashAmount = maxDealCashAmount
     }
@@ -33,10 +34,11 @@ const helpers = {
       maxDealCoinAmount,
       minDealCoinAmount: `${item.min_deal_cash_amount / item.price}`.setDigit(8),
       maxDealCashAmount,
-      minDealCashAmount: item.min_deal_cash_amount.setDigit(2),
+      minDealCashAmount,
       // 后两项为考虑用户余额时候的实际可成交额（出售时候需要考虑）
       maxAvailableCoinAmount,
       maxAvailableCashAmount,
+      available: parseFloat(maxDealCashAmount) >= parseFloat(minDealCashAmount)
     }
   }
 }
