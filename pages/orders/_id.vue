@@ -310,10 +310,16 @@
         </div>
         <template v-if="showAppeal">
           <span v-if="!appeal||appeal.status===''">
-          交易出现问题？需要
-          <span class="c-brand-green appeal-btn" v-if="canAppeal" @click="startAppeal">申诉</span>
-          <span class="c-brand-green appeal-btn" v-else v-b-tooltip.hover title="买家付款30分钟后，可发起申诉。">申诉</span>
-        </span>
+            交易出现问题？需要
+            <span class="c-brand-green appeal-btn" v-if="canAppeal" @click="startAppeal">申诉</span>
+            <span class="c-brand-green appeal-btn" v-else v-b-tooltip.hover title="买家付款30分钟后，可发起申诉。">申诉</span>
+          </span>
+        </template>
+        <template v-if="showSupport">
+          <span>
+            交易出现问题？需要
+            <b-link :href="`${coinexDomain}/res/support/ticket`" target="_blank"><span class="c-brand-green appeal-btn">提交工单</span></b-link>
+          </span>
         </template>
         <template v-if="appeal">
           <div v-if="appeal.status===constant.APPEAL_STATUS.CREATED"
@@ -513,6 +519,9 @@
         const success = this.order.status === this.constant.ORDER_STATUS.SUCCESS.value
         return paid ||
           (success && this.utils.getTimeDifference(this.order.complete_time) < SUCCESS_CAN_APPEAL)
+      },
+      showSupport() {
+        return this.order.status === this.constant.ORDER_STATUS.SUCCESS.value && !this.showAppeal
       },
       canCancel() {
         const orderStatusOk = this.order.status === this.constant.ORDER_STATUS.CREATED.value || this.order.status === this.constant.ORDER_STATUS.PAID.value

@@ -62,7 +62,8 @@
             </div>
             <span class="separator"><i class="iconfont icon-exchange"></i></span>
             <div class="input-container">
-              <div class="max-value">最多{{item.side=== constant.SIDE.BUY ?'可卖':'可买'}}{{' '+ itemLimit.maxAvailableCoinAmount + ' '+
+              <div class="max-value">最多{{item.side=== constant.SIDE.BUY ?'可卖':'可买'}}{{' '+
+                itemLimit.maxAvailableCoinAmount + ' '+
                 item.coin_type}}<span
                   class="purchase-all"
                   @click="purchaseAll">全部{{sideText}}</span>
@@ -72,7 +73,7 @@
                                      :step="0.1**8"
                                      @focus="()=>onFocus('coinAmount')"
                                      @input="coinAmountChanged"
-                                     :placeholder="'请输入'+sideText+'数量'"/>
+                                     :placeholder="coinAmountPlaceholder"/>
               </b-input-group>
               <EMsgs :result="$v.form.coin_amount" :msgs="invalidMessages.coin_amount"/>
             </div>
@@ -285,8 +286,8 @@
             },
             message: {
               required: `请填写${this.sideText}金额`,
-              minValue: `最小下单金额${this.itemLimit.minDealCashAmount} CNY`,
-              maxValue: `最大下单金额${this.itemLimit.maxDealCashAmount} CNY`,
+              minValue: `商家限制最小下单金额${this.itemLimit.minDealCashAmount} CNY`,
+              maxValue: `商家限制最大下单金额${this.itemLimit.maxDealCashAmount} CNY`,
               kycLimit: `非实名认证用户最大下单金额为${this.noKycLimit} CNY`
             },
           },
@@ -294,13 +295,15 @@
             validation: {
               required,
               minValue: minValue(this.itemLimit.minDealCoinAmount),
-              maxValue: maxValue(this.itemLimit.maxDealCoinAmount),
+              maxValue: (value) => {
+                return value < this.itemLimit.maxDealCoinAmount && this.itemLimit.maxDealCoinAmount > this.itemLimit.maxAvailableCoinAmount
+              },
               maxAvailable: maxValue(this.itemLimit.maxAvailableCoinAmount),
             },
             message: {
               required: `请填写${this.sideText}金额`,
-              minValue: `最小下单数量${this.itemLimit.minDealCoinAmount} ${this.item.coin_type}`,
-              maxValue: `最大下单数量${this.itemLimit.maxDealCoinAmount} ${this.item.coin_type}`,
+              minValue: `商家限制最小下单数量${this.itemLimit.minDealCoinAmount} ${this.item.coin_type}`,
+              maxValue: `商家限制最大下单数量${this.itemLimit.maxDealCoinAmount} ${this.item.coin_type}`,
               maxAvailable: `账户余额${this.itemLimit.maxAvailableCoinAmount} ${this.item.coin_type}`,
             },
           },
@@ -309,6 +312,9 @@
       invalidMessages() {
         return this.validationConf.invalidMessages
       },
+      coinAmountPlaceholder() {
+        return this.isBuySide ? '请输入购买数量' : `余额  ${this.currentBalance}`
+      }
     },
     methods: {
       onSubmit() {

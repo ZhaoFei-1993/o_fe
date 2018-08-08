@@ -358,7 +358,7 @@
         })
       },
       showTransferTooltip() {
-        return this.form.from === 'coinex' && this.coinexCanWidthDraw !== null && this.coinexCanWidthDraw.setDigit(8) !== this.availableAmount.setDigit(8)
+        return this.form.from === 'coinex' && this.coinexCanWidthDraw !== null && this.coinexCanWidthDraw.setDigit(8) < (parseFloat(this.availableAmount)).setDigit(8)
       },
       availableAmountShown() {
         return this.showTransferTooltip ? this.coinexCanWidthDraw : this.availableAmount
