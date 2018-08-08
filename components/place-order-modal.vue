@@ -296,7 +296,7 @@
               required,
               minValue: minValue(this.itemLimit.minDealCoinAmount),
               maxValue: (value) => {
-                return value < this.itemLimit.maxDealCoinAmount && this.itemLimit.maxDealCoinAmount > this.itemLimit.maxAvailableCoinAmount
+                return !(value > this.itemLimit.maxDealCoinAmount && this.itemLimit.maxDealCoinAmount > this.itemLimit.maxAvailableCoinAmount)
               },
               maxAvailable: maxValue(this.itemLimit.maxAvailableCoinAmount),
             },
