@@ -11,6 +11,9 @@
     }
     .navbar-nav {
       display: inline-block;
+      a.btn.btn-xs{
+        width:100px;
+      }
     }
 
     .nav-item {

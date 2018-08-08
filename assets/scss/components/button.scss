@@ -24,6 +24,38 @@ $background-red: #e45555;
     cursor: not-allowed;
   }
 }
+.btn-gradient {
+  border: none;
+  &:hover {
+    box-shadow: 0 5px 20px 0 #d3d3d3;
+  }
+  &[disabled], &[disabled]:hover {
+    border: none;
+    color: white;
+    background-color: $lightGray;
+    background-image: none;
+    box-shadow: none;
+  }
+}
+
+.btn-outline {
+  min-width: 62px;
+  background-color: transparent;
+  &.btn-xxs {
+    font-size: 12px;
+    border-width: 1px;
+  }
+  &[disabled], &[disabled]:hover {
+    border: 2px solid $lightGray;
+    color: $lightGray;
+    background-color: transparent;
+    background-image: none;
+  }
+  &:hover {
+    color: #fff;
+    border: none;
+  }
+}
 
 .btn-xl {
   min-width: 360px;
@@ -82,19 +114,7 @@ $background-red: #e45555;
   }
 }
 
-.btn-gradient {
-  border: none;
-  &:hover {
-    box-shadow: 0 5px 20px 0 #d3d3d3;
-  }
-  &[disabled], &[disabled]:hover {
-    border: none;
-    color: white;
-    background-color: $lightGray;
-    background-image: none;
-    box-shadow: none;
-  }
-}
+
 
 .btn-gradient-green {
   @extend .btn-gradient;
@@ -112,24 +132,7 @@ $background-red: #e45555;
   }
 }
 
-.btn-outline {
-  min-width: 62px;
-  background-color: transparent;
-  &.btn-xxs {
-    font-size: 12px;
-    border-width: 1px;
-  }
-  &[disabled], &[disabled]:hover {
-    border: 2px solid $lightGray;
-    color: $lightGray;
-    background-color: transparent;
-    background-image: none;
-  }
-  &:hover {
-    color: #fff;
-    border: none;
-  }
-}
+
 
 .btn-outline-green {
   @extend .btn-outline;
