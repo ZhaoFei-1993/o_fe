@@ -113,6 +113,7 @@ $background-red: #e45555;
 }
 
 .btn-outline {
+  min-width: 62px;
   background-color: transparent;
   &.btn-xxs {
     font-size: 12px;
@@ -134,8 +135,8 @@ $background-red: #e45555;
   @extend .btn-outline;
   border-color: $brandGreen;
   color: $brandGreen;
-  &:hover {
-    background-image: $image-gradient-green;
+  &:hover,&:active {
+    background-image: $image-gradient-green !important;
   }
 }
 
@@ -152,8 +153,8 @@ $background-red: #e45555;
   @extend .btn-outline;
   border-color: $brightYellow;
   color: $brightYellow;
-  &:hover {
-    background-image: $image-gradient-yellow;
+  &:hover,&:active {
+    background-image: $image-gradient-yellow !important;
   }
 }
 
