@@ -3,6 +3,21 @@ const log4js = require('log4js')
 const isDev = process.env.MODE !== 'production'
 const globalLevel = isDev ? 'TRACE' : 'INFO'
 
+log4js.addLayout('filter', function (config) {
+  // 去掉请求头里面的敏感用户信息
+  return function (logEvent) {
+    if (logEvent && logEvent.data && logEvent.data.length) {
+      logEvent.data.forEach(err => {
+        if (err.config && err.config.headers) {
+          err.config.headers.Authorization = 'hidden by log4js'
+          err.config.headers.cookie = 'hidden by log4js'
+        }
+      })
+    }
+    return logEvent
+  }
+})
+
 const smtpAppender = {
   type: '@log4js-node/smtp',
   recipients: 'jingjianfu@viabtc.com,dengshen@viabtc.com,linjunfeng@viabtc.com',
@@ -42,6 +57,7 @@ const logConfig = {
       level: 'INFO',
       maxLevel: 'WARN',
       appender: 'commonFile',
+      layout: {type: 'filter'},
     },
     errorFile: {
       type: 'file',
@@ -51,6 +67,7 @@ const logConfig = {
       type: 'logLevelFilter',
       level: 'ERROR',
       appender: 'errorFile',
+      layout: {type: 'filter'},
     },
     debug: {
       type: 'console',
@@ -90,6 +107,7 @@ if (+process.env.OTC === 0 && !isDev) { // 生产环境只发送一个实例的l
       type: 'logLevelFilter',
       level: 'ERROR',
       appender: 'errorEmailSender',
+      layout: {type: 'filter'},
     },
     commonEmailSender: {
       ...smtpAppender,
@@ -104,6 +122,7 @@ if (+process.env.OTC === 0 && !isDev) { // 生产环境只发送一个实例的l
       type: 'logLevelFilter',
       level: 'INFO',
       appender: 'commonEmailSender',
+      layout: {type: 'filter'},
     },
   }
   logConfig.categories.default.appenders.push('commonEmail', 'errorEmail')
