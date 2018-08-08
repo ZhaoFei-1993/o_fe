@@ -249,7 +249,7 @@
               <div class="order-list-header">
                 <div class="order-list-header-text">进行中订单</div>
               </div>
-              <div class="order-list-body">
+              <div class="order-list-body" v-prevent-parent-scroll>
                 <ul>
                   <li class="order-list-item" v-for="item in orderList" @click="onLinkToOrderDetail(item.id)">
                     <div>
@@ -353,6 +353,7 @@
   import PublishItemButton from '~/components/publish-item-modal/publish-item-button.vue'
   import UserAvatar from '~/components/user-avatar'
   import Blank from '~/components/blank'
+  import preventParentScroll from 'vue-prevent-parent-scroll'
 
   Vue.use(Vuelidate)
   export default {
@@ -384,6 +385,9 @@
         loginPage: `${loginPage}?redirect=${encodeURIComponent(webDomain + this.$route.fullPath)}`,
         registerPage: `${signupPage}?redirect=${encodeURIComponent(webDomain + this.$route.fullPath)}`,
       }
+    },
+    directives: {
+      preventParentScroll, // 阻止滚动订单下拉框时候body滚动
     },
     validations() {
       return {form: this.validationConf.validations}

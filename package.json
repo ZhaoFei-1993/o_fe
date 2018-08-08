@@ -29,6 +29,7 @@
     "visibilityjs": "2.0.1",
     "vue": "2.5.17",
     "vue-click-outside": "1.0.7",
+    "vue-prevent-parent-scroll": "1.0.5",
     "vue-server-renderer": "2.5.17",
     "vue-template-compiler": "2.5.17",
     "vue2-highcharts": "1.2.5",
