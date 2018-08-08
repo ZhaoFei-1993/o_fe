@@ -243,7 +243,7 @@
       </b-navbar-nav>
       <b-navbar-nav class="ml-auto">
         <div v-if="user.account" class="ps-r">
-          <div @mouseover="toggleShowOrders" @mouseout="toggleShowOrders" class="d-inline-block">
+          <div @mouseover="showOrders = true" @mouseout="showOrders = false" class="d-inline-block">
             <b-link class="order-link ps-r" to="/orders">
               <i class="iconfont icon-order-list"></i>
               <span>订单</span>
@@ -490,9 +490,6 @@
           this.orderList = []
           this.axios.onError(err)
         })
-      },
-      toggleShowOrders() {
-        this.showOrders = !this.showOrders
       },
       onLinkToOrderDetail(id) {
         this.$router.push(`/orders/${id}`)
