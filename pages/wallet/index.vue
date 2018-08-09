@@ -397,9 +397,10 @@
       updateCanWithDraw(coinType) {
         // 先置空然后请求实时数据
         this.coinexCanWidthDraw = null
-        this.axios.balance.getCanWithdrawAmount(coinType).then(response => {
-          this.coinexCanWidthDraw = parseFloat(response.data.can_withdraw_amount)
-        })
+        // TODO 后端功能还没做好，到时候去掉注释就好了
+        // this.axios.balance.getCanWithdrawAmount(coinType).then(response => {
+        //   this.coinexCanWidthDraw = parseFloat(response.data.can_withdraw_amount)
+        // })
       },
       onTransfer() {
         if (this.form.amount > 0) {
