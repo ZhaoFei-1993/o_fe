@@ -100,7 +100,7 @@
     <b-table :fields="itemTableFields" :items="itemsCurrent" class="items-table">
       <template slot="id" slot-scope="{ item }">
         <b-link>{{ item.id }}</b-link>
-        <span v-if="!item.itemLimit.available" class="unavailable-tooltip"
+        <span v-if="itemStatus === constant.ITEM_STATUS.ONLINE && !item.itemLimit.available" class="unavailable-tooltip"
               v-b-tooltip.hover title="可交易数量不足最小限额，无法在首页中展示"><i class="iconfont icon-error"></i></span>
       </template>
       <template slot="side" slot-scope="{ item }">
