@@ -15,6 +15,15 @@
         vertical-align: -1px;
       }
     }
+
+    .trade-frequency-ratio-group {
+      width: 180px;
+      margin: 0 auto;
+
+      .custom-radio {
+        margin-bottom: 5px;
+      }
+    }
   }
 </style>
 
@@ -79,8 +88,20 @@
         <span v-if="user.account.trade_validate_frequency === TRADE_VALIDATE_FREQUENCY.EACH_TWO_HOURS">2小时内不二次验证</span>
         <span v-if="user.account.trade_validate_frequency === TRADE_VALIDATE_FREQUENCY.EACH_TIME">每次交易均二次验证</span>
       </p>
-      <b-btn slot="action" variant="outline-green" size="xs" target="_blank" :href="`${coinexDomain}/my/info/security`">更换</b-btn>
+      <b-btn slot="action" variant="outline-green" size="xs" target="_blank" @click="onChangeFrequency">更换</b-btn>
     </MyInfoItem>
+    <b-modal v-model="frequencyModalShowing"
+             title="交易验证频率"
+             okTitle="确定" ok-variant="gradient-yellow" button-size="lg" okOnly
+             @ok.prevent="onChangeFrequencyConfirm">
+      <!--一定要有v-if，应该是b-form-radio-group的bug，如果初始化时model没有参数，会导致radio无法选择-->
+      <b-form-radio-group v-if="tradeValidateFrequency"
+                          class="trade-frequency-ratio-group"
+                          v-model="tradeValidateFrequency"
+                          :options="frequencyOptions"
+                          stacked>
+      </b-form-radio-group>
+    </b-modal>
   </CBlock>
 </template>
 
@@ -104,12 +125,23 @@
     data() {
       return {
         coinexDomain,
+        frequencyModalShowing: false,
+        tradeValidateFrequency: '',
+        frequencyOptions: [{
+          value: 'never',
+          text: '从不二次验证',
+        }, {
+          value: 'each_two_hours',
+          text: '2小时内不二次验证'
+        }, {
+          value: 'each_time',
+          text: '每次交易均二次验证'
+        }]
       }
     },
     head() {
       return {
-        title: '账户安全' +
-        this.$t('global.pageTitle.common')
+        title: '账户安全' + this.$t('global.pageTitle.common')
       }
     },
     fetch({app, store, req, redirect, route}) {
@@ -122,6 +154,21 @@
       ...mapState(['user', 'constant']),
       'TRADE_VALIDATE_FREQUENCY': function () {
         return this.constant.TRADE_VALIDATE_FREQUENCY
+      }
+    },
+    methods: {
+      onChangeFrequency() {
+        this.frequencyModalShowing = true
+        this.tradeValidateFrequency = this.user.account.trade_validate_frequency
+      },
+      onChangeFrequencyConfirm() {
+        this.axios.user.changeTradeValidateFrequency(this.tradeValidateFrequency).then(res => {
+          this.frequencyModalShowing = false
+          this.$store.dispatch('fetchUserAccount')
+          this.$successTips('修改成功')
+        }).catch(err => {
+          this.axios.onError(err)
+        })
       }
     }
   }

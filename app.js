@@ -1,5 +1,4 @@
 process.SERVER_BUILD = true
-
 const Koa = require('koa')
 const Nuxt = require('nuxt').Nuxt
 const Builder = require('nuxt').Builder
