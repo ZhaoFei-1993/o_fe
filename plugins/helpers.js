@@ -17,8 +17,8 @@ const helpers = {
     maxDealCoinAmount = maxDealCoinAmount.setDigit(8)
     let maxDealCashAmount = maxDealCoinAmount * item.price
     const minDealCashAmount = item.min_deal_cash_amount.setDigit(2)
-    // 最大值可能因为取小数位数的问题导致误差
-    if (item.max_deal_cash_amount - maxDealCashAmount <= 0.01) {
+    // 最大值可能因为取小数位数的问题导致误差，有时候误差是 0.010000000056这种
+    if (item.max_deal_cash_amount - maxDealCashAmount <= 0.015) {
       // 不存在更大的情况
       maxDealCashAmount = item.max_deal_cash_amount
     }
@@ -28,6 +28,11 @@ const helpers = {
     let maxAvailableCashAmount = (maxAvailableCoinAmount * item.price).setDigit(2)
     if (maxAvailableCashAmount > maxDealCashAmount) {
       maxAvailableCashAmount = maxDealCashAmount
+    }
+    // 最大值可能因为取小数位数的问题导致误差
+    if (item.max_deal_cash_amount - maxAvailableCashAmount <= 0.015) {
+      // 不存在更大的情况
+      maxAvailableCashAmount = item.max_deal_cash_amount
     }
     return {
       // 前四项是考虑广告余量的限额
