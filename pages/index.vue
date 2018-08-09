@@ -358,6 +358,7 @@
                 <b-popover triggers="hover" :target="'button-order-'+item.id"
                            title="商家交易限制">
                   <ol v-if="user && user.qualification">
+                    <!--todo:这里的文案可以用constant里面的常量代替-->
                     <li v-if="checkQualification(item,constant.QUALIFICATIONS.ONE_DEAL)">交易方必须完成过1次交易</li>
                     <li v-if="checkQualification(item,constant.QUALIFICATIONS.BIND_PHONE)">交易方必须通过手机认证</li>
                     <li v-if="checkQualification(item,constant.QUALIFICATIONS.KYC)">交易方必须通过实名认证</li>
@@ -605,7 +606,7 @@
                 break
               case this.constant.PLACE_ORDER_ERROR.KYC_AMOUNT_LIMIT:
                 this.currentConstraint = {
-                  content: `您尚未完成实名认证，每次交易限额${this.noKycLimit}元。`,
+                  content: this.$tt(`您尚未完成实名认证，每次交易限额{0}元。`, this.noKycLimit),
                   buttonText: '去认证',
                   outLink: `${this.coinexDomain}/my/info/basic?redirect=${encodeURIComponent(webDomain + this.$route.fullPath)}`,
                 }

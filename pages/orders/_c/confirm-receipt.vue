@@ -34,16 +34,16 @@
 <script>
   import VerifyCode from '~/components/verify-code'
   import {mapState} from 'vuex'
-  import constant from '~/modules/constant'
+  import {VERIFY_CODE_TYPE, VERIFY_CODE_BUSINESS} from '~/modules/constant'
 
   export default {
     data() {
       return {
         verify: {
-          codeType: constant.VERIFY_CODE_TYPE.GOOGLE,
+          codeType: VERIFY_CODE_TYPE.GOOGLE,
           sms: '',
           google: '',
-          businessType: constant.VERIFY_CODE_BUSINESS.CONFIRM_RECEIPT,
+          businessType: VERIFY_CODE_BUSINESS.CONFIRM_RECEIPT,
           smsSequence: 0,
         },
         needVerify: false,

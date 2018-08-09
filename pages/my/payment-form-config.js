@@ -3,8 +3,8 @@ import {required, minLength, maxLength} from 'vuelidate/lib/validators'
 
 /**
  * 获取payment的表单配置，由于需要i18n，所以需要传入 $t 和 $tt 函数
- * @param $t 给 i18n-auto-trans-loader 用的函数，文件顶部的pragma
- * @param $tt
+ * @param $t i18n.js中的函数，用于自动替换，文件顶部的pragma
+ * @param $tt i18n.js中的函数
  * @return {{bankValidations: {bank: {validation: {required: *}, message: {required: string}}, branch: {validation: {required: *, minLength: *, maxLength: *}, message: {required: string, minLength: *, maxLength: *}}, account_no: {validation: {required: *, minLength: *, maxLength: *}, message: {required: string, minLength: *, maxLength: *}}}, baseValidation: {method: {validation: {required: *}, message: {required: string}}, account_name: {validation: {required: *, minLength: *, maxLength: *}, message: {required: string, minLength: *, maxLength: *}}, account_no: {validation: {required: *, minLength: *, maxLength: *}, message: {required: string, minLength: *, maxLength: *}}}}}
  */
 export default function getConfig($t, $tt) {

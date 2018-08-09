@@ -161,6 +161,22 @@ module.exports = {
           },
         })
       }
+
+      // 对js文件也进行翻译
+      const jsLoader = webpackConfig.module.rules.find(rule => rule.loader === 'babel-loader')
+
+      if (jsLoader) {
+        jsLoader.use = [{
+          loader: 'babel-loader',
+          options: jsLoader.options,
+        }, {
+          loader: 'i18n-autotrans-loader'
+        }]
+
+        delete jsLoader.loader
+        delete jsLoader.options
+      }
+
       // 指定使用loader的文件类型
       const vueLoader = webpackConfig.module.rules.find((rule) => rule.loader === 'vue-loader')
       vueLoader.options.postLoaders = {
