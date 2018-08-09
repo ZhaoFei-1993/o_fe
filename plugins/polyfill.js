@@ -3,14 +3,30 @@
 const Decimal = require("decimal.js").default;
 
 Number.prototype.setDigit = String.prototype.setDigit = function (digit) {
-  const isNumber = (typeof this === 'number');
+  // 返回字符串，不能直接用> <对比，要对比的时候请用lt,lte,gt,gte 或者 a-b>0这种方式
   const str = String(this);
   const parts = str.split(".");
   if (parts[1] && parts[1].length > digit) {
     return parts[0] + (digit > 0 ? "." : "") + parts[1].substr(0, digit);
   }
-  return isNumber ? parseFloat(str) : str.toString();
+  return str;
 };
+
+Number.prototype.lt = String.prototype.lt = function (num) {
+  return (new Decimal(this.toString())).lessThan(num)
+}
+
+Number.prototype.lte = String.prototype.lte = function (num) {
+  return (new Decimal(this.toString())).lessThanOrEqualTo(num)
+}
+
+Number.prototype.gt = String.prototype.gt = function (num) {
+  return (new Decimal(this.toString())).greaterThan(num)
+}
+
+Number.prototype.gte = String.prototype.gte = function (num) {
+  return (new Decimal(this.toString())).greaterThanOrEqualTo(num)
+}
 
 String.prototype.limitDigit = function (limit, defDigit = 8) {
   const str = (this || "").toString().trim();

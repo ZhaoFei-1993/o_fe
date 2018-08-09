@@ -69,10 +69,10 @@
         })
         value = value.setDigit(this.decimalDigit)
         // 不能用 value = Math.min(this.max, value) 这种形式，会转换成数字，遇到0.0变成0导致无法输入的问题
-        if (value > this.max) {
+        if (value.gt(this.max)) {
           value = `${this.max}`.setDigit(this.decimalDigit)
         }
-        if (value < this.min) {
+        if (value.lt(this.min)) {
           value = `${this.min}`.setDigit(this.decimalDigit)
         }
         this.setValue(value.toLowerCase().scientificToDecimal(), evt) // 需要把类似1e-8这种转成0.00000001

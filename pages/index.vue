@@ -422,7 +422,7 @@
     }
   }
 
-  const refreshInterval = 10000
+  const refreshInterval = 10000000
   const PAGE_SIZE = 10
   const defaultPager = {
     limit: PAGE_SIZE,

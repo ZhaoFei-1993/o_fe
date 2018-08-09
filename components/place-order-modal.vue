@@ -279,7 +279,8 @@
               minValue: minValue(this.itemLimit.minDealCashAmount),
               maxValue: maxValue(this.itemLimit.maxDealCashAmount),
               kycLimit: (value) => {
-                return value <= this.kycLimitAmount
+                if (!value) return true
+                return value.lte(this.kycLimitAmount)
               }
             },
             message: {
@@ -294,16 +295,18 @@
               required,
               minValue: minValue(this.itemLimit.minDealCoinAmount),
               maxValue: (value) => {
-                if (this.item.side === this.constant.SIDE.BUY && this.itemLimit.maxDealCoinAmount > this.currentBalance) {
+                if (!value) return true
+                if (this.item.side === this.constant.SIDE.BUY && this.itemLimit.maxDealCoinAmount.gt(this.currentBalance)) {
                   return true // 要出售，而且实际限制为余额，不需要考虑这个条件了
                 }
-                return value <= this.itemLimit.maxDealCoinAmount
+                return value.lte(this.itemLimit.maxDealCoinAmount)
               },
               maxAvailable: (value) => {
-                if (this.item.side === this.constant.SIDE.SELL || this.itemLimit.maxDealCoinAmount <= this.currentBalance) {
+                if (!value) return true
+                if (this.item.side === this.constant.SIDE.SELL || this.itemLimit.maxDealCoinAmount.lte(this.currentBalance)) {
                   return true // 购买，或者余额充足，不需要考虑这个条件
                 }
-                return value <= this.currentBalance
+                return value.lte(this.currentBalance)
               },
             },
             message: {

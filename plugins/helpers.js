@@ -20,18 +20,18 @@ const helpers = {
     // 最大值可能因为取小数位数的问题导致误差，有时候误差是 0.010000000056这种
     if (item.max_deal_cash_amount - maxDealCashAmount <= 0.015) {
       // 不存在更大的情况
-      maxDealCashAmount = item.max_deal_cash_amount
+      maxDealCashAmount = item.max_deal_cash_amount.setDigit(2)
     }
     maxDealCashAmount = maxDealCashAmount.setDigit(2)
     // 实际可成交额为广告可成交额与余额间的较小值
-    const maxAvailableCoinAmount = Math.min(maxDealCoinAmount, availableCoin).setDigit(8)
+    const maxAvailableCoinAmount = (Math.min(maxDealCoinAmount, availableCoin)).setDigit(8)
     let maxAvailableCashAmount = (maxAvailableCoinAmount * item.price).setDigit(2)
-    if (maxAvailableCashAmount > maxDealCashAmount) {
+    if (maxAvailableCashAmount.gt(maxDealCashAmount)) {
       maxAvailableCashAmount = maxDealCashAmount
     }
-    // 最大值可能因为取小数位数的问题导致误差
-    if (item.max_deal_cash_amount - maxAvailableCashAmount <= 0.015) {
-      // 不存在更大的情况
+
+    // // 最大值可能因为取小数位数的问题导致误差
+    if (item.max_deal_cash_amount - maxAvailableCashAmount <= 0.015 && item.max_deal_cash_amount - maxAvailableCashAmount > 0) {
       maxAvailableCashAmount = item.max_deal_cash_amount
     }
     return {
@@ -43,7 +43,7 @@ const helpers = {
       // 后两项为考虑用户余额时候的实际可成交额（出售时候需要考虑）
       maxAvailableCoinAmount,
       maxAvailableCashAmount,
-      available: parseFloat(maxDealCashAmount) >= parseFloat(minDealCashAmount)
+      available: maxDealCashAmount.gte(minDealCashAmount)
     }
   }
 }
