@@ -236,7 +236,7 @@
             <Language text="最低金额 [p][/p] 元" class="input-label" tag="div">
               <span slot="p">{{constant.DEAL_CASH_AMOUNT.MIN}}</span>
             </Language>
-            <CurrencyInput v-model="form.min_deal_cash_amount" :currency="balance.currentCash" placeholder="最低单笔金额" :decimalDigit="0"/>
+            <CurrencyInput v-model="form.min_deal_cash_amount" :currency="balance.currentCash" placeholder="最低单笔金额" :decimalDigit="2"/>
             <EMsgs :result="$v.form" :messages="itemValidations.messages" keyName="min_deal_cash_amount"/>
           </div>
           <div class="order-cash-limit-separator">至</div>
@@ -244,7 +244,7 @@
             <Language text="最高金额 [p][/p] 元" class="input-label" tag="div">
               <span slot="p">{{constant.DEAL_CASH_AMOUNT.MAX.formatMoney()}}</span>
             </Language>
-            <CurrencyInput v-model="form.max_deal_cash_amount" :currency="balance.currentCash" placeholder="最高单笔金额" :decimalDigit="0"/>
+            <CurrencyInput v-model="form.max_deal_cash_amount" :currency="balance.currentCash" placeholder="最高单笔金额" :decimalDigit="2"/>
             <EMsgs :result="$v.form" :messages="itemValidations.messages" keyName="max_deal_cash_amount"/>
           </div>
         </b-form-group>

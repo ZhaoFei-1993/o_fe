@@ -57,6 +57,12 @@
           this.setValue(value, evt)
           return
         }
+        // 过滤多余的点号
+        let countPoint = 0
+        value = `${value}`.replace(/\./g, match => {
+          countPoint++
+          return countPoint === 1 ? '.' : ''
+        })
         value = value.setDigit(this.decimalDigit)
         // 不能用 value = Math.min(this.max, value) 这种形式，会转换成数字，遇到0.0变成0导致无法输入的问题
         if (value > this.max) {

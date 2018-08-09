@@ -54,7 +54,6 @@
                 <ExtendedInputNumber v-model="form.cash_amount" :name="item.id+'cash_amount'"
                                      @focus="()=>onFocus('cashAmount')"
                                      :decimalDigit="2"
-                                     :step="0.1**2"
                                      @input="cashAmountChanged"
                                      :placeholder="'请输入'+sideText+'金额'"/>
               </b-input-group>
@@ -70,7 +69,6 @@
               </div>
               <b-input-group :append="item.coin_type">
                 <ExtendedInputNumber v-model="form.coin_amount" :name="item.id+'coin_amount'"
-                                     :step="0.1**8"
                                      @focus="()=>onFocus('coinAmount')"
                                      @input="coinAmountChanged"
                                      :placeholder="coinAmountPlaceholder"/>
@@ -296,15 +294,23 @@
               required,
               minValue: minValue(this.itemLimit.minDealCoinAmount),
               maxValue: (value) => {
-                return !(value > this.itemLimit.maxDealCoinAmount && this.itemLimit.maxDealCoinAmount > this.itemLimit.maxAvailableCoinAmount)
+                if (this.item.side === this.constant.SIDE.BUY && this.itemLimit.maxDealCoinAmount > this.currentBalance) {
+                  return true // 要出售，而且实际限制为余额，不需要考虑这个条件了
+                }
+                return value <= this.itemLimit.maxDealCoinAmount
               },
-              maxAvailable: maxValue(this.itemLimit.maxAvailableCoinAmount),
+              maxAvailable: (value) => {
+                if (this.item.side === this.constant.SIDE.SELL || this.itemLimit.maxDealCoinAmount <= this.currentBalance) {
+                  return true // 购买，或者余额充足，不需要考虑这个条件
+                }
+                return value <= this.currentBalance
+              },
             },
             message: {
-              required: `请填写${this.sideText}金额`,
+              required: `请填写${this.sideText}数量`,
               minValue: `商家限制最小下单数量${this.itemLimit.minDealCoinAmount} ${this.item.coin_type}`,
               maxValue: `商家限制最大下单数量${this.itemLimit.maxDealCoinAmount} ${this.item.coin_type}`,
-              maxAvailable: `账户余额${this.itemLimit.maxAvailableCoinAmount} ${this.item.coin_type}`,
+              maxAvailable: `账户余额${this.currentBalance} ${this.item.coin_type}`,
             },
           },
         })
@@ -313,7 +319,8 @@
         return this.validationConf.invalidMessages
       },
       coinAmountPlaceholder() {
-        return this.isBuySide ? '请输入购买数量' : `余额  ${this.currentBalance}`
+        // 广告本身和看到的人是反方向的
+        return this.item.side === this.constant.SIDE.SELL ? '请输入购买数量' : `余额  ${this.currentBalance}`
       }
     },
     methods: {
