@@ -128,6 +128,17 @@ export default (axios) => {
       return axios.patch(`/user/account`, {name})
     },
 
+    /**
+     * 修改用户交易二次验证的频率（和设置用户名是同一个接口）
+     * @param frequency
+     * @return {*}
+     */
+    changeTradeValidateFrequency(frequency) {
+      return axios.patch('/user/account', {
+        trade_validate_frequency: frequency
+      })
+    },
+
     dynamicConstraint() {
       return axios.get('/user/today/limit')
     },

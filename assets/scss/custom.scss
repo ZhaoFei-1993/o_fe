@@ -124,19 +124,19 @@ input.form-control {
   }
 }
 
-// radio 的按钮有些偏下，这里修复下
+// 自定义radio按钮样式
 .custom-radio {
   font-size: 16px;
   color: #6f6f6f;
 
   .custom-control-label {
     &::before {
-      top: 3px;
+      top: 4px;
     }
 
     &::after {
       box-sizing: border-box;
-      top: 4px;
+      top: 5px;
       left: -23px;
       height: 14px;
       width: 14px;
