@@ -3,12 +3,13 @@
 const Decimal = require("decimal.js").default;
 
 Number.prototype.setDigit = String.prototype.setDigit = function (digit) {
+  const isNumber = (typeof this === 'number');
   const str = String(this);
   const parts = str.split(".");
   if (parts[1] && parts[1].length > digit) {
     return parts[0] + (digit > 0 ? "." : "") + parts[1].substr(0, digit);
   }
-  return str.toString();
+  return isNumber ? parseFloat(str) : str.toString();
 };
 
 String.prototype.limitDigit = function (limit, defDigit = 8) {

@@ -57,6 +57,10 @@
           this.setValue(value, evt)
           return
         }
+        if (value === '.') {
+          this.setValue('0.', evt)
+          return
+        }
         // 过滤多余的点号
         let countPoint = 0
         value = `${value}`.replace(/\./g, match => {
