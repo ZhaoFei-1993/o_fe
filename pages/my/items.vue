@@ -166,7 +166,9 @@
       <div class="item-coin-amount-confirm">
         <CurrencyInput v-model="onlineItemCoinAmount" class="item-coin-amount-confirm-input"
                        :currency="editingItem.coin_type"/>
-        <b-btn variant="plain-green" size="xs" class="mx-20" :disabled="onlineItemCoinAmount<=0" @click="onItemOnlineConfirm">确定</b-btn>
+        <b-btn variant="plain-green" size="xs" class="mx-20" :disabled="onlineItemCoinAmount<=0"
+               @click="onItemOnlineConfirm">确定
+        </b-btn>
         <b-btn variant="plain" size="xs" @click="onItemOnlineCancel">取消</b-btn>
       </div>
       <Language v-if="editingItem.coin_type && editingItem.side === constant.SIDE.SELL" text="最多可售[a][/a][c][/c]"
@@ -242,7 +244,7 @@
           id: {
             label: '广告编号',
             thClass: ['pl-30', 'w-100'],
-            tdClass: ['pl-30', 'w-100'],
+            tdClass: ['pl-40', 'w-100', 'text-left'],
           },
           side: {
             label: '类型',
