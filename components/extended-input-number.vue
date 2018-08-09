@@ -14,6 +14,7 @@
 <template>
   <input class="extended-input-number" :disabled="disabled" :value="value"
          autocomplete="off"
+         @keydown.enter="enterUp"
          @input="onInput" :placeholder="placeholder"
          @focus="onFocus"/>
 </template>
@@ -83,6 +84,10 @@
       },
       onFocus(evt) {
         this.$emit('focus', evt)
+      },
+      enterUp(evt) {
+        // 避免回车触发关闭弹窗
+        evt.preventDefault()
       }
     },
   }

@@ -47,7 +47,7 @@
       margin: 40px auto;
       position: relative;
       .trade-choices {
-        margin-bottom: 20px;
+        margin-bottom: 10px;
         .choice-block {
           background-color: white;
           box-shadow: 0 0 10px 0 #ececec;
@@ -422,7 +422,7 @@
     }
   }
 
-  const refreshInterval = 10000000
+  const refreshInterval = 10000
   const PAGE_SIZE = 10
   const defaultPager = {
     limit: PAGE_SIZE,

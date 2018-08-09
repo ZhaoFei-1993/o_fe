@@ -521,7 +521,7 @@
           (success && this.utils.getTimeDifference(this.order.complete_time) < SUCCESS_CAN_APPEAL)
       },
       showSupport() {
-        return this.order.status === this.constant.ORDER_STATUS.SUCCESS.value && !this.showAppeal
+        return this.order.status === this.constant.ORDER_STATUS.SUCCESS.value && !this.appeal && !this.showAppeal
       },
       canCancel() {
         const orderStatusOk = this.order.status === this.constant.ORDER_STATUS.CREATED.value || this.order.status === this.constant.ORDER_STATUS.PAID.value
