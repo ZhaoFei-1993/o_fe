@@ -18,7 +18,6 @@ export const ERROR_CODE = {
 
 // code对应的错误信息
 export const errorCodeMessageMap = {
-  [REACH_ITEM_COUNT_LIMIT]: '每个币种每个类型的广告最多只能上架2条',
   [ECONNABORTED]: '接口超时',
 }
 

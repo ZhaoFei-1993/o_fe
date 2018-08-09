@@ -299,7 +299,7 @@
   import getPaymentFormConfig from './payment-form-config'
   import EMsgs from '~/components/error-message.vue'
   import {coinexDomain} from '~/modules/variables'
-  import constant from '~/modules/constant'
+  import {PAYMENT_TYPES, VERIFY_CODE_TYPE} from '~/modules/constant'
 
   Vue.use(Vuelidate)
 
@@ -321,7 +321,7 @@
   })
 
   const DEFAULT_FORM = {
-    method: constant.PAYMENT_TYPES.BANKCARD,
+    method: PAYMENT_TYPES.BANKCARD,
     // account_name: '',        // 名字是从store拿的，不修改
     bank: null,
     branch: '',
@@ -353,7 +353,7 @@
     data() {
       return {
         verify: {
-          codeType: constant.VERIFY_CODE_TYPE.GOOGLE,
+          codeType: VERIFY_CODE_TYPE.GOOGLE,
           sms: '',
           google: '',
           email: '',
