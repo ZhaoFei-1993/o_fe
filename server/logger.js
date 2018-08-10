@@ -1,11 +1,11 @@
 const log4js = require('log4js')
-
+const layouts = require('log4js/lib/layouts')
 const isDev = process.env.MODE !== 'production'
 const globalLevel = isDev ? 'TRACE' : 'INFO'
 
 log4js.addLayout('filter', function (config) {
   // 去掉请求头里面的敏感用户信息
-  return function (logEvent) {
+  return function (logEvent, timezoneOffset) {
     if (logEvent && logEvent.data && logEvent.data.length) {
       logEvent.data.forEach(err => {
         if (err.config && err.config.headers) {
@@ -14,7 +14,7 @@ log4js.addLayout('filter', function (config) {
         }
       })
     }
-    return logEvent
+    return layouts.basicLayout(logEvent, timezoneOffset)
   }
 })
 
@@ -71,6 +71,7 @@ const logConfig = {
     },
     debug: {
       type: 'console',
+      layout: {type: 'filter'},
     },
   },
   categories: {
