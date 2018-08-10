@@ -39,7 +39,9 @@
     <p class="layout-my-desc">强烈建议完成以下设置提升账户安全等级。</p>
     <MyInfoItem title="邮箱">
       <p slot="content"><span>{{user.account.email.hideMiddleChars(6)}}</span></p>
-      <b-btn slot="action" variant="outline-green" size="xs" :href="`${coinexDomain}/my/info/basic`" target="_blank">修改</b-btn>
+      <b-btn slot="action" variant="outline-green" size="xs" :href="`${coinexDomain}/my/info/basic`" target="_blank">
+        修改
+      </b-btn>
     </MyInfoItem>
     <MyInfoItem title="手机">
       <p slot="content">
@@ -66,12 +68,15 @@
         <span v-if="user.account.login_password_level === constant.PASSWORD_LEVEL.MIDDLE">中</span>
         <span v-if="user.account.login_password_level === constant.PASSWORD_LEVEL.LOW">低</span>
       </p>
-      <b-btn slot="action" variant="outline-green" size="xs" :href="`${coinexDomain}/my/info/security`" target="_blank">重置</b-btn>
+      <b-btn slot="action" variant="outline-green" size="xs" :href="`${coinexDomain}/my/info/security`" target="_blank">
+        重置
+      </b-btn>
     </MyInfoItem>
     <MyInfoItem title="实名认证">
       <p slot="content">
         <span v-if="user.account.kyc_status === constant.KYC_STATUS.PASS">已认证</span>
-        <span v-else-if="user.account.kyc_status === constant.KYC_STATUS.PROCESSING" class="c-brand-green">信息已提交，待系统审核</span>
+        <span v-else-if="user.account.kyc_status === constant.KYC_STATUS.PROCESSING"
+              class="c-brand-green">信息已提交，待系统审核</span>
         <span v-else class="c-red">未认证</span>
       </p>
       <b-btn slot="action"
@@ -82,11 +87,13 @@
         认证
       </b-btn>
     </MyInfoItem>
-    <MyInfoItem title="交易验证">
+    <MyInfoItem title="收款时安全验证">
       <p slot="content">
-        <span v-if="user.account.trade_validate_frequency === TRADE_VALIDATE_FREQUENCY.NEVER" class="c-red">从不二次验证</span>
-        <span v-if="user.account.trade_validate_frequency === TRADE_VALIDATE_FREQUENCY.EACH_TWO_HOURS">2小时内不二次验证</span>
-        <span v-if="user.account.trade_validate_frequency === TRADE_VALIDATE_FREQUENCY.EACH_TIME">每次交易均二次验证</span>
+        <span v-if="user.account.trade_validate_frequency === VALIDATE_FREQUENCY_MAP.never.value"
+              class="c-red">从不二次验证</span>
+        <span
+          v-if="user.account.trade_validate_frequency === VALIDATE_FREQUENCY_MAP.each_two_hours.value">2小时内不二次验证</span>
+        <span v-if="user.account.trade_validate_frequency === VALIDATE_FREQUENCY_MAP.each_time.value">每次交易均二次验证</span>
       </p>
       <b-btn slot="action" variant="outline-green" size="xs" target="_blank" @click="onChangeFrequency">更换</b-btn>
     </MyInfoItem>
@@ -98,15 +105,33 @@
       <b-form-radio-group v-if="tradeValidateFrequency"
                           class="trade-frequency-ratio-group"
                           v-model="tradeValidateFrequency"
-                          :options="frequencyOptions"
+                          :options="VALIDATE_FREQUENCY_MAP"
                           stacked>
       </b-form-radio-group>
+    </b-modal>
+    <b-modal v-model="verifyModalShowing"
+             title="二次验证"
+             okTitle="提交" ok-variant="gradient-yellow" button-size="lg" okOnly
+             @ok.prevent="onVerifyChangeFrequencyConfirm">
+      <VerifyCode class="verify-code-component"
+                  ref="verify-code"
+                  :hide-label="true"
+                  :needGoogle="user.account.is_have_totp_auth"
+                  :needSms="!!user.account.mobile"
+                  :sms.sync="verify.sms"
+                  :google.sync="verify.google"
+                  :codeType.sync="verify.codeType"
+                  :businessType="verify.businessType"
+                  :smsSequence.sync="verify.smsSequence"
+      />
     </b-modal>
   </CBlock>
 </template>
 
 <script>
+  import VerifyCode from '~/components/verify-code'
   import {mapState} from 'vuex'
+  import {VERIFY_CODE_TYPE, VERIFY_CODE_BUSINESS} from '~/modules/constant'
   import MySidebar from '~/components/my-sidebar.vue'
   import My2Column from '~/components/my-2column.vue'
   import MyInfoItem from './_c/my-info-item.vue'
@@ -120,6 +145,7 @@
       My2Column,
       MyInfoItem,
       StarRate,
+      VerifyCode,
     },
     layout: 'my',
     data() {
@@ -127,16 +153,15 @@
         coinexDomain,
         frequencyModalShowing: false,
         tradeValidateFrequency: '',
-        frequencyOptions: [{
-          value: 'never',
-          text: '从不二次验证',
-        }, {
-          value: 'each_two_hours',
-          text: '2小时内不二次验证'
-        }, {
-          value: 'each_time',
-          text: '每次交易均二次验证'
-        }]
+        verify: {
+          codeType: VERIFY_CODE_TYPE.GOOGLE,
+          sms: '',
+          google: '',
+          businessType: VERIFY_CODE_BUSINESS.MODIFY_FREQUENCY,
+          smsSequence: 0,
+        },
+        needVerify: false,
+        verifyModalShowing: false,
       }
     },
     head() {
@@ -152,21 +177,50 @@
     },
     computed: {
       ...mapState(['user', 'constant']),
-      'TRADE_VALIDATE_FREQUENCY': function () {
-        return this.constant.TRADE_VALIDATE_FREQUENCY
+      'VALIDATE_FREQUENCY_MAP': function () {
+        return this.constant.VALIDATE_FREQUENCY_MAP
       }
     },
     methods: {
       onChangeFrequency() {
+        const account = this.user.account
+        if (!(account.is_have_totp_auth || account.mobile)) {
+          return this.$errorTips('请先绑定手机或谷歌验证，再进行更换')
+        }
         this.frequencyModalShowing = true
         this.tradeValidateFrequency = this.user.account.trade_validate_frequency
       },
       onChangeFrequencyConfirm() {
-        this.axios.user.changeTradeValidateFrequency(this.tradeValidateFrequency).then(res => {
-          this.frequencyModalShowing = false
+        this.frequencyModalShowing = false
+        const account = this.user.account
+        const isLevelDown = this.VALIDATE_FREQUENCY_MAP[this.tradeValidateFrequency].level < this.VALIDATE_FREQUENCY_MAP[account.trade_validate_frequency].level
+        if ((account.is_have_totp_auth || account.mobile) && isLevelDown) {
+          this.verify.sms = ''
+          this.verify.google = ''
+          this.$refs['verify-code'] && this.$refs['verify-code'].resetValidation()
+          this.verifyModalShowing = true
+        } else {
+          this.updateFrequency({trade_validate_frequency: this.tradeValidateFrequency})
+        }
+      },
+      onVerifyChangeFrequencyConfirm() {
+        const verify = this.verify
+        const code = verify.codeType === this.constant.VERIFY_CODE_TYPE.GOOGLE ? verify.google : verify.sms
+        const data = {
+          validate_code_type: verify.codeType,
+          validate_code: code,
+          sequence: verify.smsSequence,
+          trade_validate_frequency: this.tradeValidateFrequency,
+        }
+        this.updateFrequency(data)
+      },
+      updateFrequency(data) {
+        this.axios.user.changeTradeValidateFrequency(data).then(res => {
           this.$store.dispatch('fetchUserAccount')
           this.$successTips('修改成功')
+          this.verifyModalShowing = false
         }).catch(err => {
+          this.verifyModalShowing = false
           this.axios.onError(err)
         })
       }

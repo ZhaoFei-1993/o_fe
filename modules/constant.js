@@ -36,6 +36,7 @@ export const VERIFY_CODE_BUSINESS = {
   ADD_PAYMENT: 'otc_add_payment_method',
   MODIFY_PAYMENT: 'otc_modify_payment_method',
   CONFIRM_RECEIPT: 'otc_receipt_order',
+  MODIFY_FREQUENCY: 'otc_modify_validate_frequency',
 }
 
 /**
@@ -47,6 +48,7 @@ export default function getConstant($t) {
   function $translate(text) {   // eslint-disable-line
     return $t ? $t(text) : text
   }
+
   const COIN_TYPES = ['BCH', 'BTC', 'ETH', 'USDT']
 
   // 实际支持的支付方式
@@ -74,6 +76,20 @@ export default function getConstant($t) {
     {text: '系统已将冻结的币释放给卖家', value: 'cancel_order'},
   ]
 
+  const VALIDATE_FREQUENCY_OPTIONS = [{
+    value: 'never',
+    text: '从不二次验证',
+    level: 0,
+  }, {
+    value: 'each_two_hours',
+    text: '2小时内不二次验证',
+    level: 1,
+  }, {
+    value: 'each_time',
+    text: '每次交易均二次验证',
+    level: 2,
+  }]
+
   return {
     COIN_TYPES,
     COIN_TYPE_OPTIONS: COIN_TYPES.map(name => {
@@ -85,7 +101,7 @@ export default function getConstant($t) {
     ACTUAL_PAYMENT_OPTIONS,
     PAYMENT_OPTIONS,
     PAYMENT_TYPES,
-
+    VALIDATE_FREQUENCY_OPTIONS,
     // payment的映射，方便直接找到对应的配置
     PAYMENT_MAP: PAYMENT_OPTIONS.reduce((map, option) => {
       map[option.value] = option
@@ -98,6 +114,11 @@ export default function getConstant($t) {
       return map
     }, {}),
     APPEAL_RESULT_MAP: APPEAL_RESULTS.reduce((map, option) => {
+      map[option.value] = option
+      return map
+    }, {}),
+    // 交易需要验证的频率
+    VALIDATE_FREQUENCY_MAP: VALIDATE_FREQUENCY_OPTIONS.reduce((map, option) => {
       map[option.value] = option
       return map
     }, {}),
@@ -183,12 +204,6 @@ export default function getConstant($t) {
     ITEM_STATUS: {
       ONLINE: 'on',
       OFFLINE: 'off',
-    },
-    // 交易需要验证的频率
-    TRADE_VALIDATE_FREQUENCY: {
-      NEVER: 'never',
-      EACH_TIME: 'each_time',
-      EACH_TWO_HOURS: 'each_two_hours',
     },
 
     // 自动回复内容的最大长度

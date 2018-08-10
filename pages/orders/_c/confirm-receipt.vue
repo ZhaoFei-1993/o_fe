@@ -29,6 +29,7 @@
                 :businessType="verify.businessType"
                 :smsSequence.sync="verify.smsSequence"
     />
+    <b-link to="/my/security" target="_blank">不想每次收款都安全验证</b-link>
   </b-modal>
 </template>
 <script>
@@ -61,7 +62,7 @@
       },
     },
     mounted() {
-      if (this.user && this.user.account && this.user.account.trade_validate_frequency === this.constant.TRADE_VALIDATE_FREQUENCY.EACH_TIME) {
+      if (this.user && this.user.account && this.user.account.trade_validate_frequency === this.constant.VALIDATE_FREQUENCY_MAP.each_time.value) {
         this.needVerify = true
       }
     },
@@ -94,7 +95,7 @@
           this.$emit('confirmReceipt')
 
           // 如果是每两小时验证的用户，验证过一次之后，就不需要再验证了
-          if (this.needVerify && this.user.account.trade_validate_frequency === this.constant.TRADE_VALIDATE_FREQUENCY.EACH_TWO_HOURS) {
+          if (this.needVerify && this.user.account.trade_validate_frequency === this.constant.VALIDATE_FREQUENCY_MAP.each_two_hours.value) {
             this.needVerify = false
           }
         }).catch(err => {
