@@ -385,10 +385,6 @@
         app.axios.needAuth(err, redirect, route.fullPath)
       })
     },
-    destroyed() {
-      clearInterval(this.timer) // 清除定时器
-      this.stopRefreshOrders()
-    },
     head() {
       return {
         title: '订单管理' +
@@ -427,6 +423,21 @@
       this.initOrderList()
       this.startTimer()
       this.startRefreshOrders()
+      this.$nuxt.$on('IM.Event.UNREAD_MESSAGES_COUNT_UPDATE', conversations => {
+        conversations.forEach(conv => {
+          const findItem = this.orderTableItems.find(item => {
+            return item.conversation_id === conv.id
+          })
+          if (findItem) {
+            this.$set(findItem, '_unreadMessageCount', conv.unreadMessagesCount)
+          }
+        })
+      })
+    },
+    destroyed() {
+      clearInterval(this.timer) // 清除定时器
+      this.stopRefreshOrders()
+      this.$nuxt.$off('IM.Event.UNREAD_MESSAGES_COUNT_UPDATE')
     },
     methods: {
       changePage(page) {

@@ -10,7 +10,7 @@
       <ul>
         <li class="chat-list-item" v-for="item in convList" :key="item.id" @click="toOrderDetail(item._attributes.name)">
           <div>
-            <UserAvatar :username="item._otherMembers[0]" :online="false" :color="item._defaultColor" :size="42" :dot="item._unreadMessagesCount > 0"></UserAvatar>
+            <UserAvatar :username="item._otherMembers[0]" :online="false" :color="item._defaultColor" :size="42" :dot="item._unreadMessageCount > 0"></UserAvatar>
           </div>
           <div class="chat-list-item-detail">
             <div class="detail-wrapper detail-col1">
@@ -18,8 +18,18 @@
               <span class="detail-time">{{ item._formatTime }}</span>
             </div>
             <div class="detail-wrapper detail-col2">
-              <span class="detail-content detail-text">{{ item.lastMessage ? item.lastMessage.content._lctext : '' }}</span>
-              <span class="detail-tag" @click.stop="onRead(item)" v-if="item._unreadMessagesCount > 0">标为已读</span>
+              <span class="detail-content detail-text" v-if="item.lastMessage">
+                <template v-if="[messageType.text, messageType.auto].indexOf(item.lastMessage.content._lctype) > -1">
+                  {{ item.lastMessage.content._lctext }}
+                </template>
+                <template v-else-if="item.lastMessage.content._lctype === messageType.image">
+                  [图片]
+                </template>
+                <template v-else>
+                  [未知消息类型]
+                </template>
+              </span>
+              <span class="detail-tag" @click.stop="onRead(item)" v-if="item._unreadMessageCount > 0">标为已读</span>
             </div>
           </div>
         </li>
@@ -29,7 +39,8 @@
 </template>
 
 <script>
-  import { Event } from 'leancloud-realtime'
+  import { Event, TextMessage } from 'leancloud-realtime'
+  import { ImageMessage } from 'leancloud-realtime-plugin-typed-messages'
   import { mapState } from 'vuex'
   import UserAvatar from '~/components/chat/avatar'
   import preventParentScroll from 'vue-prevent-parent-scroll'
@@ -37,6 +48,11 @@
   export default {
     data() {
       return {
+        messageType: {
+          image: ImageMessage.TYPE,
+          text: TextMessage.TYPE,
+          auto: -101, // 自动回复
+        },
         showList: false,
         convList: [], // 对话列表
         maxLimit: 20, // 对话列表条数
@@ -53,7 +69,7 @@
       ...mapState(['chat', 'user', 'constant']),
       hasUnreadMessage() {  // 列表是否有未读消息
         return this.convList.some(conv => {
-          return conv._unreadMessagesCount > 0
+          return conv._unreadMessageCount > 0
         })
       },
       tips() {
@@ -151,7 +167,7 @@
                   _formatTime: formatTime,
                   _otherMembers: otherMembers, // 除了自己以外的聊天用户
                   _defaultColor: defaultColor, // 头像颜色，取第一个用户id尾号
-                  _unreadMessagesCount: conv.unreadMessagesCount || 0,
+                  _unreadMessageCount: conv.unreadMessagesCount || 0,
                 })
               }
             })
@@ -163,7 +179,7 @@
             if (options.error) {
               options.error(err)
             }
-          });
+          })
       },
       bindClientEvent() {
         const self = this
@@ -181,9 +197,10 @@
                 return item.id === conv.id
               })
               if (findConv) {
-                self.$set(findConv, '_unreadMessagesCount', conv.unreadMessagesCount)
+                self.$set(findConv, '_unreadMessageCount', conv.unreadMessagesCount)
               }
             })
+            self.$nuxt.$emit('IM.Event.UNREAD_MESSAGES_COUNT_UPDATE', conversations) // 发送全局事件
           },
         }
         Object.keys(this.clientEventMap).forEach(evtType => {
