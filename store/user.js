@@ -23,7 +23,7 @@ export default () => {
         if (data[key]) securityLevel++
       })
 
-      if (data.trade_validate_frequency === constant.TRADE_VALIDATE_FREQUENCY.EACH_TIME || data.trade_validate_frequency === constant.TRADE_VALIDATE_FREQUENCY.EACH_TWO_HOURS) securityLevel++
+      if (data.trade_validate_frequency === constant.VALIDATE_FREQUENCY_MAP.each_time.value || data.trade_validate_frequency === constant.VALIDATE_FREQUENCY_MAP.each_two_hours.value) securityLevel++
       if (data.login_password_level === constant.PASSWORD_LEVEL.HIGH || data.login_password_level === constant.PASSWORD_LEVEL.MIDDLE) securityLevel++
 
       data.securityLevel = securityLevel

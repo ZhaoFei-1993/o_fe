@@ -18,7 +18,7 @@ export const ERROR_CODE = {
 
 // code对应的错误信息
 export const errorCodeMessageMap = {
-  [ECONNABORTED]: '接口超时',
+  [ECONNABORTED]: '网络连接超时',
 }
 
 /**

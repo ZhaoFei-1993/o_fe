@@ -133,10 +133,8 @@ export default (axios) => {
      * @param frequency
      * @return {*}
      */
-    changeTradeValidateFrequency(frequency) {
-      return axios.patch('/user/account', {
-        trade_validate_frequency: frequency
-      })
+    changeTradeValidateFrequency(data) {
+      return axios.patch('/user/account', data)
     },
 
     dynamicConstraint() {
