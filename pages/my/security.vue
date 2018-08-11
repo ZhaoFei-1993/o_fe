@@ -198,6 +198,9 @@
       },
       onChangeFrequencyConfirm() {
         this.frequencyModalShowing = false
+        if (this.tradeValidateFrequency === this.user.account.trade_validate_frequency) {
+          return
+        }
         const account = this.user.account
         const isLevelDown = this.VALIDATE_FREQUENCY_MAP[this.tradeValidateFrequency].level < this.VALIDATE_FREQUENCY_MAP[account.trade_validate_frequency].level
         if ((account.is_have_totp_auth || account.mobile) && isLevelDown) {
