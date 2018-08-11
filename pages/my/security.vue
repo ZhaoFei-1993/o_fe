@@ -93,12 +93,12 @@
               class="c-red">从不二次验证</span>
         <span
           v-if="user.account.trade_validate_frequency === VALIDATE_FREQUENCY_MAP.each_two_hours.value">2小时内不二次验证</span>
-        <span v-if="user.account.trade_validate_frequency === VALIDATE_FREQUENCY_MAP.each_time.value">每次交易均二次验证</span>
+        <span v-if="user.account.trade_validate_frequency === VALIDATE_FREQUENCY_MAP.each_time.value">每次收款均二次验证</span>
       </p>
       <b-btn slot="action" variant="outline-green" size="xs" target="_blank" @click="onChangeFrequency">更换</b-btn>
     </MyInfoItem>
     <b-modal v-model="frequencyModalShowing"
-             title="交易验证频率"
+             title="收款时安全验证"
              okTitle="确定" ok-variant="gradient-yellow" button-size="lg" okOnly
              @ok.prevent="onChangeFrequencyConfirm">
       <!--一定要有v-if，应该是b-form-radio-group的bug，如果初始化时model没有参数，会导致radio无法选择-->
@@ -111,7 +111,9 @@
     </b-modal>
     <b-modal v-model="verifyModalShowing"
              title="二次验证"
-             okTitle="提交" ok-variant="gradient-yellow" button-size="lg" okOnly
+             okTitle="提交" ok-variant="gradient-yellow" button-size="lg"
+             :ok-disabled="invalidCode"
+             okOnly
              @ok.prevent="onVerifyChangeFrequencyConfirm">
       <VerifyCode class="verify-code-component"
                   ref="verify-code"
@@ -160,7 +162,6 @@
           businessType: VERIFY_CODE_BUSINESS.MODIFY_FREQUENCY,
           smsSequence: 0,
         },
-        needVerify: false,
         verifyModalShowing: false,
       }
     },
@@ -179,7 +180,12 @@
       ...mapState(['user', 'constant']),
       'VALIDATE_FREQUENCY_MAP': function () {
         return this.constant.VALIDATE_FREQUENCY_MAP
-      }
+      },
+      invalidCode() {
+        const wrongGoogle = this.verify.codeType === this.constant.VERIFY_CODE_TYPE.GOOGLE && this.user.account.is_have_totp_auth && (!this.verify.google || this.verify.google.length !== 6)
+        const wrongSMS = this.verify.codeType === this.constant.VERIFY_CODE_TYPE.SMS && this.user.account.mobile && (!this.verify.sms || this.verify.sms.length !== 6)
+        return this.verifyModalShowing && (wrongGoogle || wrongSMS)
+      },
     },
     methods: {
       onChangeFrequency() {
@@ -220,8 +226,11 @@
           this.$successTips('修改成功')
           this.verifyModalShowing = false
         }).catch(err => {
-          this.verifyModalShowing = false
-          this.axios.onError(err)
+          if (err.code === this.constant.ERROR_CODE.VALIDATE_CODE_REQUIRED) {
+            this.$errorTips('验证码错误')
+          } else {
+            this.$showTips(err.message, 'error')
+          }
         })
       }
     }
