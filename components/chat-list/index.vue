@@ -10,13 +10,13 @@
     <transition name="chat-list-fade">
       <div class="chat-list" v-show="showList" v-prevent-parent-scroll>
         <ul>
-          <li class="chat-list-item" v-for="item in convList" :key="item.id" @click="toOrderDetail(item._attributes.name)">
+          <li class="chat-list-item" v-for="item in convList" :key="item.id" @click="toOrderDetail(item._attributes.name)" @mouseover="item._showBtn = true" @mouseout="item._showBtn = false">
             <div>
               <UserAvatar :username="item._otherMembers[0]" :online="false" :color="item._defaultColor" :size="42" :dot="item._unreadMessageCount > 0"></UserAvatar>
             </div>
             <div class="chat-list-item-detail">
               <div class="detail-wrapper detail-col1">
-                <span class="detail-content">{{ item._otherMembers.join('、') }}</span>
+                <span class="detail-content detail-members">{{ item._otherMembers.join('、') }}</span>
                 <span class="detail-time">{{ item._formatTime }}</span>
               </div>
               <div class="detail-wrapper detail-col2">
@@ -31,7 +31,7 @@
                     [未知消息类型]
                   </template>
                 </span>
-                <span class="detail-tag" @click.stop="onRead(item)" v-if="item._unreadMessageCount > 0">标为已读</span>
+                <span class="detail-tag" @click.stop="onRead(item)" v-if="item._unreadMessageCount > 0 && item._showBtn">标为已读</span>
               </div>
             </div>
           </li>
@@ -169,6 +169,7 @@
                 }
                 convList.push({
                   ...conv,
+                  _showBtn: false, // 是否显示已读按钮
                   _formatTime: formatTime,
                   _otherMembers: otherMembers, // 除了自己以外的聊天用户
                   _defaultColor: defaultColor, // 头像颜色，取第一个用户id尾号
@@ -301,9 +302,9 @@
             .detail-tag {
               display: inline-block;
               width: 62px;
-              height: 100%;
+              height: 18px;
               text-align: center;
-              line-height: 18px;
+              line-height: 16px;
               border-radius: 9px;
               border: solid 1px #52cbca;
               font-size: 12px;
@@ -328,6 +329,10 @@
           }
           .detail-col1 {
             line-height: 20px;
+            .detail-members {
+              font-weight: 500;
+              color: #27313e;
+            }
           }
           .detail-col2 {
             line-height: 24px;

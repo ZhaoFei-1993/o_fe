@@ -21,14 +21,14 @@
     }
     .dot {
       position: absolute;
-      height: 7px;
-      width: 7px;
+      height: 8px;
+      width: 8px;
       right: 8px;
       top: 8px;
       border-radius: 50%;
       transform: translate3d(100%, -50%, 0);
       background-color: #e35555;
-      border: solid 1px #fff;
+      border: solid 2px #fff;
       display: inline-block;
     }
   }
