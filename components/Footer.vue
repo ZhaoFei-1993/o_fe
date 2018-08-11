@@ -49,7 +49,7 @@
         </div>
       </div>
     </div>
-    <div style="position: absolute;right: 20px;top: -100px;">
+    <div style="position: fixed;right: 20px;bottom: 20px;">
       <ChatList></ChatList>
     </div>
   </footer>
