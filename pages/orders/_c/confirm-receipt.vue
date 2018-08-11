@@ -115,6 +115,11 @@
 </script>
 <style lang="scss">
   #confirm-receipt-modal {
+    .modal-title {
+      padding: 0 34px;
+      text-align: left;
+      font-weight: normal;
+    }
     .tips {
       font-size: 16px;
       margin-bottom: 20px;
@@ -124,6 +129,17 @@
     }
     .verify-code-component {
       margin-bottom: 10px;
+    }
+    .modal-footer {
+      .btn {
+        width: 220px;
+        height: 42px;
+      }
+    }
+    .change-frequency-link {
+      position: absolute;
+      top: -36px;
+      right: 50px;
     }
   }
 </style>
