@@ -133,6 +133,7 @@
     .modal-footer {
       .btn {
         width: 220px;
+        height: 42px;
       }
     }
     .change-frequency-link {
