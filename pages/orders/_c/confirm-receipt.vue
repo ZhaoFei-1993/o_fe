@@ -29,7 +29,7 @@
                 :businessType="verify.businessType"
                 :smsSequence.sync="verify.smsSequence"
     />
-    <b-link class="change-frequency-link" v-if="needVerify" to="/my/security" target="_blank">不想每次收款都安全验证</b-link>
+    <b-link class="change-frequency-link" v-if="needVerify" to="/my/security" target="_blank">修改收款时安全验证频率</b-link>
   </b-modal>
 </template>
 <script>
@@ -124,11 +124,6 @@
     }
     .verify-code-component {
       margin-bottom: 10px;
-      min-height: 67px;
-    }
-    .change-frequency-link{
-      position: absolute;
-      bottom: 32px;
     }
   }
 </style>
