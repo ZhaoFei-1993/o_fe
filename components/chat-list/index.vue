@@ -160,10 +160,12 @@
               if (defaultColor) { // 排除只有自己的对话
                 const date = conv.lastMessageAt
                 let formatTime
-                if (todayString === date.toDateString()) { // 时间为今天内，显示时:分
-                  formatTime = `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`
-                } else { // 时间为昨天以前，显示日期
-                  formatTime = `${String(date.getMonth() + 1).padStart(2, '0')}/${String(date.getDate()).padStart(2, '0')}`
+                if (date) {
+                  if (todayString === date.toDateString()) { // 时间为今天内，显示时:分
+                    formatTime = `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`
+                  } else { // 时间为昨天以前，显示日期
+                    formatTime = `${String(date.getMonth() + 1).padStart(2, '0')}/${String(date.getDate()).padStart(2, '0')}`
+                  }
                 }
                 convList.push({
                   ...conv,
