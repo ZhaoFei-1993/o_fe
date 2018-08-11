@@ -1,5 +1,5 @@
 <template>
-  <footer class="f_ft">
+  <footer class="f_ft ps-r">
     <div class="f_wrapper">
       <div class="color-line"></div>
       <div class="ft_content container">
@@ -49,12 +49,16 @@
         </div>
       </div>
     </div>
+    <div style="position: absolute;right: 20px;top: -100px;">
+      <ChatList></ChatList>
+    </div>
   </footer>
 </template>
 
 <script>
 import { mapState } from 'vuex'
 import {coinexDomain} from '~/modules/variables'
+import ChatList from '~/components/chat-list'
 
 export default {
   data() {
@@ -64,6 +68,9 @@ export default {
   },
   computed: {
     ...mapState(['lang']),
+  },
+  components: {
+    ChatList,
   },
 }
 </script>
