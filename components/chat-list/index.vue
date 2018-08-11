@@ -1,10 +1,11 @@
 <template>
   <div id="chat-list-wrapper"
-    v-if="user.account && user.account.id && chat.imClient"
-    v-b-tooltip.hover="tips">
+    v-if="user.account && user.account.id && chat.imClient">
     <div class="chat-list-btn" @click="onShowList">
-      <i class="iconfont icon-talk"></i>
-      <sup class="chat-badge" v-show="hasUnreadMessage"></sup>
+      <div class="chat-list-btn-rotate">
+        <i class="iconfont icon-talk"></i>
+        <sup class="chat-badge" v-show="hasUnreadMessage"></sup>
+      </div>
     </div>
     <div class="chat-list" v-show="showList" v-prevent-parent-scroll>
       <ul>
@@ -230,6 +231,12 @@
       box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.1);
       text-align: center;
       cursor: pointer;
+      .chat-list-btn-rotate {
+        transition: all .5s ease-in-out;
+        &:hover {
+          transform: rotate(360deg);
+        }
+      }
       .icon-talk {
         color: #52cbca;
         font-size: 31px;
