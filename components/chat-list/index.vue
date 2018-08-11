@@ -7,35 +7,37 @@
         <sup class="chat-badge" v-show="hasUnreadMessage"></sup>
       </div>
     </div>
-    <div class="chat-list" v-show="showList" v-prevent-parent-scroll>
-      <ul>
-        <li class="chat-list-item" v-for="item in convList" :key="item.id" @click="toOrderDetail(item._attributes.name)">
-          <div>
-            <UserAvatar :username="item._otherMembers[0]" :online="false" :color="item._defaultColor" :size="42" :dot="item._unreadMessageCount > 0"></UserAvatar>
-          </div>
-          <div class="chat-list-item-detail">
-            <div class="detail-wrapper detail-col1">
-              <span class="detail-content">{{ item._otherMembers.join('、') }}</span>
-              <span class="detail-time">{{ item._formatTime }}</span>
+    <transition name="chat-list-fade">
+      <div class="chat-list" v-show="showList" v-prevent-parent-scroll>
+        <ul>
+          <li class="chat-list-item" v-for="item in convList" :key="item.id" @click="toOrderDetail(item._attributes.name)">
+            <div>
+              <UserAvatar :username="item._otherMembers[0]" :online="false" :color="item._defaultColor" :size="42" :dot="item._unreadMessageCount > 0"></UserAvatar>
             </div>
-            <div class="detail-wrapper detail-col2">
-              <span class="detail-content detail-text" v-if="item.lastMessage">
-                <template v-if="[messageType.text, messageType.auto].indexOf(item.lastMessage.content._lctype) > -1">
-                  {{ item.lastMessage.content._lctext }}
-                </template>
-                <template v-else-if="item.lastMessage.content._lctype === messageType.image">
-                  [图片]
-                </template>
-                <template v-else>
-                  [未知消息类型]
-                </template>
-              </span>
-              <span class="detail-tag" @click.stop="onRead(item)" v-if="item._unreadMessageCount > 0">标为已读</span>
+            <div class="chat-list-item-detail">
+              <div class="detail-wrapper detail-col1">
+                <span class="detail-content">{{ item._otherMembers.join('、') }}</span>
+                <span class="detail-time">{{ item._formatTime }}</span>
+              </div>
+              <div class="detail-wrapper detail-col2">
+                <span class="detail-content detail-text" v-if="item.lastMessage">
+                  <template v-if="[messageType.text, messageType.auto].indexOf(item.lastMessage.content._lctype) > -1">
+                    {{ item.lastMessage.content._lctext }}
+                  </template>
+                  <template v-else-if="item.lastMessage.content._lctype === messageType.image">
+                    [图片]
+                  </template>
+                  <template v-else>
+                    [未知消息类型]
+                  </template>
+                </span>
+                <span class="detail-tag" @click.stop="onRead(item)" v-if="item._unreadMessageCount > 0">标为已读</span>
+              </div>
             </div>
-          </div>
-        </li>
-      </ul>
-    </div>
+          </li>
+        </ul>
+      </div>
+    </transition>
   </div>
 </template>
 
@@ -253,6 +255,12 @@
         border: solid 1px #fff;
         display: inline-block;
       }
+    }
+    .chat-list-fade-enter-active, .chat-list-fade-leave-active {
+      transition: opacity .5s;
+    }
+    .chat-list-fade-enter, .chat-list-fade-leave-to {
+      opacity: 0;
     }
     .chat-list {
       position: absolute;
