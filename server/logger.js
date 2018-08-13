@@ -20,7 +20,7 @@ log4js.addLayout('filter', function (config) {
 
 const smtpAppender = {
   type: '@log4js-node/smtp',
-  recipients: 'jingjianfu@viabtc.com,dengshen@viabtc.com,linjunfeng@viabtc.com',
+  recipients: 'dengshen@viabtc.com,linjunfeng@viabtc.com',
   sender: 'alert@viabtc.com',
   attachment: {
     enable: true,

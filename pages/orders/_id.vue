@@ -411,8 +411,8 @@
   import {coinexDomain} from '~/modules/variables'
   import {mapState} from 'vuex'
 
-  const PAID_CAN_APPEAL = 30 * 60 * 1000 // 三十分钟
-  const SUCCESS_CAN_APPEAL = 24 * 3600 * 1000 // 二十四小时
+  const PAID_CAN_APPEAL = 10 * 60 * 1000 // 支付后可申诉的时间 十分钟
+  const SUCCESS_CAN_APPEAL = 24 * 3600 * 1000 // 订单完成后二十四小时内可申诉
   const ORDER_PAY_TIME = 15 // 15分钟（未换算）
   const REFRESH_ORDER_INTERVAL = 5000
 
