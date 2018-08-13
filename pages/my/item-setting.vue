@@ -18,6 +18,24 @@
     .auto-reply-content {
       word-break: break-all;
     }
+    .counterparty-limit-options {
+      .custom-checkbox input:disabled + .custom-control-label {
+        &:before {
+          background-color: #eeeeee;
+        }
+      }
+      .custom-checkbox input:disabled:checked + .custom-control-label {
+        &:before {
+          background-color: #52cbca;
+        }
+      }
+      .custom-checkbox input:disabled + .custom-control-label {
+        &:before {
+          border: none;
+        }
+      }
+
+    }
   }
 </style>
 
@@ -93,6 +111,7 @@
                                v-model="editingSettings.counterparty_limit"
                                :disabled="!counterpartyLimitEditing"
                                :options="constant.COUNTERPARTY_LIMIT_OPTIONS"
+                               class="counterparty-limit-options"
                                stacked>
         </b-form-checkbox-group>
       </div>
