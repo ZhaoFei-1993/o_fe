@@ -312,7 +312,7 @@
           <span v-if="!appeal||appeal.status===''">
             交易出现问题？需要
             <span class="c-brand-green appeal-btn" v-if="canAppeal" @click="startAppeal">申诉</span>
-            <span class="c-brand-green appeal-btn" v-else v-b-tooltip.hover title="买家付款30分钟后，可发起申诉。">申诉</span>
+            <span class="c-brand-green appeal-btn" v-else v-b-tooltip.hover title="买家付款10分钟后，可发起申诉。">申诉</span>
           </span>
         </template>
         <template v-if="showSupport">

@@ -57,7 +57,9 @@
             <span class="status-icon">
               <i
                 v-if="queryParams.status!==ORDERS_FILTERS.APPEAL && item.appeal_status!=='' && item.appeal_status!==constant.APPEAL_STATUS.CANCEL"
-                class="iconfont icon-appeal fz-12 c-brand-green"></i>
+                class="iconfont icon-appeal fz-12 c-brand-green"
+                v-b-tooltip.hover title="申诉中"
+              ></i>
               <i v-if="statusIconMap[item.status]" class="iconfont"
                  :class="statusIconMap[item.status].class"
                  :style="{fontSize: '12px', color: statusIconMap[item.status].color}"></i>
