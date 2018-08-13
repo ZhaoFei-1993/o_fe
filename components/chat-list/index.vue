@@ -150,12 +150,11 @@
               const otherMembers = []
               let defaultColor
               conv.members.forEach(member => { // 找出除了自己以外的用户
-                const { _attributes: { attr: { username } } } = conv
-                if (member !== myClientId && username && username[member]) {
+                if (member !== myClientId && conv._attributes.attr && conv._attributes.attr[member]) {
                   if (!otherMembers.length) {
                     defaultColor = this.constant.COLORS[member % 10]
                   }
-                  otherMembers.push(username[member])
+                  otherMembers.push(conv._attributes.attr[member])
                 }
               })
               if (defaultColor) { // 排除只有自己的对话

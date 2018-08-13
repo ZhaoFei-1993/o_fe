@@ -289,12 +289,11 @@
       memberInfoMapper(arr) { // 遍历每一个消息，对用户头像进行映射，以防部分已退出用户没有头像
         const { conversation } = this
         if (conversation) {
-          const { _attributes: { attr: { username } } } = conversation
           arr.forEach(item => {
             if (!this.memberInfoMap[item.from]) {
               this.memberInfoMap[item.from] = {
                 color: this.colors[++this.colorIndex],
-                name: !!username && !!username[item.from] ? username[item.from] : '',
+                name: conversation._attributes.attr[item.from] || '',
               }
             }
           })
