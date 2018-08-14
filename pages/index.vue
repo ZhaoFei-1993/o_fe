@@ -440,7 +440,6 @@
       ViaPagination,
       Blank,
     },
-    layout: 'fullwidth',
     data() {
       return {
         loginPage: `${loginPage}?redirect=${encodeURIComponent(webDomain + this.$route.fullPath)}`,
@@ -470,8 +469,7 @@
     },
     head() {
       return {
-        title: '首页' +
-        this.$t('global.pageTitle.common')
+        title: '首页' + this.$t('global.pageTitle.common')
       }
     },
     fetch({store, app, req}) {

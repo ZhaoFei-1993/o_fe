@@ -173,6 +173,7 @@ export default ({app, store}) => {
         }
       } else {
         if (process.client) {
+          ga('send', 'pageview')
           ga('send', 'exception', {
             exDescription: `[${new Date()}]:${JSON.stringify(err)}|cookie:${document.cookie}|ua:${navigator.userAgent}`,
             exFatal: true,

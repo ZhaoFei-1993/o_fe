@@ -210,23 +210,24 @@
   }
 </style>
 <template>
-  <div v-if="order" class="page-order-detail">
-    <div class="main-content">
-      <div class="order-basic-info">
-        <div class="info-header">
-          <span class="c-black">订单#{{order.id+' '}}详情</span>
-          <span class="c-6f">交易状态：<span class="c-brand-yellow fz-18">{{orderStatus}}</span></span>
-        </div>
-        <div class="info-detail">
-          <div class="title">{{paymentTitle}}</div>
-          <div class="content">
-            {{paymentOrigin}}
+  <div class="page-content-container">
+    <div v-if="order" class="page-order-detail">
+      <div class="main-content">
+        <div class="order-basic-info">
+          <div class="info-header">
+            <span class="c-black">订单#{{order.id+' '}}详情</span>
+            <span class="c-6f">交易状态：<span class="c-brand-yellow fz-18">{{orderStatus}}</span></span>
+          </div>
+          <div class="info-detail">
+            <div class="title">{{paymentTitle}}</div>
+            <div class="content">
+              {{paymentOrigin}}
+            </div>
           </div>
         </div>
-      </div>
-      <div class="payment-info">
-        <div class="payment-method" v-if="showPayment">
-          <template v-if="order.status ===constant.ORDER_STATUS.CREATED.value">
+        <div class="payment-info">
+          <div class="payment-method" v-if="showPayment">
+            <template v-if="order.status ===constant.ORDER_STATUS.CREATED.value">
             <span v-if="isBuySide">
               <i v-if="selectedMethod.method === constant.PAYMENT_TYPES.WECHAT" class="iconfont icon-wechat-round"></i>
               <i v-if="selectedMethod.method === constant.PAYMENT_TYPES.BANKCARD" class="iconfont icon-bankcard"></i>
@@ -239,167 +240,170 @@
                 </option>
               </select>
             </span>
-          </template>
-          <template v-else>
+            </template>
+            <template v-else>
             <span v-if="selectedMethod.method === constant.PAYMENT_TYPES.BANKCARD">
             <i class="mr-10 iconfont icon-bankcard"></i>银行转帐</span>
-            <span v-if="selectedMethod.method === constant.PAYMENT_TYPES.WECHAT"><i
-              class="mr-10 iconfont icon-wechat-round"></i>微信支付</span>
-            <span v-if="selectedMethod.method === constant.PAYMENT_TYPES.ALIPAY"><i
-              class="mr-10 iconfont icon-alipay"></i>支付宝支付</span>
-          </template>
-          <span class="payment-account">
+              <span v-if="selectedMethod.method === constant.PAYMENT_TYPES.WECHAT"><i
+                class="mr-10 iconfont icon-wechat-round"></i>微信支付</span>
+              <span v-if="selectedMethod.method === constant.PAYMENT_TYPES.ALIPAY"><i
+                class="mr-10 iconfont icon-alipay"></i>支付宝支付</span>
+            </template>
+            <span class="payment-account">
             <span>{{selectedMethod.account_name + ' '}}</span>
             <span v-if="selectedMethod.method === constant.PAYMENT_TYPES.BANKCARD">{{ selectedMethod.account_no | splitCardNumber }}</span>
             <span v-else>{{ selectedMethod.account_no }}</span>
           </span>
-          <span v-if="selectedMethod.method === constant.PAYMENT_TYPES.BANKCARD"
-                class="detail-text">
+            <span v-if="selectedMethod.method === constant.PAYMENT_TYPES.BANKCARD"
+                  class="detail-text">
             {{ selectedMethod.bank_name }}<span v-if="selectedMethod.branch&&selectedMethod.branch.length">, {{ selectedMethod.branch }}</span>
           </span>
 
-          <QrcodePopover v-if="selectedMethod.method!==constant.PAYMENT_TYPES.BANKCARD && selectedMethod.qr_code_image"
-                         :src="selectedMethod.qr_code_image_url"/>
+            <QrcodePopover
+              v-if="selectedMethod.method!==constant.PAYMENT_TYPES.BANKCARD && selectedMethod.qr_code_image"
+              :src="selectedMethod.qr_code_image_url"/>
+          </div>
+          <div class="payment-status" v-html="paymentStatusMessage.message"></div>
+          <div class="payment-warning" v-if="paymentStatusMessage.warning" v-html="paymentStatusMessage.warning"></div>
         </div>
-        <div class="payment-status" v-html="paymentStatusMessage.message"></div>
-        <div class="payment-warning" v-if="paymentStatusMessage.warning" v-html="paymentStatusMessage.warning"></div>
-      </div>
-      <div class="order-steps">
-        <ol>
-          <li :class="['step',{active:order.status===constant.ORDER_STATUS.CREATED.value}]"
-              v-if="(order.status!==constant.ORDER_STATUS.CANCEL.value||order.pay_time)&&order.status!==constant.ORDER_STATUS.CLOSED.value">
-            <div class="message">{{stepsMessage.payCash}}</div>
-            <div class="step-time" v-if="order.pay_time">{{order.pay_time | getTimeText}}</div>
-            <b-btn v-if="isBuySide && !order.pay_time"
-                   :disabled="expired"
-                   size="xs" variant="gradient-yellow"
-                   @click="confirmPay()">
-              我已付款
-            </b-btn>
-          </li>
-          <li :class="['step',{active:order.status===constant.ORDER_STATUS.PAID.value}]"
-              v-if="showConfirmReceiptStep">
-            <div class="message">{{stepsMessage.payCoin}}</div>
-            <div class="step-time" v-if="order.complete_time">{{order.complete_time| getTimeText}}</div>
-            <button v-if="!isBuySide&&order.status===constant.ORDER_STATUS.PAID.value"
-                    class="btn btn-gradient-yellow btn-xs"
-                    :disabled="isAppealing"
-                    @click="confirmReceipt()">确认收款
-            </button>
-          </li>
-          <li :class="['step',{active:order.status===constant.ORDER_STATUS.SUCCESS.value}]"
-              v-if="order.status!=='cancel'&&order.status!==constant.ORDER_STATUS.CLOSED.value">
-            <div class="message">{{stepsMessage.success}}</div>
-            <div class="step-time" v-if="order.complete_time">{{order.complete_time| getTimeText}}</div>
-          </li>
-          <li :class="['step',{active:order.status===constant.ORDER_STATUS.CANCEL.value}]"
-              v-if="order.status===constant.ORDER_STATUS.CANCEL.value">
-            <div class="message">{{stepsMessage.cancel}}</div>
-            <div class="step-time" v-if="order.update_time">{{order.update_time| getTimeText}}</div>
-          </li>
-          <li :class="['step',{active:order.status===constant.ORDER_STATUS.CLOSED.value}]"
-              v-if="order.status===constant.ORDER_STATUS.CLOSED.value">
-            <div class="message">{{stepsMessage.closed}}</div>
-          </li>
-        </ol>
-      </div>
-      <div class="order-helper">
-        <div v-if="canCancel" class="d-flex align-items-center justify-content-between">
-          <span>想要终止交易？</span>
-          <b-btn size="xs" variant="outline-green" :disabled="expired" @click="cancelOrder">取消订单</b-btn>
+        <div class="order-steps">
+          <ol>
+            <li :class="['step',{active:order.status===constant.ORDER_STATUS.CREATED.value}]"
+                v-if="(order.status!==constant.ORDER_STATUS.CANCEL.value||order.pay_time)&&order.status!==constant.ORDER_STATUS.CLOSED.value">
+              <div class="message">{{stepsMessage.payCash}}</div>
+              <div class="step-time" v-if="order.pay_time">{{order.pay_time | getTimeText}}</div>
+              <b-btn v-if="isBuySide && !order.pay_time"
+                     :disabled="expired"
+                     size="xs" variant="gradient-yellow"
+                     @click="confirmPay()">
+                我已付款
+              </b-btn>
+            </li>
+            <li :class="['step',{active:order.status===constant.ORDER_STATUS.PAID.value}]"
+                v-if="showConfirmReceiptStep">
+              <div class="message">{{stepsMessage.payCoin}}</div>
+              <div class="step-time" v-if="order.complete_time">{{order.complete_time| getTimeText}}</div>
+              <button v-if="!isBuySide&&order.status===constant.ORDER_STATUS.PAID.value"
+                      class="btn btn-gradient-yellow btn-xs"
+                      :disabled="isAppealing"
+                      @click="confirmReceipt()">确认收款
+              </button>
+            </li>
+            <li :class="['step',{active:order.status===constant.ORDER_STATUS.SUCCESS.value}]"
+                v-if="order.status!=='cancel'&&order.status!==constant.ORDER_STATUS.CLOSED.value">
+              <div class="message">{{stepsMessage.success}}</div>
+              <div class="step-time" v-if="order.complete_time">{{order.complete_time| getTimeText}}</div>
+            </li>
+            <li :class="['step',{active:order.status===constant.ORDER_STATUS.CANCEL.value}]"
+                v-if="order.status===constant.ORDER_STATUS.CANCEL.value">
+              <div class="message">{{stepsMessage.cancel}}</div>
+              <div class="step-time" v-if="order.update_time">{{order.update_time| getTimeText}}</div>
+            </li>
+            <li :class="['step',{active:order.status===constant.ORDER_STATUS.CLOSED.value}]"
+                v-if="order.status===constant.ORDER_STATUS.CLOSED.value">
+              <div class="message">{{stepsMessage.closed}}</div>
+            </li>
+          </ol>
         </div>
-        <template v-if="showAppeal">
+        <div class="order-helper">
+          <div v-if="canCancel" class="d-flex align-items-center justify-content-between">
+            <span>想要终止交易？</span>
+            <b-btn size="xs" variant="outline-green" :disabled="expired" @click="cancelOrder">取消订单</b-btn>
+          </div>
+          <template v-if="showAppeal">
           <span v-if="!appeal||appeal.status===''">
             交易出现问题？需要
             <span class="c-brand-green appeal-btn" v-if="canAppeal" @click="startAppeal">申诉</span>
-            <span class="c-brand-green appeal-btn" v-else v-b-tooltip.hover title="买家付款30分钟后，可发起申诉。">申诉</span>
+            <span class="c-brand-green appeal-btn" v-else v-b-tooltip.hover title="买家付款10分钟后，可发起申诉。">申诉</span>
           </span>
-        </template>
-        <template v-if="showSupport">
+          </template>
+          <template v-if="showSupport">
           <span>
             交易出现问题？需要
             <b-link :href="`${coinexDomain}/res/support/ticket`" target="_blank"><span class="c-brand-green appeal-btn">提交工单</span></b-link>
           </span>
-        </template>
-        <template v-if="appeal">
-          <div v-if="appeal.status===constant.APPEAL_STATUS.CREATED"
-               class="d-flex align-items-center justify-content-between">
-            <span>{{appealSide}}已发起申诉，请等待申诉专员介入</span>
-            <button v-if="isCurrentUserAppealing" class="btn btn-outline-green btn-xs" @click="cancelAppeal">取消申诉
-            </button>
-          </div>
-          <div
-            v-if="appeal.status===constant.APPEAL_STATUS.PROCESSING || appeal.status===constant.APPEAL_STATUS.PENDING"
-            class="d-flex align-items-center justify-content-between">
-            <span>申诉专员已经介入，请及时提供必要的信息</span>
-          </div>
-          <div v-if="appeal.status===constant.APPEAL_STATUS.CANCEL">
-            <span>{{appealSide}}已取消申诉，如果仍有问题，请</span>
-            <b-link :href="`${coinexDomain}/res/support/ticket`" target="_blank">提交工单</b-link>
-          </div>
-          <div v-if="appeal.status===constant.APPEAL_STATUS.COMPLETED">
-            <span>申诉裁决：{{appealResult}}</span>
-          </div>
-        </template>
-        <div class="divider" v-if="canCancel||showAppeal||appeal"></div>
-      </div>
-      <div class="order-notice">
-        <div class="title c-dark">交易须知</div>
-        <ul class="notices" v-if="isBuySide">
-          <li>您支付的法币将直接进入卖方收款账户，交易中卖方的数字货币由平台托管冻结。</li>
-          <li>请尽快完成付款，并务必<span class="c-red">点击“我已付款”</span>，卖方确认收款后，平台将数字货币划转到您的账户。</li>
-          <li>买方当日取消订单达3笔（含超时未支付订单），会被限制当日交易功能。</li>
-          <li>请<span class="c-red">使用即时到账支付方式</span>，付款后2小时内未到账订单，卖方有权要求退款后取消交易，请知悉。</li>
-        </ul>
-        <ul class="notices" v-else>
-          <li>买方支付的法币将直接进入您的收款账户，交易中您的数字货币由平台托管冻结。</li>
-          <li>确认收到买方付款后，请及时<span class="c-red">点击“确认收款”</span>，放行数字货币给买方。</li>
-          <li>收到到账短信后，请<span class="c-red">务必登录收款账户确认款项是否到账</span>，避免因收到诈骗短信错误释放数字货币。</li>
-        </ul>
-      </div>
-    </div>
-    <div class="sidebar">
-      <CBlock class="my-sidebar-info" style="padding: 30px 0 13px 0;">
-        <UserStatsProfile :user-data="counterparty" v-if="counterparty"
-                          :is-merchant="counterparty.id===order.merchant_id"/>
-      </CBlock>
-      <CBlock id="my-chat-box">
-        <Chat :client="chat.imClient" :conversation-id="order.conversation_id" :client-id="`${user.account.id}`"></Chat>
-      </CBlock>
-    </div>
-    <b-modal ref="appealModal"
-             title="交易申诉"
-             @ok="submitAppeal"
-             ok-variant="gradient-yellow"
-             :ok-disabled="cannotSubmitAppeal"
-             cancel-variant="outline-green"
-             ok-title="确定"
-             cancel-title="取消"
-             button-size="sm"
-             :noCloseOnBackdrop="true"
-             class="text-center"
-    >
-      <div id="appeal-modal" class="text-left fz-14 c-black">
-        <p class="mb-40">提起申诉后，申诉专员将介入本次交易，直至申诉结束。恶意申诉者将被冻结账户。</p>
-        <div class="d-flex align-items-center">
-          <span class="tip">申诉原因</span>
-          <b-form-select class="appeal-input" v-model="appealReason"
-                         :options="constant.appealReasonOptions"></b-form-select>
+          </template>
+          <template v-if="appeal">
+            <div v-if="appeal.status===constant.APPEAL_STATUS.CREATED"
+                 class="d-flex align-items-center justify-content-between">
+              <span>{{appealSide}}已发起申诉，请等待申诉专员介入</span>
+              <button v-if="isCurrentUserAppealing" class="btn btn-outline-green btn-xs" @click="cancelAppeal">取消申诉
+              </button>
+            </div>
+            <div
+              v-if="appeal.status===constant.APPEAL_STATUS.PROCESSING || appeal.status===constant.APPEAL_STATUS.PENDING"
+              class="d-flex align-items-center justify-content-between">
+              <span>申诉专员已经介入，请及时提供必要的信息</span>
+            </div>
+            <div v-if="appeal.status===constant.APPEAL_STATUS.CANCEL">
+              <span>{{appealSide}}已取消申诉，如果仍有问题，请</span>
+              <b-link :href="`${coinexDomain}/res/support/ticket`" target="_blank">提交工单</b-link>
+            </div>
+            <div v-if="appeal.status===constant.APPEAL_STATUS.COMPLETED">
+              <span>申诉裁决：{{appealResult}}</span>
+            </div>
+          </template>
+          <div class="divider" v-if="canCancel||showAppeal||appeal"></div>
         </div>
-        <div class="d-flex align-items-start mt-20">
-          <span class="tip">申诉理由</span>
-          <textarea class="appeal-input"
-                    v-model="appealComment"
-                    placeholder="请填写15-500字的申诉理由"
-                    rows="8">
+        <div class="order-notice">
+          <div class="title c-dark">交易须知</div>
+          <ul class="notices" v-if="isBuySide">
+            <li>您支付的法币将直接进入卖方收款账户，交易中卖方的数字货币由平台托管冻结。</li>
+            <li>请尽快完成付款，并务必<span class="c-red">点击“我已付款”</span>，卖方确认收款后，平台将数字货币划转到您的账户。</li>
+            <li>买方当日取消订单达3笔（含超时未支付订单），会被限制当日交易功能。</li>
+            <li>请<span class="c-red">使用即时到账支付方式</span>，付款后2小时内未到账订单，卖方有权要求退款后取消交易，请知悉。</li>
+          </ul>
+          <ul class="notices" v-else>
+            <li>买方支付的法币将直接进入您的收款账户，交易中您的数字货币由平台托管冻结。</li>
+            <li>确认收到买方付款后，请及时<span class="c-red">点击“确认收款”</span>，放行数字货币给买方。</li>
+            <li>收到到账短信后，请<span class="c-red">务必登录收款账户确认款项是否到账</span>，避免因收到诈骗短信错误释放数字货币。</li>
+          </ul>
+        </div>
+      </div>
+      <div class="sidebar">
+        <CBlock class="my-sidebar-info" style="padding: 30px 0 13px 0;">
+          <UserStatsProfile :user-data="counterparty" v-if="counterparty"
+                            :is-merchant="counterparty.id===order.merchant_id"/>
+        </CBlock>
+        <CBlock id="my-chat-box">
+          <Chat :client="chat.imClient" :conversation-id="order.conversation_id"
+                :client-id="`${user.account.id}`"></Chat>
+        </CBlock>
+      </div>
+      <b-modal ref="appealModal"
+               title="交易申诉"
+               @ok="submitAppeal"
+               ok-variant="gradient-yellow"
+               :ok-disabled="cannotSubmitAppeal"
+               cancel-variant="outline-green"
+               ok-title="确定"
+               cancel-title="取消"
+               button-size="sm"
+               :noCloseOnBackdrop="true"
+               class="text-center"
+      >
+        <div id="appeal-modal" class="text-left fz-14 c-black">
+          <p class="mb-40">提起申诉后，申诉专员将介入本次交易，直至申诉结束。恶意申诉者将被冻结账户。</p>
+          <div class="d-flex align-items-center">
+            <span class="tip">申诉原因</span>
+            <b-form-select class="appeal-input" v-model="appealReason"
+                           :options="constant.appealReasonOptions"></b-form-select>
+          </div>
+          <div class="d-flex align-items-start mt-20">
+            <span class="tip">申诉理由</span>
+            <textarea class="appeal-input"
+                      v-model="appealComment"
+                      placeholder="请填写15-500字的申诉理由"
+                      rows="8">
           </textarea>
+          </div>
+          <div :class="['text-right',appealCommentLength>500?'c-red':'c-gray']">{{appealCommentLength}}/500</div>
         </div>
-        <div :class="['text-right',appealCommentLength>500?'c-red':'c-gray']">{{appealCommentLength}}/500</div>
-      </div>
-    </b-modal>
-    <ConfirmReceipt :orderId="order.id" :show-confirm-receipt-modal="showConfirmReceiptModal"
-                    @confirmReceipt="refreshOrderStatus"
-                    @cancelReceipt="showConfirmReceiptModal=false"/>
+      </b-modal>
+      <ConfirmReceipt :orderId="order.id" :show-confirm-receipt-modal="showConfirmReceiptModal"
+                      @confirmReceipt="refreshOrderStatus"
+                      @cancelReceipt="showConfirmReceiptModal=false"/>
+    </div>
   </div>
 </template>
 
@@ -411,8 +415,8 @@
   import {coinexDomain} from '~/modules/variables'
   import {mapState} from 'vuex'
 
-  const PAID_CAN_APPEAL = 30 * 60 * 1000 // 三十分钟
-  const SUCCESS_CAN_APPEAL = 24 * 3600 * 1000 // 二十四小时
+  const PAID_CAN_APPEAL = 10 * 60 * 1000 // 支付后可申诉的时间 十分钟
+  const SUCCESS_CAN_APPEAL = 24 * 3600 * 1000 // 订单完成后二十四小时内可申诉
   const ORDER_PAY_TIME = 15 // 15分钟（未换算）
   const REFRESH_ORDER_INTERVAL = 5000
 

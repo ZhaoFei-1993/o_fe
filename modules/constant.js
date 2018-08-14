@@ -149,7 +149,7 @@ export default function getConstant($t) {
         value: 'created',
       },
       PAID: {
-        text: '待收款',
+        text: '待放币',
         value: 'paid',
       },
       SUCCESS: {

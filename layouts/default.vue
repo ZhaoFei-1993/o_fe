@@ -7,10 +7,9 @@
     display: flex;
     flex-direction: column;
     .layout-content {
-      width: 1200px;
-      // 设置内容的最小高度，防止 页面切换时由于内容的暂空，导致底部footer上升，进而导致页面闪烁
+      width: 100%;
       flex: 1;
-      margin: 40px auto;
+      min-height: 500px;
       position: relative;
       /*opacity: 1;*/
       // 如果想启用过渡效果，直接开启这个就行了

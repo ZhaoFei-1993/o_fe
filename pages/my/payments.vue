@@ -343,7 +343,6 @@
       QrcodePopover,
       KycStep,
     },
-    layout: 'my',
     head() {
       return {
         title: '支付方式' +
