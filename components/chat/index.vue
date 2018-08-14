@@ -13,7 +13,7 @@
                 <span class="msg-send-error"></span>
                 <span>发送失败</span>
               </div>
-              <div class="msg-text">
+              <div class="msg-text my-text">
                 <span v-if="item.content._lctype === TextMessage.TYPE">{{ item.content._lctext }}</span>
                 <img v-else-if="item.content._lctype === ImageMessage.TYPE" @click="onClickImage(item.content._lcfile.url)" style="width: 100%" :src="item.content._lcfile.url">
                 <span v-else-if="item.content._lctype === SystemMessage.TYPE">{{ item.content._lctext }}</span>
@@ -590,6 +590,9 @@
           .username-right {
             text-align: right;
           }
+          .my-text {
+            background-color: #b8e986;
+          }
           .msg-text {
             position: relative;
             margin-top: 7px;
@@ -598,15 +601,14 @@
             padding: 15px 20px 15px 15px;
             border-radius: 4px;
             word-wrap: break-word;
-            background-color: #f9f9f9;
             color: #27313e;
             &::after {
               content: "";
               position: absolute;
               display: block;
               border-style: solid;
-              border-color: #f9f9f9 transparent transparent;
-              border-left-color: #f9f9f9;
+              border-color: #b8e986 transparent transparent;
+              border-left-color: #b8e986;
               border-width: 8px;
               border-right-color: transparent;
               border-right-width: 0;
