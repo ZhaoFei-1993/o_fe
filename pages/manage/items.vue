@@ -74,8 +74,9 @@
 </style>
 
 <template>
-  <CBlock class="page-my-items" x="0">
-    <h2 class="items-header" v-if="user.merchant">
+  <div class="page-content-container">
+    <CBlock class="page-my-items" x="0">
+      <h2 class="items-header" v-if="user.merchant">
       <span class="items-header-left">
         广告管理
         <ToggleButton :value="user.merchant.is_available" class="mb-0 mx-5" @input="onUserStatusChange"/>
@@ -83,103 +84,105 @@
         <span v-else class="c-gray fz-12">暂停接单</span>
       </span>
 
-      <PublishItemButton @published="onItemPublished">
-        <b-btn size="xs" variant="gradient-yellow">发布广告</b-btn>
-      </PublishItemButton>
-    </h2>
+        <PublishItemButton @published="onItemPublished">
+          <b-btn size="xs" variant="gradient-yellow">发布广告</b-btn>
+        </PublishItemButton>
+      </h2>
 
-    <div class="my-25 px-30">
-      <b-btn v-for="(status, index) in filterOptions"
-             :variant="itemStatus === status.value ? 'outline-green' : 'outline-gray'"
-             :key="index" size="xxs" class="mr-20"
-             @click="onSetItemStatus(status.value)">
-        {{status.text}}
-      </b-btn>
-    </div>
+      <div class="my-25 px-30">
+        <b-btn v-for="(status, index) in filterOptions"
+               :variant="itemStatus === status.value ? 'outline-green' : 'outline-gray'"
+               :key="index" size="xxs" class="mr-20"
+               @click="onSetItemStatus(status.value)">
+          {{status.text}}
+        </b-btn>
+      </div>
 
-    <b-table :fields="itemTableFields" :items="itemsCurrent" class="items-table">
-      <template slot="id" slot-scope="{ item }">
-        <b-link>{{ item.id }}</b-link>
-        <span v-if="itemStatus === constant.ITEM_STATUS.ONLINE && !item.itemLimit.available" class="unavailable-tooltip"
-              v-b-tooltip.hover title="可交易数量不足最小限额，无法在首页中展示"><i class="iconfont icon-error"></i></span>
-      </template>
-      <template slot="side" slot-scope="{ item }">
-        <!-- 自定义的属性 -->
-        <span :class="['order-type', item.side === 'buy' ? 'order-type-buy' : 'order-type-sell']">
+      <b-table :fields="itemTableFields" :items="itemsCurrent" class="items-table">
+        <template slot="id" slot-scope="{ item }">
+          <b-link>{{ item.id }}</b-link>
+          <span v-if="itemStatus === constant.ITEM_STATUS.ONLINE && !item.itemLimit.available"
+                class="unavailable-tooltip"
+                v-b-tooltip.hover title="可交易数量不足最小限额，无法在首页中展示"><i class="iconfont icon-error"></i></span>
+        </template>
+        <template slot="side" slot-scope="{ item }">
+          <!-- 自定义的属性 -->
+          <span :class="['order-type', item.side === 'buy' ? 'order-type-buy' : 'order-type-sell']">
           {{ item.side === 'buy' ? '买' : '卖' }}
         </span>
-      </template>
-      <template slot="remain_coin_amount" slot-scope="{ item }">
-        {{ formatMoney(item.remain_coin_amount) }}
-      </template>
-      <template slot="cashAmountLimit" slot-scope="{ item }">
-        {{formatMoney(item.itemLimit.minDealCashAmount,2)}} - {{formatMoney(item.itemLimit.maxDealCashAmount,2)}}
-        {{item.cash_type}}
-      </template>
-      <template slot="price" slot-scope="{ item }">
-        <!--浮动定价需要显示浮动的定价，会和price不一致（由于后台更新延迟所导致）-->
-        <!--这里先不考虑最高、最低价，简单地显示个市价*比例，等后续用户反馈和产品决定，再看怎么显示-->
-        <span v-if="item.pricing_type === constant.PRICING_TYPE.FLOAT">
+        </template>
+        <template slot="remain_coin_amount" slot-scope="{ item }">
+          {{ formatMoney(item.remain_coin_amount) }}
+        </template>
+        <template slot="cashAmountLimit" slot-scope="{ item }">
+          {{formatMoney(item.itemLimit.minDealCashAmount,2)}} - {{formatMoney(item.itemLimit.maxDealCashAmount,2)}}
+          {{item.cash_type}}
+        </template>
+        <template slot="price" slot-scope="{ item }">
+          <!--浮动定价需要显示浮动的定价，会和price不一致（由于后台更新延迟所导致）-->
+          <!--这里先不考虑最高、最低价，简单地显示个市价*比例，等后续用户反馈和产品决定，再看怎么显示-->
+          <span v-if="item.pricing_type === constant.PRICING_TYPE.FLOAT">
           {{(balance.currentRate[item.coin_type] * item.float_rate / 100).setDigit(2)}} {{item.cash_type}}
           <span style="color:#00b275">({{item.float_rate}}%)</span>
         </span>
-        <span v-else>
+          <span v-else>
           {{item.price}} {{item.cash_type}}
         </span>
-      </template>
-      <!--暂时不显示用户的最后编辑时间 jeff 20180721-->
-      <template v-if="itemStatus === constant.ITEM_STATUS.ONLINE" slot="on_time" slot-scope="{item}">
-        {{utils.getTimeText(item.on_time)}}
-      </template>
-      <template slot="action" slot-scope="{ item }">
-        <b-btn v-if="itemStatus === constant.ITEM_STATUS.ONLINE" variant="plain-green" size="xxs"
-               @click="onItemOffline(item)">下架
-        </b-btn>
-        <div v-else>
-          <b-btn variant="plain-green" size="xxs" @click="onItemEdit(item)">编辑</b-btn>
-
-          <b-btn v-if="user.payments && user.payments.length"
-                 variant="plain-green" size="xxs" class="mx-10" @click="onItemOnline(item, $event)">
-            上架
+        </template>
+        <!--暂时不显示用户的最后编辑时间 jeff 20180721-->
+        <template v-if="itemStatus === constant.ITEM_STATUS.ONLINE" slot="on_time" slot-scope="{item}">
+          {{utils.getTimeText(item.on_time)}}
+        </template>
+        <template slot="action" slot-scope="{ item }">
+          <b-btn v-if="itemStatus === constant.ITEM_STATUS.ONLINE" variant="plain-green" size="xxs"
+                 @click="onItemOffline(item)">下架
           </b-btn>
+          <div v-else>
+            <b-btn variant="plain-green" size="xxs" @click="onItemEdit(item)">编辑</b-btn>
 
-          <template v-else>
-            <b-btn :id="`deleteDisabled_${item.id}`"
-                   variant="plain-light-gray" size="xxs" class="mx-10">
+            <b-btn v-if="user.payments && user.payments.length"
+                   variant="plain-green" size="xxs" class="mx-10" @click="onItemOnline(item, $event)">
               上架
             </b-btn>
-            <b-tooltip :target="`deleteDisabled_${item.id}`">
-              您尚未激活支付方式，请先激活再上架广告。
-              <b-link to="/my/payments">去激活支付方式</b-link>
-            </b-tooltip>
-          </template>
 
-          <b-btn variant="plain-green" size="xxs" @click="onItemDelete(item)">删除</b-btn>
+            <template v-else>
+              <b-btn :id="`deleteDisabled_${item.id}`"
+                     variant="plain-light-gray" size="xxs" class="mx-10">
+                上架
+              </b-btn>
+              <b-tooltip :target="`deleteDisabled_${item.id}`">
+                您尚未激活支付方式，请先激活再上架广告。
+                <b-link to="/my/payments">去激活支付方式</b-link>
+              </b-tooltip>
+            </template>
+
+            <b-btn variant="plain-green" size="xxs" @click="onItemDelete(item)">删除</b-btn>
+          </div>
+        </template>
+      </b-table>
+
+      <Blank v-if="!itemsCurrent.length"/>
+
+      <CBlock v-show="isItemAmountEditing" class="item-coin-amount-container" ref="coin-amount" x="20" y="20"
+              v-click-outside="onClickOutsideAmount">
+        <div class="item-coin-amount-confirm">
+          <CurrencyInput v-model="onlineItemCoinAmount" class="item-coin-amount-confirm-input"
+                         :currency="editingItem.coin_type"/>
+          <b-btn variant="plain-green" size="xs" class="mx-20" :disabled="onlineItemCoinAmount<=0"
+                 @click="onItemOnlineConfirm">确定
+          </b-btn>
+          <b-btn variant="plain" size="xs" @click="onItemOnlineCancel">取消</b-btn>
         </div>
-      </template>
-    </b-table>
+        <Language v-if="editingItem.coin_type && editingItem.side === constant.SIDE.SELL" text="最多可售[a][/a][c][/c]"
+                  class="mt-1" :class="{'c-red': !editingAmountValid}" tag="div">
+          <span slot="a"> {{balance.otcMap[editingItem.coin_type].available}} </span>
+          <span slot="c">{{editingItem.coin_type}}</span>
+        </Language>
+      </CBlock>
 
-    <Blank v-if="!itemsCurrent.length"/>
-
-    <CBlock v-show="isItemAmountEditing" class="item-coin-amount-container" ref="coin-amount" x="20" y="20"
-            v-click-outside="onClickOutsideAmount">
-      <div class="item-coin-amount-confirm">
-        <CurrencyInput v-model="onlineItemCoinAmount" class="item-coin-amount-confirm-input"
-                       :currency="editingItem.coin_type"/>
-        <b-btn variant="plain-green" size="xs" class="mx-20" :disabled="onlineItemCoinAmount<=0"
-               @click="onItemOnlineConfirm">确定
-        </b-btn>
-        <b-btn variant="plain" size="xs" @click="onItemOnlineCancel">取消</b-btn>
-      </div>
-      <Language v-if="editingItem.coin_type && editingItem.side === constant.SIDE.SELL" text="最多可售[a][/a][c][/c]"
-                class="mt-1" :class="{'c-red': !editingAmountValid}" tag="div">
-        <span slot="a"> {{balance.otcMap[editingItem.coin_type].available}} </span>
-        <span slot="c">{{editingItem.coin_type}}</span>
-      </Language>
+      <PublishItemModal v-model="isItemEditing" :editingItem="editingItem" :editing="true" @edited="onItemEdited"/>
     </CBlock>
-
-    <PublishItemModal v-model="isItemEditing" :editingItem="editingItem" :editing="true" @edited="onItemEdited"/>
-  </CBlock>
+  </div>
 </template>
 
 <script>

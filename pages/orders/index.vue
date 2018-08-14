@@ -1,59 +1,60 @@
 <template>
-  <div class="page-order">
-    <c-block>
-      <header class="header">订单管理</header>
-      <div class="filter-wapper">
-        <b-btn v-for="(item, index) in filterOptions"
-               :variant="queryParams.status === item.value ? 'outline-green' : 'outline-gray'"
-               :key="index" size="xxs" class="mr-20"
-               @click="onClickFilter(index)">
-          <i v-if="item.value===ORDERS_FILTERS.APPEAL" class="iconfont icon-appeal"></i>{{item.text}}
-        </b-btn>
-      </div>
-      <div class="order-table">
-        <b-table :fields="orderTableFields" :items="orderTableItems" @row-clicked="onRowClick"
-                 :tbody-tr-class="queryParams.status === ORDERS_FILTERS.PROCESSING ? 'order-row-class' : ''">
-          <template slot="HEAD__isBuySide" slot-scope="{ item }">
-            <div>
-              <TableHeadDropdown :options="orderTypeFilterOptions" label="类型"
-                                 @click="onClickSideDropdown"></TableHeadDropdown>
-            </div>
-          </template>
-          <template slot="HEAD_coin_type" slot-scope="{ item }">
-            <div>
-              <TableHeadDropdown :options="coinTypeFilterOptions" label="币种"
-                                 @click="onClickCoinTypeDropdown"></TableHeadDropdown>
-            </div>
-          </template>
-          <template slot="id" slot-scope="{ item }">
-            <b-link class="id-text" @click.stop="onClickItemId(item.id)">
-              <span>{{ item.id }}</span>
-              <span class="message-btn">
+  <div class="page-content-container">
+    <div class="page-order">
+      <c-block>
+        <header class="header">订单管理</header>
+        <div class="filter-wapper">
+          <b-btn v-for="(item, index) in filterOptions"
+                 :variant="queryParams.status === item.value ? 'outline-green' : 'outline-gray'"
+                 :key="index" size="xxs" class="mr-20"
+                 @click="onClickFilter(index)">
+            <i v-if="item.value===ORDERS_FILTERS.APPEAL" class="iconfont icon-appeal"></i>{{item.text}}
+          </b-btn>
+        </div>
+        <div class="order-table">
+          <b-table :fields="orderTableFields" :items="orderTableItems" @row-clicked="onRowClick"
+                   :tbody-tr-class="queryParams.status === ORDERS_FILTERS.PROCESSING ? 'order-row-class' : ''">
+            <template slot="HEAD__isBuySide" slot-scope="{ item }">
+              <div>
+                <TableHeadDropdown :options="orderTypeFilterOptions" label="类型"
+                                   @click="onClickSideDropdown"></TableHeadDropdown>
+              </div>
+            </template>
+            <template slot="HEAD_coin_type" slot-scope="{ item }">
+              <div>
+                <TableHeadDropdown :options="coinTypeFilterOptions" label="币种"
+                                   @click="onClickCoinTypeDropdown"></TableHeadDropdown>
+              </div>
+            </template>
+            <template slot="id" slot-scope="{ item }">
+              <b-link class="id-text" @click.stop="onClickItemId(item.id)">
+                <span>{{ item.id }}</span>
+                <span class="message-btn">
                 <i
                   :class="['iconfont', 'icon-message', item._unreadMessageCount > 0 ? 'shake-rotate' : '']"></i>
                 <sup class="message-badge" v-if="item._unreadMessageCount > 0"></sup>
               </span>
-            </b-link>
-          </template>
-          <template slot="_isBuySide" slot-scope="{ item }">
+              </b-link>
+            </template>
+            <template slot="_isBuySide" slot-scope="{ item }">
             <span
               :class="['order-type', item._isBuySide ? 'order-type-buy' : 'order-type-sell']">
               {{ item._isBuySide ? '买' : '卖' }}
             </span>
-          </template>
-          <template slot="place_time" slot-scope="{ item }">
-            {{ item.place_time | getTimeText }}
-          </template>
-          <template slot="coin_amount" slot-scope="{ item }">
-            {{ item.coin_amount | formatMoney }}
-          </template>
-          <template slot="price" slot-scope="{ item }">
-            {{ item.price }} CNY
-          </template>
-          <template slot="cash_amount" slot-scope="{ item }">
-            {{ item.cash_amount | formatMoney }} CNY
-          </template>
-          <template slot="status" slot-scope="{ item, detailsShowing, toggleDetails }">
+            </template>
+            <template slot="place_time" slot-scope="{ item }">
+              {{ item.place_time | getTimeText }}
+            </template>
+            <template slot="coin_amount" slot-scope="{ item }">
+              {{ item.coin_amount | formatMoney }}
+            </template>
+            <template slot="price" slot-scope="{ item }">
+              {{ item.price }} CNY
+            </template>
+            <template slot="cash_amount" slot-scope="{ item }">
+              {{ item.cash_amount | formatMoney }} CNY
+            </template>
+            <template slot="status" slot-scope="{ item, detailsShowing, toggleDetails }">
             <span class="status-icon">
               <i
                 v-if="queryParams.status!==ORDERS_FILTERS.APPEAL && item.appeal_status!=='' && item.appeal_status!==constant.APPEAL_STATUS.CANCEL"
@@ -64,180 +65,182 @@
                  :class="statusIconMap[item.status].class"
                  :style="{fontSize: '12px', color: statusIconMap[item.status].color}"></i>
             </span>
-            <span>{{ constant?constant.ORDER_STATUS[item.status.toUpperCase()].text:'' }}</span>
-            <span
-              v-if="item.status === constant.ORDER_STATUS.CREATED.value || item.status === constant.ORDER_STATUS.PAID.value && queryParams.status === 'processing'"
-              class="detail"
-              :class="[ detailsShowing ? 'show-detail' : 'hidden-detail' ]">
+              <span>{{ constant?constant.ORDER_STATUS[item.status.toUpperCase()].text:'' }}</span>
+              <span
+                v-if="item.status === constant.ORDER_STATUS.CREATED.value || item.status === constant.ORDER_STATUS.PAID.value && queryParams.status === 'processing'"
+                class="detail"
+                :class="[ detailsShowing ? 'show-detail' : 'hidden-detail' ]">
               <i class="iconfont icon-detail"></i>
             </span>
-          </template>
-          <template slot="row-details" slot-scope="{ item }" class="buy-side-detail">
-            <div :class="['detail-wrapper', item._isBuySide ? 'buy-side-detail' : 'sell-side-detail']">
-              <div class="col1">
-                <div class="detail-h1 detail-flex">
+            </template>
+            <template slot="row-details" slot-scope="{ item }" class="buy-side-detail">
+              <div :class="['detail-wrapper', item._isBuySide ? 'buy-side-detail' : 'sell-side-detail']">
+                <div class="col1">
+                  <div class="detail-h1 detail-flex">
                   <span
                     :class="['arrow-icon', item._isBuySide ? 'buy-arrow-icon' : 'sell-arrow-icon']"></span>
-                  <span>{{ item._isBuySide ? '购买' : '出售' }} {{ item.coin_type }}</span>
+                    <span>{{ item._isBuySide ? '购买' : '出售' }} {{ item.coin_type }}</span>
+                  </div>
+                  <div class="detail-h2">
+                    <span style="display: inline-block;width: 24px;"></span>
+                    <span style="display: inline-block;margin-right: 3px;">向</span>{{ item._counterparty.name }}
+                  </div>
                 </div>
-                <div class="detail-h2">
-                  <span style="display: inline-block;width: 24px;"></span>
-                  <span style="display: inline-block;margin-right: 3px;">向</span>{{ item._counterparty.name }}
+                <div class="col2">
+                  <div class="detail-h1">
+                    {{ item.cash_amount | formatMoney }} {{ item.cash_type }}
+                  </div>
+                  <div class="detail-h2">
+                    {{ item.coin_amount | formatMoney }} {{ item.coin_type }}
+                  </div>
                 </div>
-              </div>
-              <div class="col2">
-                <div class="detail-h1">
-                  {{ item.cash_amount | formatMoney }} {{ item.cash_type }}
-                </div>
-                <div class="detail-h2">
-                  {{ item.coin_amount | formatMoney }} {{ item.coin_type }}
-                </div>
-              </div>
-              <div class="col3"
-                   v-if="item._selected_payment_method && (!item._isBuySide && item.status === constant.ORDER_STATUS.PAID.value) || item._isBuySide">
-                <div class="payment-method"
-                     v-if="item.status !== constant.ORDER_STATUS.CANCEL.value
+                <div class="col3"
+                     v-if="item._selected_payment_method && (!item._isBuySide && item.status === constant.ORDER_STATUS.PAID.value) || item._isBuySide">
+                  <div class="payment-method"
+                       v-if="item.status !== constant.ORDER_STATUS.CANCEL.value
                   && item.status !== constant.ORDER_STATUS.CLOSED.value && !item._expired">
-                  <template v-if="item.status === constant.ORDER_STATUS.CREATED.value">
-                    <i v-if="item._selected_payment_method.method === constant.PAYMENT_TYPES.BANKCARD"
-                       class="iconfont icon-bankcard"></i>
-                    <i v-if="item._selected_payment_method.method === constant.PAYMENT_TYPES.WECHAT"
-                       class="iconfont icon-wechat-round"></i>
-                    <i v-if="item._selected_payment_method.method === constant.PAYMENT_TYPES.ALIPAY"
-                       class="iconfont icon-alipay"></i>
-                    <select v-model="item._selected_payment_method">
-                      <option v-for="payment in item.payment_methods" :value="payment">
-                        <span v-if="payment.method === constant.PAYMENT_TYPES.BANKCARD">银行转帐</span>
-                        <span v-if="payment.method === constant.PAYMENT_TYPES.WECHAT">微信支付</span>
-                        <span v-if="payment.method === constant.PAYMENT_TYPES.ALIPAY">支付宝支付</span>
-                      </option>
-                    </select>
-                  </template>
-                  <template v-else>
+                    <template v-if="item.status === constant.ORDER_STATUS.CREATED.value">
+                      <i v-if="item._selected_payment_method.method === constant.PAYMENT_TYPES.BANKCARD"
+                         class="iconfont icon-bankcard"></i>
+                      <i v-if="item._selected_payment_method.method === constant.PAYMENT_TYPES.WECHAT"
+                         class="iconfont icon-wechat-round"></i>
+                      <i v-if="item._selected_payment_method.method === constant.PAYMENT_TYPES.ALIPAY"
+                         class="iconfont icon-alipay"></i>
+                      <select v-model="item._selected_payment_method">
+                        <option v-for="payment in item.payment_methods" :value="payment">
+                          <span v-if="payment.method === constant.PAYMENT_TYPES.BANKCARD">银行转帐</span>
+                          <span v-if="payment.method === constant.PAYMENT_TYPES.WECHAT">微信支付</span>
+                          <span v-if="payment.method === constant.PAYMENT_TYPES.ALIPAY">支付宝支付</span>
+                        </option>
+                      </select>
+                    </template>
+                    <template v-else>
                     <span v-if="item._selected_payment_method.method === constant.PAYMENT_TYPES.BANKCARD">
                       <i class="iconfont icon-bankcard"></i><span class="payment-text">银行转帐</span>
                     </span>
-                    <span v-if="item._selected_payment_method.method === constant.PAYMENT_TYPES.WECHAT">
+                      <span v-if="item._selected_payment_method.method === constant.PAYMENT_TYPES.WECHAT">
                       <i class="iconfont icon-wechat-round"></i><span class="payment-text">微信支付</span>
                     </span>
-                    <span v-if="item._selected_payment_method.method === constant.PAYMENT_TYPES.ALIPAY">
+                      <span v-if="item._selected_payment_method.method === constant.PAYMENT_TYPES.ALIPAY">
                       <i class="iconfont icon-alipay"></i><span class="payment-text">支付宝支付</span>
                     </span>
+                    </template>
+                  </div>
+                </div>
+                <div class="col4"
+                     v-if="item._selected_payment_method && (!item._isBuySide && item.status === constant.ORDER_STATUS.PAID.value) || item._isBuySide">
+                  <template v-if="!item._expired">
+                    <div class="detail-text" style="color: #27313e;">
+                      {{ item._selected_payment_method.account_name }}
+                    </div>
+                    <div class="detail-text">
+                      <span v-if="item._selected_payment_method.method === constant.PAYMENT_TYPES.BANKCARD">{{ item._selected_payment_method.account_no | splitCardNumber }}</span>
+                      <span v-else>{{ item._selected_payment_method.account_no }}</span>
+
+                      <QrcodePopover
+                        v-show="item._selected_payment_method.qr_code_image_url && item._selected_payment_method.method !== constant.PAYMENT_TYPES.BANKCARD"
+                        :src="item._selected_payment_method.qr_code_image_url"
+                        class="ml-1"/>
+                    </div>
+                    <div v-if="item._selected_payment_method.method === constant.PAYMENT_TYPES.BANKCARD"
+                         class="detail-text">
+                      {{ item._selected_payment_method.bank_name }}
+                      <span v-if="item._selected_payment_method.branch&&item._selected_payment_method.branch.length">, {{ item._selected_payment_method.branch }}</span>
+                    </div>
+                    <div class="detail-text">
+                      备注参考号：<span class="detail-code">{{ `${item.id}`.substr(`${item.id}`.length - 6) }}</span>
+                    </div>
                   </template>
                 </div>
-              </div>
-              <div class="col4"
-                   v-if="item._selected_payment_method && (!item._isBuySide && item.status === constant.ORDER_STATUS.PAID.value) || item._isBuySide">
-                <template v-if="!item._expired">
-                  <div class="detail-text" style="color: #27313e;">
-                    {{ item._selected_payment_method.account_name }}
-                  </div>
-                  <div class="detail-text">
-                    <span v-if="item._selected_payment_method.method === constant.PAYMENT_TYPES.BANKCARD">{{ item._selected_payment_method.account_no | splitCardNumber }}</span>
-                    <span v-else>{{ item._selected_payment_method.account_no }}</span>
-
-                    <QrcodePopover
-                      v-show="item._selected_payment_method.qr_code_image_url && item._selected_payment_method.method !== constant.PAYMENT_TYPES.BANKCARD"
-                      :src="item._selected_payment_method.qr_code_image_url"
-                      class="ml-1"/>
-                  </div>
-                  <div v-if="item._selected_payment_method.method === constant.PAYMENT_TYPES.BANKCARD"
-                       class="detail-text">
-                    {{ item._selected_payment_method.bank_name }}
-                    <span v-if="item._selected_payment_method.branch&&item._selected_payment_method.branch.length">, {{ item._selected_payment_method.branch }}</span>
-                  </div>
-                  <div class="detail-text">
-                    备注参考号：<span class="detail-code">{{ `${item.id}`.substr(`${item.id}`.length - 6) }}</span>
-                  </div>
-                </template>
-              </div>
-              <div class="col5">
-                <template v-if="item._isBuySide">
-                  <template v-if="item.status === constant.ORDER_STATUS.CREATED.value">
-                    <template v-if="item._remaining_time>0">
-                      <div class="detail-text detail-timer">
-                        还剩{{ item._remaining_time | formatDuration }}
-                      </div>
-                      <div class="detail-btn-wrapper">
-                        <b-btn size="xs" variant="gradient-yellow" class="detail-btn" @click="confirmPay(item)">我已付款
-                        </b-btn>
+                <div class="col5">
+                  <template v-if="item._isBuySide">
+                    <template v-if="item.status === constant.ORDER_STATUS.CREATED.value">
+                      <template v-if="item._remaining_time>0">
+                        <div class="detail-text detail-timer">
+                          还剩{{ item._remaining_time | formatDuration }}
+                        </div>
+                        <div class="detail-btn-wrapper">
+                          <b-btn size="xs" variant="gradient-yellow" class="detail-btn" @click="confirmPay(item)">我已付款
+                          </b-btn>
+                        </div>
+                        <div class="detail-btn-wrapper">
+                          <b-link class="cancel-order-btn" @click="cancelOrder(item)">取消订单</b-link>
+                        </div>
+                      </template>
+                      <template v-else>
+                        <div class="detail-btn-wrapper detail-waiting">
+                          已超时
+                        </div>
+                      </template>
+                    </template>
+                    <template v-if="item.status === constant.ORDER_STATUS.PAID.value">
+                      <div class="detail-btn-wrapper detail-waiting">
+                        等待卖家收款
                       </div>
                       <div class="detail-btn-wrapper">
                         <b-link class="cancel-order-btn" @click="cancelOrder(item)">取消订单</b-link>
                       </div>
                     </template>
-                    <template v-else>
+                    <template v-if="item.status === constant.ORDER_STATUS.CLOSED.value">
                       <div class="detail-btn-wrapper detail-waiting">
-                        已超时
+                        已结束
                       </div>
                     </template>
                   </template>
-                  <template v-if="item.status === constant.ORDER_STATUS.PAID.value">
-                    <div class="detail-btn-wrapper detail-waiting">
-                      等待卖家收款
-                    </div>
-                    <div class="detail-btn-wrapper">
-                      <b-link class="cancel-order-btn" @click="cancelOrder(item)">取消订单</b-link>
-                    </div>
-                  </template>
-                  <template v-if="item.status === constant.ORDER_STATUS.CLOSED.value">
-                    <div class="detail-btn-wrapper detail-waiting">
-                      已结束
-                    </div>
-                  </template>
-                </template>
-                <template v-if="!item._isBuySide">
-                  <template v-if="item.status === constant.ORDER_STATUS.CREATED.value">
-                    <template v-if="item._remaining_time>0">
-                      <div class="detail-text detail-timer">
-                        还剩{{ item._remaining_time | formatDuration }}
-                      </div>
-                      <div class="detail-btn-wrapper detail-waiting">
-                        等待买家付款
-                      </div>
+                  <template v-if="!item._isBuySide">
+                    <template v-if="item.status === constant.ORDER_STATUS.CREATED.value">
+                      <template v-if="item._remaining_time>0">
+                        <div class="detail-text detail-timer">
+                          还剩{{ item._remaining_time | formatDuration }}
+                        </div>
+                        <div class="detail-btn-wrapper detail-waiting">
+                          等待买家付款
+                        </div>
+                      </template>
+                      <template v-else>
+                        <div class="detail-btn-wrapper detail-waiting">
+                          已超时
+                        </div>
+                      </template>
                     </template>
-                    <template v-else>
-                      <div class="detail-btn-wrapper detail-waiting">
-                        已超时
+                    <template v-if="item.status === constant.ORDER_STATUS.PAID.value">
+                      <div class="detail-btn-wrapper">
+                        <b-btn size="xs" variant="gradient-yellow" class="detail-btn" @click="confirmReceipt(item)">确认收款
+                        </b-btn>
                       </div>
                     </template>
                   </template>
-                  <template v-if="item.status === constant.ORDER_STATUS.PAID.value">
-                    <div class="detail-btn-wrapper">
-                      <b-btn size="xs" variant="gradient-yellow" class="detail-btn" @click="confirmReceipt(item)">确认收款
-                      </b-btn>
-                    </div>
-                  </template>
-                </template>
+                </div>
               </div>
-            </div>
-            <div v-if="item._isBuySide && item.status === constant.ORDER_STATUS.CREATED.value" class="detail-warn-text">
-              <span>* 请使用实名付款，转账时除参考号外请不要备注任何信息！</span>
-            </div>
-            <div v-else-if="!item._isBuySide && item.status === constant.ORDER_STATUS.PAID.value"
-                 class="detail-warn-text">
+              <div v-if="item._isBuySide && item.status === constant.ORDER_STATUS.CREATED.value"
+                   class="detail-warn-text">
+                <span>* 请使用实名付款，转账时除参考号外请不要备注任何信息！</span>
+              </div>
+              <div v-else-if="!item._isBuySide && item.status === constant.ORDER_STATUS.PAID.value"
+                   class="detail-warn-text">
               <span>
                 <span style="margin-right: 10px;color: #27313e;" v-if="item._counterparty.kyc_name">* 买方实名：{{ item._counterparty.kyc_name }} </span>
                 请务必查看您的收款账户，并核实买家是否实名付款！
               </span>
-            </div>
-          </template>
-        </b-table>
-        <blank v-if="!orderTableItems.length"></blank>
-        <ViaPagination v-if="orderTableItems.length"
-                       :total-rows="queryParams.totalRows"
-                       :current-page="queryParams.page"
-                       @change="changePage"
-                       :per-page="queryParams.limit">
-        </ViaPagination>
+              </div>
+            </template>
+          </b-table>
+          <blank v-if="!orderTableItems.length"></blank>
+          <ViaPagination v-if="orderTableItems.length"
+                         :total-rows="queryParams.totalRows"
+                         :current-page="queryParams.page"
+                         @change="changePage"
+                         :per-page="queryParams.limit">
+          </ViaPagination>
+        </div>
+      </c-block>
+      <div class="bottom-tips">
+        温馨提示：每日取消订单超过3笔，将被限制当日交易功能。
       </div>
-    </c-block>
-    <div class="bottom-tips">
-      温馨提示：每日取消订单超过3笔，将被限制当日交易功能。
+      <ConfirmReceipt :orderId="curReceiptOrderId" :show-confirm-receipt-modal="showConfirmReceiptModal"
+                      @confirmReceipt="markOrderSuccess"
+                      @cancelReceipt="showConfirmReceiptModal=false"/>
     </div>
-    <ConfirmReceipt :orderId="curReceiptOrderId" :show-confirm-receipt-modal="showConfirmReceiptModal"
-                    @confirmReceipt="markOrderSuccess"
-                    @cancelReceipt="showConfirmReceiptModal=false"/>
   </div>
 </template>
 

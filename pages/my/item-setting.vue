@@ -43,7 +43,7 @@
   <CBlock class="page-item-setting" :x="0" :y="0">
     <h3 class="layout-my-title">
       广告设置
-      <b-link to="/my/items" class="ml-15 fz-16">管理我的广告</b-link>
+      <b-link to="/manage/items" class="ml-15 fz-16">管理我的广告</b-link>
     </h3>
 
     <p class="layout-my-desc">管理与广告相关的快捷操作</p>
@@ -163,7 +163,6 @@
         this.$t('global.pageTitle.common')
       }
     },
-    layout: 'my',
     computed: {
       ...mapState(['constant', 'user']),
       settings: function () {
