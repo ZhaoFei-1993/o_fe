@@ -3,35 +3,6 @@
            hide-footer
            :noCloseOnBackdrop="true"
            :title="title">
-    <div class="merchant-info" hidden v-if="item.user">
-      <div class="profile d-flex align-items-center">
-        <UserAvatar :username="item.user.name" :online="true"></UserAvatar>
-        <span class="ml-10">{{item.user.name}}</span>
-      </div>
-      <div class="stats">
-        <div class="stats-item">
-          <span>30天成交量:</span>
-          <span class="c-brand-yellow">{{item.user.user_stat.deal_count}}单</span>
-        </div>
-        <div class="stats-item">
-          <span>30天完成率:</span>
-          <span v-if="item.user.user_stat && item.user.user_stat.order_count"
-                class="c-brand-yellow">{{(item.user.user_stat.deal_count / item.user.user_stat.order_count) | percentage}} </span>
-          <span v-else
-                class="c-brand-yellow"> -- </span>
-        </div>
-      </div>
-      <div class="stats">
-        <div class="stats-item">
-          <span>平均付款时间:</span>
-          <span class="c-brand-yellow">{{utils.formatDuration(item.user.user_stat.pay_time)}} </span>
-        </div>
-        <div class="stats-item">
-          <span>平均放行时间:</span>
-          <span class="c-brand-yellow">{{utils.formatDuration(item.user.user_stat.receipt_time)}} </span>
-        </div>
-      </div>
-    </div>
     <div class="item-info">
       <div class="info-header">确认信息</div>
       <div class="info-detail">
@@ -208,7 +179,6 @@
   import {required, minValue, maxValue} from 'vuelidate/lib/validators'
   import EMsgs from '~/components/error-message.vue'
   import ExtendedInputNumber from '~/components/extended-input-number.vue'
-  import UserAvatar from '~/components/user-avatar'
   import {mapState} from 'vuex'
 
   Vue.use(Vuelidate)
@@ -226,7 +196,6 @@
     components: {
       ExtendedInputNumber,
       EMsgs,
-      UserAvatar,
     },
     data() {
       return {

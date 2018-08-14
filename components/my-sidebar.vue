@@ -48,7 +48,7 @@
 <template>
   <div class="my-sidebar" v-if="user.account">
     <CBlock class="my-sidebar-info" :x="0" :y="20">
-      <UserStatsProfile :user-data="user.account" :isMerchant="user.merchant && user.merchant.auth_status === constant.MERCHANT_AUTH_STATUS.PASS"/>
+      <UserStatsProfile :color="constant.COLORS[user.account.id % 10]" :user-data="user.account" :isMerchant="user.merchant && user.merchant.auth_status === constant.MERCHANT_AUTH_STATUS.PASS"/>
     </CBlock>
 
     <b-list-group class="my-sidebar-menu">

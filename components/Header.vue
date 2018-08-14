@@ -256,7 +256,7 @@
                 <ul>
                   <li class="order-list-item" v-for="item in orderList" @click="onLinkToOrderDetail(item.id)">
                     <div>
-                      <UserAvatar :username="item._counterparty.name" :online="false" :size="40" :color="colors[item._counterparty.id % 10]"></UserAvatar>
+                      <UserAvatar :username="item._counterparty.name" :online="false" :size="40" :color="constant.COLORS[item._counterparty.id % 10]"></UserAvatar>
                     </div>
                     <div class="order-list-item-detail">
                       <div style="color: #9b9b9b;">
@@ -371,7 +371,6 @@
     },
     data() {
       return {
-        colors: ['#b2d9fd', '#fae7a3', '#ceeaaf', '#ffddd3', '#d4bfe8', '#b1ebde', '#ffd5bb', '#a9b2e0', '#e0a9cf', '#e0d0a9'],
         orderList: [],
         showOrders: false,
         form: {

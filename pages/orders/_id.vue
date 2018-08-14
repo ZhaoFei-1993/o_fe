@@ -360,7 +360,7 @@
     </div>
     <div class="sidebar">
       <CBlock class="my-sidebar-info" style="padding: 30px 0 13px 0;">
-        <UserStatsProfile :user-data="counterparty" v-if="counterparty"
+        <UserStatsProfile :user-data="counterparty" v-if="counterparty" :color="constant.COLORS[counterparty.id % 10]"
                           :is-merchant="counterparty.id===order.merchant_id"/>
       </CBlock>
       <CBlock id="my-chat-box">

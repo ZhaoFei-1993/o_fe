@@ -85,7 +85,7 @@
           show: false,
           src: '',
         },
-        colors: ['#b2d9fd', '#fae7a3', '#ceeaaf', '#ffddd3', '#d4bfe8'],
+        colors: ['#b2d9fd', '#fae7a3', '#ceeaaf', '#ffddd3', '#d4bfe8', '#b1ebde', '#ffd5bb', '#a9b2e0', '#e0a9cf', '#e0d0a9'],
         members: [],
         message: '',
         conversation: null,
@@ -94,7 +94,6 @@
         msgLog: [],
         loading: false, // 消息加载中
         loadAll: false, // 是否已经加载全部消息
-        colorIndex: -1,
         memberInfoMap: {}, // 保存聊天者信息：头像色号，用户名
         originalTitle: '', // 保存旧页面title
         unreadMessagesCount: 0, // 未读消息数
@@ -294,7 +293,7 @@
           arr.forEach(item => {
             if (!this.memberInfoMap[item.from]) {
               this.memberInfoMap[item.from] = {
-                color: this.colors[++this.colorIndex],
+                color: this.colors[item.from % 10],
                 name: !!username && !!username[item.from] ? username[item.from] : '',
               }
             }
