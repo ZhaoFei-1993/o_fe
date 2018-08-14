@@ -263,6 +263,7 @@
             const message = new ImageMessage(savedFile)
             return this.conversation.send(message)
           }).then((message) => {
+            this.$nuxt.$emit('IM.Event.SINGLE_MESSAGE_UPDATE', message)
             $toast.show('发送成功...100%', 1000)
             this.messageHandler({
               ...message,
@@ -403,6 +404,7 @@
         const msg = this.message.trim()
         if (msg && this.conversation) {
           this.conversation.send(new TextMessage(msg)).then(message => {
+            this.$nuxt.$emit('IM.Event.SINGLE_MESSAGE_UPDATE', message) // 手动强制更新聊天列表
             this.messageHandler({
               ...message,
               content: { // leancloud返回字段content=undefined，需要自己补充
