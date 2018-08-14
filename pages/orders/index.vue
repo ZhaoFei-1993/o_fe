@@ -12,7 +12,8 @@
           </b-btn>
         </div>
         <div class="order-table">
-          <b-table :fields="orderTableFields" :items="orderTableItems" @row-clicked="onRowClick"
+          <b-table :fields="queryParams.status === ORDERS_FILTERS.APPEAL?appealTableFields:orderTableFields"
+                   :items="orderTableItems" @row-clicked="onRowClick"
                    :tbody-tr-class="queryParams.status === ORDERS_FILTERS.PROCESSING ? 'order-row-class' : ''">
             <template slot="HEAD__isBuySide" slot-scope="{ item }">
               <div>
@@ -55,23 +56,23 @@
               {{ item.cash_amount | formatMoney }} CNY
             </template>
             <template slot="status" slot-scope="{ item, detailsShowing, toggleDetails }">
-            <span class="status-icon">
-              <i
-                v-if="queryParams.status!==ORDERS_FILTERS.APPEAL && item.appeal_status!=='' && item.appeal_status!==constant.APPEAL_STATUS.CANCEL"
-                class="iconfont icon-appeal fz-12 c-brand-green"
-                v-b-tooltip.hover title="申诉中"
-              ></i>
-              <i v-if="statusIconMap[item.status]" class="iconfont"
-                 :class="statusIconMap[item.status].class"
-                 :style="{fontSize: '12px', color: statusIconMap[item.status].color}"></i>
-            </span>
+              <span class="status-icon">
+                <i
+                  v-if="queryParams.status!==ORDERS_FILTERS.APPEAL && item.appeal_status!=='' && item.appeal_status!==constant.APPEAL_STATUS.CANCEL"
+                  class="iconfont icon-appeal fz-12 c-brand-green"
+                  v-b-tooltip.hover title="申诉中"
+                ></i>
+                <i v-if="statusIconMap[item.status]" class="iconfont"
+                   :class="statusIconMap[item.status].class"
+                   :style="{fontSize: '12px', color: statusIconMap[item.status].color}"></i>
+              </span>
               <span>{{ constant?constant.ORDER_STATUS[item.status.toUpperCase()].text:'' }}</span>
               <span
                 v-if="item.status === constant.ORDER_STATUS.CREATED.value || item.status === constant.ORDER_STATUS.PAID.value && queryParams.status === 'processing'"
                 class="detail"
                 :class="[ detailsShowing ? 'show-detail' : 'hidden-detail' ]">
-              <i class="iconfont icon-detail"></i>
-            </span>
+                <i class="iconfont icon-detail"></i>
+              </span>
             </template>
             <template slot="row-details" slot-scope="{ item }" class="buy-side-detail">
               <div :class="['detail-wrapper', item._isBuySide ? 'buy-side-detail' : 'sell-side-detail']">
@@ -224,6 +225,13 @@
               </span>
               </div>
             </template>
+            <!--以下为申诉列表的信息-->
+            <template slot="appeal_time" slot-scope="{ item }">
+              {{ item.appeal_time | getTimeText }}
+            </template>
+            <template slot="appeal_status" slot-scope="{ item }">
+              {{ constant.APPEAL_STATUS_MAP[item.appeal_status]?constant.APPEAL_STATUS_MAP[item.appeal_status].text:'-'}}
+            </template>
           </b-table>
           <blank v-if="!orderTableItems.length"></blank>
           <ViaPagination v-if="orderTableItems.length"
@@ -318,7 +326,48 @@
           value: ORDERS_FILTERS.APPEAL,
           active: false,
         }],
-        orderTableFields: {
+        orderTableItems: [],
+        queryParams: {
+          coin_type: null,
+          side: null,
+          status: ORDERS_FILTERS.PROCESSING,
+          page: 1,
+          limit: LIMIT,
+        },
+      }
+    },
+    fetch({store, app, req, redirect, route}) {
+      app.axios.init(req)
+      return store.dispatch('fetchUserAccount').catch(err => {
+        app.axios.needAuth(err, redirect, route.fullPath)
+      })
+    },
+    head() {
+      return {
+        title: '订单管理' +
+        this.$t('global.pageTitle.common')
+      }
+    },
+    components: {
+      cBlock,
+      Blank,
+      ConfirmReceipt,
+      ViaPagination,
+      TableHeadDropdown,
+      QrcodePopover,
+    },
+    computed: {
+      ...mapState(['user', 'constant', 'chat']),
+      coinTypeFilterOptions() {
+        const defaultOption = {
+          active: true,
+          text: '不限',
+          value: null,
+        }
+        return [defaultOption, ...this.constant.COIN_TYPE_OPTIONS.map(item => ({active: false, ...item}))]
+      },
+      commonTableFields() {
+        return {
           id: {
             label: '订单编号',
             sortable: false,
@@ -374,6 +423,10 @@
             },
             sortable: false,
           },
+        }
+      },
+      orderTableFields() {
+        const orderFields = {
           place_time: {
             label: '下单时间',
             thClass: ['text-center'],
@@ -391,47 +444,29 @@
             },
             sortable: false,
           },
-        },
-        orderTableItems: [],
-        queryParams: {
-          coin_type: null,
-          side: null,
-          status: ORDERS_FILTERS.PROCESSING,
-          page: 1,
-          limit: LIMIT,
-        },
-      }
-    },
-    fetch({store, app, req, redirect, route}) {
-      app.axios.init(req)
-      return store.dispatch('fetchUserAccount').catch(err => {
-        app.axios.needAuth(err, redirect, route.fullPath)
-      })
-    },
-    head() {
-      return {
-        title: '订单管理' +
-        this.$t('global.pageTitle.common')
-      }
-    },
-    components: {
-      cBlock,
-      Blank,
-      ConfirmReceipt,
-      ViaPagination,
-      TableHeadDropdown,
-      QrcodePopover,
-    },
-    computed: {
-      ...mapState(['user', 'constant', 'chat']),
-      coinTypeFilterOptions() {
-        const defaultOption = {
-          active: true,
-          text: '不限',
-          value: null,
         }
-        return [defaultOption, ...this.constant.COIN_TYPE_OPTIONS.map(item => ({active: false, ...item}))]
+        return Object.assign({}, this.commonTableFields, orderFields)
       },
+      appealTableFields() {
+        const orderFields = {
+          appeal_time: {
+            label: '申诉时间',
+            thClass: ['text-center'],
+            tdClass: ['text-center'],
+            thStyle: {
+              width: '190px',
+            },
+            sortable: false,
+          },
+          appeal_status: {
+            label: '申诉状态',
+            thClass: ['text-center'],
+            tdClass: ['text-center'],
+            sortable: false,
+          },
+        }
+        return Object.assign({}, this.commonTableFields, orderFields)
+      }
     },
     mounted() {
       // browser only

@@ -89,6 +89,17 @@ export default function getConstant($t) {
     text: '每次交易均二次验证',
     level: 2,
   }]
+  const APPEAL_STATUS_OPTIONS = [{
+    value: 'created', text: '申诉等待中',
+  }, {
+    value: 'processing', text: '申诉处理中',
+  }, {
+    value: 'pending', text: '申诉挂起中',
+  }, {
+    value: 'cancel', text: '已取消申诉',
+  }, {
+    value: 'completed', text: '已申诉解决',
+  }]
 
   return {
     COLORS: ['#b2d9fd', '#fae7a3', '#ceeaaf', '#ffddd3', '#d4bfe8', '#b1ebde', '#ffd5bb', '#a9b2e0', '#e0a9cf', '#e0d0a9'], // 头像基础色号
@@ -115,6 +126,11 @@ export default function getConstant($t) {
       return map
     }, {}),
     APPEAL_RESULT_MAP: APPEAL_RESULTS.reduce((map, option) => {
+      map[option.value] = option
+      return map
+    }, {}),
+    APPEAL_STATUS_OPTIONS,
+    APPEAL_STATUS_MAP: APPEAL_STATUS_OPTIONS.reduce((map, option) => {
       map[option.value] = option
       return map
     }, {}),
