@@ -62,6 +62,7 @@ const logConfig = {
     errorFile: {
       type: 'file',
       filename: 'logs/error.log',
+      maxLogSize: 10485760, // 10Mb
     },
     error: {
       type: 'logLevelFilter',
@@ -91,7 +92,6 @@ if (isDev) {
     },
   }
 }
-
 if (+process.env.OTC === 0 && !isDev) { // 生产环境只发送一个实例的log
   logConfig.appenders = {
     ...logConfig.appenders,
@@ -108,7 +108,6 @@ if (+process.env.OTC === 0 && !isDev) { // 生产环境只发送一个实例的l
       type: 'logLevelFilter',
       level: 'ERROR',
       appender: 'errorEmailSender',
-      layout: {type: 'filter'},
     },
     commonEmailSender: {
       ...smtpAppender,
@@ -123,7 +122,6 @@ if (+process.env.OTC === 0 && !isDev) { // 生产环境只发送一个实例的l
       type: 'logLevelFilter',
       level: 'INFO',
       appender: 'commonEmailSender',
-      layout: {type: 'filter'},
     },
   }
   logConfig.categories.default.appenders.push('commonEmail', 'errorEmail')
