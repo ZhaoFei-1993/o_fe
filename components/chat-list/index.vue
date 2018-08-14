@@ -45,8 +45,7 @@
 </template>
 
 <script>
-  import { Event, TextMessage } from 'leancloud-realtime'
-  import { ImageMessage } from 'leancloud-realtime-plugin-typed-messages'
+  import { Event } from 'leancloud-realtime'
   import { mapState } from 'vuex'
   import UserAvatar from '~/components/chat/avatar'
   import preventParentScroll from 'vue-prevent-parent-scroll'
