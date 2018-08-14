@@ -5,46 +5,53 @@
         <div class="msg-time">
           {{ item._timestamp | formatTime }}
         </div>
-        <template v-if="item.from === clientId">
-          <div class="msg-box-right">
-            <div class="msg-detail-wrapper">
-              <div class="msg-username username-right">{{ memberInfoMap[item.from].name }}</div>
-              <div class="msg-username username-right" v-if="item.status === MessageStatus.FAILED">
-                <span class="msg-send-error"></span>
-                <span>发送失败</span>
-              </div>
-              <div class="msg-text my-text">
-                <span v-if="item.content._lctype === TextMessage.TYPE">{{ item.content._lctext }}</span>
-                <img v-else-if="item.content._lctype === ImageMessage.TYPE" @click="onClickImage(item.content._lcfile.url)" style="width: 100%" :src="item.content._lcfile.url">
-                <span v-else-if="item.content._lctype === SystemMessage.TYPE">{{ item.content._lctext }}</span>
-                <span v-else>[不支持当前消息类型]</span>
-              </div>
-            </div>
-            <UserAvatar v-if="memberInfoMap[item.from]" :username="memberInfoMap[item.from].name" :color="memberInfoMap[item.from].color" :online="false" :size="30"></UserAvatar>
-          </div>
-        </template>
-        <template v-else-if="item.from === 'temporary'">
-          <div class="begin-text-wrapper">
-            <div class="begin-text">{{ item.content._lctext }}</div>
+        <template v-if="item.content._lctype === messageType.order">
+          <div class="order-text">
+            {{ item.from === clientId ? orderMessages[item.content._lctext].me : orderMessages[item.content._lctext].other }}
           </div>
         </template>
         <template v-else>
-          <div class="msg-box-left">
-            <UserAvatar v-if="memberInfoMap[item.from]" :username="memberInfoMap[item.from].name" :color="memberInfoMap[item.from].color" :online="false" :size="30"></UserAvatar>
-            <div class="msg-detail-wrapper">
-              <div class="msg-username username-left">{{ memberInfoMap[item.from].name }}</div>
-              <div class="msg-username username-left" v-if="item.status === MessageStatus.FAILED">
-                <span class="msg-send-error"></span>
-                <span>发送失败</span>
+          <template v-if="item.from === clientId">
+            <div class="msg-box-right">
+              <div class="msg-detail-wrapper">
+                <div class="msg-username username-right">{{ memberInfoMap[item.from].name }}</div>
+                <div class="msg-username username-right" v-if="item.status === MessageStatus.FAILED">
+                  <span class="msg-send-error"></span>
+                  <span>发送失败</span>
+                </div>
+                <div class="msg-text my-text">
+                  <span v-if="item.content._lctype === messageType.text">{{ item.content._lctext }}</span>
+                  <img v-else-if="item.content._lctype === messageType.image" @click="onClickImage(item.content._lcfile.url)" style="width: 100%" :src="item.content._lcfile.url">
+                  <span v-else-if="item.content._lctype === messageType.auto">{{ item.content._lctext }}</span>
+                  <span v-else>[不支持当前消息类型]</span>
+                </div>
               </div>
-              <div class="msg-text">
-                <span v-if="item.content._lctype === TextMessage.TYPE">{{ item.content._lctext }}</span>
-                <img v-else-if="item.content._lctype === ImageMessage.TYPE" @click="onClickImage(item.content._lcfile.url)" style="width: 100%" :src="item.content._lcfile.url">
-                <span v-else-if="item.content._lctype === SystemMessage.TYPE">{{ item.content._lctext }}</span>
-                <span v-else>[不支持当前消息类型]</span>
+              <UserAvatar v-if="memberInfoMap[item.from]" :username="memberInfoMap[item.from].name" :color="memberInfoMap[item.from].color" :online="false" :size="30"></UserAvatar>
+            </div>
+          </template>
+          <template v-else-if="item.from === 'temporary'">
+            <div class="begin-text-wrapper">
+              <div class="begin-text">{{ item.content._lctext }}</div>
+            </div>
+          </template>
+          <template v-else>
+            <div class="msg-box-left">
+              <UserAvatar v-if="memberInfoMap[item.from]" :username="memberInfoMap[item.from].name" :color="memberInfoMap[item.from].color" :online="false" :size="30"></UserAvatar>
+              <div class="msg-detail-wrapper">
+                <div class="msg-username username-left">{{ memberInfoMap[item.from].name }}</div>
+                <div class="msg-username username-left" v-if="item.status === MessageStatus.FAILED">
+                  <span class="msg-send-error"></span>
+                  <span>发送失败</span>
+                </div>
+                <div class="msg-text">
+                  <span v-if="item.content._lctype === messageType.text">{{ item.content._lctext }}</span>
+                  <img v-else-if="item.content._lctype === messageType.image" @click="onClickImage(item.content._lcfile.url)" style="width: 100%" :src="item.content._lcfile.url">
+                  <span v-else-if="item.content._lctype === messageType.auto">{{ item.content._lctext }}</span>
+                  <span v-else>[不支持当前消息类型]</span>
+                </div>
               </div>
             </div>
-          </div>
+          </template>
         </template>
       </div>
     </div>
@@ -69,23 +76,19 @@
   import ImageModal from './image-modal'
   import infiniteScroll from './infinite-scroll-directive.js'
   import $toast from './toast.js'
-
-  const SystemMessage = { // 自定义消息类型：自动回复
-    TYPE: -101,
-  }
+  import { COLORS, MESSAGE_TYPE, ORDER_MESSAGES } from './constant.js'
 
   export default {
     data() {
       return {
-        ImageMessage,
-        TextMessage,
+        orderMessages: ORDER_MESSAGES,
+        messageType: MESSAGE_TYPE,
         MessageStatus,
-        SystemMessage,
         imageModalData: {
           show: false,
           src: '',
         },
-        colors: ['#b2d9fd', '#fae7a3', '#ceeaaf', '#ffddd3', '#d4bfe8', '#b1ebde', '#ffd5bb', '#a9b2e0', '#e0a9cf', '#e0d0a9'],
+        colors: COLORS,
         members: [],
         message: '',
         conversation: null,
@@ -234,7 +237,7 @@
           from: 'temporary',
           content: {
             _lctext: text,
-            _lctype: this.TextMessage.TYPE,
+            _lctype: this.messageType.text,
           },
           _timestamp: Date.now(),
         })
@@ -430,53 +433,13 @@
     },
     filters: {
       formatTime(timestamp) {
-        const time = new Date(timestamp)
-        const precision = 'second'
-        let timeText = ''
-        switch (precision) {
-          case 'second':
-            timeText =
-              time.getSeconds() > 9 ? time.getSeconds() : '0' + time.getSeconds()
-          case 'minute': // eslint-disable-line no-fallthrough
-            if (precision !== 'minute') {
-              timeText = ':' + timeText
-            }
-            timeText =
-              (time.getMinutes() > 9
-                ? time.getMinutes()
-                : '0' + time.getMinutes()) + timeText
-          case 'hour': // eslint-disable-line no-fallthrough
-            if (precision !== 'hour') {
-              timeText = ':' + timeText
-            }
-            timeText =
-              (time.getHours() > 9 ? time.getHours() : '0' + time.getHours()) +
-              timeText
-          case 'day': // eslint-disable-line no-fallthrough
-            if (precision !== 'day') {
-              timeText = ' ' + timeText
-            }
-            timeText =
-              (time.getDate() > 9 ? time.getDate() : '0' + time.getDate()) +
-              timeText
-          case 'month': // eslint-disable-line no-fallthrough
-            if (precision !== 'month') {
-              timeText = '-' + timeText
-            }
-            timeText =
-              (time.getMonth() + 1 > 9
-                ? time.getMonth() + 1
-                : '0' + (time.getMonth() + 1)) + timeText
-          case 'year': // eslint-disable-line no-fallthrough
-            if (precision !== 'year') {
-              timeText = '-' + timeText
-            }
-            timeText = time.getFullYear() + timeText
-            break
-          default:
-            break
+        const todayString = new Date().toDateString()
+        const date = new Date(timestamp)
+        let formatTime = `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`
+        if (todayString !== date.toDateString()) {
+          formatTime = `${String(date.getMonth() + 1).padStart(2, '0')}/${String(date.getDate()).padStart(2, '0')} ${formatTime}`
         }
-        return timeText
+        return formatTime
       },
     },
   }
@@ -505,6 +468,12 @@
       padding: 10px 30px;
       .content-detail-box {
         margin-bottom: 20px;
+        .order-text {
+          width: 100%;
+          color: #192330;
+          text-align: center;
+          overflow: hidden;
+        }
       }
       .begin-text-wrapper {
         width: 100%;

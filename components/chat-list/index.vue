@@ -21,7 +21,10 @@
               </div>
               <div class="detail-wrapper detail-col2">
                 <span class="detail-content detail-text" v-if="item.lastMessage">
-                  <template v-if="[messageType.text, messageType.auto].indexOf(item.lastMessage.content._lctype) > -1">
+                  <template v-if="item.lastMessage.content._lctype === messageType.order">
+                    {{ item.lastMessage.from === user.account.id ? orderMessages[item.lastMessage.content._lctext].me : orderMessages[item.lastMessage.content._lctext].other }}
+                  </template>
+                  <template v-else-if="[messageType.text, messageType.auto].indexOf(item.lastMessage.content._lctype) > -1">
                     {{ item.lastMessage.content._lctext }}
                   </template>
                   <template v-else-if="item.lastMessage.content._lctype === messageType.image">
@@ -47,15 +50,14 @@
   import { mapState } from 'vuex'
   import UserAvatar from '~/components/chat/avatar'
   import preventParentScroll from 'vue-prevent-parent-scroll'
+  import { COLORS, MESSAGE_TYPE, ORDER_MESSAGES } from '~/components/chat/constant.js'
 
   export default {
     data() {
       return {
-        messageType: {
-          image: ImageMessage.TYPE,
-          text: TextMessage.TYPE,
-          auto: -101, // 自动回复
-        },
+        orderMessages: ORDER_MESSAGES,
+        messageType: MESSAGE_TYPE,
+        colors: COLORS,
         showList: false,
         convList: [], // 对话列表
         maxLimit: 20, // 对话列表条数
@@ -69,7 +71,7 @@
       UserAvatar,
     },
     computed: {
-      ...mapState(['chat', 'user', 'constant']),
+      ...mapState(['chat', 'user']),
       hasUnreadMessage() {  // 列表是否有未读消息
         return this.convList.some(conv => {
           return conv._unreadMessageCount > 0
@@ -161,7 +163,7 @@
                 const { _attributes: { attr: { username } } } = conv
                 if (member !== myClientId && username && username[member]) {
                   if (!otherMembers.length) {
-                    defaultColor = this.constant.COLORS[member % 10]
+                    defaultColor = this.colors[member % 10]
                   }
                   otherMembers.push(username[member])
                 }

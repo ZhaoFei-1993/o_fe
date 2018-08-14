@@ -360,7 +360,7 @@
     </div>
     <div class="sidebar">
       <CBlock class="my-sidebar-info" style="padding: 30px 0 13px 0;">
-        <UserStatsProfile :user-data="counterparty" v-if="counterparty" :color="constant.COLORS[counterparty.id % 10]"
+        <UserStatsProfile :user-data="counterparty" v-if="counterparty" :color="colors[counterparty.id % 10]"
                           :is-merchant="counterparty.id===order.merchant_id"/>
       </CBlock>
       <CBlock id="my-chat-box">
@@ -409,6 +409,7 @@
   import QrcodePopover from '~/components/qrcode-popover.vue'
   import ConfirmReceipt from './_c/confirm-receipt'
   import {coinexDomain} from '~/modules/variables'
+  import { COLORS } from '~/components/chat/constant.js'
   import {mapState} from 'vuex'
 
   const PAID_CAN_APPEAL = 30 * 60 * 1000 // 三十分钟
@@ -419,6 +420,7 @@
   export default {
     data() {
       return {
+        colors: COLORS,
         id: this.$route.params.id,
         counterparty: null,
         merchant: null,

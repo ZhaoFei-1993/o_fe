@@ -256,7 +256,7 @@
                 <ul>
                   <li class="order-list-item" v-for="item in orderList" @click="onLinkToOrderDetail(item.id)">
                     <div>
-                      <UserAvatar :username="item._counterparty.name" :online="false" :size="40" :color="constant.COLORS[item._counterparty.id % 10]"></UserAvatar>
+                      <UserAvatar :username="item._counterparty.name" :online="false" :size="40" :color="colors[item._counterparty.id % 10]"></UserAvatar>
                     </div>
                     <div class="order-list-item-detail">
                       <div style="color: #9b9b9b;">
@@ -357,6 +357,7 @@
   import UserAvatar from '~/components/user-avatar'
   import Blank from '~/components/blank'
   import preventParentScroll from 'vue-prevent-parent-scroll'
+  import { COLORS } from '~/components/chat/constant.js'
 
   Vue.use(Vuelidate)
   export default {
@@ -371,6 +372,7 @@
     },
     data() {
       return {
+        colors: COLORS,
         orderList: [],
         showOrders: false,
         form: {

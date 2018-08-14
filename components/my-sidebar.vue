@@ -48,7 +48,7 @@
 <template>
   <div class="my-sidebar" v-if="user.account">
     <CBlock class="my-sidebar-info" :x="0" :y="20">
-      <UserStatsProfile :color="constant.COLORS[user.account.id % 10]" :user-data="user.account" :isMerchant="user.merchant && user.merchant.auth_status === constant.MERCHANT_AUTH_STATUS.PASS"/>
+      <UserStatsProfile :color="colors[user.account.id % 10]" :user-data="user.account" :isMerchant="user.merchant && user.merchant.auth_status === constant.MERCHANT_AUTH_STATUS.PASS"/>
     </CBlock>
 
     <b-list-group class="my-sidebar-menu">
@@ -76,13 +76,16 @@
 <script>
   import {mapState} from 'vuex'
   import UserStatsProfile from '~/components/user-stats-profile.vue'
+  import { COLORS } from '~/components/chat/constant.js'
 
   export default {
     components: {
       UserStatsProfile,
     },
     data() {
-      return {}
+      return {
+        colors: COLORS,
+      }
     },
     computed: {
       ...mapState(['user', 'constant'])
