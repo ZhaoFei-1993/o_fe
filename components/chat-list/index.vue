@@ -22,7 +22,7 @@
               <div class="detail-wrapper detail-col2">
                 <span class="detail-content detail-text" v-if="item.lastMessage">
                   <template v-if="item.lastMessage.content._lctype === messageType.order">
-                    {{ item.lastMessage.from === user.account.id ? orderMessages[item.lastMessage.content._lctext].me : orderMessages[item.lastMessage.content._lctext].other }}
+                    {{ item.lastMessage.from === `${user.account.id}` ? orderMessages[item.lastMessage.content._lctext].me : orderMessages[item.lastMessage.content._lctext].other }}
                   </template>
                   <template v-else-if="[messageType.text, messageType.auto].indexOf(item.lastMessage.content._lctype) > -1">
                     {{ item.lastMessage.content._lctext }}
