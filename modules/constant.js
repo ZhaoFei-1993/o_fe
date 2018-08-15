@@ -86,7 +86,7 @@ export default function getConstant($t) {
     level: 1,
   }, {
     value: 'each_time',
-    text: '每次交易均二次验证',
+    text: '每次收款均二次验证',
     level: 2,
   }]
   const APPEAL_STATUS_OPTIONS = [{
