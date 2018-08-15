@@ -363,6 +363,7 @@
       <div class="sidebar">
         <CBlock class="my-sidebar-info" style="padding: 30px 0 13px 0;">
           <UserStatsProfile :user-data="counterparty" v-if="counterparty"
+                            :color="colors[counterparty.id % 10]"
                             :is-merchant="counterparty.id===order.merchant_id"/>
         </CBlock>
         <CBlock id="my-chat-box">
@@ -380,8 +381,7 @@
                cancel-title="取消"
                button-size="sm"
                :noCloseOnBackdrop="true"
-               class="text-center"
-      >
+               class="text-center">
         <div id="appeal-modal" class="text-left fz-14 c-black">
           <p class="mb-40">提起申诉后，申诉专员将介入本次交易，直至申诉结束。恶意申诉者将被冻结账户。</p>
           <div class="d-flex align-items-center">
@@ -413,6 +413,7 @@
   import QrcodePopover from '~/components/qrcode-popover.vue'
   import ConfirmReceipt from './_c/confirm-receipt'
   import {coinexDomain} from '~/modules/variables'
+  import { COLORS } from '~/components/chat/constant.js'
   import {mapState} from 'vuex'
 
   const PAID_CAN_APPEAL = 10 * 60 * 1000 // 支付后可申诉的时间 十分钟
@@ -423,6 +424,7 @@
   export default {
     data() {
       return {
+        colors: COLORS,
         id: this.$route.params.id,
         counterparty: null,
         merchant: null,
