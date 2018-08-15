@@ -26,7 +26,7 @@
 
 <template>
   <div class="user-mini-profile">
-    <UserAvatar :username="username" color="#c5f0f0" :online="online" :size="avatarSize"/>
+    <UserAvatar :username="username" :color="color" :online="online" :size="avatarSize"/>
 
     <div class="profile-right">
       <div class="username" v-b-tooltip.hover :title="username">
@@ -53,6 +53,10 @@
       isMerchant: Boolean,
       online: Boolean,
       avatarSize: Number,
+      color: {
+        type: String,
+        default: '#c5f0f0',
+      }
     },
     data() {
       return {}

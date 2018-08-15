@@ -1,6 +1,6 @@
 <template>
   <div class="user-stats-profile">
-    <UserMiniProfile class="user-mini-profile" :username="userData.name" :is-merchant="isMerchant" :online="online"/>
+    <UserMiniProfile class="user-mini-profile" :username="userData.name" :is-merchant="isMerchant" :online="online" :color="color"/>
     <div class="pt-20 px-30">
       <SidebarInfoItem title="30天成交量">
         <Language text="[t][/t]">
@@ -69,6 +69,7 @@
         required: true,
       },
       isMerchant: Boolean,
+      color: String,
     },
     components: {
       UserMiniProfile,
