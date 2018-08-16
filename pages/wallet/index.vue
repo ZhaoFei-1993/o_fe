@@ -119,7 +119,8 @@
             <div class="amount-available">
               <span>可转数量：</span>
               <span>{{ availableAmountShown | formatMoney }}</span>
-              <span v-if="showTransferTooltip" class="ml-5 c-gray fz-12" v-b-tooltip.hover title="存在充值未完全确认或挂单冻结的情况，部分金额无法划转"><i
+              <span v-if="showTransferTooltip" class="ml-5 c-gray fz-12" v-b-tooltip.hover
+                    title="存在充值未完全确认或挂单冻结的情况，部分金额无法划转"><i
                 class="iconfont icon-tooltip"></i></span>
               <b-link class="float-right" @click="onShowhand">全部划转</b-link>
             </div>
@@ -393,7 +394,7 @@
         })
         this.availableAmount = fromBalance ? fromBalance.available : 0
         if (this.form.from === 'coinex') {
-          this.updateCanWithDraw(this.form.coinType)
+          this.updateCanWithDraw(coinType)
         }
       },
       updateCanWithDraw(coinType) {
