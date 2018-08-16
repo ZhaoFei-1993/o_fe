@@ -1,133 +1,136 @@
 <template>
-  <div class="page-wallet">
-    <c-block style="min-height: 240px;">
-      <div class="float-left asset-info">
-        <p class="total">总资产估值</p>
-        <p class="total-tips">
+  <div class="page-content-container">
+    <div class="page-wallet">
+      <c-block style="min-height: 240px;">
+        <div class="float-left asset-info">
+          <p class="total">总资产估值</p>
+          <p class="total-tips">
           <span style="font-size:24px;">
             {{ `${totalBalance}`.setDigit(2) }} CNY
           </span>
-        </p>
-        <div class="total-coin">
-          <span> ≈ {{ `${totalCoin}`.setDigit(4) }}</span>
-          <div class="order-menu" @mouseover="toggleDropdown(true)" @mouseout="toggleDropdown(false)">
-            <div class="menu-select-wrapper">
-              <span class="menu-select-label">{{ selectedCoin }}</span>
-            </div>
-            <div class="menu-container" v-show="showCoinDropdown">
-              <div class="list-menu">
-                <div v-for="(item, index) in priceCoins" :key="index" @click="onChangePriceCoin(index)">
-                  <div class="order-menu-item">{{item}}</div>
-                  <div v-if="index < priceCoins.length - 1" class="order-separator"></div>
+          </p>
+          <div class="total-coin">
+            <span> ≈ {{ `${totalCoin}`.setDigit(4) }}</span>
+            <div class="order-menu" @mouseover="toggleDropdown(true)" @mouseout="toggleDropdown(false)">
+              <div class="menu-select-wrapper">
+                <span class="menu-select-label">{{ selectedCoin }}</span>
+              </div>
+              <div class="menu-container" v-show="showCoinDropdown">
+                <div class="list-menu">
+                  <div v-for="(item, index) in priceCoins" :key="index" @click="onChangePriceCoin(index)">
+                    <div class="order-menu-item">{{item}}</div>
+                    <div v-if="index < priceCoins.length - 1" class="order-separator"></div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
+          <p class="rate">
+            <span>实时汇率：</span>
+            <span>{{selectedCoin}}/{{balance.currentCash}}={{ balance.currentRate[selectedCoin] }}</span>
+          </p>
         </div>
-        <p class="rate">
-          <span>实时汇率：</span>
-          <span>{{selectedCoin}}/{{balance.currentCash}}={{ balance.currentRate[selectedCoin] }}</span>
-        </p>
-      </div>
-      <div class="float-right ps-r">
-        <div class="pie-chart-container" v-if="showPieChart">
-          <fund-pie :datas="pieDatas" :asset="defaultAsset" name="市场份额"></fund-pie>
-        </div>
-      </div>
-    </c-block>
-    <div class="row-header">
-      <span>资产结构</span>
-    </div>
-    <c-block class="p-0">
-      <b-table :fields="assetsTableFields" :items="otcBalance">
-        <template slot="available" slot-scope="{ item }">
-          {{ item.available | formatMoney }}
-        </template>
-        <template slot="frozen" slot-scope="{ item }">
-          {{ item.frozen | formatMoney }}
-        </template>
-        <template slot="total" slot-scope="{ item }">
-          {{ item.total | formatMoney }}
-        </template>
-        <template slot="action" slot-scope="{ item }">
-          <b-link @click="onShowTransferModal('in', item)">转入</b-link>
-          <span class="space-margin"></span>
-          <b-link @click="onShowTransferModal('out', item)">转出</b-link>
-        </template>
-      </b-table>
-      <blank v-if="!otcBalance.length"></blank>
-    </c-block>
-    <div class="row-header">
-      <span>资产流水</span>
-      <div class="float-right">
-        <div style="display: inline-block;">
-          <span style="font-size: 12px;">币种：</span>
-          <b-form-select class="history-filter-select"
-                         v-model="historyQueryParams.coin_type"
-                         :options="constant.COIN_TYPE_OPTIONS">
-            <option slot="first" :value="null">不限</option>
-          </b-form-select>
-        </div>
-        <div style="display: inline-block;margin-left: 30px;">
-          <span style="font-size: 12px;">操作：</span>
-          <b-form-select class="history-filter-select"
-                         v-model="historyQueryParams.business_type"
-                         :options="operationOptions">
-            <option slot="first" :value="null">不限</option>
-          </b-form-select>
-        </div>
-      </div>
-    </div>
-    <c-block class="p-0">
-      <b-table :fields="assetsHistoryFields" :items="assetHistoryItems">
-        <template slot="amount" slot-scope="{ item }">
-          {{ item.amount | formatMoney }}
-        </template>
-        <template slot="total" slot-scope="{ item }">
-          {{ item.total | formatMoney }}
-        </template>
-        <template slot="create_time" slot-scope="{ item }">
-          {{ item.create_time | getTimeText }}
-        </template>
-      </b-table>
-      <blank v-if="!assetHistoryItems.length"></blank>
-      <ViaPagination v-if="assetHistoryItems.length"
-                     :total-rows="historyQueryParams.totalRows"
-                     :current-page="historyQueryParams.page"
-                     @change="changePage"
-                     :per-page="historyQueryParams.limit">
-      </ViaPagination>
-    </c-block>
-
-    <b-modal title="资金划转" v-model="showTransferModal" hide-footer no-close-on-backdrop>
-      <b-form>
-        <b-form-group label="选择币种" horizontal>
-          <b-form-select v-model="form.coinType" :options="constant.COIN_TYPE_OPTIONS"
-                         @change="onChangeCoinType"></b-form-select>
-        </b-form-group>
-        <b-form-group label="从" horizontal>
-          <b-form-select v-model="form.from" :options="walletOptions" @change="onSwap"></b-form-select>
-        </b-form-group>
-        <b-form-group label="划转至" horizontal>
-          <b-form-select v-model="form.to" :options="walletOptions" @change="onSwap"></b-form-select>
-        </b-form-group>
-        <b-form-group label="划转数量" horizontal>
-          <ExtendedInputNumber v-model="form.amount" :min="0" :max="+availableAmount" class="amount-input"/>
-        </b-form-group>
-        <b-form-group horizontal>
-          <div class="amount-available">
-            <span>可转数量：</span>
-            <span>{{ availableAmountShown | formatMoney }}</span>
-            <span v-if="showTransferTooltip" class="ml-5 c-gray fz-12" v-b-tooltip.hover title="存在充值未完全确认或挂单冻结的情况，部分金额无法划转"><i
-              class="iconfont icon-tooltip"></i></span>
-            <b-link class="float-right" @click="onShowhand">全部划转</b-link>
+        <div class="float-right ps-r">
+          <div class="pie-chart-container" v-if="showPieChart">
+            <fund-pie :datas="pieDatas" :asset="defaultAsset" name="市场份额"></fund-pie>
           </div>
-        </b-form-group>
-        <div class="submit-btn-wrapper">
-          <b-btn type="button" variant="gradient-yellow" class="submit-btn" @click="onTransfer">提交</b-btn>
         </div>
-      </b-form>
-    </b-modal>
+      </c-block>
+      <div class="row-header">
+        <span>资产结构</span>
+      </div>
+      <c-block class="p-0">
+        <b-table :fields="assetsTableFields" :items="otcBalance">
+          <template slot="available" slot-scope="{ item }">
+            {{ item.available | formatMoney }}
+          </template>
+          <template slot="frozen" slot-scope="{ item }">
+            {{ item.frozen | formatMoney }}
+          </template>
+          <template slot="total" slot-scope="{ item }">
+            {{ item.total | formatMoney }}
+          </template>
+          <template slot="action" slot-scope="{ item }">
+            <b-link @click="onShowTransferModal('in', item)">转入</b-link>
+            <span class="space-margin"></span>
+            <b-link @click="onShowTransferModal('out', item)">转出</b-link>
+          </template>
+        </b-table>
+        <blank v-if="!otcBalance.length"></blank>
+      </c-block>
+      <div class="row-header">
+        <span>资产流水</span>
+        <div class="float-right">
+          <div style="display: inline-block;">
+            <span style="font-size: 12px;">币种：</span>
+            <b-form-select class="history-filter-select"
+                           v-model="historyQueryParams.coin_type"
+                           :options="constant.COIN_TYPE_OPTIONS">
+              <option slot="first" :value="null">不限</option>
+            </b-form-select>
+          </div>
+          <div style="display: inline-block;margin-left: 30px;">
+            <span style="font-size: 12px;">操作：</span>
+            <b-form-select class="history-filter-select"
+                           v-model="historyQueryParams.business_type"
+                           :options="operationOptions">
+              <option slot="first" :value="null">不限</option>
+            </b-form-select>
+          </div>
+        </div>
+      </div>
+      <c-block class="p-0">
+        <b-table :fields="assetsHistoryFields" :items="assetHistoryItems">
+          <template slot="amount" slot-scope="{ item }">
+            {{ item.amount | formatMoney }}
+          </template>
+          <template slot="total" slot-scope="{ item }">
+            {{ item.total | formatMoney }}
+          </template>
+          <template slot="create_time" slot-scope="{ item }">
+            {{ item.create_time | getTimeText }}
+          </template>
+        </b-table>
+        <blank v-if="!assetHistoryItems.length"></blank>
+        <ViaPagination v-if="assetHistoryItems.length"
+                       :total-rows="historyQueryParams.totalRows"
+                       :current-page="historyQueryParams.page"
+                       @change="changePage"
+                       :per-page="historyQueryParams.limit">
+        </ViaPagination>
+      </c-block>
+
+      <b-modal title="资金划转" v-model="showTransferModal" hide-footer no-close-on-backdrop>
+        <b-form>
+          <b-form-group label="选择币种" horizontal>
+            <b-form-select v-model="form.coinType" :options="constant.COIN_TYPE_OPTIONS"
+                           @change="onChangeCoinType"></b-form-select>
+          </b-form-group>
+          <b-form-group label="从" horizontal>
+            <b-form-select v-model="form.from" :options="walletOptions" @change="onSwap"></b-form-select>
+          </b-form-group>
+          <b-form-group label="划转至" horizontal>
+            <b-form-select v-model="form.to" :options="walletOptions" @change="onSwap"></b-form-select>
+          </b-form-group>
+          <b-form-group label="划转数量" horizontal>
+            <ExtendedInputNumber v-model="form.amount" :min="0" :max="+availableAmount" class="amount-input"/>
+          </b-form-group>
+          <b-form-group horizontal>
+            <div class="amount-available">
+              <span>可转数量：</span>
+              <span>{{ availableAmountShown | formatMoney }}</span>
+              <span v-if="showTransferTooltip" class="ml-5 c-gray fz-12" v-b-tooltip.hover
+                    title="存在充值未完全确认或挂单冻结的情况，部分金额无法划转"><i
+                class="iconfont icon-tooltip"></i></span>
+              <b-link class="float-right" @click="onShowhand">全部划转</b-link>
+            </div>
+          </b-form-group>
+          <div class="submit-btn-wrapper">
+            <b-btn type="button" variant="gradient-yellow" class="submit-btn" @click="onTransfer">提交</b-btn>
+          </div>
+        </b-form>
+      </b-modal>
+    </div>
   </div>
 </template>
 
@@ -391,16 +394,15 @@
         })
         this.availableAmount = fromBalance ? fromBalance.available : 0
         if (this.form.from === 'coinex') {
-          this.updateCanWithDraw(this.form.coinType)
+          this.updateCanWithDraw(coinType)
         }
       },
       updateCanWithDraw(coinType) {
         // 先置空然后请求实时数据
         this.coinexCanWidthDraw = null
-        // TODO 后端功能还没做好，到时候去掉注释就好了
-        // this.axios.balance.getCanWithdrawAmount(coinType).then(response => {
-        //   this.coinexCanWidthDraw = parseFloat(response.data.can_withdraw_amount)
-        // })
+        this.axios.balance.getCanWithdrawAmount(coinType).then(response => {
+          this.coinexCanWidthDraw = parseFloat(response.data.can_withdraw_amount)
+        })
       },
       onTransfer() {
         if (this.form.amount > 0) {

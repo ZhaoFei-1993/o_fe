@@ -149,7 +149,6 @@
       StarRate,
       VerifyCode,
     },
-    layout: 'my',
     data() {
       return {
         coinexDomain,

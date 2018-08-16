@@ -308,7 +308,6 @@
       ContactItem,
       MyInfoItem,
     },
-    layout: 'my',
     head() {
       return {
         title: '商家认证' +

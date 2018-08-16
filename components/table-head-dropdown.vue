@@ -1,10 +1,13 @@
 <template>
   <div class="th-filter" v-click-outside="hide">
-    <span style="cursor: pointer;" @click="showSideType = !showSideType"><span>{{ title }}</span><i class="iconfont icon-arrowdown"></i></span>
+    <span style="cursor: pointer;" @click="showSideType = !showSideType"><span>{{ title }}</span><i
+      class="iconfont icon-arrowdown"></i></span>
     <div class="filter-dropdown-wrapper" v-show="showSideType">
       <ul>
-        <li @click="onClickDropdown({index, option})" v-for="(option, index) in options" class="filter-dropdown-item" :class="{'filter-dropdown-item-active': option.active}">
-          <span class="filter-dropdown-item-placeholder"><i class="iconfont icon-tick" v-show="option.active"></i></span>
+        <li @click="onClickDropdown({index, option})" v-for="(option, index) in options" class="filter-dropdown-item"
+            :class="{'filter-dropdown-item-active': option.active}">
+          <span class="filter-dropdown-item-placeholder"><i class="iconfont icon-tick"
+                                                            v-show="option.active"></i></span>
           <span>{{ option.text }}</span>
         </li>
       </ul>
@@ -27,7 +30,8 @@
       },
       onClick: {
         type: Function,
-        default: () => {},
+        default: () => {
+        },
       },
     },
     data() {
@@ -47,7 +51,7 @@
       hide() {
         this.showSideType = false
       },
-      onClickDropdown({ index, option }) {
+      onClickDropdown({index, option}) {
         this.showSideType = false
         if (this.activeId === index) return // 重复点击同一个item不触发事件
 

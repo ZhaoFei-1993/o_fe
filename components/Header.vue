@@ -282,7 +282,7 @@
             <b-dropdown-item to="/my/security"><i class="iconfont icon-manage-account"></i> 个人中心</b-dropdown-item>
             <b-dropdown-item to="/wallet"><i class="iconfont icon-wallet"></i> OTC钱包</b-dropdown-item>
             <b-dropdown-item v-if="user.merchant && user.merchant.auth_status === constant.MERCHANT_AUTH_STATUS.PASS"
-                             to="/my/items">
+                             to="/manage/items">
               <i class="iconfont icon-apply-merchant"></i>
               广告管理
             </b-dropdown-item>
@@ -357,11 +357,12 @@
   import UserAvatar from '~/components/user-avatar'
   import Blank from '~/components/blank'
   import preventParentScroll from 'vue-prevent-parent-scroll'
+  import { COLORS } from '~/components/chat/constant.js'
 
   Vue.use(Vuelidate)
   export default {
     head: {
-      link: [{rel: 'stylesheet', href: '//at.alicdn.com/t/font_739076_j4jq0hbb3qh.css'}]
+      link: [{rel: 'stylesheet', href: '//at.alicdn.com/t/font_739076_4h78rlvhjqt.css'}]
     },
     components: {
       PublishItemButton,
@@ -371,7 +372,7 @@
     },
     data() {
       return {
-        colors: ['#b2d9fd', '#fae7a3', '#ceeaaf', '#ffddd3', '#d4bfe8', '#b1ebde', '#ffd5bb', '#a9b2e0', '#e0a9cf', '#e0d0a9'],
+        colors: COLORS,
         orderList: [],
         showOrders: false,
         form: {
