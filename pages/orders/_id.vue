@@ -336,15 +336,18 @@
               <span>申诉专员已经介入，请及时提供必要的信息</span>
             </div>
             <div v-if="appeal.status===constant.APPEAL_STATUS.CANCEL">
-              <span v-if="canAppeal">
-                交易出现问题？需要
-                <span class="c-brand-green appeal-btn" @click="startAppeal">申诉</span>
-              </span>
-              <span v-else>
-                交易出现问题？需要
-                <b-link :href="`${coinexDomain}/res/support/ticket`" target="_blank"><span
-                  class="c-brand-green appeal-btn">提交工单</span></b-link>
-              </span>
+              <span>{{appealSide}}已取消申诉，如果仍有问题，请</span>
+              <b-link :href="`${coinexDomain}/res/support/ticket`" target="_blank">提交工单</b-link>
+              <!--暂时后端没做好支持-->
+              <!--<span v-if="canAppeal">-->
+                <!--交易出现问题？需要-->
+                <!--<span class="c-brand-green appeal-btn" @click="startAppeal">申诉</span>-->
+              <!--</span>-->
+              <!--<span v-else>-->
+                <!--交易出现问题？需要-->
+                <!--<b-link :href="`${coinexDomain}/res/support/ticket`" target="_blank"><span-->
+                  <!--class="c-brand-green appeal-btn">提交工单</span></b-link>-->
+              <!--</span>-->
             </div>
             <div v-if="appeal.status===constant.APPEAL_STATUS.COMPLETED">
               <span>申诉裁决：{{appealResult}}</span>
