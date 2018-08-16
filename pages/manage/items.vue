@@ -99,6 +99,18 @@
       </div>
 
       <b-table :fields="itemTableFields" :items="itemsCurrent" class="items-table">
+        <template slot="HEAD_side" slot-scope="{ item }">
+          <div>
+            <TableHeadDropdown :options="itemTypeOptions" label="类型"
+                               @click="onClickSideDropdown"></TableHeadDropdown>
+          </div>
+        </template>
+        <template slot="HEAD_coin_type" slot-scope="{ item }">
+          <div>
+            <TableHeadDropdown :options="coinTypeFilterOptions" label="币种"
+                               @click="onClickCoinTypeDropdown"></TableHeadDropdown>
+          </div>
+        </template>
         <template slot="id" slot-scope="{ item }">
           <b-link>{{ item.id }}</b-link>
           <span v-if="itemStatus === constant.ITEM_STATUS.ONLINE && !item.itemLimit.available"
@@ -187,11 +199,12 @@
 
 <script>
   import Vue from 'vue'
-  import PublishItemModal from '~/components/publish-item-modal/index.vue'
-  import PublishItemButton from '~/components/publish-item-modal/publish-item-button.vue'
-  import ToggleButton from '~/components/toggle-button.vue'
-  import CurrencyInput from '~/components/currency-input.vue'
-  import Blank from '~/components/blank.vue'
+  import PublishItemModal from '~/components/publish-item-modal/index'
+  import PublishItemButton from '~/components/publish-item-modal/publish-item-button'
+  import ToggleButton from '~/components/toggle-button'
+  import CurrencyInput from '~/components/currency-input'
+  import TableHeadDropdown from '~/components/table-head-dropdown'
+  import Blank from '~/components/blank'
   import {mapState} from 'vuex'
   import ClickOutside from 'vue-click-outside'
 
@@ -205,6 +218,7 @@
       ToggleButton,
       Blank,
       PublishItemButton,
+      TableHeadDropdown,
     },
     data() {
       return {
@@ -215,6 +229,7 @@
         onlineItemCoinAmount: 0, // 正在上架的广告的数量
         isItemAmountEditing: false,   // 正在上架的广告的币量，是否在编辑
         isItemEditing: false,   // 是否在编辑广告
+        queryParams: {},
       }
     },
     head() {
@@ -237,6 +252,21 @@
           text: '已下架',
           value: this.constant.ITEM_STATUS.OFFLINE,
         }]
+      },
+      itemTypeOptions() {
+        return [
+          {text: '买', value: this.constant.SIDE.BUY, active: false},
+          {text: '卖', value: this.constant.SIDE.SELL, active: false},
+          {text: '不限', value: null, active: true},
+        ]
+      },
+      coinTypeFilterOptions() {
+        const defaultOption = {
+          active: true,
+          text: '不限',
+          value: null,
+        }
+        return [defaultOption, ...this.constant.COIN_TYPE_OPTIONS.map(item => ({active: false, ...item}))]
       },
       // 正在编辑的广告是否有效
       editingAmountValid: function () {
@@ -319,8 +349,17 @@
       document.querySelector('.layout-content').style.position = 'static'
     },
     methods: {
+      onClickSideDropdown(item) {
+        this.queryParams.side = item.value
+        this.getItems()
+      },
+      onClickCoinTypeDropdown(item) {
+        this.queryParams.coin_type = item.value
+        this.getItems()
+      },
       getItems() {
-        this.axios.item.userItems(this.itemStatus).then(res => {
+        const params = Object.assign({}, this.queryParams, {status: this.itemStatus})
+        this.axios.item.userItems(params).then(res => {
           res.data.forEach(item => {
             item.itemLimit = this.helpers.getItemLimit(item)
           })
@@ -349,13 +388,11 @@
           this.axios.onError(err)
         })
       },
-
       onClickOutsideAmount() {
         if (this.isItemAmountEditing) {
           this.isItemAmountEditing = false
         }
       },
-
       onItemOnline(item, e) {
         const onlineItems = this.itemsOnline.filter(onlineItem => onlineItem.coin_type === item.coin_type && onlineItem.side === item.side)
 

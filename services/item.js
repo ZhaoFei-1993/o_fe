@@ -36,12 +36,10 @@ export default (axios) => {
      * 获取我的广告列表
      * @param {ITEM_STATUS} status
      */
-    async userItems(status) {
+    async userItems(params) {
       // return Promise.resolve(require('./mock/item').userItems)
       return axios.get('/items/mine', {
-        params: {
-          status
-        }
+        params
       })
     },
 

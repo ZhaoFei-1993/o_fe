@@ -257,7 +257,7 @@
   import cBlock from '~/components/c-block'
   import Blank from '~/components/blank'
   import ConfirmReceipt from './_c/confirm-receipt'
-  import TableHeadDropdown from './_c/table-head-dropdown'
+  import TableHeadDropdown from '~/components/table-head-dropdown'
   import ViaPagination from '~/components/via-pagination'
   import QrcodePopover from '~/components/qrcode-popover'
 
