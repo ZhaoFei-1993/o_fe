@@ -90,7 +90,7 @@ export default function getConstant($t) {
     level: 2,
   }]
   const APPEAL_STATUS_OPTIONS = [{
-    value: 'created', text: '申诉等待中',
+    value: 'created', text: '申诉待处理',
   }, {
     value: 'processing', text: '申诉处理中',
   }, {
@@ -98,7 +98,7 @@ export default function getConstant($t) {
   }, {
     value: 'cancel', text: '已取消申诉',
   }, {
-    value: 'completed', text: '已申诉解决',
+    value: 'completed', text: '申诉已裁决',
   }]
 
   return {
