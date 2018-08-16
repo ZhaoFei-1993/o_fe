@@ -378,7 +378,7 @@
         </CBlock>
         <CBlock id="my-chat-box">
           <Chat :client="chat.imClient" :conversation-id="order.conversation_id"
-                :client-id="`${user.account.id}`"></Chat>
+                :client-id="`${user.account.id}`" :is-buy-side="isBuySide"></Chat>
         </CBlock>
       </div>
       <b-modal ref="appealModal"
