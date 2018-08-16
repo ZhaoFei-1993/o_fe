@@ -58,7 +58,7 @@
             <template slot="status" slot-scope="{ item, detailsShowing, toggleDetails }">
               <span class="status-icon">
                 <i
-                  v-if="queryParams.status!==ORDERS_FILTERS.APPEAL && item.appeal_status!=='' && item.appeal_status!==constant.APPEAL_STATUS.CANCEL"
+                  v-if="showAppealMark(item)"
                   class="iconfont icon-appeal fz-12 c-brand-green"
                   v-b-tooltip.hover title="申诉中"
                 ></i>
@@ -230,7 +230,8 @@
               {{ item.appeal_time | getTimeText }}
             </template>
             <template slot="appeal_status" slot-scope="{ item }">
-              {{ constant.APPEAL_STATUS_MAP[item.appeal_status]?constant.APPEAL_STATUS_MAP[item.appeal_status].text:'-'}}
+              {{
+              constant.APPEAL_STATUS_MAP[item.appeal_status]?constant.APPEAL_STATUS_MAP[item.appeal_status].text:'-'}}
             </template>
           </b-table>
           <blank v-if="!orderTableItems.length"></blank>
@@ -746,6 +747,9 @@
           console.log(err)
           this.axios.onError(err)
         })
+      },
+      showAppealMark(item) {
+        return this.queryParams.status !== this.ORDERS_FILTERS.APPEAL && (item.appeal_status === this.constant.APPEAL_STATUS.CREATED || item.appeal_status === this.constant.APPEAL_STATUS.PENDING || item.appeal_status === this.constant.APPEAL_STATUS.PROCESSING)
       }
     }
   }
