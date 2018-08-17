@@ -357,10 +357,10 @@ a.dropdown-item {
 
 $sideList: top right bottom left;
 /* tooltip */
-.tooltip  {
+.tooltip {
   @each $side in $sideList {
-    &.bs-tooltip-#{$side}{
-      .arrow::before,.arrow::after {
+    &.bs-tooltip-#{$side} {
+      .arrow::before, .arrow::after {
         border-#{$side}-color: #fdf5e6;
       }
     }
@@ -418,10 +418,16 @@ $sideList: top right bottom left;
     color: #192330;
   }
   @each $side in $sideList {
-    &.bs-popover-#{$side}{
-      .arrow::before,.arrow::after {
+    &.bs-popover-#{$side} {
+      .arrow::before, .arrow::after {
         border-#{$side}-color: #fdf5e6;
       }
     }
+  }
+}
+
+@media (min-width: 1200px) {
+  .container {
+    max-width: 1200px;
   }
 }
