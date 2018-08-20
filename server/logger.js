@@ -2,6 +2,8 @@ const log4js = require('log4js')
 const layouts = require('log4js/lib/layouts')
 const isDev = process.env.MODE !== 'production'
 const globalLevel = isDev ? 'TRACE' : 'INFO'
+const os = require('os')
+const serverName = os.hostname()
 
 log4js.addLayout('filter', function (config) {
   // 去掉请求头里面的敏感用户信息
@@ -92,12 +94,12 @@ if (isDev) {
     },
   }
 }
-if (+process.env.OTC === 0 && !isDev) { // 生产环境只发送一个实例的log
+if (!isDev) { // 生产环境才发送log，log4js会自动根据instanceVar来处理log文件（https://log4js-node.github.io/log4js-node/clustering.html）
   logConfig.appenders = {
     ...logConfig.appenders,
     errorEmailSender: {
       ...smtpAppender,
-      subject: '[❌Error] OTC最近1小时错误日志',
+      subject: serverName + '[❌Error] OTC最近1小时错误日志',
       attachment: {
         ...smtpAppender.attachment,
         filename: 'error.log',
@@ -111,7 +113,7 @@ if (+process.env.OTC === 0 && !isDev) { // 生产环境只发送一个实例的l
     },
     commonEmailSender: {
       ...smtpAppender,
-      subject: '[⚠️Common] OTC最近4小时普通日志',
+      subject: serverName + '[⚠️Common] OTC最近4小时普通日志',
       attachment: {
         ...smtpAppender.attachment,
         filename: 'common.log',
