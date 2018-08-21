@@ -22,6 +22,12 @@ export default () => {
         state.imClient = data
       }
     },
+    LOGOUT_CHAT_CLIENT(state) {
+      if (state.imClient) {
+        state.imClient.close()
+        state.imClient = null
+      }
+    },
   }
 
   const actions = {
@@ -52,8 +58,8 @@ export default () => {
       return state.imClient
     },
 
-    logout({ state }) {
-      return state.imClient.close()
+    logout({ commit, state }) {
+      commit('LOGOUT_CHAT_CLIENT')
     },
   }
 
