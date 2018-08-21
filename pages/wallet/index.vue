@@ -17,9 +17,9 @@
               </div>
               <div class="menu-container" v-show="showCoinDropdown">
                 <div class="list-menu">
-                  <div v-for="(item, index) in priceCoins" :key="index" @click="onChangePriceCoin(index)">
+                  <div v-for="(item, index) in constant.COIN_TYPES" :key="index" @click="onChangePriceCoin(index)">
                     <div class="order-menu-item">{{item}}</div>
-                    <div v-if="index < priceCoins.length - 1" class="order-separator"></div>
+                    <div v-if="index < constant.COIN_TYPES.length - 1" class="order-separator"></div>
                   </div>
                 </div>
               </div>
@@ -177,8 +177,7 @@
         showPieChart: false,
         showCoinDropdown: false,
         totalCoin: 0,
-        selectedCoin: 'BCH',
-        priceCoins: ['BCH', 'BTC', 'ETH', 'USDT'],
+        selectedCoin: 'USDT', // 实时汇率默认选择币种
         assetsTableFields: {
           coin_type: {
             label: '币种',
@@ -465,7 +464,7 @@
       onChangePriceCoin(index) {
         const rate = this.balance.currentRate[this.selectedCoin] // 币种汇率
         this.totalCoin = rate ? this.totalBalance / rate : 0
-        this.selectedCoin = this.priceCoins[index]
+        this.selectedCoin = this.constant.COIN_TYPES[index]
         this.showCoinDropdown = false
       },
       onShowhand() {
