@@ -25,6 +25,7 @@ export default () => {
     LOGOUT_CHAT_CLIENT(state) {
       if (state.imClient) {
         state.imClient.close()
+        state.imClient = null
       }
     },
   }
