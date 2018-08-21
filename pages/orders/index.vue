@@ -498,6 +498,13 @@
       this.stopRefreshOrders()
       this.$nuxt.$off('IM.Event.UNREAD_MESSAGES_COUNT_UPDATE')
     },
+    watch: {
+      'chat.imClient'(newVal, oldVal) {
+        if (newVal && !oldVal) { // 直接刷新页面情况可能出现IM还没初始化，需要延迟获取未读消息
+          this.getUnreadMsgCount()
+        }
+      },
+    },
     methods: {
       changePage(page) {
         this.queryParams.page = page
@@ -526,7 +533,7 @@
         })
       },
       getUnreadMsgCount() {
-        const handler = () => {
+        if (this.chat.imClient) {
           const task = this.orderTableItems.map(item => {
             if (item.conversation_id) {
               return this.chat.imClient.getConversation(item.conversation_id)
@@ -535,15 +542,11 @@
           })
           Promise.all(task).then(res => {
             res.forEach((item, index) => {
-              this.orderTableItems[index]._unreadMessageCount = item.unreadMessagesCount
+              if (item) {
+                this.orderTableItems[index]._unreadMessageCount = item.unreadMessagesCount
+              }
             })
           }).catch(console.error)
-        }
-
-        if (!this.chat.imClient) {
-          setTimeout(handler, 1500) // 直接刷新页面情况可能出现im还没初始化，需要延迟获取未读消息
-        } else {
-          handler()
         }
       },
       initOrderList() {

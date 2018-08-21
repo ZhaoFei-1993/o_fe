@@ -397,7 +397,7 @@
       return {form: this.validationConf.validations}
     },
     computed: {
-      ...mapState(['lang', 'user', 'messages', 'constant', 'chat']),
+      ...mapState(['lang', 'user', 'messages', 'constant']),
       helpLink() {
         return 'https://support.coinex.com/hc/categories/360000724513'
       },
@@ -444,12 +444,6 @@
         if (this.user && this.user.account) {
           if (!this.user.account.is_name_confirmed) {
             this.$refs.updateNameModal.show()
-          }
-          if (!this.chat.imClient) {
-            const clientId = `${this.user.account.id}`
-            this.$store.dispatch('chat/newChatClient', clientId).catch(err => {
-              onApiError(err, this)
-            })
           }
         }
       }).catch(err => {
