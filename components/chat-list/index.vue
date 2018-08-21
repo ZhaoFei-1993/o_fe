@@ -80,24 +80,26 @@
         return !this.convList.length ? '您还未收到任何消息' : ''
       },
     },
-    mounted() {
-      if (!this.chat.imClient) {
-        const clientId = `${this.user.account.id}`
-        this.$store.dispatch('chat/newChatClient', clientId)
-          .then(() => {
-            this.init()
+    watch: {
+      'user.account'(account) {
+        if (!this.chat.imClient && account && account.id) {
+          const clientId = `${account.id}`
+          this.$store.dispatch('chat/newChatClient', clientId)
+            .then(() => {
+              this.init()
+            })
+            .catch(err => {
+              this.$errorTips(`初始化聊天失败，error=${err}`)
+            })
+          this.$nuxt.$on('IM.Event.SINGLE_MESSAGE_UPDATE', () => {  // 手动强制更新聊天列表
+            this.fetchMessageList({
+              success: (convList) => {
+                this.convList = convList
+              },
+            })
           })
-          .catch(err => {
-            this.$errorTips(`初始化聊天失败，error=${err}`)
-          })
-      }
-      this.$nuxt.$on('IM.Event.SINGLE_MESSAGE_UPDATE', () => {  // 手动强制更新聊天列表
-        this.fetchMessageList({
-          success: (convList) => {
-            this.convList = convList
-          },
-        })
-      })
+        }
+      },
     },
     beforeDestroy() {
       this.unbindClientEvent()
