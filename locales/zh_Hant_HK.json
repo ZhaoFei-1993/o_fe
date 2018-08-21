@@ -64,7 +64,9 @@
         "您还未收到任何消_4052": "您還未收到任何消息",
         "获取消息失败，e_e4aa": "獲取消息失敗，error=",
         "标记已读失败，e_c1d4": "標記已讀失敗，error=",
-        "获取对话失败，e_6c4c": "獲取對話失敗，error="
+        "获取对话失败，e_6c4c": "獲取對話失敗，error=",
+        "初始化聊天失败，_ebb4": "初始化聊天失敗，error=",
+        "获取消息列表失败_495f": "獲取消息列表失敗，error="
     },
     "components_chat_avatar_vue": {},
     "components_chat_index_vue": {
