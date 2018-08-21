@@ -10,21 +10,31 @@
       <slot/>
     </div>
     <PublishModal v-model="modalShowing" @published="onPublished"/>
+    <LinkModal v-model="showConstraintModal"
+               content="您今日已取消交易3次，无法发布和上架广告"
+               title="发布广告限制"
+               linkText="查看规则"
+               link="//support.coinex.com/hc/articles/360007643734"
+               :isOutLink="true">
+    </LinkModal>
   </div>
 </template>
 
 <script>
   import {mapState, mapGetters} from 'vuex'
-  import PublishModal from './index.vue'
+  import PublishModal from './index'
+  import LinkModal from '~/components/link-modal'
 
   export default {
     name: 'publish-item-button',
     components: {
       PublishModal,
+      LinkModal,
     },
     data() {
       return {
         modalShowing: false,
+        showConstraintModal: false,
       }
     },
     computed: {
@@ -32,11 +42,13 @@
       ...mapGetters(['paymentEnabled']),
     },
     mounted() {
-      this.$store.dispatch('fetchUserMerchant').catch(() => {})
-      this.$store.dispatch('fetchUserPayments').catch(() => {})
+      this.$store.dispatch('fetchUserMerchant').catch(() => {
+      })
+      this.$store.dispatch('fetchUserPayments').catch(() => {
+      })
     },
     methods: {
-      onShowModal() {
+      async onShowModal() {
         if (!this.user.account) {
           window.location.href = `${this.constant.loginPage}?redirect=${encodeURIComponent(this.constant.webDomain + this.$route.fullPath)}`
           return
@@ -52,6 +64,12 @@
             }
           })
 
+          return
+        }
+        const constraintResponse = await this.axios.user.dynamicConstraint()
+        const constraint = constraintResponse.data
+        if (!constraint.can_publish_item) {
+          this.showConstraintModal = true
           return
         }
 

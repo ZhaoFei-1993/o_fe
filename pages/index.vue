@@ -232,17 +232,6 @@
       }
     }
   }
-
-  #prevent-order-modal {
-    .actions {
-      margin-top: 24px;
-      button {
-        margin: 0 10px;
-        width: 160px;
-        height: 42px;
-      }
-    }
-  }
 </style>
 
 <template>
@@ -361,7 +350,6 @@
                     <!--todo:这里的文案可以用constant里面的常量代替-->
                     <li v-if="checkQualification(item,constant.QUALIFICATIONS.ONE_DEAL)">交易方必须完成过1次交易</li>
                     <li v-if="checkQualification(item,constant.QUALIFICATIONS.BIND_PHONE)">交易方必须通过手机认证</li>
-                    <li v-if="checkQualification(item,constant.QUALIFICATIONS.KYC)">交易方必须通过实名认证</li>
                   </ol>
                 </b-popover>
               </template>
@@ -378,37 +366,19 @@
       v-if="selectedItem&&user.account"
       :item="selectedItem"
       v-model="showPlaceOrderModal"/>
-
-    <b-modal id="prevent-order-modal"
-             v-model="showConstraintModal"
-             :title="currentConstraint.title || '交易限制'"
-             :hide-footer="true"
-             :noCloseOnBackdrop="true"
-             class="text-center">
-      <div>
-        {{currentConstraint.content}}
-      </div>
-      <div class="actions">
-        <b-btn size="sm" variant="outline-green" @click="showConstraintModal=false">取消</b-btn>
-        <b-link v-if="currentConstraint.outLink" :href="currentConstraint.outLink">
-          <b-btn size="sm" variant="gradient-yellow">{{currentConstraint.buttonText}}</b-btn>
-        </b-link>
-        <b-link v-else :to="currentConstraint.link">
-          <b-btn size="sm" variant="gradient-yellow">{{currentConstraint.buttonText}}</b-btn>
-        </b-link>
-      </div>
-    </b-modal>
+    <LinkModal v-bind="currentConstraint" v-model="showConstraintModal"></LinkModal>
   </div>
 </template>
 
 <script>
-  import {mapState} from 'vuex'
+  import {mapState, mapGetters} from 'vuex'
   import {coinexDomain, loginPage, webDomain} from '~/modules/variables'
   import PlaceOrderModal from '~/components/place-order-modal'
   import ViaPagination from '~/components/via-pagination'
   import UserPayments from '~/components/user-payments'
-  import PublishItemButton from '~/components/publish-item-modal/publish-item-button.vue'
-  import Blank from '~/components/blank.vue'
+  import PublishItemButton from '~/components/publish-item-modal/publish-item-button'
+  import Blank from '~/components/blank'
+  import LinkModal from '~/components/link-modal'
   import {PlaceOrderError} from '~/modules/error-code'
 
   // 从路由数据中获取需要的列表数据
@@ -439,6 +409,7 @@
       PublishItemButton,
       ViaPagination,
       Blank,
+      LinkModal,
     },
     data() {
       return {
@@ -451,7 +422,7 @@
           content: '',
           linkText: '',
           link: '',
-          outLink: null,
+          isOutLink: false,
         },
         busy: false,
         coinexDomain,
@@ -466,6 +437,7 @@
     },
     computed: {
       ...mapState(['constant', 'user', 'balance']),
+      ...mapGetters(['kycPassed']),
     },
     head() {
       return {
@@ -566,9 +538,11 @@
             const available = parseFloat(this.balance.otcBalance.find(b => b.coin_type === item.coin_type).available)
             if (item.side === this.constant.SIDE.BUY && available < (item.min_deal_cash_amount / item.price)) {
               this.currentConstraint = {
+                title: '交易限制',
                 content: `您的余额为${available} ${item.coin_type}小于该广告最低限额`,
-                buttonText: '去划转',
+                linkText: '去划转',
                 link: `/wallet`,
+                isOutLink: false,
               }
               this.showConstraintModal = true
               return
@@ -583,30 +557,27 @@
                 this.currentConstraint = {
                   title: '开启支付方式',
                   content: '您需要开启该广告支持的支付方式后，才可以进行交易。',
-                  buttonText: '去开启',
+                  linkText: '去开启',
                   link: '/my/payments',
+                  isOutLink: false,
                 }
                 break
-              case this.constant.PLACE_ORDER_ERROR.KYC_TIMES_LIMIT:
+              case this.constant.PLACE_ORDER_ERROR.NO_KYC_LIMIT:
                 this.currentConstraint = {
                   title: '实名认证',
-                  content: '您尚未完成实名认证，每日限制下单次数为 3 次。',
-                  buttonText: '去认证',
-                  outLink: `${this.coinexDomain}/my/info/basic?redirect=${encodeURIComponent(webDomain + this.$route.fullPath)}`,
+                  content: '您需先完成实名认证，才可进行交易。',
+                  linkText: '去认证',
+                  link: `${this.coinexDomain}/my/info/basic?redirect=${encodeURIComponent(webDomain + this.$route.fullPath)}`,
+                  isOutLink: true,
                 }
                 break
               case this.constant.PLACE_ORDER_ERROR.CANCEL_LIMIT:
                 this.currentConstraint = {
+                  title: '交易限制',
                   content: '您今天累计取消超过 3 次订单，被冻结交易功能。',
-                  buttonText: '查看规则',
-                  outLink: '//support.coinex.com',
-                }
-                break
-              case this.constant.PLACE_ORDER_ERROR.KYC_AMOUNT_LIMIT:
-                this.currentConstraint = {
-                  content: this.$tt(`您尚未完成实名认证，每次交易限额{0}元。`, this.noKycLimit),
-                  buttonText: '去认证',
-                  outLink: `${this.coinexDomain}/my/info/basic?redirect=${encodeURIComponent(webDomain + this.$route.fullPath)}`,
+                  linkText: '查看规则',
+                  link: '//support.coinex.com/hc/articles/360007643734',
+                  isOutLink: true,
                 }
                 break
               default:
@@ -643,19 +614,17 @@
         })
       },
       async verifyDynamicConstraint(item) {
-        // 不做外部验证了
-        // if (item.min_deal_cash_amount >= this.noKycLimit) {
-        //   return Promise.reject(new PlaceOrderError('未完成实名认证', this.constant.PLACE_ORDER_ERROR.KYC_AMOUNT_LIMIT))
-        // }
+        // 未完成kyc验证不可以交易
+        if (!this.kycPassed) {
+          return Promise.reject(new PlaceOrderError('未完成实名认证', this.constant.PLACE_ORDER_ERROR.NO_KYC_LIMIT))
+        }
         if (item.side === this.constant.SIDE.BUY) {
           await this.verifyHasPayment(item)
         }
         return this.axios.user.dynamicConstraint().then(response => {
           const constraint = response.data
-          if (!constraint.kyc_place_order_verified) {
-            return Promise.reject(new PlaceOrderError('未完成实名认证', this.constant.PLACE_ORDER_ERROR.KYC_TIMES_LIMIT))
-          } else if (!constraint.cancel_order_times_verified) {
-            return Promise.reject(new PlaceOrderError('频繁取消订单', this.constant.PLACE_ORDER_ERROR.CANCEL_LIMIT))
+          if (!constraint.can_place_order) {
+            return Promise.reject(new PlaceOrderError('限制交易', this.constant.PLACE_ORDER_ERROR.CANCEL_LIMIT))
           } else {
             return Promise.resolve()
           }

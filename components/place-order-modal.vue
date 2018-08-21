@@ -204,7 +204,6 @@
           cash_amount: null,
         },
         submitting: false,
-        noKycLimit: 500,
       }
     },
     validations() {
@@ -212,9 +211,6 @@
     },
     computed: {
       ...mapState(['constant', 'balance', 'user']),
-      kycLimitAmount() {
-        return (this.user && this.user.account.kyc_status === this.constant.KYC_STATUS.PASS) ? Number.MAX_SAFE_INTEGER : this.noKycLimit
-      },
       currentBalance() {
         return parseFloat(this.balance.otcBalance.find(b => b.coin_type === this.item.coin_type).available)
       },
@@ -247,16 +243,11 @@
               required,
               minValue: minValue(this.itemLimit.minDealCashAmount),
               maxValue: maxValue(this.itemLimit.maxDealCashAmount),
-              kycLimit: (value) => {
-                if (!value) return true
-                return value.lte(this.kycLimitAmount)
-              }
             },
             message: {
               required: `请填写${this.sideText}金额`,
               minValue: `商家限制最小下单金额${this.itemLimit.minDealCashAmount} CNY`,
               maxValue: `商家限制最大下单金额${this.itemLimit.maxDealCashAmount} CNY`,
-              kycLimit: `非实名认证用户最大下单金额为${this.noKycLimit} CNY`
             },
           },
           coin_amount: {
