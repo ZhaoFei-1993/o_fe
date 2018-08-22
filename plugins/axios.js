@@ -126,20 +126,14 @@ export default ({app, store}) => {
     function (config) {
       // Do something before request is sent
       if (!/get|options/i.test(config.method)) {
-        const Tokens = require('csrf')
-        const tokens = new Tokens({
-          secretLength: 6,
-          saltLength: 8,
-        })
-        const token = tokens.secretSync()
+        const token = Math.random().toString(36).substring(2, 15) // 后端只校验header跟query是否一致，可能存在后患
 
-        // todo: 看一下 csrf 具体怎么用
         config.headers.common['X-CSRF-TOKEN'] = token
-        // if (/\?/.test(config.url)) {
-        //   config.url += '&X-CSRF-TOKEN=' + token
-        // } else {
-        //   config.url += '?X-CSRF-TOKEN=' + token
-        // }
+        if (/\?/.test(config.url)) {
+          config.url += '&X-CSRF-TOKEN=' + token
+        } else {
+          config.url += '?X-CSRF-TOKEN=' + token
+        }
       }
       return config
     },
