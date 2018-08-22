@@ -179,7 +179,7 @@
             </div>
           </ContactItem>
           <ContactItem title="实名认证" icon="icon-namecard" :required="true">
-            <div v-if="account.kyc_status === constant.KYC_STATUS.PASS" class="c-6f">
+            <div v-if="kycPassed" class="c-6f">
               已认证
             </div>
             <div v-else>
@@ -243,7 +243,7 @@
 
 <script>
   import Vue from 'vue'
-  import {mapState} from 'vuex'
+  import {mapState, mapGetters} from 'vuex'
   import MySidebar from '~/components/my-sidebar.vue'
   import My2Column from '~/components/my-2column.vue'
   import ProgressIndicator from '~/components/progress-indicator.vue'
@@ -334,6 +334,7 @@
         constant: state => state.constant,
         balance: state => state.balance,
       }),
+      ...mapGetters(['kycPassed']),
       cetAvailable() {
         if (!this.balance || !this.balance.coinexBalance) {
           return '--'
@@ -364,7 +365,7 @@
     },
     methods: {
       onSubmit() {
-        if (this.account.kyc_status !== this.constant.KYC_STATUS.PASS) return this.$errorTips(`请先完成实名认证`)
+        if (!this.kycPassed) return this.$errorTips(`请先完成实名认证`)
         if (!this.account.mobile) return this.$errorTips(`请先绑定手机`)
         if (!this.isVideoSent) return this.$errorTips(`请先确认发送认证视频到 bd@coinex.com`)
         if (!this.isContractRead) return this.$errorTips('请先阅读并同意服务协议')

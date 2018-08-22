@@ -255,9 +255,9 @@
       },
       itemTypeOptions() {
         return [
+          {text: '不限', value: null, active: true},
           {text: '买', value: this.constant.SIDE.BUY, active: false},
           {text: '卖', value: this.constant.SIDE.SELL, active: false},
-          {text: '不限', value: null, active: true},
         ]
       },
       coinTypeFilterOptions() {

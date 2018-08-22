@@ -139,7 +139,7 @@
 </style>
 
 <template>
-  <CBlock class="page-my-payments" x="0" y="0" v-if="user.account.kyc_status === constant.KYC_STATUS.PASS">
+  <CBlock class="page-my-payments" x="0" y="0" v-if="this.kycPassed">
     <h3 class="layout-my-title">
       支付方式
       <b-btn @click="onPaymentAdd" variant="plain" size="xs" class="ml-15 c-brand-green">
@@ -287,7 +287,7 @@
 
 <script>
   import Vue from 'vue'
-  import {mapState} from 'vuex'
+  import {mapState, mapGetters} from 'vuex'
   import MySidebar from '~/components/my-sidebar.vue'
   import My2Column from '~/components/my-2column.vue'
   import MyInfoItem from './_c/my-info-item.vue'
@@ -372,6 +372,7 @@
     },
     computed: {
       ...mapState(['constant', 'user']),
+      ...mapGetters(['kycPassed']),
       // 根据当前状态生成的校验数据
       validationConf: function () {
         const PAYMENT_TYPES = this.constant.PAYMENT_TYPES
@@ -456,7 +457,7 @@
       },
 
       onPaymentAdd() {
-        if (!(this.user.account.kyc_status === this.constant.KYC_STATUS.PASS)) {
+        if (!this.kycPassed) {
           this.$showDialog({
             title: '未实名认证',
             content: '请实名认证后再添加支付方式',

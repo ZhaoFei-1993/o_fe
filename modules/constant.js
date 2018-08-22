@@ -8,7 +8,10 @@ export const PAYMENT_STATUS = {
   ON: 'on',
   OFF: 'off'
 }
-
+export const KYC_STATUS = {
+  PASS: 'pass',
+  PROCESSING: 'processing',
+}
 // 自动回复内容的最大长度
 export const MAX_AUTO_REPLY_LENGTH = 50
 
@@ -142,9 +145,6 @@ export default function getConstant($t) {
       text: '交易方必须通过手机验证',
       value: 'bind_phone'
     }, {
-      text: '交易方必须通过实名验证',
-      value: 'kyc',
-    }, {
       text: '交易方必须完成过 1 次交易',
       value: 'one_deal',
     }],
@@ -153,10 +153,7 @@ export default function getConstant($t) {
     // 验证码的业务类型
     VERIFY_CODE_BUSINESS,
 
-    KYC_STATUS: {
-      PASS: 'pass',
-      PROCESSING: 'processing',
-    },
+    KYC_STATUS,
 
     ORDER_STATUS: {
       CREATED: {
@@ -228,8 +225,7 @@ export default function getConstant($t) {
     // 允许的交易最大最小值的上下限（暂时只针对CNY）
     DEAL_CASH_AMOUNT,
     PLACE_ORDER_ERROR: {
-      KYC_TIMES_LIMIT: 'KYC_TIMES_LIMIT',
-      KYC_AMOUNT_LIMIT: 'KYC_AMOUNT_LIMIT',
+      NO_KYC_LIMIT: 'NO_KYC_LIMIT',
       CANCEL_LIMIT: 'CANCEL_LIMIT',
       PAYMENT_LIMIT: 'PAYMENT_LIMIT',
       BALANCE_LIMIT: 'BALANCE_LIMIT',

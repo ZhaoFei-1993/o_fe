@@ -74,13 +74,13 @@
     </MyInfoItem>
     <MyInfoItem title="实名认证">
       <p slot="content">
-        <span v-if="user.account.kyc_status === constant.KYC_STATUS.PASS">已认证</span>
+        <span v-if="kycPassed">已认证</span>
         <span v-else-if="user.account.kyc_status === constant.KYC_STATUS.PROCESSING"
               class="c-brand-green">信息已提交，待系统审核</span>
         <span v-else class="c-red">未认证</span>
       </p>
       <b-btn slot="action"
-             v-if="user.account.kyc_status !== constant.KYC_STATUS.PASS"
+             v-if="!kycPassed"
              :disabled="user.account.kyc_status === constant.KYC_STATUS.PROCESSING"
              variant="outline-green" size="xs" target="_blank"
              :href="`${coinexDomain}/my/info/basic`">
@@ -132,7 +132,7 @@
 
 <script>
   import VerifyCode from '~/components/verify-code'
-  import {mapState} from 'vuex'
+  import {mapState, mapGetters} from 'vuex'
   import {VERIFY_CODE_TYPE, VERIFY_CODE_BUSINESS} from '~/modules/constant'
   import MySidebar from '~/components/my-sidebar.vue'
   import My2Column from '~/components/my-2column.vue'
@@ -177,6 +177,7 @@
     },
     computed: {
       ...mapState(['user', 'constant']),
+      ...mapGetters(['kycPassed']),
       'VALIDATE_FREQUENCY_MAP': function () {
         return this.constant.VALIDATE_FREQUENCY_MAP
       },

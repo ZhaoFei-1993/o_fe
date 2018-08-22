@@ -1,4 +1,5 @@
-import {PAYMENT_STATUS} from '~/modules/constant'
+import {PAYMENT_STATUS, KYC_STATUS} from '~/modules/constant'
+
 export default () => {
   const initialState = {
     account: null,
@@ -12,6 +13,9 @@ export default () => {
   const getters = {
     paymentEnabled: (state) => {
       return state.payments && state.payments.some((payment) => payment.status === PAYMENT_STATUS.ON)
+    },
+    kycPassed: (state) => {
+      return state.account && state.account.kyc_status === KYC_STATUS.PASS
     }
   }
 
