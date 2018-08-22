@@ -186,7 +186,7 @@
         width: 80px;
       }
       .appeal-input {
-        width: 430px;
+        flex: 1;
         border: solid 1px #dddddd;
         &:focus {
           border: solid 1px $brandGreen;
@@ -340,13 +340,13 @@
               <b-link :href="`${coinexDomain}/res/support/ticket`" target="_blank">提交工单</b-link>
               <!--暂时后端没做好支持-->
               <!--<span v-if="canAppeal">-->
-                <!--交易出现问题？需要-->
-                <!--<span class="c-brand-green appeal-btn" @click="startAppeal">申诉</span>-->
+              <!--交易出现问题？需要-->
+              <!--<span class="c-brand-green appeal-btn" @click="startAppeal">申诉</span>-->
               <!--</span>-->
               <!--<span v-else>-->
-                <!--交易出现问题？需要-->
-                <!--<b-link :href="`${coinexDomain}/res/support/ticket`" target="_blank"><span-->
-                  <!--class="c-brand-green appeal-btn">提交工单</span></b-link>-->
+              <!--交易出现问题？需要-->
+              <!--<b-link :href="`${coinexDomain}/res/support/ticket`" target="_blank"><span-->
+              <!--class="c-brand-green appeal-btn">提交工单</span></b-link>-->
               <!--</span>-->
             </div>
             <div v-if="appeal.status===constant.APPEAL_STATUS.COMPLETED">
@@ -423,7 +423,7 @@
   import QrcodePopover from '~/components/qrcode-popover.vue'
   import ConfirmReceipt from './_c/confirm-receipt'
   import {coinexDomain} from '~/modules/variables'
-  import { COLORS } from '~/components/chat/constant.js'
+  import {COLORS} from '~/components/chat/constant.js'
   import {mapState} from 'vuex'
 
   const PAID_CAN_APPEAL = 10 * 60 * 1000 // 支付后可申诉的时间 十分钟
