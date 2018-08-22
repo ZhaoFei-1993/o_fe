@@ -103,7 +103,7 @@
       <b-modal title="资金划转" v-model="showTransferModal" hide-footer no-close-on-backdrop>
         <b-form>
           <b-form-group label="选择币种" horizontal>
-            <b-form-select v-model="form.coinType" :options="constant.COIN_TYPE_OPTIONS"
+            <b-form-select v-model="form.coinType" :options="walletCoinTypes"
                            @change="onChangeCoinType"></b-form-select>
           </b-form-group>
           <b-form-group label="从" horizontal>
@@ -310,12 +310,15 @@
     },
     computed: {
       ...mapState(['balance', 'constant']),
+      walletCoinTypes() { // 增加币种CET, 只在钱包使用
+        return [ ...this.constant.COIN_TYPES, 'CET' ]
+      },
       otcBalance() {
         if (this.balance.otcBalance) {
           const pieDatas = []
           let totalBalance = 0
           const defaultRate = this.balance.allRate[this.defaultAsset] // 各币种CNY汇率
-          const sortedBalance = this.constant.COIN_TYPES.map((coin, index) => { // 必须根据constant配置的币种顺序输出数组
+          const sortedBalance = this.walletCoinTypes.map((coin, index) => { // 根据配置的币种顺序输出数组
             const item = this.balance.otcMap[coin]
             if (item) {
               if (item.total > 0) {
