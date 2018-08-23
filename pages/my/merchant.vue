@@ -195,11 +195,11 @@
 
       <ProgressItem title="提交认证视频">
         <InfoItem title="录制认证视频">
-          <p>手持身份证正面，进行视频录制，保持录制过程中声音和影像都清晰</p>
+          <p>手持实名认证所使用的证件正面，进行视频录制，保持录制过程中声音和影像都清晰</p>
         </InfoItem>
         <InfoItem title="视频诵读范本">
           <p class="info-item-content-example">
-            本人（姓名），身份证号（身份证号码），我申请成为CoinEx认证商家，我的资金来源合法可靠，自愿交易比特币等数字资产，本人充分了解数字货币及潜在风险，本人具有抗风险的能力并愿意承担一切风险！</p>
+            本人（姓名），身份证号（身份证号码）/护照（护照号码），我申请成为CoinEx认证商家，我的资金来源合法可靠，自愿交易比特币等数字资产，本人充分了解数字货币及潜在风险，本人具有抗风险的能力并愿意承担一切风险！</p>
         </InfoItem>
         <InfoItem title="提交认证视频" :required="true">
           <p class="c-6f">请将视频资料发送邮至 bd@coinex.com，邮件主题为"申请成为CoinEx认证商家+CoinEx账户（注册邮箱或手机）"</p>
@@ -210,7 +210,7 @@
       <ProgressItem title="缴纳保证金">
         <p class="c-6f">申请成为CoinEx认证商家，需要同意冻结您交易所账户中 {{MERCHANT_REQUIRED_CET_AMOUNT|formatMoney}}
           CET作为商家保证金，钱包中冻结的保证金依然享有分红权益，但是不
-          可交易和提现。取消商家认证后，商家保证金将继续冻结三个月后解冻。
+          可交易和提现。取消商家认证后，冻结的保证金会立即解冻。
           <b-link :href="`${coinexDomain}/token`" target="_blank">什么是 CET？</b-link>
         </p>
         <InfoItem title="账户可用余额" v-if="balance && balance.coinexBalance">

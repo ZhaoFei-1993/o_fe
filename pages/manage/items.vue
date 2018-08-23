@@ -194,6 +194,13 @@
 
       <PublishItemModal v-model="isItemEditing" :editingItem="editingItem" :editing="true" @edited="onItemEdited"/>
     </CBlock>
+    <LinkModal v-model="showConstraintModal"
+               content="您今日已取消交易3次，无法发布和上架广告"
+               title="发布广告限制"
+               linkText="查看规则"
+               link="//support.coinex.com/hc/articles/360007643734"
+               :isOutLink="true">
+    </LinkModal>
   </div>
 </template>
 
@@ -204,6 +211,7 @@
   import ToggleButton from '~/components/toggle-button'
   import CurrencyInput from '~/components/currency-input'
   import TableHeadDropdown from '~/components/table-head-dropdown'
+  import LinkModal from '~/components/link-modal'
   import Blank from '~/components/blank'
   import {mapState} from 'vuex'
   import ClickOutside from 'vue-click-outside'
@@ -219,6 +227,7 @@
       Blank,
       PublishItemButton,
       TableHeadDropdown,
+      LinkModal,
     },
     data() {
       return {
@@ -230,6 +239,7 @@
         isItemAmountEditing: false,   // 正在上架的广告的币量，是否在编辑
         isItemEditing: false,   // 是否在编辑广告
         queryParams: {},
+        showConstraintModal: false,
       }
     },
     head() {
@@ -393,7 +403,13 @@
           this.isItemAmountEditing = false
         }
       },
-      onItemOnline(item, e) {
+      async onItemOnline(item, e) {
+        const constraintResponse = await this.axios.user.dynamicConstraint()
+        const constraint = constraintResponse.data
+        if (!constraint.can_publish_item) {
+          this.showConstraintModal = true
+          return
+        }
         const onlineItems = this.itemsOnline.filter(onlineItem => onlineItem.coin_type === item.coin_type && onlineItem.side === item.side)
 
         if (onlineItems.length >= 2) {

@@ -607,9 +607,9 @@
               warning: this.isBuySide ? undefined : `<div>${kycName}<span class="c-red">请务必查看您的收款账户，并核实买家是否实名付款。</span></div>`
             }
           case this.constant.ORDER_STATUS.SUCCESS.value:
-            return {message: `${this.appeal ? '申诉裁决' : ''}卖方已确认收款，付款参考号：<span class="c-red">${this.referCode}</span>`}
+            return {message: `卖方已确认收款，付款参考号：<span class="c-red">${this.referCode}</span>`}
           case this.constant.ORDER_STATUS.CANCEL.value:
-            return {message: this.appeal ? `申诉裁决买方未付款，付款参考号：<span class="c-red">${this.referCode}</span>` : `买家已取消交易，无法查看支付信息。`}
+            return {message: `买家已取消交易，无法查看支付信息。`}
           case this.constant.ORDER_STATUS.CLOSED.value:
             return {message: `订单超时已关闭，无法查看支付信息。`}
           default:
