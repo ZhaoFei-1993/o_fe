@@ -153,6 +153,7 @@
           sell_order: '出售',
           transfer_in: '转入',
           transfer_out: '转出',
+          gift: '赠送',
         },
         totalBalance: 0,
         showTransferModal: false,
@@ -273,8 +274,8 @@
           },
         },
         historyQueryParams: {
-          coin_type: null,
-          business_type: null,
+          coin_type: this.$route.query.coin_type || null,
+          business_type: this.$route.query.business_type || null,
           page: 1,
           total: 0,
           limit: P_LIMIT,
@@ -369,10 +370,22 @@
     watch: {
       'historyQueryParams.coin_type'() {
         this.historyQueryParams.page = 1
+        this.$router.replace({
+          query: {
+            ...this.$route.query,
+            coin_type: this.historyQueryParams.coin_type || undefined
+          }
+        }) // 不限的时候用undefined清掉query，而不是null
         this.fetchBalanceHistory()
       },
       'historyQueryParams.business_type'() {
         this.historyQueryParams.page = 1
+        this.$router.replace({
+          query: {
+            ...this.$route.query,
+            business_type: this.historyQueryParams.business_type || undefined
+          }
+        })
         this.fetchBalanceHistory()
       },
     },
