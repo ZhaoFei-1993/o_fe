@@ -232,7 +232,11 @@
       paymentMethods() {
         const payText = []
         this.item.payment_methods.forEach(p => {
-          payText.push(this.constant.PAYMENT_OPTIONS.find(pay => pay.value === p).text)
+          if (p.method === this.constant.PAYMENT_TYPES.BANKCARD && p.bank_name) {
+            payText.push(p.bank_name)
+          } else {
+            payText.push(this.constant.PAYMENT_OPTIONS.find(pay => pay.value === p.method).text)
+          }
         })
         return payText.join('，')
       },

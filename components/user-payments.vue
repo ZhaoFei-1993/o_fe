@@ -19,32 +19,30 @@
 </template>
 
 <script>
-const SORT_WEIGHT = {
-  bankcard: 0,
-  alipay: 1,
-  wechat: 2,
-}
-export default {
-  name: 'user-payments',
-  components: {
-  },
-  props: {
-    payments: {
-      type: Array,        // Array<Strings>
-      default: () => []
+  const SORT_WEIGHT = {
+    bankcard: 0,
+    alipay: 1,
+    wechat: 2,
+  }
+  export default {
+    name: 'user-payments',
+    components: {},
+    props: {
+      payments: {
+        type: Array,        // Array<Strings>
+        default: () => []
+      },
+      size: [Number, String],
     },
-    size: [Number, String],
-  },
-  computed: {
-    sortedPayments: function () {
-      return this.payments.sort((a, b) => {
-        return SORT_WEIGHT[a] - SORT_WEIGHT[b]
-      })
-    }
-  },
-  data() {
-    return {
+    computed: {
+      sortedPayments: function () {
+        return this.payments.map(p => p.method).sort((a, b) => {
+          return SORT_WEIGHT[a] - SORT_WEIGHT[b]
+        })
+      }
+    },
+    data() {
+      return {}
     }
   }
-}
 </script>
