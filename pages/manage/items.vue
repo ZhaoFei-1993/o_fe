@@ -286,8 +286,8 @@
         const fields = {
           id: {
             label: '广告编号',
-            thClass: ['pl-30', 'w-128'],
-            tdClass: ['pl-40', 'w-128', 'text-left'],
+            thClass: ['pl-20', 'w-120'],
+            tdClass: ['pl-40', 'w-120', 'text-left'],
           },
           side: {
             label: '类型',

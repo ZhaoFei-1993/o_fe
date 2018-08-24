@@ -11,8 +11,8 @@
     }
     .navbar-nav {
       display: inline-block;
-      a.btn.btn-xs{
-        width:100px;
+      a.btn.btn-xs {
+        width: 100px;
       }
     }
 
@@ -238,6 +238,7 @@
         </PublishItemButton>
         <b-nav-item to="/wallet">OTC钱包</b-nav-item>
         <b-nav-item :href="helpLink" target="_blank">帮助</b-nav-item>
+        <b-nav-item to="/activity/mining">挖矿<i class="iconfont icon-fire c-brand-yellow"></i></b-nav-item>
         <span style="color: #d5d5d5">|</span>
         <b-nav-item :href="`${coinexDomain}?lang=${lang.lang}`">返回主站</b-nav-item>
       </b-navbar-nav>
@@ -256,14 +257,17 @@
                 <ul>
                   <li class="order-list-item" v-for="item in orderList" @click="onLinkToOrderDetail(item.id)">
                     <div>
-                      <UserAvatar :username="item._counterparty.name" :online="false" :size="40" :color="colors[item._counterparty.id % 10]"></UserAvatar>
+                      <UserAvatar :username="item._counterparty.name" :online="false" :size="40"
+                                  :color="colors[item._counterparty.id % 10]"></UserAvatar>
                     </div>
                     <div class="order-list-item-detail">
                       <div style="color: #9b9b9b;">
                         <span style="display: inline-block;margin-right: 5px;">{{ item._isBuySide ? '购买' : '出售' }}{{ item.coin_type }}</span>
                         <span>总价：{{ item.cash_amount | formatMoney(2) }} CNY</span>
                       </div>
-                      <div style="color: #27313e;">{{ constant ? constant.ORDER_STATUS[item.status.toUpperCase()].text : '' }}</div>
+                      <div style="color: #27313e;">{{ constant ? constant.ORDER_STATUS[item.status.toUpperCase()].text :
+                        '' }}
+                      </div>
                     </div>
                   </li>
                 </ul>
@@ -357,12 +361,12 @@
   import UserAvatar from '~/components/user-avatar'
   import Blank from '~/components/blank'
   import preventParentScroll from 'vue-prevent-parent-scroll'
-  import { COLORS } from '~/components/chat/constant.js'
+  import {COLORS} from '~/components/chat/constant.js'
 
   Vue.use(Vuelidate)
   export default {
     head: {
-      link: [{rel: 'stylesheet', href: '//at.alicdn.com/t/font_739076_4h78rlvhjqt.css'}]
+      link: [{rel: 'stylesheet', href: '//at.alicdn.com/t/font_739076_it0lsvain.css'}]
     },
     components: {
       PublishItemButton,
@@ -479,7 +483,7 @@
           limit: 20,
         }).then(res => {
           if (res.data) {
-            const { data } = res.data
+            const {data} = res.data
             this.orderList = data.map(item => this.preprocessOrder(item))
           } else {
             this.orderList = []
