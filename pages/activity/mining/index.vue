@@ -488,8 +488,11 @@
       margin-top: 10px;
       margin-bottom: 150px;
       overflow: hidden;
-      thead {
+      thead th {
+        min-height: 40px;
+        line-height: 40px;
         height: 40px;
+        font-weight: normal;
       }
       .mining-line {
         width: 100%;
@@ -543,7 +546,7 @@
     .mining-banner {
       width: 100%;
       height: 600px;
-      background-image: url(~assets/img/activity/mining/bg.jpg);
+      background-image: url(~assets/img/activity/mining/bg.png);
       background-size: cover;
     }
     .mining-body {
