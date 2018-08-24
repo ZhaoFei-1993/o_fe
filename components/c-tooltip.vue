@@ -7,7 +7,7 @@
 </style>
 
 <template>
-  <i class="c-tooltip iconfont icon-tooltip" v-b-tooltip.hover :title="content" :style="{margin: `${y}px ${x}px`, fontSize: `${size}px`}"></i>
+  <i class="c-tooltip iconfont icon-tooltip" v-b-tooltip.hover :title="content" :style="{margin: `${y}px ${x}px`, fontSize: `${size}px`, color: color}"></i>
 </template>
 
 <script>
@@ -16,6 +16,10 @@
     props: {
       content: String,
       size: [Number, String],
+      color: {
+        type: String,
+        default: '#9b9b9b',
+      },
       x: {
         type: [Number, String],
         default: 0

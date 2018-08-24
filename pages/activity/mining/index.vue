@@ -8,6 +8,8 @@
         发布广告瓜分每日<span class="mining-text-highlight">20万CET</span>，首次交易获得<span class="mining-text-highlight">100CET</span>奖励
       </div>
       <div class="mining-rule-box">
+        <div class="mining-left-point"></div>
+        <div class="mining-right-point"></div>
         <div class="mining-rule-decorator-left"></div>
         <div class="mining-rule-decorator-right"></div>
         <div class="mining-rule-detail">
@@ -25,17 +27,40 @@
       <c-block class="mining-my-detail">
         <div class="mining-my-detail-col1">
           <div class="mining-my-detail-icon"></div>
-          <div class="mining-my-detail-label">我的今日排名</div>
-          <div class="mining-my-detail-value">{{ myMiningData && myMiningData.today_rank && +myMiningData.today_rank.sort ? myMiningData.today_rank.sort : '- -' }}</div>
+          <div class="mining-my-detail-label">我的今日排名<CTooltip content="排名和积分每5分钟更新一次" x="4" size="18" color="#6f6f6f" /></div>
+          <div class="mining-my-detail-value">
+            <ICountUp
+              v-if="myMiningData && myMiningData.today_rank && +myMiningData.today_rank.sort"
+              :startVal="coutupParams.startVal"
+              :endVal="+myMiningData.today_rank.sort"
+              :decimals="coutupParams.decimals"
+              :duration="coutupParams.duration"
+              :options="coutupParams.options"/>
+            <template v-else>- -</template>
+          </div>
         </div>
         <div class="mining-my-detail-col2">
           <div class="mining-my-detail-icon"></div>
-          <div class="mining-my-detail-label">今日累计积分</div>
-          <div class="mining-my-detail-value">{{ myMiningData && myMiningData.today_rank && +myMiningData.today_rank.score ? myMiningData.today_rank.score : '- -' }}</div>
+          <div class="mining-my-detail-label">今日累计积分<CTooltip content="排名和积分每5分钟更新一次" x="4" size="18" color="#6f6f6f" /></div>
+          <div class="mining-my-detail-value">
+            <ICountUp
+              v-if="myMiningData && myMiningData.today_rank && +myMiningData.today_rank.score"
+              :startVal="coutupParams.startVal"
+              :endVal="+myMiningData.today_rank.score"
+              :decimals="coutupParams.decimals"
+              :duration="coutupParams.duration"
+              :options="coutupParams.options"/>
+            <template v-else>- -</template>
+          </div>
         </div>
         <div class="mining-my-detail-col3">
           <div class="mining-my-detail-wrapper" v-if="user.account">
-            <div>昨日排名<span class="mining-text-highlight">{{ myMiningData && myMiningData.yesterday_rank && +myMiningData.yesterday_rank.sort ? myMiningData.yesterday_rank.sort : '- -' }}</span>，昨日获得奖励<span class="mining-text-highlight">{{ myMiningData && myMiningData.yesterday_rank && +myMiningData.yesterday_rank.award_amount ? myMiningData.yesterday_rank.award_amount : '- -' }}</span>CET，累计获得奖励<span class="mining-text-highlight">{{ myMiningData && +myMiningData.total_award_amount ? myMiningData.total_award_amount : '- -' }}</span>CET。</div>
+            <div>
+              昨日排名<span style="color: #7bbb78;">{{ myMiningData && myMiningData.yesterday_rank && +myMiningData.yesterday_rank.sort ? myMiningData.yesterday_rank.sort : '- -' }}</span>，昨日获得奖励<span style="color: #7bbb78;">{{ myMiningData && myMiningData.yesterday_rank && +myMiningData.yesterday_rank.award_amount ? myMiningData.yesterday_rank.award_amount : '- -' }}</span>CET，
+            </div>
+            <div>
+              累计获得奖励<span style="color: #7bbb78;">{{ myMiningData && +myMiningData.total_award_amount ? myMiningData.total_award_amount : '- -' }}</span>CET。
+            </div>
             <b-link to="/wallet?business_type=gift&coin_type=CET" class="wallet-link">查看我的奖励明细 ></b-link>
           </div>
           <div class="mining-my-detail-wrapper mining-my-detail-login-wrapper" v-else>
@@ -71,16 +96,16 @@
             {{ item.score | formatMoney }}
           </template>
           <template slot="trading_amount" slot-scope="{ item }">
-            {{ item.trading_amount | formatMoney }}
+            {{ item.trading_amount | formatMoney }} 元
           </template>
           <template slot="award_amount" slot-scope="{ item }">
-            {{ item.award_amount | formatMoney }}
+            {{ item.award_amount | formatMoney }} CET
           </template>
           <template slot="date" slot-scope="{ item }">
             {{ item.date | getTimeText('day') }}
           </template>
         </b-table>
-        <div v-if="targetTableName === 'myHistory' && !user.account" style="text-align: center;background: #fff;height: 115px;line-height: 115px;color: #898989;font-size: 16px;">
+        <div v-if="targetTableName === 'myHistory' && !user.account" class="mining-table-login-wrapper">
           <b-link style="color: #5da759;" @click="onLogin">登录</b-link>后查看
         </div>
         <Blank v-else-if="!tableItems.length" text="无内容"></Blank>
@@ -99,6 +124,8 @@
   import cBlock from '~/components/c-block'
   import Blank from '~/components/blank'
   import ViaPagination from '~/components/via-pagination'
+  import CTooltip from '~/components/c-tooltip.vue'
+  import ICountUp from 'vue-countup-v2'
   import { mapState } from 'vuex'
   import {loginPage, webDomain} from '~/modules/variables'
 
@@ -107,9 +134,24 @@
       cBlock,
       Blank,
       ViaPagination,
+      CTooltip,
+      ICountUp,
     },
     data() {
       return {
+        coutupParams: {
+          startVal: 0,
+          decimals: 0,
+          duration: 1,
+          options: {
+            useEasing: true,
+            useGrouping: true,
+            separator: ',',
+            decimal: '.',
+            prefix: '',
+            suffix: ''
+          },
+        },
         loginPage: `${loginPage}?redirect=${encodeURIComponent(webDomain + this.$route.fullPath)}`,
         myHistoryQuery: {
           page: 1,
@@ -150,7 +192,7 @@
           sort: {
             label: '今日排名',
             thStyle: {
-              width: '185px',
+              width: '135px',
             },
             thClass: ['text-right'],
             tdClass: ['text-right'],
@@ -235,7 +277,7 @@
           sort: {
             label: '当日排名',
             thStyle: {
-              width: '185px',
+              width: '135px',
             },
             thClass: ['text-right'],
             tdClass: ['text-right'],
@@ -453,7 +495,8 @@
         .mining-my-detail-wrapper {
           position: relative;
           margin: 34px 68px;
-          width: 348px;
+          margin-right: 0;
+          width: 400px;
           height: 112px;
           font-size: 18px;
           &.mining-my-detail-login-wrapper {
@@ -493,6 +536,14 @@
         line-height: 40px;
         height: 40px;
         font-weight: normal;
+      }
+      .mining-table-login-wrapper {
+        text-align: center;
+        background: #fff;
+        height: 115px;
+        line-height: 115px;
+        color: #898989;
+        font-size: 16px;
       }
       .mining-line {
         width: 100%;
@@ -577,6 +628,24 @@
         margin: 141px auto 0 auto;
         padding-top: 37px;
         padding-left: 154px;
+        .mining-left-point {
+          position: absolute;
+          left: 90px;
+          top: -84px;
+          width: 216px;
+          height: 64px;
+          background-image: url(~assets/img/activity/mining/left-point.png);
+          background-size: contain;
+        }
+        .mining-right-point {
+          position: absolute;
+          right: 62px;
+          top: -138px;
+          width: 350px;
+          height: 100%;
+          background-image: url(~assets/img/activity/mining/right-point.png);
+          background-size: contain;
+        }
         .mining-rule-decorator-left {
           width: 100px;
           height: 200px;
