@@ -358,7 +358,6 @@
         }).then(res => {
           if (res.data && res.data.data) {
             const {data, curr_page: currentPage, total: totalRows} = res.data
-            console.log(res.data)
             this.myHistoryQuery.page = currentPage
             this.myHistoryQuery.totalRows = totalRows
             this.tableItems = data
