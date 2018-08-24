@@ -211,6 +211,7 @@ module.exports = {
     {src: '~/plugins/modal', ssr: false},
     {src: '~/plugins/tips', ssr: false},
     {src: '~/plugins/vue-components'},
+    {src: '~/plugins/sentry'},
     '~/plugins/filter',
     '~/plugins/vuex-action-debouncer',
   ],
