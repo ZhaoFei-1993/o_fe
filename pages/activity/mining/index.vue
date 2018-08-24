@@ -28,20 +28,20 @@
         <div class="mining-my-detail-col1">
           <div class="mining-my-detail-icon"></div>
           <div class="mining-my-detail-label">我的今日排名<CTooltip content="排名和积分每5分钟更新一次" x="4" size="18" color="#6f6f6f" /></div>
-          <div class="mining-my-detail-value">{{ myMiningData && myMiningData.today_rank && +myMiningData.today_rank.sort ? myMiningData.today_rank.sort : '1234' }}</div>
+          <div class="mining-my-detail-value">{{ myMiningData && myMiningData.today_rank && +myMiningData.today_rank.sort ? myMiningData.today_rank.sort : '- -' }}</div>
         </div>
         <div class="mining-my-detail-col2">
           <div class="mining-my-detail-icon"></div>
           <div class="mining-my-detail-label">今日累计积分<CTooltip content="排名和积分每5分钟更新一次" x="4" size="18" color="#6f6f6f" /></div>
-          <div class="mining-my-detail-value">{{ myMiningData && myMiningData.today_rank && +myMiningData.today_rank.score ? myMiningData.today_rank.score : '1234' }}</div>
+          <div class="mining-my-detail-value">{{ myMiningData && myMiningData.today_rank && +myMiningData.today_rank.score ? myMiningData.today_rank.score : '- -' }}</div>
         </div>
         <div class="mining-my-detail-col3">
           <div class="mining-my-detail-wrapper" v-if="user.account">
             <div>
-              昨日排名<span style="color: #7bbb78;">{{ myMiningData && myMiningData.yesterday_rank && +myMiningData.yesterday_rank.sort ? myMiningData.yesterday_rank.sort : '1234' }}</span>，昨日获得奖励<span style="color: #7bbb78;">{{ myMiningData && myMiningData.yesterday_rank && +myMiningData.yesterday_rank.award_amount ? myMiningData.yesterday_rank.award_amount : '1234' }}</span>CET，
+              昨日排名<span style="color: #7bbb78;">{{ myMiningData && myMiningData.yesterday_rank && +myMiningData.yesterday_rank.sort ? myMiningData.yesterday_rank.sort : '- -' }}</span>，昨日获得奖励<span style="color: #7bbb78;">{{ myMiningData && myMiningData.yesterday_rank && +myMiningData.yesterday_rank.award_amount ? myMiningData.yesterday_rank.award_amount : '- -' }}</span>CET，
             </div>
             <div>
-              累计获得奖励<span style="color: #7bbb78;">{{ myMiningData && +myMiningData.total_award_amount ? myMiningData.total_award_amount : '1234' }}</span>CET。
+              累计获得奖励<span style="color: #7bbb78;">{{ myMiningData && +myMiningData.total_award_amount ? myMiningData.total_award_amount : '- -' }}</span>CET。
             </div>
             <b-link to="/wallet?business_type=gift&coin_type=CET" class="wallet-link">查看我的奖励明细 ></b-link>
           </div>
