@@ -28,12 +28,30 @@
         <div class="mining-my-detail-col1">
           <div class="mining-my-detail-icon"></div>
           <div class="mining-my-detail-label">我的今日排名<CTooltip content="排名和积分每5分钟更新一次" x="4" size="18" color="#6f6f6f" /></div>
-          <div class="mining-my-detail-value">{{ myMiningData && myMiningData.today_rank && +myMiningData.today_rank.sort ? myMiningData.today_rank.sort : '- -' }}</div>
+          <div class="mining-my-detail-value">
+            <ICountUp
+              v-if="myMiningData && myMiningData.today_rank && +myMiningData.today_rank.sort"
+              :startVal="coutupParams.startVal"
+              :endVal="+myMiningData.today_rank.sort"
+              :decimals="coutupParams.decimals"
+              :duration="coutupParams.duration"
+              :options="coutupParams.options"/>
+            <template v-else>- -</template>
+          </div>
         </div>
         <div class="mining-my-detail-col2">
           <div class="mining-my-detail-icon"></div>
           <div class="mining-my-detail-label">今日累计积分<CTooltip content="排名和积分每5分钟更新一次" x="4" size="18" color="#6f6f6f" /></div>
-          <div class="mining-my-detail-value">{{ myMiningData && myMiningData.today_rank && +myMiningData.today_rank.score ? myMiningData.today_rank.score : '- -' }}</div>
+          <div class="mining-my-detail-value">
+            <ICountUp
+              v-if="myMiningData && myMiningData.today_rank && +myMiningData.today_rank.score"
+              :startVal="coutupParams.startVal"
+              :endVal="+myMiningData.today_rank.score"
+              :decimals="coutupParams.decimals"
+              :duration="coutupParams.duration"
+              :options="coutupParams.options"/>
+            <template v-else>- -</template>
+          </div>
         </div>
         <div class="mining-my-detail-col3">
           <div class="mining-my-detail-wrapper" v-if="user.account">
@@ -107,6 +125,7 @@
   import Blank from '~/components/blank'
   import ViaPagination from '~/components/via-pagination'
   import CTooltip from '~/components/c-tooltip.vue'
+  import ICountUp from 'vue-countup-v2'
   import { mapState } from 'vuex'
   import {loginPage, webDomain} from '~/modules/variables'
 
@@ -116,9 +135,23 @@
       Blank,
       ViaPagination,
       CTooltip,
+      ICountUp,
     },
     data() {
       return {
+        coutupParams: {
+          startVal: 0,
+          decimals: 0,
+          duration: 1,
+          options: {
+            useEasing: true,
+            useGrouping: true,
+            separator: ',',
+            decimal: '.',
+            prefix: '',
+            suffix: ''
+          },
+        },
         loginPage: `${loginPage}?redirect=${encodeURIComponent(webDomain + this.$route.fullPath)}`,
         myHistoryQuery: {
           page: 1,
