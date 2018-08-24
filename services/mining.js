@@ -1,10 +1,10 @@
 export default (axios) => {
   return {
-    getRank() {
+    getTodayRankRank() {
       return axios.get('/mining/rank')
     },
 
-    getHistory(query = null) {
+    getAllHistory(query = null) {
       return axios.get('/mining/history', {
         params: query,
       })

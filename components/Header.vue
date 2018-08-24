@@ -8,6 +8,9 @@
       .nav-link {
         color: #fff;
       }
+      .order-link {
+        color: #fff;
+      }
     }
   }
   .page-header {

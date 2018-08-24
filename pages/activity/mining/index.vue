@@ -26,35 +26,70 @@
         <div class="mining-my-detail-col1">
           <div class="mining-my-detail-icon"></div>
           <div class="mining-my-detail-label">我的今日排名</div>
-          <div class="mining-my-detail-value">23</div>
+          <div class="mining-my-detail-value">{{ myMiningData && myMiningData.today_rank && +myMiningData.today_rank.sort ? myMiningData.today_rank.sort : '- -' }}</div>
         </div>
         <div class="mining-my-detail-col2">
           <div class="mining-my-detail-icon"></div>
           <div class="mining-my-detail-label">今日累计积分</div>
-          <div class="mining-my-detail-value">5235</div>
+          <div class="mining-my-detail-value">{{ myMiningData && myMiningData.today_rank && +myMiningData.today_rank.score ? myMiningData.today_rank.score : '- -' }}</div>
         </div>
         <div class="mining-my-detail-col3">
-          <div class="mining-my-detail-wrapper">
-            <div>昨日排名<span class="mining-text-highlight">13</span>，昨日获得奖励<span class="mining-text-highlight">20000</span> CET，累计获得奖励<span class="mining-text-highlight">523534</span>CET。</div>
-            <b-link to="/" style="color: #7bbb78;position: absolute;left: 0;bottom: 0;">查看我的奖励明细 ></b-link>
+          <div class="mining-my-detail-wrapper" v-if="user.account">
+            <div>昨日排名<span class="mining-text-highlight">{{ myMiningData && myMiningData.yesterday_rank && +myMiningData.yesterday_rank.sort ? myMiningData.yesterday_rank.sort : '- -' }}</span>，昨日获得奖励<span class="mining-text-highlight">{{ myMiningData && myMiningData.yesterday_rank && +myMiningData.yesterday_rank.award_amount ? myMiningData.yesterday_rank.award_amount : '- -' }}</span>CET，累计获得奖励<span class="mining-text-highlight">{{ myMiningData && +myMiningData.total_award_amount ? myMiningData.total_award_amount : '- -' }}</span>CET。</div>
+            <b-link to="/wallet?business_type=gift&coin_type=CET" class="wallet-link">查看我的奖励明细 ></b-link>
+          </div>
+          <div class="mining-my-detail-wrapper mining-my-detail-login-wrapper" v-else>
+            <button class="mining-my-detail-login-btn" @click="onLogin">登录查看我的积分 ></button>
           </div>
         </div>
       </c-block>
       <c-block class="mining-table">
         <div class="mining-table-btn-wrapper">
-          <button class="mining-table-btn">积分排名</button>
-          <button class="mining-table-btn active">我的历史记录</button>
+          <button
+            v-for="(item, index) in firstTabs"
+            :class="['mining-table-btn', item.active ? 'active' : '']"
+            @click="onClickTab({level: 'first', index})">
+            {{ item.text }}
+          </button>
         </div>
-        <div>
-          <div style="margin-left: 20px;display: flex;width: 210px;justify-content: space-between;">
-            <div style="width: 100px;height: 40px;line-height: 40px;background-color: #5aa256;text-align: center;color: #fff;cursor: pointer;border: solid 1px #eeeeee;border-bottom: 0;font-size: 16px;">今日排名</div>
-            <div style="width: 100px;height: 40px;line-height: 40px;background-color: #fff;text-align: center;color: #5aa356;cursor: pointer;border: solid 1px #eeeeee;border-bottom: 0;font-size: 16px;">奖励历史</div>
+        <div style="width: 100%;min-height: 42px;">
+          <div v-if="firstTabs.find(item => item.active).value === 'rank'">
+            <div class="mining-table-tab-wrapper">
+              <div
+                v-for="(item, index) in secondTabs"
+                :class="['mining-table-tab-btn', item.active ? 'active' : '']"
+                @click="onClickTab({level: 'second', index})">
+                {{ item.text }}
+              </div>
+            </div>
+            <div class="mining-line"></div>
+            <b-input v-if="showDatePicker" style="width: 140px;height: 30px;margin: 10px 20px;" type="date" size="sm" v-model="selectedDate" :max="maxDate" required/>
           </div>
         </div>
-        <div style="width: 100%;height: 2px;border: solid 1px #5aa256;"></div>
-        <b-table :fields="assetsTableFields" :items="historyItems">
-          
+        <b-table :fields="tableFields" :items="tableItems">
+          <template slot="score" slot-scope="{ item }">
+            {{ item.score | formatMoney }}
+          </template>
+          <template slot="trading_amount" slot-scope="{ item }">
+            {{ item.trading_amount | formatMoney }}
+          </template>
+          <template slot="award_amount" slot-scope="{ item }">
+            {{ item.award_amount | formatMoney }}
+          </template>
+          <template slot="date" slot-scope="{ item }">
+            {{ item.date | getTimeText('day') }}
+          </template>
         </b-table>
+        <div v-if="targetTableName === 'myHistory' && !user.account" style="text-align: center;background: #fff;height: 115px;line-height: 115px;color: #898989;font-size: 16px;">
+          <b-link style="color: #5da759;" @click="onLogin">登录</b-link>后查看
+        </div>
+        <Blank v-else-if="!tableItems.length" text="无内容"></Blank>
+        <ViaPagination v-if="tableItems.length && targetTableName === 'myHistory'"
+                       :total-rows="myHistoryQuery.totalRows"
+                       :current-page="myHistoryQuery.page"
+                       @change="changePage"
+                       :per-page="myHistoryQuery.limit">
+        </ViaPagination>
       </c-block>
     </div>
   </div>
@@ -62,17 +97,47 @@
 
 <script>
   import cBlock from '~/components/c-block'
+  import Blank from '~/components/blank'
+  import ViaPagination from '~/components/via-pagination'
   import { mapState } from 'vuex'
+  import {loginPage, webDomain} from '~/modules/variables'
 
   export default {
     components: {
       cBlock,
+      Blank,
+      ViaPagination,
     },
     data() {
       return {
+        loginPage: `${loginPage}?redirect=${encodeURIComponent(webDomain + this.$route.fullPath)}`,
+        myHistoryQuery: {
+          page: 1,
+          limit: 30,
+          totalRows: 0,
+        },
+        showDatePicker: false,
+        firstTabs: [{
+          text: '积分排名',
+          value: 'rank',
+          active: true,
+        }, {
+          text: '我的历史记录',
+          value: 'myHistory',
+          active: false,
+        }],
+        secondTabs: [{
+          text: '今日排名',
+          value: 'todayRank',
+          active: true,
+        }, {
+          text: '奖励历史',
+          value: 'awardHistory',
+          active: false,
+        }],
         myMiningData: null,
-        historyItems: [],
-        assetsTableFields: {
+        tableItems: [],
+        todayRankFields: {
           username: {
             label: '用户昵称',
             sortable: false,
@@ -87,7 +152,7 @@
             thStyle: {
               width: '185px',
             },
-            thClass: ['text-right', 'pr-5'],
+            thClass: ['text-right'],
             tdClass: ['text-right'],
             sortable: false,
           },
@@ -96,7 +161,7 @@
             thStyle: {
               width: '260px',
             },
-            thClass: ['text-right', 'pr-5'],
+            thClass: ['text-right'],
             tdClass: ['text-right'],
             sortable: false,
           },
@@ -110,6 +175,95 @@
             sortable: false,
           },
         },
+        awardHistoryFields: {
+          username: {
+            label: '用户昵称',
+            sortable: false,
+            thStyle: {
+              width: '185px',
+            },
+            thClass: ['text-left', 'pl-20'],
+            tdClass: ['text-left', 'pl-20'],
+          },
+          sort: {
+            label: '当日排名',
+            thStyle: {
+              width: '185px',
+            },
+            thClass: ['text-right'],
+            tdClass: ['text-right'],
+            sortable: false,
+          },
+          score: {
+            label: '当日积分',
+            thStyle: {
+              width: '260px',
+            },
+            thClass: ['text-right'],
+            tdClass: ['text-right'],
+            sortable: false,
+          },
+          trading_amount: {
+            label: '当日成交额',
+            thStyle: {
+              width: '260px',
+            },
+            thClass: ['text-right'],
+            tdClass: ['text-right'],
+            sortable: false,
+          },
+          award_amount: {
+            label: '当日获得奖励',
+            thStyle: {
+              width: '275px',
+            },
+            thClass: ['text-right', 'pr-20'],
+            tdClass: ['text-right', 'pr-20'],
+            sortable: false,
+          },
+        },
+        myHistoryFields: {
+          date: {
+            label: '日期',
+            sortable: false,
+            thStyle: {
+              width: '185px',
+            },
+            thClass: ['text-left', 'pl-20'],
+            tdClass: ['text-left', 'pl-20'],
+          },
+          sort: {
+            label: '当日排名',
+            thStyle: {
+              width: '185px',
+            },
+            thClass: ['text-right'],
+            tdClass: ['text-right'],
+            sortable: false,
+          },
+          score: {
+            label: '当日积分',
+            thStyle: {
+              width: '260px',
+            },
+            thClass: ['text-right'],
+            tdClass: ['text-right'],
+            sortable: false,
+          },
+          award_amount: {
+            label: '当日获得奖励',
+            thStyle: {
+              width: '275px',
+            },
+            thClass: ['text-right', 'pr-20'],
+            tdClass: ['text-right', 'pr-20'],
+            sortable: false,
+          },
+        },
+        tableFields: {},
+        selectedDate: '2018-01-01',
+        maxDate: '2018-01-01',
+        targetTableName: '',
       }
     },
     computed: {
@@ -118,18 +272,117 @@
     watch: {
       'user.account'(newVal, oldVal) {
         if (newVal && !oldVal) {
-          // todo
+          this.init()
+        }
+      },
+      targetTableName(newVal, oldVal) {
+        if (newVal !== oldVal && newVal) {
+          this.tableFields = this[`${this.targetTableName}Fields`]
+          this[`${newVal}Fetch`]()
+        }
+      },
+      selectedDate(newVal, oldVal) {
+        if (newVal !== oldVal && newVal) {
+          this.awardHistoryFetch()
         }
       },
     },
     mounted() {
       if (this.user.account) {
-        // todo
+        this.init()
       }
+      this.selectedDate = this.getDate()
+      this.maxDate = this.selectedDate
+      this.targetTableName = 'todayRank'
+      this.tableFields = this[`${this.targetTableName}Fields`]
     },
     methods: {
+      onLogin() {
+        window.location.href = this.loginPage
+      },
+      changePage(page) {
+        this.myHistoryQuery.page = page
+        this.myHistoryFetch()
+      },
+      getDate() {
+        const d = new Date()
+        d.setDate(d.getDate() - 1) // 取昨天date
+        const month = String(d.getMonth() + 1).padStart(2, '0')
+        const day = String(d.getDate()).padStart(2, '0')
+        const year = String(d.getFullYear()).padStart(2, '0')
+
+        return [year, month, day].join('-')
+      },
+      onClickTab(payload) {
+        this[`${payload.level}Tabs`].forEach((item, index) => {
+          if (index === payload.index) {
+            if (!item.active) {
+              item.active = true
+              if (payload.level === 'first') { // 点击一级tab
+                if (item.value === 'myHistory') { // 点击`我的历史记录`更新targetTableName
+                  this.targetTableName = item.value
+                } else if (item.value === 'rank') { // 点击`积分排名`需要查找二级tab
+                  this.targetTableName = this.secondTabs.find(tab => tab.active).value
+                }
+              } else { // 点击二级tab
+                this.targetTableName = item.value
+              }
+              this.showDatePicker = this.targetTableName === 'awardHistory' // 只有点击`奖励历史`才显示日期选择框
+            }
+          } else {
+            item.active = false
+          }
+        })
+      },
+      todayRankFetch() {
+        if (this.targetTableName !== 'todayRank') return
+
+        this.axios.mining.getTodayRankRank().then(res => {
+          if (res.data) {
+            this.tableItems = res.data
+          }
+        })
+      },
+      myHistoryFetch() {
+        if (this.targetTableName !== 'myHistory') return
+        if (!this.user.account) {
+          this.tableItems = []
+          return
+        }
+
+        const { limit, page } = this.myHistoryQuery
+
+        this.axios.mining.getMyHistory({
+          limit,
+          page,
+        }).then(res => {
+          if (res.data && res.data.data) {
+            const {data, curr_page: currentPage, total: totalRows} = res.data
+            console.log(res.data)
+            this.myHistoryQuery.page = currentPage
+            this.myHistoryQuery.totalRows = totalRows
+            this.tableItems = data
+          }
+        })
+      },
+      awardHistoryFetch() {
+        if (this.targetTableName !== 'awardHistory') return
+
+        const dateTime = parseInt(new Date(this.selectedDate).getTime() / 1000)
+        this.axios.mining.getAllHistory({
+          date: dateTime,
+        }).then(res => {
+          if (res.data) {
+            this.tableItems = res.data
+          }
+        })
+      },
       init() {
-  
+        this.axios.mining.getMyRank().then(res => {
+          if (res.data) {
+            this.myMiningData = res.data
+          }
+        })
       },
     },
   }
@@ -204,12 +457,67 @@
           width: 348px;
           height: 112px;
           font-size: 18px;
+          &.mining-my-detail-login-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            .mining-my-detail-login-btn {
+              outline: 0;
+              cursor: pointer;
+              width: 220px;
+              height: 48px;
+              border-radius: 100px;
+              border: solid 1px #5aa356;
+              background-color: #fff;
+              color: #5aa356;
+              &:hover {
+                background-color: #5aa356;
+                color: #fff;
+              }
+            }
+          }
+          .wallet-link {
+            color: #7bbb78;
+            position: absolute;
+            left: 0;bottom: 0;
+          }
         }
       }
     }
     .mining-table {
       padding: 0 !important;
+      margin-top: 10px;
+      margin-bottom: 150px;
       overflow: hidden;
+      thead {
+        height: 40px;
+      }
+      .mining-line {
+        width: 100%;
+        height: 2px;
+        border: solid 1px #5aa256;
+      }
+      .mining-table-tab-wrapper {
+        margin-left: 20px;
+        display: flex;
+        width: 210px;
+        justify-content: space-between;
+        .mining-table-tab-btn {
+          width: 100px;
+          height: 40px;
+          line-height: 40px;
+          text-align: center;
+          cursor: pointer;
+          border: solid 1px #eeeeee;
+          color: #5aa356;
+          border-bottom: 0;
+          font-size: 16px;
+          &.active {
+            background-color: #5aa256;
+            color: #fff;
+          }
+        }
+      }
       .mining-table-btn-wrapper {
         width: 420px;
         margin: 40px auto 0 auto;
