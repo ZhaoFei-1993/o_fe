@@ -607,7 +607,7 @@
           if (!this.user.payments) throw new Error('获取支付方式失败')
 
           for (const pay of item.payment_methods) {
-            if (this.user.payments.find(p => p.status === 'on' && p.method === pay)) return 'passed'    // 没有意义的返回值，只是为了标明通过该条件
+            if (this.user.payments.find(p => p.status === 'on' && p.method === pay.method)) return 'passed'    // 没有意义的返回值，只是为了标明通过该条件
           }
 
           throw new PlaceOrderError('尚未添加该广告支持的支付方式', this.constant.PLACE_ORDER_ERROR.PAYMENT_LIMIT)
