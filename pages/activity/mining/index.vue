@@ -306,7 +306,6 @@
       },
       getDate() {
         const d = new Date()
-        d.setDate(d.getDate() - 1) // 取昨天date
         const month = String(d.getMonth() + 1).padStart(2, '0')
         const day = String(d.getDate()).padStart(2, '0')
         const year = String(d.getFullYear()).padStart(2, '0')
@@ -338,7 +337,7 @@
         if (this.targetTableName !== 'todayRank') return
 
         this.axios.mining.getTodayRankRank().then(res => {
-          if (res.data) {
+          if (res.data && Array.isArray(res.data)) {
             this.tableItems = res.data
           }
         })
@@ -371,7 +370,7 @@
         this.axios.mining.getAllHistory({
           date: dateTime,
         }).then(res => {
-          if (res.data) {
+          if (res.data && Array.isArray(res.data)) {
             this.tableItems = res.data
           }
         })
