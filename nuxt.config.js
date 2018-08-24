@@ -97,7 +97,7 @@ module.exports = {
       chunk: '[name].[chunkhash:7].js',
     },
     vendor: ['babel-polyfill', 'axios'],
-    extend(webpackConfig, { isDev }) {
+    extend(webpackConfig, {isDev}) {
       // spritesmith
       webpackConfig.resolve = webpackConfig.resolve || {modules: []}
 
@@ -201,6 +201,7 @@ module.exports = {
 
   plugins: [
     '~/plugins/polyfill',
+    {src: '~/plugins/datepolyfill', ssr: false},
     '~/plugins/cookies',
     {src: '~/plugins/i18n'},
     {src: '~/plugins/axios'},
