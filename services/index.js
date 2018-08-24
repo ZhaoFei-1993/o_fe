@@ -4,6 +4,7 @@ import createOrderService from './order'
 import createBalanceService from './balance'
 import createMiscService from './misc'
 import createChatService from './chat'
+import createMiningService from './mining'
 
 export default function injectService(axiosInst) {
   const services = {
@@ -13,6 +14,7 @@ export default function injectService(axiosInst) {
     misc: createMiscService(axiosInst),
     balance: createBalanceService(axiosInst),
     chat: createChatService(axiosInst),
+    mining: createMiningService(axiosInst),
   }
 
   Object.assign(axiosInst, services)
