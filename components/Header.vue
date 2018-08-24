@@ -1,8 +1,21 @@
 <style lang="scss">
   @import "~assets/scss/variables.scss";
-
+  // 活动页header
+  .page-header.page-act-header {
+    position: relative;
+    background-color: transparent;
+    .navbar-main {
+      .nav-link {
+        color: #fff;
+      }
+      .order-link {
+        color: #fff;
+      }
+    }
+  }
   .page-header {
     position: sticky;
+    width: 100%;
     z-index: 11;
     top: 0px;
     font-size: 14px;
@@ -226,10 +239,11 @@
 </style>
 
 <template>
-  <div :class="['page-header pr bgc-w',headerClass]">
+  <div :class="['page-header pr bgc-w', headerClass, actClass]">
     <b-navbar class="navbar-main" toggleable="md">
       <b-navbar-brand to="/">
-        <img src="~assets/img/logo.svg" alt="CoinEx OTC" height="34" width="120">
+        <img v-if="actClass" src="~assets/img/logo-white.svg" alt="CoinEx OTC" height="34" width="120">
+        <img v-else src="~assets/img/logo.svg" alt="CoinEx OTC" height="34" width="120">
       </b-navbar-brand>
       <b-navbar-nav style="margin-left: 70px;">
         <b-nav-item to="/" exact>法币交易</b-nav-item>
@@ -402,6 +416,9 @@
     },
     computed: {
       ...mapState(['lang', 'user', 'messages', 'constant']),
+      actClass() {
+        return this.$route.path.indexOf('/activity/') > -1 ? 'page-act-header' : null
+      },
       helpLink() {
         return 'https://support.coinex.com/hc/categories/360000724513'
       },

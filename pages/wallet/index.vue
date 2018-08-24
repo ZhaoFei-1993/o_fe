@@ -50,6 +50,9 @@
           <template slot="total" slot-scope="{ item }">
             {{ item.total | formatMoney }}
           </template>
+          <template slot="marketValue" slot-scope="{ item }">
+            {{ item.marketValue | formatMoney }} CNY
+          </template>
           <template slot="action" slot-scope="{ item }">
             <b-link @click="onShowTransferModal('in', item)">转入</b-link>
             <span class="space-margin"></span>
@@ -103,7 +106,7 @@
       <b-modal title="资金划转" v-model="showTransferModal" hide-footer no-close-on-backdrop>
         <b-form>
           <b-form-group label="选择币种" horizontal>
-            <b-form-select v-model="form.coinType" :options="constant.COIN_TYPE_OPTIONS"
+            <b-form-select v-model="form.coinType" :options="walletCoinTypes"
                            @change="onChangeCoinType"></b-form-select>
           </b-form-group>
           <b-form-group label="从" horizontal>
@@ -184,7 +187,7 @@
             label: '币种',
             sortable: false,
             thStyle: {
-              width: '185px',
+              width: '70px',
             },
             thClass: ['text-left', 'pl-30'],
             tdClass: ['text-left', 'pl-30'],
@@ -192,25 +195,34 @@
           total: {
             label: '总额',
             thStyle: {
-              width: '185px',
+              width: '235px',
             },
-            thClass: ['text-right', 'pr-5'],
+            thClass: ['text-right'],
             tdClass: ['text-right'],
             sortable: false,
           },
           frozen: {
             label: '冻结',
             thStyle: {
-              width: '260px',
+              width: '235px',
             },
-            thClass: ['text-right', 'pr-5'],
+            thClass: ['text-right'],
             tdClass: ['text-right'],
             sortable: false,
           },
           available: {
             label: '可用',
             thStyle: {
-              width: '275px',
+              width: '235px',
+            },
+            thClass: ['text-right'],
+            tdClass: ['text-right'],
+            sortable: false,
+          },
+          marketValue: {
+            label: '市值',
+            thStyle: {
+              width: '235px',
             },
             thClass: ['text-right'],
             tdClass: ['text-right'],
@@ -311,25 +323,29 @@
     },
     computed: {
       ...mapState(['balance', 'constant']),
+      walletCoinTypes() { // 增加币种CET, 只在钱包使用
+        return [ ...this.constant.COIN_TYPES, 'CET' ]
+      },
       otcBalance() {
         if (this.balance.otcBalance) {
           const pieDatas = []
           let totalBalance = 0
           const defaultRate = this.balance.allRate[this.defaultAsset] // 各币种CNY汇率
-          const sortedBalance = this.constant.COIN_TYPES.map((coin, index) => { // 必须根据constant配置的币种顺序输出数组
+          const sortedBalance = this.walletCoinTypes.map((coin, index) => { // 根据配置的币种顺序输出数组
             const item = this.balance.otcMap[coin]
             if (item) {
+              let curCoinMarketValue = 0
               if (item.total > 0) {
-                const curCoinAmount = (+item.total) * defaultRate[item.coin_type]
+                curCoinMarketValue = (+item.total) * defaultRate[item.coin_type] // 市值
                 pieDatas.push({
                   name: item.coin_type,
-                  y: curCoinAmount,
+                  y: curCoinMarketValue,
                   colorIndex: index,
                   virtual: false,
                 })
-                totalBalance += curCoinAmount
+                totalBalance += curCoinMarketValue
               }
-              return item
+              return { ...item, marketValue: curCoinMarketValue }
             }
           })
           this.pieDatas = pieDatas
