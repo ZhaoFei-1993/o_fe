@@ -123,7 +123,7 @@ module.exports = {
       if (!isDev) {
         // 生产环境，图片压缩
         webpackConfig.module.rules.push({
-          test: /\.(gif|png|jpe?g|svg)$/i,
+          test: /\.(gif|png|svg)$/i, // 暂时去掉 |jpe?g 有bug https://github.com/imagemin/mozjpeg-bin/issues/18
           loaders: [
             {
               loader: 'image-webpack-loader',
@@ -137,10 +137,10 @@ module.exports = {
                 gifsicle: {
                   optimizationLevel: 7,
                 },
-                mozjpeg: {
-                  progressive: true,
-                  quality: 80,
-                },
+                // mozjpeg: {
+                //   progressive: true,
+                //   quality: 80,
+                // },
               },
             },
           ],
