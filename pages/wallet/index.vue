@@ -68,7 +68,7 @@
             <span style="font-size: 12px;">币种：</span>
             <b-form-select class="history-filter-select"
                            v-model="historyQueryParams.coin_type"
-                           :options="constant.COIN_TYPE_OPTIONS">
+                           :options="walletCoinTypes">
               <option slot="first" :value="null">不限</option>
             </b-form-select>
           </div>

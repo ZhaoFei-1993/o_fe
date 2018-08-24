@@ -338,7 +338,7 @@
         if (this.targetTableName !== 'todayRank') return
 
         this.axios.mining.getTodayRankRank().then(res => {
-          if (res.data) {
+          if (res.data && Array.isArray(res.data)) {
             this.tableItems = res.data
           }
         })
@@ -371,7 +371,7 @@
         this.axios.mining.getAllHistory({
           date: dateTime,
         }).then(res => {
-          if (res.data) {
+          if (res.data && Array.isArray(res.data)) {
             this.tableItems = res.data
           }
         })
