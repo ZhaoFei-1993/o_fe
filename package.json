@@ -27,6 +27,7 @@
     "nodemailer": "4.6.7",
     "nuxt": "1.4.1",
     "qr.js": "0.0.0",
+    "raven-js": "^3.26.4",
     "visibilityjs": "2.0.1",
     "vue": "2.5.17",
     "vue-click-outside": "1.0.7",
