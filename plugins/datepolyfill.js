@@ -1,1 +1,1 @@
-import "date-input-polyfill";
+import 'date-input-polyfill'
