@@ -10,7 +10,7 @@ const serve = require('koa-static')
 const compress = require('koa-compress')
 const path = require('path')
 const staticCache = require('./server/staticCache')    // todo: read
-require('./server/logger')
+// require('./server/logger') 用sentry了 不再需要log4js
 
 const app = new Koa()
 const isApiDev = app.env === 'api-dev'
