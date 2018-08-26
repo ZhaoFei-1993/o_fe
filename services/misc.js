@@ -52,6 +52,9 @@ export default (axios) => {
       return Promise.resolve(
         {
           'announcements': [{
+            'title': '关于调整OTC“挂单即挖矿”活动规则的公告',
+            'href': 'https://support.coinex.com/hc/zh-cn/articles/360008423834'
+          }, {
             'title': 'OTC开启“挂单即挖矿”: 挂单买卖得CET',
             'href': 'https://support.coinex.com/hc/articles/360008303433'
           }, {
