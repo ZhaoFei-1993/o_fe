@@ -22,7 +22,17 @@
               <div class="detail-wrapper detail-col2">
                 <span class="detail-content detail-text" v-if="item.lastMessage">
                   <template v-if="item.lastMessage.content._lctype === messageType.order">
-                    {{ item.lastMessage.from === `${user.account.id}` ? orderMessages[item.lastMessage.content._lctext].me : orderMessages[item.lastMessage.content._lctext].other }}
+                    <template v-if="item.lastMessage.content._lctext === 'order_create'">
+                      <template v-if="isBuySide(item._attributes.attr.order)">
+                        {{ orderMessages[item.content._lctext].me }}
+                      </template>
+                      <template v-else>
+                        {{ orderMessages[item.content._lctext].other }}
+                      </template>
+                    </template>
+                    <template v-else>
+                      {{ item.lastMessage.from === `${user.account.id}` ? orderMessages[item.lastMessage.content._lctext].me : orderMessages[item.lastMessage.content._lctext].other }}
+                    </template>
                   </template>
                   <template v-else-if="[messageType.text, messageType.auto].indexOf(item.lastMessage.content._lctype) > -1">
                     {{ item.lastMessage.content._lctext }}
@@ -116,6 +126,13 @@
           },
         })
         this.bindClientEvent() // 绑定事件
+      },
+      isBuySide(order) {
+        console.log(order)
+        if (!order) return true // 兼容旧数据，没有order字段默认是买家
+
+        const isMerchant = this.user.account && order.merchant_id === this.user.account.id
+        return order.merchant_side === 'buy' ? isMerchant : !isMerchant
       },
       onRead(curConv) {
         if (this.chat.imClient) {
