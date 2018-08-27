@@ -513,7 +513,7 @@
           // taker和maker的方向是反的
           side: this.selectedSide === this.constant.SIDE.BUY ? this.constant.SIDE.SELL : this.constant.SIDE.BUY,
           coin_type: this.selectedCoin,
-          payment_method: this.selectedPayment === 'ALL' ? undefined : this.selectedPayment.toLowerCase(),
+          payment_method: (this.selectedPayment === 'ALL' || !this.selectedPayment) ? undefined : this.selectedPayment.toLowerCase(),
         }).then(response => {
           const data = response.data
           this.busy = false
