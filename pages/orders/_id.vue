@@ -377,7 +377,7 @@
                             :is-merchant="counterparty.id===order.merchant_id"/>
         </CBlock>
         <CBlock id="my-chat-box">
-          <Chat :client="chat.imClient" :conversation-id="order.conversation_id"
+          <Chat v-if="user.account" :client="chat.imClient" :conversation-id="order.conversation_id"
                 :client-id="`${user.account.id}`" :is-buy-side="isBuySide"></Chat>
         </CBlock>
       </div>

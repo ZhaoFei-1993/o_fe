@@ -1,6 +1,7 @@
 <template>
   <div class="chat" ref="chatWrapper" :style="{width: `${width}px`, height: `${height}px`}">
-    <div class="content" ref="chatbox" v-infinite-scroll="loadMore" infinite-scroll-disabled="loading" infinite-scroll-distance="0" infinite-scroll-reverse infinite-scroll-immediate-check="false">
+    <div class="content" ref="chatbox" v-infinite-scroll="loadMore" infinite-scroll-disabled="loading"
+         infinite-scroll-distance="0" infinite-scroll-reverse infinite-scroll-immediate-check="false">
       <div v-for="item in msgLog" class="content-detail-box" :key="item.id">
         <div class="msg-time">
           {{ item._timestamp | formatTime }}
@@ -9,7 +10,8 @@
           <div class="order-text">
             <template v-if="eachUserId">
               <template v-if="['appeal_create', 'appeal_cancel'].indexOf(item.content._lctext) > -1">
-                {{ orderMessages[item.content._lctext].customer[item.from === eachUserId.buyer ? 'byBuyer' : 'bySeller'] }}
+                {{ orderMessages[item.content._lctext].customer[item.from === eachUserId.buyer ? 'byBuyer' : 'bySeller']
+                }}
               </template>
               <template v-else>
                 {{ orderMessages[item.content._lctext].customer }}
@@ -20,7 +22,8 @@
                 {{ isBuySide ? orderMessages[item.content._lctext].me : orderMessages[item.content._lctext].other }}
               </template>
               <template v-else>
-                {{ item.from === clientId ? orderMessages[item.content._lctext].me : orderMessages[item.content._lctext].other }}
+                {{ item.from === clientId ? orderMessages[item.content._lctext].me :
+                orderMessages[item.content._lctext].other }}
               </template>
             </template>
           </div>
@@ -36,12 +39,15 @@
                 </div>
                 <div class="msg-text my-text">
                   <span v-if="item.content._lctype === messageType.text">{{ item.content._lctext }}</span>
-                  <img v-else-if="item.content._lctype === messageType.image" @click="onClickImage(item.content._lcfile.url)" style="width: 100%" :src="item.content._lcfile.url">
+                  <img v-else-if="item.content._lctype === messageType.image"
+                       @click="onClickImage(item.content._lcfile.url)" style="width: 100%"
+                       :src="item.content._lcfile.url">
                   <span v-else-if="item.content._lctype === messageType.auto">{{ item.content._lctext }}</span>
                   <span v-else>[不支持当前消息类型]</span>
                 </div>
               </div>
-              <UserAvatar v-if="memberInfoMap[item.from]" :username="memberInfoMap[item.from].name" :color="memberInfoMap[item.from].color" :online="false" :size="30"></UserAvatar>
+              <UserAvatar v-if="memberInfoMap[item.from]" :username="memberInfoMap[item.from].name"
+                          :color="memberInfoMap[item.from].color" :online="false" :size="30"></UserAvatar>
             </div>
           </template>
           <template v-else-if="item.from === 'temporary'">
@@ -51,7 +57,8 @@
           </template>
           <template v-else>
             <div class="msg-box-left">
-              <UserAvatar v-if="memberInfoMap[item.from]" :username="memberInfoMap[item.from].name" :color="memberInfoMap[item.from].color" :online="false" :size="30"></UserAvatar>
+              <UserAvatar v-if="memberInfoMap[item.from]" :username="memberInfoMap[item.from].name"
+                          :color="memberInfoMap[item.from].color" :online="false" :size="30"></UserAvatar>
               <div class="msg-detail-wrapper">
                 <div class="msg-username username-left">{{ memberInfoMap[item.from].name }}</div>
                 <div class="msg-username username-left" v-if="item.status === MessageStatus.FAILED">
@@ -60,7 +67,9 @@
                 </div>
                 <div class="msg-text">
                   <span v-if="item.content._lctype === messageType.text">{{ item.content._lctext }}</span>
-                  <img v-else-if="item.content._lctype === messageType.image" @click="onClickImage(item.content._lcfile.url)" style="width: 100%" :src="item.content._lcfile.url">
+                  <img v-else-if="item.content._lctype === messageType.image"
+                       @click="onClickImage(item.content._lcfile.url)" style="width: 100%"
+                       :src="item.content._lcfile.url">
                   <span v-else-if="item.content._lctype === messageType.auto">{{ item.content._lctext }}</span>
                   <span v-else>[不支持当前消息类型]</span>
                 </div>
@@ -73,7 +82,8 @@
     <div class="input-box" :style="{height: `${inputHeight}px`}">
       <div class="input-group">
         <input placeholder="输入信息，回车发送" type="text" class="input-text" v-model="message" @keyup.enter="onSendMsg">
-        <input id="chat-file-image" type="file" accept="image/*" style="display: none;" ref="fileSelector" @change="onUpload">
+        <input id="chat-file-image" type="file" accept="image/*" style="display: none;" ref="fileSelector"
+               @change="onUpload">
         <button id="upload" @click="onSelectFile">
           <span style="color: #52cbca;"><i class="iconfont icon-attachment"></i></span>
         </button>
@@ -84,14 +94,14 @@
 </template>
 
 <script>
-  import { TextMessage, Event, MessageStatus } from 'leancloud-realtime'
+  import {TextMessage, Event, MessageStatus} from 'leancloud-realtime'
   import AV from 'leancloud-storage'
-  import { ImageMessage } from 'leancloud-realtime-plugin-typed-messages'
+  import {ImageMessage} from 'leancloud-realtime-plugin-typed-messages'
   import UserAvatar from './avatar'
   import ImageModal from './image-modal'
   import infiniteScroll from './infinite-scroll-directive.js'
   import $toast from './toast.js'
-  import { COLORS, MESSAGE_TYPE, ORDER_MESSAGES } from './constant.js'
+  import {COLORS, MESSAGE_TYPE, ORDER_MESSAGES} from './constant.js'
 
   export default {
     data() {
@@ -207,7 +217,7 @@
     },
     methods: {
       init() { // 全部功能初始化
-        const { client, conversationId } = this
+        const {client, conversationId} = this
         if (!client) return
         if (!conversationId) return
 
@@ -314,9 +324,9 @@
         }
       },
       memberInfoMapper(arr) { // 遍历每一个消息，对用户头像进行映射，以防部分已退出用户没有头像
-        const { conversation } = this
+        const {conversation} = this
         if (conversation) {
-          const { _attributes: { attr: { username } } } = conversation
+          const {_attributes: {attr: {username}}} = conversation
           arr.forEach(item => {
             if (!this.memberInfoMap[item.from]) {
               this.memberInfoMap[item.from] = {
@@ -334,7 +344,9 @@
             this.msgLog = this.memberInfoMapper(res.value).concat(this.msgLog)
             this.pushSystemMessage('现在可以开始聊天')
             this.scrollToBottom() // 滚动到底部
-            this.conversation.read() // 对话标记为已读
+            if (this.conversation) {
+              this.conversation.read() // 对话标记为已读
+            }
           }
           const tid = setTimeout(() => {
             this.bindClientEvent() // 需要初始化聊天记录后才能绑定事件，否则会出现重复消息问题
