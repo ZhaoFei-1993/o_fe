@@ -10,7 +10,7 @@
     <transition name="chat-list-fade">
       <div class="chat-list" v-show="showList" v-prevent-parent-scroll>
         <ul>
-          <li class="chat-list-item" v-for="item in convList" :key="item.id" @click="toOrderDetail(item._attributes.name)" @mouseover="item._showBtn = true" @mouseout="item._showBtn = false">
+          <li class="chat-list-item" v-for="item in convList" :key="item.id" @click="toOrderDetail(item)" @mouseover="item._showBtn = true" @mouseout="item._showBtn = false">
             <div>
               <UserAvatar :username="item._otherMembers[0]" :online="false" :color="item._defaultColor" :size="42" :dot="item._unreadMessageCount > 0"></UserAvatar>
             </div>
@@ -23,11 +23,14 @@
                 <span class="detail-content detail-text" v-if="item.lastMessage">
                   <template v-if="item.lastMessage.content._lctype === messageType.order">
                     <template v-if="item.lastMessage.content._lctext === 'order_create'">
-                      <template v-if="isBuySide(item._attributes.attr.order)">
-                        {{ orderMessages[item.content._lctext].me }}
+                      <template v-if="item._side === 'buyer'">
+                        {{ orderMessages[item.lastMessage.content._lctext].me }}
+                      </template>
+                      <template v-else-if="item._side === 'seller'">
+                        {{ orderMessages[item.lastMessage.content._lctext].other }}
                       </template>
                       <template v-else>
-                        {{ orderMessages[item.content._lctext].other }}
+                        {{ orderMessages[item.lastMessage.content._lctext].customer }}
                       </template>
                     </template>
                     <template v-else>
@@ -127,13 +130,6 @@
         })
         this.bindClientEvent() // 绑定事件
       },
-      isBuySide(order) {
-        console.log(order)
-        if (!order) return true // 兼容旧数据，没有order字段默认是买家
-
-        const isMerchant = this.user.account && order.merchant_id === this.user.account.id
-        return order.merchant_side === 'buy' ? isMerchant : !isMerchant
-      },
       onRead(curConv) {
         if (this.chat.imClient) {
           this.chat.imClient
@@ -152,8 +148,14 @@
             })
         }
       },
-      toOrderDetail(name) {
-        const orderId = name.match(/\d+/)
+      toOrderDetail(item) {
+        const { _attributes: { attr: { order }, name } } = item
+        let orderId
+        if (order && order.id) { // 兼容旧数据，优先使用扩展字段id
+          orderId = order.id
+        } else if (name) {
+          orderId = name.match(/\d+/)
+        }
         if (orderId) {
           this.$router.push(`/orders/${orderId}`)
         }
@@ -196,8 +198,20 @@
                     formatTime = `${String(date.getMonth() + 1).padStart(2, '0')}/${String(date.getDate()).padStart(2, '0')}`
                   }
                 }
+                const orderInfo = conv._attributes.attr.order
+                let side = 'buyer'
+                if (orderInfo) {
+                  if (+orderInfo.buyer === +myClientId) {
+                    side = 'buyer'
+                  } else if (+orderInfo.seller === +myClientId) {
+                    side = 'seller'
+                  } else {
+                    side = 'customer'
+                  }
+                }
                 convList.push({
                   ...conv,
+                  _side: side, // 当前用户身份：买方、卖方、客服
                   _showBtn: false, // 是否显示已读按钮
                   _formatTime: formatTime,
                   _otherMembers: otherMembers, // 除了自己以外的聊天用户
