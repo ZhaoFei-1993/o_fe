@@ -14,7 +14,7 @@ function sleep(ms = 100) {
 }
 
 // 全局处理
-axios.defaults.timeout = 10000
+axios.defaults.timeout = 15000
 axios.defaults.headers.common['platform'] = 'web'
 axios.defaults.headers.common['timezone'] = new Date().getTimezoneOffset() / 60
 
