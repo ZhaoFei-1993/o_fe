@@ -246,7 +246,8 @@
         <img v-else src="~assets/img/logo.svg" alt="CoinEx OTC" height="34" width="120">
       </b-navbar-brand>
       <b-navbar-nav style="margin-left: 70px;">
-        <b-nav-item to="/" exact>法币交易</b-nav-item>
+        <!-- 首页path不需要精确匹配，否则首页url带有query无法高亮nav-item -->
+        <b-nav-item to="/" :exact="$route.path !== '/'">法币交易</b-nav-item>
         <PublishItemButton>
           <b-nav-item>发布广告</b-nav-item>
         </PublishItemButton>

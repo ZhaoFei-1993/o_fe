@@ -130,6 +130,11 @@
   import {loginPage, webDomain} from '~/modules/variables'
 
   export default {
+    head() {
+      return {
+        title: `挂单挖矿${this.$t('global.pageTitle.common')}`,
+      }
+    },
     components: {
       cBlock,
       Blank,
