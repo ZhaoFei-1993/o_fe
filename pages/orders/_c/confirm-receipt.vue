@@ -103,7 +103,7 @@
           if (err.code === this.constant.ERROR_CODE.VALIDATE_CODE_REQUIRED) {
             this.needVerify = true
           } else {
-            this.$showTips(err.message, 'error')
+            this.axios.onError(err)
           }
         })
       },

@@ -4,6 +4,7 @@ import {serverApiDomain, clientApiDomain, loginPage, webDomain} from '../modules
 import cookieParser from '~/plugins/cookies'
 import injectServices from '../services/index'
 import {onApiError} from '~/modules/error-code'
+import {reportError} from '~/plugins/sentry'
 
 function sleep(ms = 100) {
   return new Promise(function (resolve, reject) {
@@ -107,7 +108,7 @@ export default ({app, store}) => {
           redirect(loginUrl)
         }
       } catch (e) {
-        console.error(path, e)
+        reportError(e)
       }
 
       // redirect是异步的...神坑，window.location也是异步的
@@ -115,8 +116,7 @@ export default ({app, store}) => {
       // https://stackoverflow.com/questions/37521172/is-javascript-location-href-call-is-asynchronous
       return process.client ? sleep(300) : ''
     }
-
-    console.error(err)
+    reportError(err)
   }
 
   // 挂载一下api错误处理函数

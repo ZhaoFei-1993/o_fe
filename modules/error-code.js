@@ -1,3 +1,5 @@
+import {reportError} from '~/plugins/sentry'
+
 const VALIDATE_CODE_REQUIRED = 10   // 需要输入验证码
 const MISSING_PAY_METHODS = 71      // 发广告缺少支付方式
 const ATLEAST_ONE_PAYMENT_METHOD = 606    // 最少需要一种支付方式
@@ -36,6 +38,7 @@ export function onApiError(err, vm) {
   }
 
   vm.$showTips && vm.$showTips(message, 'error')
+  reportError(err)
 }
 
 export class PlaceOrderError extends Error {
