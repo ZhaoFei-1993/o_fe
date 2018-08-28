@@ -479,8 +479,8 @@
     },
     methods: {
       getAnnouncements() {
-        this.axios.misc.announcements().then(data => {
-          this.announcements = data.announcements.slice(0, 3)
+        this.axios.misc.announcements().then(response => {
+          this.announcements = response.data.slice(0, 3)
         })
       },
       showItems(side, coin) {
