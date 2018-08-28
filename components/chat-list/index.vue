@@ -4,7 +4,7 @@
     <div class="chat-list-btn" @click="onShowList">
       <div class="chat-list-btn-rotate">
         <i class="iconfont icon-talk"></i>
-        <sup class="chat-badge" v-show="hasUnreadMessage"></sup>
+        <sup class="chat-badge" v-show="hasUnreadMessage"><span>NEW</span></sup>
       </div>
     </div>
     <transition name="chat-list-fade">
@@ -274,7 +274,7 @@
       width: 60px;
       height: 60px;
       line-height: 60px;
-      background-color: #fff;
+      background-image: linear-gradient(to left, #22e6b8, #00c1ce);
       border-radius: 100px;
       box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.1);
       text-align: center;
@@ -286,20 +286,28 @@
         }
       }
       .icon-talk {
-        color: #52cbca;
-        font-size: 31px;
+        color: #fff;
+        font-size: 35px;
       }
       .chat-badge {
         position: absolute;
-        height: 7px;
-        width: 7px;
-        border-radius: 50%;
-        top: 18px;
-        right: 20px;
+        top: 14px;
+        right: 38px;
+        display: inline-block;
+        height: 14px;
+        line-height: 14px;
+        font-size: 12px;
+        padding: 0 1px;
+        text-align: center;
+        white-space: nowrap;
+        border-radius: 10px;
+        color: #fff;
         transform: translate3d(100%, -50%, 0);
         background-color: #e35555;
-        border: solid 1px #fff;
-        display: inline-block;
+        span {
+          display: inline-block;
+          transform: scale(.8);
+        }
       }
     }
     .chat-list-fade-enter-active, .chat-list-fade-leave-active {
