@@ -537,8 +537,8 @@
           title: '实名认证',
           content: '您需先完成高级实名认证，才可进行交易。',
           linkText: '去认证',
-          link: `${this.coinexDomain}/my/info/basic?redirect=${encodeURIComponent(webDomain + this.$route.fullPath)}`,
-          isOutLink: true,
+          link: '/my/security',
+          isOutLink: false,
         }
         const paymentModalData = { // 支付方式弹窗提示参数
           title: '开启支付方式',
