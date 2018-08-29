@@ -24,6 +24,15 @@
         margin-bottom: 5px;
       }
     }
+
+    .kyc-detail {
+      width: 260px;
+      display: flex;
+      justify-content: space-between;
+      .kyc-level {
+        color: #27313e;
+      }
+    }
   }
 </style>
 
@@ -73,19 +82,19 @@
       </b-btn>
     </MyInfoItem>
     <MyInfoItem title="实名认证">
-      <p slot="content">
-        <span v-if="kycPassed">已认证</span>
-        <span v-else-if="user.account.kyc_status === constant.KYC_STATUS.PROCESSING"
-              class="c-brand-green">信息已提交，待系统审核</span>
-        <span v-else class="c-red">未认证</span>
-      </p>
-      <b-btn slot="action"
+      <div slot="content" class="kyc-detail" v-if="kycStatus">
+        <div v-for="(item, index) in kycStatus">
+          <div class="kyc-level">{{ index === 0 ? '初级认证' : '高级认证' }}</div>
+          <div :class="{'c-red': item.status === 0, 'c-brand-green': item.status === 1}">{{ item.text }}</div>
+        </div>
+      </div>
+      <!-- <b-btn slot="action"
              v-if="!kycPassed"
              :disabled="user.account.kyc_status === constant.KYC_STATUS.PROCESSING"
              variant="outline-green" size="xs" target="_blank"
              :href="`${coinexDomain}/my/info/basic`">
-        认证
-      </b-btn>
+        去认证
+      </b-btn> -->
     </MyInfoItem>
     <MyInfoItem title="收款时安全验证">
       <p slot="content">
@@ -185,6 +194,31 @@
         const wrongGoogle = this.verify.codeType === this.constant.VERIFY_CODE_TYPE.GOOGLE && this.user.account.is_have_totp_auth && (!this.verify.google || this.verify.google.length !== 6)
         const wrongSMS = this.verify.codeType === this.constant.VERIFY_CODE_TYPE.SMS && this.user.account.mobile && (!this.verify.sms || this.verify.sms.length !== 6)
         return this.verifyModalShowing && (wrongGoogle || wrongSMS)
+      },
+      kycStatus() {
+        let result // [初级认证, 高级认证]
+        const { account } = this.user
+        if (account && account.kyc_status) {
+          const status = account.kyc_status
+          const { KYC_STATUS, KYC_STATUS_TEXT } = this.constant
+          switch (status) {
+            case KYC_STATUS.ADVANCED_PASS: // 高级已完成，初级已完成
+              result = [{ status: 2, text: KYC_STATUS_TEXT.PASS }, { status: 2, text: KYC_STATUS_TEXT.PASS }]
+              break
+            case KYC_STATUS.ADVANCED_PROCESSING: // 高级进行中，初级已完成
+              result = [{ status: 2, text: KYC_STATUS_TEXT.PASS }, { status: 1, text: KYC_STATUS_TEXT.ADVANCED_PROCESSING }]
+              break
+            case KYC_STATUS.PROCESSING: // 初级进行中，未完成高级
+              result = [{ status: 1, text: KYC_STATUS_TEXT.PROCESSING }, { status: 0, text: KYC_STATUS_TEXT.NO }]
+              break
+            case KYC_STATUS.PASS: // 初级已完成，高级未完成
+              result = [{ status: 2, text: KYC_STATUS_TEXT.PASS }, { status: 0, text: KYC_STATUS_TEXT.NO }]
+              break
+            default: // 默认初级高级未完成
+              result = [{ status: 0, text: KYC_STATUS_TEXT.NO }, { status: 0, text: KYC_STATUS_TEXT.NO }]
+          }
+        }
+        return result
       },
     },
     methods: {

@@ -533,61 +533,82 @@
           window.location.href = this.loginPage
           return
         }
-        this.verifyDynamicConstraint(item).then(res => {
-          this.$store.dispatch('fetchOtcBalance').then(_ => {
-            const available = parseFloat(this.balance.otcBalance.find(b => b.coin_type === item.coin_type).available)
-            if (item.side === this.constant.SIDE.BUY && available < (item.min_deal_cash_amount / item.price)) {
-              this.currentConstraint = {
-                title: '交易限制',
-                content: `您的余额为${available} ${item.coin_type}小于该广告最低限额`,
-                linkText: '去划转',
-                link: `/wallet`,
-                isOutLink: false,
-              }
-              this.showConstraintModal = true
-              return
-            }
-            this.selectedItem = item
-            this.showPlaceOrderModal = true
-          })
-        }).catch(err => {
-          if (err.errorType) {
-            switch (err.errorType) {
-              case this.constant.PLACE_ORDER_ERROR.PAYMENT_LIMIT:
-                this.currentConstraint = {
-                  title: '开启支付方式',
-                  content: '您需要开启该广告支持的支付方式后，才可以进行交易。',
-                  linkText: '去开启',
-                  link: '/my/payments',
-                  isOutLink: false,
-                }
-                break
-              case this.constant.PLACE_ORDER_ERROR.NO_KYC_LIMIT:
-                this.currentConstraint = {
-                  title: '实名认证',
-                  content: '您需先完成实名认证，才可进行交易。',
-                  linkText: '去认证',
-                  link: `${this.coinexDomain}/my/info/basic?redirect=${encodeURIComponent(webDomain + this.$route.fullPath)}`,
-                  isOutLink: true,
-                }
-                break
-              case this.constant.PLACE_ORDER_ERROR.CANCEL_LIMIT:
+        const kycModalData = { // 实名认证弹窗提示参数
+          title: '实名认证',
+          content: '您需先完成高级实名认证，才可进行交易。',
+          linkText: '去认证',
+          link: `${this.coinexDomain}/my/info/basic?redirect=${encodeURIComponent(webDomain + this.$route.fullPath)}`,
+          isOutLink: true,
+        }
+        const paymentModalData = { // 支付方式弹窗提示参数
+          title: '开启支付方式',
+          content: '您需要开启该广告支持的支付方式后，才可以进行交易。',
+          linkText: '去开启',
+          link: '/my/payments',
+          isOutLink: false,
+        }
+        // 预判条件，需要全部为true才能发起请求
+        const conditions = [() => {
+          if (this.user.account.kyc_status !== this.constant.KYC_STATUS.ADVANCED_PASS) { // 要求必须完成高级kyc才能交易
+            this.currentConstraint = kycModalData
+            this.showConstraintModal = true
+            return false
+          }
+          return true
+        }, () => {
+          const { user_kyc: { country } } = this.user.account
+          if (country !== 'CHN') { // kyc国籍为非中国大陆地区，均提示其绑定支付方式
+            this.currentConstraint = paymentModalData
+            this.showConstraintModal = true
+            return false
+          }
+          return true
+        }]
+        if (conditions.every(fn => fn() === true)) {
+          this.verifyDynamicConstraint(item).then(res => {
+            this.$store.dispatch('fetchOtcBalance').then(_ => {
+              const available = parseFloat(this.balance.otcBalance.find(b => b.coin_type === item.coin_type).available)
+              if (item.side === this.constant.SIDE.BUY && available < (item.min_deal_cash_amount / item.price)) {
                 this.currentConstraint = {
                   title: '交易限制',
-                  content: '您今天累计取消超过 3 次订单，被冻结交易功能。',
-                  linkText: '查看规则',
-                  link: '//support.coinex.com/hc/articles/360007643734',
-                  isOutLink: true,
+                  content: `您的余额为${available} ${item.coin_type}小于该广告最低限额`,
+                  linkText: '去划转',
+                  link: `/wallet`,
+                  isOutLink: false,
                 }
-                break
-              default:
-                this.$showTips(err.message, 'error')
+                this.showConstraintModal = true
+                return
+              }
+              this.selectedItem = item
+              this.showPlaceOrderModal = true
+            })
+          }).catch(err => {
+            if (err.errorType) {
+              switch (err.errorType) {
+                case this.constant.PLACE_ORDER_ERROR.PAYMENT_LIMIT:
+                  this.currentConstraint = paymentModalData
+                  break
+                case this.constant.PLACE_ORDER_ERROR.NO_KYC_LIMIT:
+                  this.currentConstraint = kycModalData
+                  break
+                case this.constant.PLACE_ORDER_ERROR.CANCEL_LIMIT:
+                  this.currentConstraint = {
+                    title: '交易限制',
+                    content: '您今天累计取消超过 3 次订单，被冻结交易功能。',
+                    linkText: '查看规则',
+                    link: '//support.coinex.com/hc/articles/360007643734',
+                    isOutLink: true,
+                  }
+                  break
+                default:
+                  this.$showTips(err.message, 'error')
+              }
+              this.showConstraintModal = true
+            } else {
+              this.$showTips(err.message, 'error')
             }
-            this.showConstraintModal = true
-          } else {
-            this.$showTips(err.message, 'error')
-          }
-        })
+          })
+        }
       },
       qualified(item) {
         for (const limit of item.counterparty_limit) {
