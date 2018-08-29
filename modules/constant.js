@@ -159,15 +159,6 @@ export default function getConstant($t) {
     VERIFY_CODE_BUSINESS,
 
     KYC_STATUS,
-    KYC_STATUS_TEXT: {
-      PASS: '已完成', // 完成初级认证
-      PROCESSING: '审核中',
-      NO: '未完成',
-      FAIL: '认证失败',
-      ADVANCED_FAIL: '认证失败',
-      ADVANCED_PROCESSING: '审核中',
-      ADVANCED_PASS: '已完成', // 完成高级认证
-    },
 
     ORDER_STATUS: {
       CREATED: {

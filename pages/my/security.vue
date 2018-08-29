@@ -26,11 +26,53 @@
     }
 
     .kyc-detail {
-      width: 260px;
+      width: 300px;
       display: flex;
-      justify-content: space-between;
+      justify-content: flex-end;
       .kyc-level {
+        display: inline-block;
         color: #27313e;
+      }
+      .kyc-status {
+        margin-left: 22px;
+        .kyc-go2check {
+          display: inline-block;
+          margin-left: 10px;
+        }
+      }
+      .kyc-arrow {
+        width: 64px;
+        height: 23px;
+        display: inline-block;
+        vertical-align: bottom;
+        margin: 0 15px;
+        background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAAAXCAMAAACMPLmjAAABHVBMVEUAAAB519a16eni9/fM8PCf4uH2/PyL3Nqi4+OU399l0NB72Nf6/v7c9fS46umt5uaI29t62dlg0M7r+fnT8vLL7+/C7u1l0dBjzs5q09Nr09JWzMvy/Pvk9/dr09J11tVazMxlz8921tVhz8921tViz89519Zv1dNu1dNZzc1519dm0dBbzs152NZczsx519dSysp11tVo0tFx1NP3/f3s+vrk9/fc9fXR8vHJ7+++7Oyu5+eb4eGQ3t2G29qA2dhu1NNi0M9s09L+///7/v7z+/vw+/ro+Pjg9vXY8/PV8vLN8PDF7u3C7ey66uq36em16eiy6Oeq5eWn5eSk5OOi4+Kf4uKX4N+U396M3NyJ3Nt82Nd519Zez85azs07woK8AAAAMXRSTlMAsyIiIiIiIpmZKpqZmZmZmSLWmZmZmVkKBfPumZmRWUga9fHw7uHSzMW9oqKJiHJgQEecUgAAAN9JREFUOMvF1MWuwkAUgOFewVqsVGhxd3d3d3d4/8dgSgt7ckj4drP5k5nMOdjb4k4M5sdjBwaSSRsPDKQDJDDQMBmBgVYqzAEDKQMuntWIxUJRlNWqQWiaZhiGZVktokOUApVAjxAE4ZMCTbd4jXYnk+n2stl+LjfI54ejQmFcLE6mpdJsvliWy6v1ZrurVPaHavV4qtXq9fPlGWheIxwwcDPgwMDNnIAGHLBA0Am7QowHPaLXgQnkoj/Jv+T3SSZRPJAkGXp9JNhPtPFfHSY/DhtnggMtFBdwpUVx7KPuXPqETfhZgwEAAAAASUVORK5CYII=');
+      }
+      .kyc-check {
+        display: inline-block;
+        position: relative;
+        width: 12px;
+        height: 12px;
+        background-color: #fff;
+        border: 1px solid #52cbca;
+        margin-right: 10px;
+        vertical-align: middle;
+      }
+      .kyc-checked {
+        background-color: #52cbca;
+        border: none;
+        &:after {
+          display: block;
+          content: "";
+          position: absolute;
+          left: 4px;
+          top: 1px;
+          width: 4px;
+          height: 8px;
+          border: solid #fff;
+          border-width: 0 2px 2px 0;
+          transform: rotate(45deg);
+        }
       }
     }
   }
@@ -81,21 +123,6 @@
         重置
       </b-btn>
     </MyInfoItem>
-    <MyInfoItem title="实名认证">
-      <div slot="content" class="kyc-detail" v-if="kycStatus">
-        <div v-for="(item, index) in kycStatus">
-          <div class="kyc-level">{{ index === 0 ? '初级认证' : '高级认证' }}</div>
-          <div :class="{'c-red': item.status === 0, 'c-brand-green': item.status === 1}">{{ item.text }}</div>
-        </div>
-      </div>
-      <!-- <b-btn slot="action"
-             v-if="!kycPassed"
-             :disabled="user.account.kyc_status === constant.KYC_STATUS.PROCESSING"
-             variant="outline-green" size="xs" target="_blank"
-             :href="`${coinexDomain}/my/info/basic`">
-        去认证
-      </b-btn> -->
-    </MyInfoItem>
     <MyInfoItem title="收款时安全验证">
       <p slot="content">
         <span v-if="user.account.trade_validate_frequency === VALIDATE_FREQUENCY_MAP.never.value"
@@ -105,6 +132,20 @@
         <span v-if="user.account.trade_validate_frequency === VALIDATE_FREQUENCY_MAP.each_time.value">每次收款均二次验证</span>
       </p>
       <b-btn slot="action" variant="outline-green" size="xs" target="_blank" @click="onChangeFrequency">更换</b-btn>
+    </MyInfoItem>
+    <MyInfoItem title="实名认证">
+      <div slot="content">需完成初级和高级实名认证，才可进行OTC交易</div>
+      <div slot="action" class="kyc-detail" v-if="kycStatus">
+        <div v-for="(item, index) in kycStatus">
+          <div class="kyc-check" :class="{'kyc-checked': item.status === 2}"></div>
+          <div class="kyc-level">{{ index === 0 ? '初级认证' : '高级认证' }}</div>
+          <div v-if="index === 0" class="kyc-arrow"></div>
+          <div class="kyc-status" :class="{'c-red': item.status <= 0, 'c-brand-green': item.status === 1}">
+            <span>{{ item.text }}</span>
+            <b-link v-if="item.showEntry" @click="showDownloadModal = true" class="kyc-go2check">去验证 ></b-link>
+          </div>
+        </div>
+      </div>
     </MyInfoItem>
     <b-modal v-model="frequencyModalShowing"
              title="收款时安全验证"
@@ -136,6 +177,7 @@
                   :smsSequence.sync="verify.smsSequence"
       />
     </b-modal>
+    <DownloadModal v-model="showDownloadModal"></DownloadModal>
   </CBlock>
 </template>
 
@@ -143,10 +185,11 @@
   import VerifyCode from '~/components/verify-code'
   import {mapState, mapGetters} from 'vuex'
   import {VERIFY_CODE_TYPE, VERIFY_CODE_BUSINESS} from '~/modules/constant'
-  import MySidebar from '~/components/my-sidebar.vue'
-  import My2Column from '~/components/my-2column.vue'
-  import MyInfoItem from './_c/my-info-item.vue'
-  import StarRate from '~/components/star-rate.vue'
+  import MySidebar from '~/components/my-sidebar'
+  import My2Column from '~/components/my-2column'
+  import MyInfoItem from './_c/my-info-item'
+  import DownloadModal from './_c/download-modal'
+  import StarRate from '~/components/star-rate'
   import {coinexDomain} from '~/modules/variables'
 
   export default {
@@ -157,9 +200,11 @@
       MyInfoItem,
       StarRate,
       VerifyCode,
+      DownloadModal,
     },
     data() {
       return {
+        showDownloadModal: false,
         coinexDomain,
         frequencyModalShowing: false,
         tradeValidateFrequency: '',
@@ -171,6 +216,24 @@
           smsSequence: 0,
         },
         verifyModalShowing: false,
+        KYC_STATUS_TEXT: {
+          PASS: '已认证', // 完成初级认证
+          PROCESSING: '审核中',
+          NO: '未认证',
+          FAIL: '已驳回',
+          ADVANCED_FAIL: '已驳回',
+          ADVANCED_PROCESSING: '审核中',
+          ADVANCED_PASS: '已认证', // 完成高级认证
+        },
+        KYC_STATUS_MAP: { // -1-未开始认证，0-失败，1-进行中，2-完成
+          PASS: 2, // 完成初级认证
+          PROCESSING: 1,
+          NO: -1,
+          FAIL: 0,
+          ADVANCED_FAIL: 0,
+          ADVANCED_PROCESSING: 1,
+          ADVANCED_PASS: 2, // 完成高级认证
+        },
       }
     },
     head() {
@@ -195,33 +258,42 @@
         const wrongSMS = this.verify.codeType === this.constant.VERIFY_CODE_TYPE.SMS && this.user.account.mobile && (!this.verify.sms || this.verify.sms.length !== 6)
         return this.verifyModalShowing && (wrongGoogle || wrongSMS)
       },
-      kycStatus() {
-        let result // [初级认证, 高级认证]
+      kycStatus() { // 判断各种组合kyc状态
+        let result = [{}, {}] // [初级认证, 高级认证]
         const { account } = this.user
         if (account && account.kyc_status) {
           const status = account.kyc_status
-          const { KYC_STATUS, KYC_STATUS_TEXT } = this.constant
+          const { KYC_STATUS } = this.constant
           switch (status) {
             case KYC_STATUS.ADVANCED_PASS: // 高级已完成，初级已完成
-              result = [{ status: 2, text: KYC_STATUS_TEXT.PASS }, { status: 2, text: KYC_STATUS_TEXT.PASS }]
+              result = [this.getKycStatusData('PASS', false), this.getKycStatusData('ADVANCED_PASS', false)]
               break
-            case KYC_STATUS.ADVANCED_PROCESSING: // 高级进行中，初级已完成
-              result = [{ status: 2, text: KYC_STATUS_TEXT.PASS }, { status: 1, text: KYC_STATUS_TEXT.ADVANCED_PROCESSING }]
+            case KYC_STATUS.ADVANCED_PROCESSING: // 高级进行中，初级审核中
+              result = [this.getKycStatusData('PASS', false), this.getKycStatusData('ADVANCED_PROCESSING', false)]
               break
-            case KYC_STATUS.PROCESSING: // 初级进行中，未完成高级
-              result = [{ status: 1, text: KYC_STATUS_TEXT.PROCESSING }, { status: 0, text: KYC_STATUS_TEXT.NO }]
+            case KYC_STATUS.PROCESSING: // 初级进行中，高级未开始
+              result = [this.getKycStatusData('PROCESSING', false), this.getKycStatusData('NO', false)]
               break
-            case KYC_STATUS.PASS: // 初级已完成，高级未完成
-              result = [{ status: 2, text: KYC_STATUS_TEXT.PASS }, { status: 0, text: KYC_STATUS_TEXT.NO }]
+            case KYC_STATUS.PASS: // 初级已完成，高级未开始
+              result = [this.getKycStatusData('PASS', false), this.getKycStatusData('NO', true)]
               break
-            default: // 默认初级高级未完成
-              result = [{ status: 0, text: KYC_STATUS_TEXT.NO }, { status: 0, text: KYC_STATUS_TEXT.NO }]
+            case KYC_STATUS.FAIL: // 初级失败，高级未开始
+              result = [this.getKycStatusData('FAIL', true), this.getKycStatusData('NO', false)]
+              break
+            case KYC_STATUS.ADVANCED_FAIL: // 初级已完成，高级失败
+              result = [this.getKycStatusData('PASS', false), this.getKycStatusData('ADVANCED_FAIL', true)]
+              break
+            default: // 默认初级和高级未开始
+              result = [this.getKycStatusData('NO', true), this.getKycStatusData('NO', false)]
           }
         }
         return result
       },
     },
     methods: {
+      getKycStatusData(status, isShowEntry = false) { // isShowEntry：是否显示`去验证`入口
+        return { status: this.KYC_STATUS_MAP[status], text: this.KYC_STATUS_TEXT[status], showEntry: isShowEntry }
+      },
       onChangeFrequency() {
         const account = this.user.account
         if (!(account.is_have_totp_auth || account.mobile)) {

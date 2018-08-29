@@ -15,7 +15,7 @@ export default () => {
       return state.payments && state.payments.some((payment) => payment.status === PAYMENT_STATUS.ON)
     },
     kycPassed: (state) => {
-      return state.account && state.account.kyc_status === KYC_STATUS.PASS
+      return state.account && state.account.kyc_status === KYC_STATUS.ADVANCED_PASS
     }
   }
 
