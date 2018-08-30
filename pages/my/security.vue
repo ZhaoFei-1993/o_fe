@@ -26,7 +26,7 @@
     }
 
     .kyc-detail {
-      width: 300px;
+      width: 330px;
       display: flex;
       justify-content: flex-end;
       .kyc-level {

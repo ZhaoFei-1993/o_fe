@@ -549,7 +549,7 @@
         }
         // 预判条件，需要全部为true才能发起请求
         const conditions = [() => {
-          if (this.user.account.kyc_status !== this.constant.KYC_STATUS.ADVANCED_PASS) { // 要求必须完成高级kyc才能交易
+          if (!this.kycPassed) { // 要求必须完成高级kyc才能交易
             this.currentConstraint = kycModalData
             this.showConstraintModal = true
             return false
