@@ -337,8 +337,9 @@
             </div>
             <div v-else-if="appeal.status===constant.APPEAL_STATUS.COMPLETED">
               <span>申诉裁决：{{appealResult}}</span>
-                <!--判定平局-->
-                <span v-if="appeal.order_result==='none'" class="c-brand-green appeal-btn ml-10" @click="startAppeal">再次申诉</span>
+              <!--判定平局-->
+              <span v-if="appeal.order_result==='none'" class="c-brand-green appeal-btn ml-10"
+                    @click="startAppeal">再次申诉</span>
             </div>
             <div v-else-if="canAppeal && appeal.status===constant.APPEAL_STATUS.CANCEL">
               <!--取消 但仍在申诉期-->
@@ -372,6 +373,7 @@
         <CBlock class="my-sidebar-info" style="padding: 30px 0 13px 0;">
           <UserStatsProfile :user-data="counterparty" v-if="counterparty"
                             :color="colors[counterparty.id % 10]"
+                            :phone-status="phoneStatus"
                             :is-merchant="counterparty.id===order.merchant_id"/>
         </CBlock>
         <CBlock id="my-chat-box">
@@ -635,6 +637,14 @@
           return ''
         }
         return this.constant.APPEAL_RESULT_MAP[this.appeal.result].text + '，' + this.constant.ORDER_RESULT_MAP[this.appeal.order_result].text
+      },
+      phoneStatus() {
+        return {
+          show: this.order.status === this.constant.ORDER_STATUS.PAID.value,
+          tooltip: this.order.network_phone_reason,
+          network_phone: this.order.network_phone,
+          self_phone: this.user.account.mobile,
+        }
       }
     },
     methods: {
