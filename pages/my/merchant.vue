@@ -178,13 +178,13 @@
               <b-link :href="`${coinexDomain}/my/info/security`" target="_blank">去认证</b-link>
             </div>
           </ContactItem>
-          <ContactItem title="实名认证" icon="icon-namecard" :required="true">
+          <ContactItem title="高级实名认证" icon="icon-namecard" :required="true">
             <div v-if="kycPassed" class="c-6f">
               已认证
             </div>
             <div v-else>
               <p class="c-red">未认证</p>
-              <b-link :href="`${coinexDomain}/my/info/basic`" target="_blank">去认证</b-link>
+              <b-link @click="showDownloadModal = true" target="_blank">去认证</b-link>
             </div>
           </ContactItem>
           <ContactItem title="联系人微信" icon="icon-wechat-linear" :required="true">
@@ -238,16 +238,18 @@
         <b-btn variant="gradient-yellow" size="lg" style="width:330px;" @click="onSubmit">提交</b-btn>
       </div>
     </template>
+    <DownloadModal v-model="showDownloadModal"></DownloadModal>
   </CBlock>
 </template>
 
 <script>
   import Vue from 'vue'
   import {mapState, mapGetters} from 'vuex'
-  import MySidebar from '~/components/my-sidebar.vue'
-  import My2Column from '~/components/my-2column.vue'
-  import ProgressIndicator from '~/components/progress-indicator.vue'
-  import MyInfoItem from './_c/my-info-item.vue'
+  import MySidebar from '~/components/my-sidebar'
+  import My2Column from '~/components/my-2column'
+  import ProgressIndicator from '~/components/progress-indicator'
+  import MyInfoItem from './_c/my-info-item'
+  import DownloadModal from './_c/download-modal'
   import {coinexDomain} from '~/modules/variables'
 
   const ProgressItem = Vue.extend({
@@ -307,6 +309,7 @@
       InfoItem,
       ContactItem,
       MyInfoItem,
+      DownloadModal,
     },
     head() {
       return {
@@ -316,6 +319,7 @@
     },
     data() {
       return {
+        showDownloadModal: false,
         form: {
           wechat: '',
         },

@@ -50,6 +50,10 @@ export default (axios) => {
       // https://static.coinex.com/viaconfig/otc-frontend/announcements/endpoint.json
       // 实际上最好用上面的cdn链接，但是因为cdn的header需要配置，不然会有跨域问题，所以只能暂时用s3的源链接了（s3已经配置了跨域头）
       return axios.get('/system/config/web/announcements')
-    }
+    },
+
+    async appDownloadUrl() {
+      return axios.get('/system/app/download')
+    },
   }
 }

@@ -9,8 +9,13 @@ export const PAYMENT_STATUS = {
   OFF: 'off'
 }
 export const KYC_STATUS = {
-  PASS: 'pass',
+  PASS: 'pass', // 完成初级认证
   PROCESSING: 'processing',
+  NO: 'no',
+  FAIL: 'fail',
+  ADVANCED_FAIL: 'advanced_fail',
+  ADVANCED_PROCESSING: 'advanced_processing',
+  ADVANCED_PASS: 'advanced_pass', // 完成高级认证
 }
 // 自动回复内容的最大长度
 export const MAX_AUTO_REPLY_LENGTH = 50
