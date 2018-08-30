@@ -285,7 +285,6 @@
               <div class="step-time" v-if="order.complete_time">{{order.complete_time| getTimeText}}</div>
               <button v-if="!isBuySide&&order.status===constant.ORDER_STATUS.PAID.value"
                       class="btn btn-gradient-yellow btn-xs"
-                      :disabled="isAppealing"
                       @click="confirmReceipt()">确认收款
               </button>
             </li>
@@ -311,17 +310,18 @@
             <b-btn size="xs" variant="outline-green" :disabled="expired" @click="cancelOrder">取消订单</b-btn>
           </div>
           <template v-if="showAppeal">
-          <span v-if="!appeal||appeal.status===''">
-            交易出现问题？需要
-            <span class="c-brand-green appeal-btn" v-if="canAppeal" @click="startAppeal">申诉</span>
-            <span class="c-brand-green appeal-btn" v-else v-b-tooltip.hover title="买家付款10分钟后，可发起申诉。">申诉</span>
-          </span>
+            <span v-if="!appeal||appeal.status===''">
+              交易出现问题？需要
+              <span class="c-brand-green appeal-btn" v-if="canAppeal" @click="startAppeal">申诉</span>
+              <span class="c-brand-green appeal-btn" v-else v-b-tooltip.hover title="买家付款10分钟后，可发起申诉。">申诉</span>
+            </span>
           </template>
           <template v-if="showSupport">
-          <span>
-            交易出现问题？需要
-            <b-link :href="`${coinexDomain}/res/support/ticket`" target="_blank"><span class="c-brand-green appeal-btn">提交工单</span></b-link>
-          </span>
+            <span>
+              交易出现问题？需要
+              <b-link :href="`${coinexDomain}/res/support/ticket`" target="_blank"><span
+                class="c-brand-green appeal-btn">提交工单</span></b-link>
+            </span>
           </template>
           <template v-if="appeal">
             <div v-if="appeal.status===constant.APPEAL_STATUS.CREATED"
@@ -331,27 +331,25 @@
               </button>
             </div>
             <div
-              v-if="appeal.status===constant.APPEAL_STATUS.PROCESSING || appeal.status===constant.APPEAL_STATUS.PENDING"
+              v-else-if="appeal.status===constant.APPEAL_STATUS.PROCESSING || appeal.status===constant.APPEAL_STATUS.PENDING"
               class="d-flex align-items-center justify-content-between">
               <span>申诉专员已经介入，请及时提供必要的信息</span>
             </div>
-            <div v-if="appeal.status===constant.APPEAL_STATUS.CANCEL">
-              <span>{{appealSide}}已取消申诉，如果仍有问题，请</span>
-              <b-link :href="`${coinexDomain}/res/support/ticket`" target="_blank">提交工单</b-link>
-              <!--暂时后端没做好支持-->
-              <!--<span v-if="canAppeal">-->
-              <!--交易出现问题？需要-->
-              <!--<span class="c-brand-green appeal-btn" @click="startAppeal">申诉</span>-->
-              <!--</span>-->
-              <!--<span v-else>-->
-              <!--交易出现问题？需要-->
-              <!--<b-link :href="`${coinexDomain}/res/support/ticket`" target="_blank"><span-->
-              <!--class="c-brand-green appeal-btn">提交工单</span></b-link>-->
-              <!--</span>-->
-            </div>
-            <div v-if="appeal.status===constant.APPEAL_STATUS.COMPLETED">
+            <div v-else-if="appeal.status===constant.APPEAL_STATUS.COMPLETED">
               <span>申诉裁决：{{appealResult}}</span>
+                <!--判定平局-->
+                <span v-if="appeal.order_result==='none'" class="c-brand-green appeal-btn ml-10" @click="startAppeal">再次申诉</span>
             </div>
+            <div v-else-if="canAppeal && appeal.status===constant.APPEAL_STATUS.CANCEL">
+              <!--取消 但仍在申诉期-->
+              交易出现问题？需要
+              <span class="c-brand-green appeal-btn" @click="startAppeal">申诉</span>
+            </div>
+            <span v-else>
+                交易出现问题？需要
+                <b-link :href="`${coinexDomain}/res/support/ticket`" target="_blank"><span
+                  class="c-brand-green appeal-btn">提交工单</span></b-link>
+              </span>
           </template>
           <div class="divider" v-if="canCancel||showAppeal||appeal"></div>
         </div>
@@ -507,9 +505,16 @@
         if (!this.appeal) return false
         return (this.order.user_side === this.constant.SIDE.BUY) === (this.appeal.user_id === this.order.user_id)
       },
+      userNames() {
+        if (this.isBuySide) {
+          return {buyer: '您', seller: this.counterparty.name}
+        } else {
+          return {seller: '您', buyer: this.counterparty.name}
+        }
+      },
       appealSide() {
         if (!this.appeal) return null
-        return this.isBuyerAppeal ? '买家' : '卖家'
+        return this.isBuyerAppeal ? this.userNames.buyer + '(买家)' : this.userNames.seller + '(卖家)'
       },
       isCurrentUserAppealing() {
         if (!this.appeal) return false
@@ -520,7 +525,7 @@
         return this.appeal && this.appeal.status !== this.constant.APPEAL_STATUS.CANCEL && this.appeal.result !== this.constant.APPEAL_RESULT_MAP.draw.value
       },
       canAppeal() {
-        // 支付后三十分钟以后 和 完成后七天内可以申诉
+        // 支付后十分钟以后 和 完成后七天内可以申诉
         const paid = this.order.status === this.constant.ORDER_STATUS.PAID.value
         const success = this.order.status === this.constant.ORDER_STATUS.SUCCESS.value
         return (paid && this.utils.getTimeDifference(this.order.pay_time) > PAID_CAN_APPEAL) ||
@@ -589,12 +594,12 @@
         let payMessage = '订单已超时'
         if (this.payRemainTime > 0) {
           payMessage = `
-                买方需在
+                ${this.userNames.buyer}(买家)需在
                 <span class="c-red">${Math.floor(this.payRemainTime / 60)}分${this.payRemainTime % 60}秒</span>
                 内完成支付，付款参考号：<span class="c-red">${this.referCode}</span>
                 `
         }
-        const kycName = `${this.counterparty.kyc_name && this.counterparty.kyc_name.length ? '<span>买方实名： ' + this.counterparty.kyc_name + ' </span>' : ''}`
+        const kycName = `${this.counterparty.kyc_name && this.counterparty.kyc_name.length ? '<span>买家实名： ' + this.counterparty.kyc_name + ' </span>' : ''}`
         switch (this.order.status) {
           case this.constant.ORDER_STATUS.CREATED.value:
             return {
@@ -603,13 +608,13 @@
             }
           case this.constant.ORDER_STATUS.PAID.value:
             return {
-              message: `等待卖方确认并放币，付款参考号：<span class="c-red">${this.referCode}</span>`,
+              message: `等待${this.userNames.seller}(卖家)确认并放币，付款参考号：<span class="c-red">${this.referCode}</span>`,
               warning: this.isBuySide ? undefined : `<div>${kycName}<span class="c-red">请务必查看您的收款账户，并核实买家是否实名付款。</span></div>`
             }
           case this.constant.ORDER_STATUS.SUCCESS.value:
-            return {message: `卖方已确认收款，付款参考号：<span class="c-red">${this.referCode}</span>`}
+            return {message: `${this.userNames.seller}(卖家)已确认收款，付款参考号：<span class="c-red">${this.referCode}</span>`}
           case this.constant.ORDER_STATUS.CANCEL.value:
-            return {message: `买家已取消交易，无法查看支付信息。`}
+            return {message: `${this.userNames.buyer}(买家)已取消交易，无法查看支付信息。`}
           case this.constant.ORDER_STATUS.CLOSED.value:
             return {message: `订单超时已关闭，无法查看支付信息。`}
           default:
@@ -754,7 +759,8 @@
         this.$showDialog({
           title: '取消订单',
           content: (
-            <div class="text-left"><p class="c-red">如您已向卖家付款，取消订单您将会损失付款资金。</p><p>温馨提示：买方每日累计取消订单超过3笔，将被限制当日交易功能和广告功能。</p>
+            <div class="text-left"><p class="c-red">如您已向卖家付款，取消订单您将会损失付款资金。</p>
+              <p>温馨提示：买方每日累计取消订单超过3笔，将被限制当日交易功能和广告功能。</p>
             </div>),
           onOk: () => {
             this.axios.order.cancelOrder(this.order.id).then(() => {
