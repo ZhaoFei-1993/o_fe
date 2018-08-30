@@ -392,10 +392,14 @@
             self.messageHandler(message)
           },
           [Event.MEMBERS_JOINED]: (payload) => { // 有用户被添加至某个对话
-            self.pushSystemMessage(`${payload.invitedBy === 'REST_API' ? '客服' : payload.invitedBy}已加入对话`)
+            if (payload.invitedBy === 'REST_API') { // 只显示客服加入聊天
+              self.pushSystemMessage('客服已加入对话')
+            }
           },
           [Event.MEMBERS_LEFT]: (payload) => { // 有成员被从某个对话中移除
-            self.pushSystemMessage(`${payload.kickedBy === 'REST_API' ? '客服' : payload.kickedBy}已退出对话`)
+            if (payload.kickedBy === 'REST_API') {
+              self.pushSystemMessage('客服已退出对话')
+            }
           },
           [Event.KICKED]: (payload) => { // 当前用户被从某个对话中移除
             if (payload.kickedBy === 'REST_API') return // 系统邀请信息不展示
