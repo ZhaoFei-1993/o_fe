@@ -641,7 +641,7 @@
       phoneStatus() {
         return {
           show: this.order.status === this.constant.ORDER_STATUS.PAID.value,
-          tooltip: this.order.network_phone_reason,
+          tooltip: this.order.network_phone_reason, // 后端直接给出reason，前端不用判断
           network_phone: this.order.network_phone,
           self_phone: this.user.account.mobile,
         }

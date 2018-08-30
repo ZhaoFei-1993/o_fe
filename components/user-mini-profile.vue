@@ -38,6 +38,7 @@
 
     <div class="profile-right">
       <div class="username" v-b-tooltip.hover :title="phoneStatus?null:username">
+        <!--订单详情页有phoneStatus，这里显示区域比较大，不会隐藏号码所以不要tooltip-->
         {{username}}
         <i v-if="phoneStatus&&phoneStatus.show"
            :class="['iconfont icon-netphone',{available:phoneStatus.network_phone}]"
