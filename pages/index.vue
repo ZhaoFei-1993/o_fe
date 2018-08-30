@@ -556,8 +556,8 @@
           }
           return true
         }, () => {
-          const { user_kyc: { country } } = this.user.account
-          if (country !== 'CHN') { // kyc国籍为非中国大陆地区，均提示其绑定支付方式
+          const { account: { user_kyc: { country } }, payments } = this.user
+          if (country !== 'CHN' && !(Array.isArray(payments) && payments.length > 0)) { // kyc国籍为非中国大陆地区且没有绑定支付方式需要弹窗提示
             this.currentConstraint = paymentModalData
             this.showConstraintModal = true
             return false
