@@ -757,7 +757,7 @@
       cancelAppeal() {
         this.$showDialog({
           title: '取消申诉',
-          content: (<div><p>确认取消申诉？</p></div>),
+          content: (<p>确认取消申诉？</p>),
           onOk: () => {
             this.axios.order.cancelAppeal(this.order.id).then(() => {
               this.refreshOrderStatus()
