@@ -206,7 +206,7 @@
                     </template>
                     <template v-if="item.status === constant.ORDER_STATUS.PAID.value">
                       <div class="detail-btn-wrapper">
-                        <b-btn :disabled="showAppealMark(item)" size="xs" variant="gradient-yellow" class="detail-btn"
+                        <b-btn size="xs" variant="gradient-yellow" class="detail-btn"
                                @click="confirmReceipt(item)">确认收款
                         </b-btn>
                       </div>
