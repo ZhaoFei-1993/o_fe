@@ -757,7 +757,7 @@
       cancelAppeal() {
         this.$showDialog({
           title: '取消申诉',
-          content: (<div class="text-left"><p>确认取消申诉？</p><p class="c-red">取消申诉后的订单将不可再次申诉。</p></div>),
+          content: (<div><p>确认取消申诉？</p></div>),
           onOk: () => {
             this.axios.order.cancelAppeal(this.order.id).then(() => {
               this.refreshOrderStatus()
