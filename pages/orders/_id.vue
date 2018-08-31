@@ -403,7 +403,7 @@
             <span class="tip">申诉理由</span>
             <textarea class="appeal-input"
                       v-model="appealComment"
-                      placeholder="请填写15-500字的申诉理由"
+                      placeholder="请填写0-500字的申诉理由"
                       rows="8">
           </textarea>
           </div>
@@ -490,7 +490,7 @@
         return Object.values(this.constant.ORDER_STATUS).find(s => s.value === this.order.status).text
       },
       cannotSubmitAppeal() {
-        return !(this.appealReason && this.appealComment && this.appealComment.length >= 15 && this.appealComment.length <= 500)
+        return !(this.appealReason && (!this.appealComment || this.appealComment.length <= 500))
       },
       isMerchant() {
         return this.user.account && this.order.merchant_id === this.user.account.id
@@ -748,7 +748,7 @@
         this.$refs.appealModal.show()
       },
       submitAppeal() {
-        this.axios.order.submitAppeal(this.order.id, this.appealReason, this.appealComment).then(_ => {
+        this.axios.order.submitAppeal(this.order.id, this.appealReason, this.appealComment || '').then(_ => {
           this.refreshOrderStatus()
         }).catch(err => {
           this.axios.onError(err)
