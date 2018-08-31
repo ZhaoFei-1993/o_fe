@@ -36,7 +36,6 @@ export default (axios) => {
     upload(file) {
       const fd = new FormData()
       fd.append('my_file', file)
-
       return axios.post('/user/file', fd, {
         timeout: 20000,
         headers: {
