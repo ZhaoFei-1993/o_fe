@@ -42,6 +42,7 @@
   "scripts": {
     "dev": "cross-env NODE_ENV=development MODE=development DEBUG=nuxt:* node app",
     "build-pre": "cross-env NODE_ENV=pre MODE=pre nuxt build",
+    "jenkins-deploy-pre": "npm i && npm run build-pre && pm2 startOrRestart ecosystem.json --only otc-pre --env pre",
     "deploy-pre": "git checkout . && git pull && npm i && npm run build-pre && pm2 startOrRestart ecosystem.json --only otc-pre --env pre",
     "deploy-online-setup": "pm2 deploy ecosystem.json production setup",
     "build": "cross-env NODE_ENV=production MODE=production nuxt build",
