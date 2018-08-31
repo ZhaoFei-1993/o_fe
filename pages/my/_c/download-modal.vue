@@ -1,11 +1,11 @@
 <template>
   <b-modal :visible="value"
-           title="高级实名认证"
+           title="实名认证"
            @hide="hideModal"
            :hide-footer="true"
            :noCloseOnBackdrop="true">
     <div class="kyc-modal">
-      <div class="download-header">高级实名认证请前往CoinEx APP中 「 账户 」-「 实名认证 」 中进行。</div>
+      <div class="download-header">实名认证请前往CoinEx APP中 「 账户 」-「 实名认证 」 中进行。</div>
       <div class="download-box kyc-modal-download-wrapper">
         <Qrcode val="https://www.coinex.com/mobile/download" :size="140" bg-color="#FFFFFF" fg-color="#000000" level="L"></Qrcode>
         <div class="download">
