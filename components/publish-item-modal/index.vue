@@ -4,6 +4,10 @@
   .publish-item-modal {
     .modal-dialog {
       max-width: 940px !important;
+      .modal-body{
+        max-height:500px;
+        overflow-y: auto;
+      }
     }
     // custom
     .col-form-label {

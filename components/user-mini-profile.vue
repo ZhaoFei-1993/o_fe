@@ -1,5 +1,6 @@
 <!--包含用户头像、在线状态、名字、支付方式的组件-->
 <style lang="scss">
+  @import "~assets/scss/variables.scss";
   .user-mini-profile {
     display: flex;
 
@@ -27,7 +28,7 @@
       margin-left: 5px;
       color: #9b9b9b;
       &.available {
-        color: #6f6f6f;
+        color: $brandGreen;
       }
     }
   }
@@ -45,7 +46,7 @@
         </span>
         <i v-if="phoneStatus&&phoneStatus.show"
            :class="['iconfont icon-netphone',{available:phoneStatus.network_phone}]"
-           v-b-tooltip.hover :title="phoneStatus.tooltip"
+           v-b-tooltip.hover :title="phoneAvailable?null:phoneStatus.tooltip"
            @click="clickNetPhone"
         ></i>
       </div>
@@ -84,9 +85,14 @@
     data() {
       return {}
     },
+    computed: {
+      phoneAvailable() {
+        return this.phoneStatus.network_phone && this.phoneStatus.network_phone.length
+      }
+    },
     methods: {
       clickNetPhone() {
-        if (this.phoneStatus.network_phone && this.phoneStatus.network_phone.length) {
+        if (this.phoneAvailable) {
           this.$showDialog({
             title: '联系对方',
             content: (<div>
@@ -94,6 +100,7 @@
               <p class="c-gray">平台会对双方号码做隐私保护，请务必使用{this.phoneStatus.self_phone}拨打，否则将无法接通</p>
             </div>),
             okTitle: '我知道了',
+            okOnly: true,
           })
         }
       }
