@@ -20,6 +20,7 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      display: inline-block;
     }
     .icon-netphone {
       cursor: pointer;
@@ -37,15 +38,19 @@
     <UserAvatar :username="username" :color="color" :online="online" :size="avatarSize"/>
 
     <div class="profile-right">
-      <div class="username" v-b-tooltip.hover :title="phoneStatus?null:username">
-        <!--订单详情页有phoneStatus，这里显示区域比较大，不会隐藏号码所以不要tooltip-->
-        {{username}}
+      <div class="d-flex align-items-center">
+        <span class="username" v-b-tooltip.hover :title="phoneStatus?null:username">
+          <!--订单详情页有phoneStatus，这里显示区域比较大，不会隐藏号码所以不要tooltip-->
+          {{username}}
+        </span>
         <i v-if="phoneStatus&&phoneStatus.show"
            :class="['iconfont icon-netphone',{available:phoneStatus.network_phone}]"
            v-b-tooltip.hover :title="phoneStatus.tooltip"
            @click="clickNetPhone"
         ></i>
       </div>
+
+
       <div v-if="isMerchant" class="lh-1">
         <i class="iconfont icon-certificated-merchant" v-b-tooltip.hover title="认证商家"></i>
       </div>

@@ -201,7 +201,7 @@
     }
     .user-stats-profile {
       .username {
-        max-width: 300px;
+        max-width: 270px;
       }
       .sidebar-info-item-title {
         width: 160px;
