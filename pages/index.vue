@@ -459,14 +459,7 @@
       this.requestItems = setInterval(this.getItems, refreshInterval)
       // browser only
       this.Visibility = require('visibilityjs')
-      this.Visibility.change(() => {
-        if (!this.Visibility.hidden()) {
-          clearInterval(this.requestItems)
-          this.requestItems = setInterval(this.getItems, refreshInterval)
-        } else {
-          clearInterval(this.requestItems)
-        }
-      })
+      this.Visibility.change(this.onVisibilityChange)
     },
     beforeRouteUpdate(to, from, next) {
       next()
@@ -476,8 +469,17 @@
     },
     beforeDestroy() {
       clearInterval(this.requestItems)
+      this.Visibility.unbind(this.onVisibilityChange)
     },
     methods: {
+      onVisibilityChange() {
+        if (!this.Visibility.hidden()) {
+          clearInterval(this.requestItems)
+          this.requestItems = setInterval(this.getItems, refreshInterval)
+        } else {
+          clearInterval(this.requestItems)
+        }
+      },
       getAnnouncements() {
         this.axios.misc.announcements().then(response => {
           this.announcements = response.data.slice(0, 3)
@@ -556,7 +558,7 @@
           }
           return true
         }, () => {
-          const { account: { user_kyc: { country } }, payments } = this.user
+          const {account: {user_kyc: {country}}, payments} = this.user
           if (country !== 'CHN' && !(Array.isArray(payments) && payments.length > 0)) { // kyc国籍为非中国大陆地区且没有绑定支付方式需要弹窗提示
             this.currentConstraint = paymentModalData
             this.showConstraintModal = true

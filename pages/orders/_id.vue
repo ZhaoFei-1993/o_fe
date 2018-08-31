@@ -476,18 +476,13 @@
     beforeDestroy() {
       this.stopCountDown()
       this.stopRefreshOrder()
+      this.Visibility.unbind(this.onVisibilityChange)
     },
     mounted() {
       this.getCurrentOrder()
       // browser only
       this.Visibility = require('visibilityjs')
-      this.Visibility.change(() => {
-        if (this.Visibility.visible) {
-          this.startRefreshOrder()
-        } else {
-          this.stopRefreshOrder()
-        }
-      })
+      this.Visibility.change(this.onVisibilityChange)
     },
     computed: {
       ...mapState(['user', 'constant', 'chat']),
@@ -648,6 +643,13 @@
       }
     },
     methods: {
+      onVisibilityChange() {
+        if (!this.Visibility.hidden()) {
+          this.startRefreshOrder()
+        } else {
+          this.stopRefreshOrder()
+        }
+      },
       getCurrentOrder() {
         this.axios.order.getOrderById(this.id).then(response => {
           if (response.code === 0) {

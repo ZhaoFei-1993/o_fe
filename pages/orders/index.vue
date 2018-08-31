@@ -206,7 +206,8 @@
                     </template>
                     <template v-if="item.status === constant.ORDER_STATUS.PAID.value">
                       <div class="detail-btn-wrapper">
-                        <b-btn :disabled="showAppealMark(item)" size="xs" variant="gradient-yellow" class="detail-btn" @click="confirmReceipt(item)">确认收款
+                        <b-btn :disabled="showAppealMark(item)" size="xs" variant="gradient-yellow" class="detail-btn"
+                               @click="confirmReceipt(item)">确认收款
                         </b-btn>
                       </div>
                     </template>
@@ -472,13 +473,7 @@
     mounted() {
       // browser only
       this.Visibility = require('visibilityjs')
-      this.Visibility.change(() => {
-        if (this.Visibility.visible) {
-          this.startRefreshOrders()
-        } else {
-          this.stopRefreshOrders()
-        }
-      })
+      this.Visibility.change(this.onVisibilityChange)
       this.initOrderList()
       this.startTimer()
       this.startRefreshOrders()
@@ -493,9 +488,10 @@
         })
       })
     },
-    destroyed() {
+    beforeDestroy() {
       clearInterval(this.timer) // 清除定时器
       this.stopRefreshOrders()
+      this.Visibility.unbind(this.onVisibilityChange)
       this.$nuxt.$off('IM.Event.UNREAD_MESSAGES_COUNT_UPDATE')
     },
     watch: {
@@ -506,6 +502,13 @@
       },
     },
     methods: {
+      onVisibilityChange() {
+        if (!this.Visibility.hidden()) {
+          this.startRefreshOrders()
+        } else {
+          this.stopRefreshOrders()
+        }
+      },
       changePage(page) {
         this.queryParams.page = page
         this.initOrderList()
@@ -654,7 +657,8 @@
           hideHeader: true,
           title: '取消订单',
           content: (
-            <div class="text-left"><p class="c-red">如您已向卖家付款，取消订单您将会损失付款资金。</p><p>温馨提示：买方每日累计取消订单超过3笔，将被限制当日交易功能和广告功能。</p>
+            <div class="text-left"><p class="c-red">如您已向卖家付款，取消订单您将会损失付款资金。</p>
+              <p>温馨提示：买方每日累计取消订单超过3笔，将被限制当日交易功能和广告功能。</p>
             </div>),
           onOk: () => {
             this.axios.order.cancelOrder(item.id).then(res => {
