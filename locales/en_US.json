@@ -389,6 +389,8 @@
         "未完成实名认证": "未完成实名认证",
         "限制交易": "限制交易",
         "<iclass=_2e11": "<i class=\"iconfont icon-announcement mr-10\"></i>公告：",
+        "下单失败": "下单失败",
+        "确定": "确定",
         "<iclass=_2e11****DEPRECATED****": "<i class=\"iconfont icon-announcement mr-10\"></i>公告："
     },
     "pages_manage_items_vue": {

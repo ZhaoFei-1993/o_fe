@@ -603,11 +603,21 @@
                   }
                   break
                 default:
-                  this.$showTips(err.message, 'error')
+                  this.$showDialog({
+                    title: '下单失败',
+                    content: err.message,
+                    okTitle: '确定',
+                    okOnly: true,
+                  })
               }
               this.showConstraintModal = true
             } else {
-              this.$showTips(err.message, 'error')
+              this.$showDialog({
+                title: '下单失败',
+                content: err.message,
+                okTitle: '确定',
+                okOnly: true,
+              })
             }
           })
         }
