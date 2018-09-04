@@ -441,7 +441,33 @@
       },
       onItemOnlineConfirm() {
         if (!this.editingAmountValid) return
-
+        // 判定价格是否偏离, 广告发布页面有一个类似的上架
+        const delta = this.constant.ITEM_PRICE_DELTA
+        const basePrice = this.balance.currentRate[this.editingItem.coin_type]
+        const direction = this.editingItem.side === this.constant.SIDE.BUY ? 1 : -1
+        const bias = (this.editingItem.price - basePrice) * direction / basePrice
+        if (basePrice && bias > delta) {
+          this.$emit('input', false)
+          setTimeout(() => {
+            this.$showDialog({
+              title: '价格警告',
+              content: (
+                <div>
+                  您设置的广告价格
+                  <span class="c-brand-green">（{this.editingItem.price}）</span>{direction > 0 ? '高' : '低'}于当前市场价格
+                  <span class="c-brand-green">（{basePrice}）</span>的{(bias * 100).setDigit(2)}%，请确认是否以该价格发布广告。
+                </div>),
+              okTitle: '确认发布',
+              onOk: () => {
+                this.confirmSumbitItemOnline()
+              }
+            })
+          }, 500)
+        } else {
+          this.confirmSumbitItemOnline()
+        }
+      },
+      confirmSumbitItemOnline() {
         this.axios.item.online(this.editingItem.id, this.onlineItemCoinAmount).then(res => {
           this.getItems()
           // 每次上架之后都重新请求资产数据
@@ -481,7 +507,6 @@
       onItemEdited() {
         this.isItemEditing = false
         this.getItems()
-        this.$showTips('编辑成功')
       }
     }
   }

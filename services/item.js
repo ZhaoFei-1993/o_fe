@@ -31,6 +31,13 @@ export default (axios) => {
     async updateItem(item) {
       return axios.put(`/items/${item.id}`, normalizeItem(item))
     },
+    async updateAndOnlineItem(item) {
+      return axios.put(`/items/${item.id}`, normalizeItem(item)).then(() => {
+        return axios.post(`/items/${item.id}/on`, {
+          'coin_amount': item.coin_amount                        // 币量
+        })
+      })
+    },
 
     /**
      * 获取我的广告列表

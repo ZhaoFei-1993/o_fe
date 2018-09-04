@@ -235,5 +235,6 @@ export default function getConstant($t) {
       PAYMENT_LIMIT: 'PAYMENT_LIMIT',
       BALANCE_LIMIT: 'BALANCE_LIMIT',
     },
+    ITEM_PRICE_DELTA: 0.05,
   }
 }

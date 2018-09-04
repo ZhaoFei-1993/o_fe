@@ -142,7 +142,7 @@
            v-model="modalShowing"
            size="lg" ok-variant="gradient-yellow" cancel-variant="outline-green" button-size="lg"
            :title="editing ? '编辑广告' : '发布广告'"
-           :okTitle="editing ? '保存' : '确定'"
+           :okTitle="editing ? '保存并发布' : '确定'"
            cancelTitle="取消"
            :noCloseOnBackdrop="true"
            @ok="onSubmit">
@@ -443,8 +443,8 @@
         this.form.coin_amount = this.balance.otcMap[this.form.coin_type].available
       },
       doCreateOrUpdateItem(isEdit) {
-        // 判定价格是否偏离
-        const delta = 0.05
+        // 判定价格是否偏离, 广告管理页面有一个类似的上架
+        const delta = this.constant.ITEM_PRICE_DELTA
         const basePrice = this.balance.currentRate[this.form.coin_type]
         const direction = this.form.side === this.constant.SIDE.BUY ? 1 : -1
         const bias = (this.form.price - basePrice) * direction / basePrice
@@ -470,10 +470,9 @@
         }
       },
       confirmSumbit(isEdit) {
-        const itemPromise = isEdit ? this.axios.item.updateItem : this.axios.item.createItem
+        const itemPromise = isEdit ? this.axios.item.updateAndOnlineItem : this.axios.item.createItem
         itemPromise(this.form).then(res => {
-          this.$showTips(isEdit ? '广告编辑成功' : '广告发布成功')
-
+          this.$showTips('广告发布成功')
           this.$emit(isEdit ? 'edited' : 'published', this.form)
         }).catch(err => {
           const ERROR_CODE = this.constant.ERROR_CODE
