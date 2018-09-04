@@ -2,7 +2,7 @@
   "name": "coinex_otc_frontend",
   "version": "1.0.0",
   "description": "",
-  "author": "jeffjing <jingjinafu@viabtc.com>",
+  "author": "viabtc.com",
   "private": true,
   "dependencies": {
     "@log4js-node/smtp": "^1.0.1",

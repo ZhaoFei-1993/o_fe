@@ -4,8 +4,8 @@
   .publish-item-modal {
     .modal-dialog {
       max-width: 940px !important;
-      .modal-body{
-        max-height:500px;
+      .modal-body {
+        max-height: 500px;
         overflow-y: auto;
       }
     }
@@ -429,6 +429,9 @@
       },
       onClickMoreSetting() {
         this.moreSettingShowing = !this.moreSettingShowing
+        if (this.moreSettingShowing) {
+          this.$nextTick(() => document.querySelector('.more-setting-container').scrollIntoView())
+        }
       },
       onClickItemSetting() {
         this.$emit('input', false)
@@ -440,8 +443,34 @@
         this.form.coin_amount = this.balance.otcMap[this.form.coin_type].available
       },
       doCreateOrUpdateItem(isEdit) {
+        // 判定价格是否偏离
+        const delta = 0.05
+        const basePrice = this.balance.currentRate[this.form.coin_type]
+        const direction = this.form.side === this.constant.SIDE.BUY ? 1 : -1
+        const bias = (this.form.price - basePrice) * direction / basePrice
+        if (basePrice && bias > delta) {
+          this.$emit('input', false)
+          setTimeout(() => {
+            this.$showDialog({
+              title: '价格警告',
+              content: (
+                <div>
+                  您设置的广告价格
+                  <span class="c-brand-green">（{this.form.price}）</span>{direction > 0 ? '高' : '低'}于当前市场价格
+                  <span class="c-brand-green">（{basePrice}）</span>的{(bias * 100).setDigit(2)}%，请确认是否以该价格发布广告。
+                </div>),
+              okTitle: '确认发布',
+              onOk: () => {
+                this.confirmSumbit(isEdit)
+              }
+            })
+          }, 500)
+        } else {
+          this.confirmSumbit(isEdit)
+        }
+      },
+      confirmSumbit(isEdit) {
         const itemPromise = isEdit ? this.axios.item.updateItem : this.axios.item.createItem
-
         itemPromise(this.form).then(res => {
           this.$showTips(isEdit ? '广告编辑成功' : '广告发布成功')
 
@@ -455,7 +484,6 @@
           }
         })
       },
-
       onSubmit(e) {
         e.preventDefault()
         this.$v.$touch()
@@ -472,18 +500,6 @@
           this.form.cash_type = this.balance.currentCash
           this.doCreateOrUpdateItem(false)
         }
-
-        // if (Math.abs((form.price / this.marketPrice) - 1) > 0.1) {
-        //   this.$showDialog({
-        //     title: '差价过大',
-        //     content: '当前价格偏离市价过大，将可能不会显示在首页。确认要以此价格下交易单？',
-        //     onOk: () => {
-        //       this.doCreateItem()
-        //     }
-        //   })
-        // } else {
-        //   this.doCreateItem()
-        // }
       },
       onCoinTypeChange() {
         // 很奇葩，即使是数据层面改变了coin_type，也会触发b-form-select的input事件，进而调用本函数。
