@@ -26,14 +26,6 @@ if (process.env.MODE === 'production') {
       ga('send', 'pageview')
     })
   })
-
-  // basic错误上报
-  window.addEventListener('error', function (e) {
-    ga('send', 'exception', {
-      'exDescription': '[' + new Date() + ']:' + JSON.stringify(e) + '|cookie:' + document.cookie + '|ua:' + navigator.userAgent,
-      'exFatal': false,
-    })
-  })
 } else {
   window.addEventListener('error', function (ev) {
     console.log(ev)

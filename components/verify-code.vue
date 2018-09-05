@@ -42,7 +42,7 @@
   <div :class="['verify-code',{'hide-label':hideLabel}]">
     <b-form-group v-if="needEmail" class="email-group" label="邮箱验证码:" horizontal>
       <b-input-group class="code-input-group">
-        <b-form-input class="code-input" :value="email" @input="onEmailInput" size="lg"
+        <b-form-input maxlength="6" class="code-input" :value="email" @input="onEmailInput" size="lg"
                       placeholder="6位邮箱验证码"></b-form-input>
         <template slot="append">
           <Language v-if="emailTimer" text="[s][/s]秒重新发送" style="line-height: 40px;" tag="div">
@@ -57,7 +57,7 @@
     <b-form-group v-if="needGoogle && codeType === constant.VERIFY_CODE_TYPE.GOOGLE"
                   class="google-group" label="Google 验证码:" horizontal>
       <b-input-group class="code-input-group">
-        <b-form-input class="code-input" :value="google" @input="onGoogleInput" size="lg"
+        <b-form-input maxlength="6" class="code-input" :value="google" @input="onGoogleInput" size="lg"
                       placeholder="Google验证码"></b-form-input>
       </b-input-group>
       <EMsgs :result="$v" :msgs="invalidMessages" keyName="google" class="ps-a"/>
@@ -66,7 +66,7 @@
     <b-form-group v-if="needSms && codeType === constant.VERIFY_CODE_TYPE.SMS"
                   class="sms-group" label="短信验证码:" horizontal>
       <b-input-group class="code-input-group">
-        <b-form-input class="code-input" :value="sms" @input="onSmsInput" size="lg" placeholder="短信验证码"></b-form-input>
+        <b-form-input maxlength="6" class="code-input" :value="sms" @input="onSmsInput" size="lg" placeholder="短信验证码"></b-form-input>
         <template slot="append">
           <Language v-if="smsTimer" text="[s][/s]秒重新发送" style="line-height: 40px;" tag="div">
             <span slot="s">{{smsCountdown}}</span>
