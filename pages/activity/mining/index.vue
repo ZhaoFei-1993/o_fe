@@ -7,6 +7,9 @@
       <div class="mining-slogan-detail">
         发布广告瓜分每日<span class="mining-text-highlight">20万CET</span>，首次交易获得<span class="mining-text-highlight">100CET</span>奖励
       </div>
+      <div style="width: 200px;height: 40px;border-radius: 20px;border: solid 2px #59a155;font-size: 20px;line-height: 36px;text-align: center;margin: 30px auto auto;">
+        <b-link href="https://support.coinex.com/hc/zh-cn/articles/360008525693-%E4%BB%80%E4%B9%88%E6%98%AF%E6%8C%82%E5%8D%95%E5%8D%B3%E6%8C%96%E7%9F%BF" target="_blank" style="color: #5aa356;">了解活动规则 ></b-link>
+      </div>
       <div class="mining-rule-box">
         <div class="mining-left-point"></div>
         <div class="mining-right-point"></div>
@@ -630,7 +633,7 @@
         width: 1180px;
         height: 240px;
         background-color: #013456;
-        margin: 141px auto 0 auto;
+        margin: 72px auto 0 auto;
         padding-top: 37px;
         padding-left: 154px;
         .mining-left-point {
@@ -694,7 +697,7 @@
               }
             }
             li:not(:last-child) {
-              margin-bottom: 15px;
+              margin-bottom: 11px;
             }
           }
         }
