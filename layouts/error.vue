@@ -24,10 +24,6 @@ export default {
     // 上报错误日志
     if (!this.$isServer) {
       ga('send', 'pageview')
-      ga('send', 'exception', {
-        'exDescription': '[' + new Date() + ']:' + JSON.stringify(this.error) + '|cookie:' + document.cookie + '|ua:' + navigator.userAgent,
-        'exFatal': true,
-      })
     }
     if (this.error.statusCode === 401 || this.error.statusCode === 403) {
       // 跳转到登录页

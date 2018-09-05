@@ -123,6 +123,31 @@
       background-color: #fff9ef;
       color: #6f6f6f;
     }
+
+    #cancel-merchant-modal {
+      .cancel-form-wrapper {
+        .cancel-form-tips {
+          font-size: 18px;
+          color: #e35555;
+        }
+        .cancel-form-row {
+          margin: 20px 0;
+          display: flex;
+          justify-content: space-between;
+          .cancel-form-label {
+            width: 15%;
+            text-align: right;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+          }
+          .cancel-form-content {
+            display: inline-block;
+            width: 80%;
+          }
+        }
+      }
+    }
   }
 </style>
 
@@ -131,13 +156,25 @@
     <h3 class="layout-my-title">商家认证</h3>
     <p class="layout-my-desc">成为认证商家，尊享更多时权益</p>
     <template v-if="merchant && !formEditing">
-      <MyInfoItem v-if="merchant.auth_status === constant.MERCHANT_AUTH_STATUS.PASS" title="商家认证">
+      <MyInfoItem v-if="merchant.auth_status === constant.MERCHANT_AUTH_STATUS.CANCELLING" title="商家认证">
+        <template slot="content">
+          <p class="c-brand-green">取消认证商家的申请已提交，平台审核中</p>
+        </template>
+        <b-btn slot="action" variant="outline-green" size="xs" @click="showDeleteCancelMerchantModal = true;">
+          撤销申请
+        </b-btn>
+      </MyInfoItem>
+
+      <MyInfoItem v-else-if="merchant.auth_status === constant.MERCHANT_AUTH_STATUS.PASS" title="商家认证">
         <template slot="content">
           <p class="c-brand-green">您已通过商家认证审核，现在可以发布广告了</p>
           <Language text="商家认证已锁定 [a][/a] CET" tag="p">
             <span slot="a">{{merchant.guaranty_amount.formatMoney()}}</span>
           </Language>
         </template>
+        <b-btn slot="action" variant="outline-green" size="xs" @click="onBeforeCancelMerchant">
+          取消认证
+        </b-btn>
       </MyInfoItem>
 
       <MyInfoItem v-else-if="merchant.auth_status === constant.MERCHANT_AUTH_STATUS.CREATED" title="商家认证">
@@ -239,6 +276,76 @@
       </div>
     </template>
     <DownloadModal v-model="showDownloadModal"></DownloadModal>
+    <b-modal id="cancel-merchant-modal"
+             title="取消认证"
+             ok-title="确认"
+             cancel-title="取消"
+             cancel-variant="outline-green"
+             ok-variant="gradient-yellow"
+             button-size="sm"
+             :centered="true"
+             :ok-disabled="invalidCode"
+             :noCloseOnBackdrop="true"
+             @ok="onCancelMerchant"
+             @cancel="onCloseCancelMerchant"
+             ref="cancelMerchantModal">
+      <div class="cancel-form-wrapper">
+        <div class="cancel-form-tips">平台会在7个工作日内进行审核，审核通过后，冻结的CET立即解冻。</div>
+        <div class="cancel-form-row">
+          <div class="cancel-form-label">选择原因</div>
+          <div class="cancel-form-content">
+            <b-form-select class="history-filter-select"
+                           v-model="cancelForm.title"
+                           :options="constant.cancelMerchantReasonOptions">
+              <option slot="first" :value="null" disabled>请选择</option>
+            </b-form-select>
+          </div>
+        </div>
+        <div class="cancel-form-row">
+          <div class="cancel-form-label" style="align-items: flex-start;">简单描述</div>
+          <div class="cancel-form-content">
+            <b-form-textarea id="textarea"
+                             v-model="cancelForm.detail"
+                             placeholder="简单描述下您取消认证商家的原因（小于500字）"
+                             :rows="3"
+                             :max-rows="6">
+            </b-form-textarea>
+          </div>
+        </div>
+        <div class="cancel-form-row">
+          <div class="cancel-form-label">验证码</div>
+          <div class="cancel-form-content">
+            <VerifyCode ref="verify-code"
+                        :hide-label="true"
+                        :needGoogle="account.is_have_totp_auth"
+                        :needSms="!!account.mobile"
+                        :sms.sync="verify.sms"
+                        :google.sync="verify.google"
+                        :codeType.sync="verify.codeType"
+                        :businessType="verify.businessType"
+                        :smsSequence.sync="verify.smsSequence"
+            />
+          </div>
+        </div>
+      </div>
+    </b-modal>
+    <b-modal id="delete-cancel-merchant-modal"
+             title="撤销申请"
+             ok-title="确认"
+             cancel-title="取消"
+             cancel-variant="outline-green"
+             ok-variant="gradient-yellow"
+             button-size="sm"
+             :centered="true"
+             :visible="showDeleteCancelMerchantModal"
+             :noCloseOnBackdrop="true"
+             @ok="onDeleteCancelMerchant"
+             @hide="onDeleteCloseCancelMerchant"
+             ref="deleteCancelMerchantModal">
+      <div style="text-align: center;">
+        是否确认撤销申请？
+      </div>
+    </b-modal>
   </CBlock>
 </template>
 
@@ -251,6 +358,8 @@
   import MyInfoItem from './_c/my-info-item'
   import DownloadModal from './_c/download-modal'
   import {coinexDomain} from '~/modules/variables'
+  import VerifyCode from '~/components/verify-code'
+  import {VERIFY_CODE_TYPE, VERIFY_CODE_BUSINESS} from '~/modules/constant'
 
   const ProgressItem = Vue.extend({
     props: {
@@ -310,6 +419,7 @@
       ContactItem,
       MyInfoItem,
       DownloadModal,
+      VerifyCode,
     },
     head() {
       return {
@@ -319,6 +429,18 @@
     },
     data() {
       return {
+        showDeleteCancelMerchantModal: false,
+        cancelForm: {
+          title: '',
+          detail: '',
+        },
+        verify: {
+          codeType: VERIFY_CODE_TYPE.GOOGLE,
+          sms: '',
+          google: '',
+          businessType: VERIFY_CODE_BUSINESS.CANCEL_MERCHANT_AUTH,
+          smsSequence: 0,
+        },
         showDownloadModal: false,
         form: {
           wechat: '',
@@ -339,6 +461,12 @@
         balance: state => state.balance,
       }),
       ...mapGetters(['kycPassed']),
+      invalidCode() {
+        if (!this.account) return true
+        const wrongGoogle = this.verify.codeType === this.constant.VERIFY_CODE_TYPE.GOOGLE && this.account.is_have_totp_auth && (!this.verify.google || this.verify.google.length !== 6)
+        const wrongSMS = this.verify.codeType === this.constant.VERIFY_CODE_TYPE.SMS && this.account.mobile && (!this.verify.sms || this.verify.sms.length !== 6)
+        return wrongGoogle || wrongSMS
+      },
       cetAvailable() {
         if (!this.balance || !this.balance.coinexBalance) {
           return '--'
@@ -358,6 +486,7 @@
         store.dispatch('fetchUserAccount'),
         store.dispatch('fetchUserMerchant'),
         store.dispatch('fetchCoinexBalance'),
+        store.dispatch('fetchSystemConstant'),
       ]).catch(err => {
         app.axios.needAuth(err, redirect, route.fullPath)
       })
@@ -368,6 +497,77 @@
       }
     },
     methods: {
+      onDeleteCancelMerchant() {
+        this.axios.user.deleteCancelMerchant().then(res => {
+          if (res.code === 0) {
+            this.showDeleteCancelMerchantModal = false
+            this.$store.dispatch('fetchUserMerchant')
+          } else {
+            this.$errorTips(res.message)
+          }
+        }).catch(err => {
+          this.$errorTips(err.message)
+        })
+      },
+      onDeleteCloseCancelMerchant() {
+        this.showDeleteCancelMerchantModal = false
+      },
+      onBeforeCancelMerchant() {
+        this.axios.user.beforeCancelMerchant().then(res => {
+          if (res.code === 0) {
+            this.$refs.cancelMerchantModal.show()
+          } else {
+            this.$errorTips(res.message)
+          }
+        }).catch(err => {
+          this.$errorTips(err.message)
+        })
+      },
+      onCloseCancelMerchant() {
+        this.cancelForm = {
+          title: '',
+          detail: '',
+        }
+        this.verify.sms = ''
+        this.verify.google = ''
+      },
+      onCancelMerchant(evt) {
+        evt.preventDefault()
+        if (!this.cancelForm.title) {
+          this.$errorTips('请选择取消认证原因')
+          return false
+        }
+        if (this.cancelForm.detail.length > 500) {
+          this.$errorTips('描述超过字数限制')
+          return false
+        }
+
+        const verify = this.verify
+        const code = verify.codeType === this.constant.VERIFY_CODE_TYPE.GOOGLE ? verify.google : verify.sms
+
+        this.axios.user.cancelMerchant({
+          ...this.cancelForm,
+          title: this.cancelForm.title,
+          validate_code_type: verify.codeType,
+          validate_code: code,
+          sequence: verify.smsSequence,
+        }).then(res => {
+          if (res.code === 0) {
+            this.$refs.cancelMerchantModal.hide()
+            this.$store.dispatch('fetchUserMerchant')
+            this.cancelForm = {
+              title: '',
+              detail: '',
+            }
+            this.verify.sms = ''
+            this.verify.google = ''
+          } else {
+            this.$errorTips(res.message)
+          }
+        }).catch(err => {
+          this.$errorTips(err.message)
+        })
+      },
       onSubmit() {
         if (!this.kycPassed) return this.$errorTips(`请先完成实名认证`)
         if (!this.account.mobile) return this.$errorTips(`请先绑定手机`)
