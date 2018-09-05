@@ -209,7 +209,7 @@
              v-model="showPriceAlertModal"
              okTitle="确认发布"
              cancel-title="取消"
-             @ok="confirmPriceAlert">
+             @ok="confirmSumbitItemOnline">
       <div>
         您设置的广告价格
         <span class="c-brand-green">（{{priceAlert.price}}）</span>
