@@ -138,151 +138,171 @@
 </style>
 
 <template>
-  <b-modal class="publish-item-modal"
-           v-model="modalShowing"
-           size="lg" ok-variant="gradient-yellow" cancel-variant="outline-green" button-size="lg"
-           :title="editing ? '编辑广告' : '发布广告'"
-           :okTitle="editing ? '保存并发布' : '确定'"
-           cancelTitle="取消"
-           :noCloseOnBackdrop="true"
-           @ok="onSubmit">
-    <b-form v-if="balance.currentRate">
-      <!--<TabButtons :tabs="tradeSideOptions" v-model="form.side"/>-->
-      <b-form-group label="我想" class="group-purpose">
-        <b-form-select v-model="form.side" :disabled="editing" class="col-left fz-16"
-                       :options="tradeSideOptions"></b-form-select>
-        <b-form-select v-model="form.coin_type" :disabled="editing" class="col-right fz-16"
-                       :options="constant.COIN_TYPE_OPTIONS" @input="onCoinTypeChange"></b-form-select>
-      </b-form-group>
+  <div>
+    <b-modal class="publish-item-modal"
+             v-model="modalShowing"
+             size="lg" ok-variant="gradient-yellow" cancel-variant="outline-green" button-size="lg"
+             :title="editing ? '编辑广告' : '发布广告'"
+             :okTitle="editing ? '保存并发布' : '确定'"
+             cancelTitle="取消"
+             :noCloseOnBackdrop="true"
+             @ok="onSubmit">
+      <b-form v-if="balance.currentRate">
+        <!--<TabButtons :tabs="tradeSideOptions" v-model="form.side"/>-->
+        <b-form-group label="我想" class="group-purpose">
+          <b-form-select v-model="form.side" :disabled="editing" class="col-left fz-16"
+                         :options="tradeSideOptions"></b-form-select>
+          <b-form-select v-model="form.coin_type" :disabled="editing" class="col-right fz-16"
+                         :options="constant.COIN_TYPE_OPTIONS" @input="onCoinTypeChange"></b-form-select>
+        </b-form-group>
 
-      <b-form-group label="交易价格" class="item-price-group">
-        <b-form-radio-group v-model="form.pricing_type" :options="pricingTypeOptions"
-                            class="mb-10"></b-form-radio-group>
+        <b-form-group label="交易价格" class="item-price-group">
+          <b-form-radio-group v-model="form.pricing_type" :options="pricingTypeOptions"
+                              class="mb-10"></b-form-radio-group>
 
-        <div v-if="form.pricing_type === constant.PRICING_TYPE.FIXED" class="mt-25">
-          <div class="input-label">
-            当前参考价格
-            <b-btn variant="plain-yellow" size="xxs" @click="onSetPrice2MarketPrice">{{marketPrice}}</b-btn>
-            <CTooltip v-if="form.coin_type !== 'USDT'" content="采用Bitfinex、Coinbase和Bitstamp 三个交易所的平均价格，仅供参考。" x="4"/>
-          </div>
-          <CurrencyInput v-model="form.price" :currency="balance.currentCash" :decimalDigit="2" placeholder="请输入价格"
-                         class="col-left"/>
-        </div>
-
-        <div v-else class="item-float-price-container">
-          <div class="item-price-container">
+          <div v-if="form.pricing_type === constant.PRICING_TYPE.FIXED" class="mt-25">
             <div class="input-label">
               当前参考价格
               <b-btn variant="plain-yellow" size="xxs" @click="onSetPrice2MarketPrice">{{marketPrice}}</b-btn>
               <CTooltip v-if="form.coin_type !== 'USDT'" content="采用Bitfinex、Coinbase和Bitstamp 三个交易所的平均价格，仅供参考。" x="4"/>
             </div>
-            <CurrencyInput :value="floatPrice" :currency="balance.currentCash" :disabled="true" plain
-                           placeholder="请输入价格"/>
+            <CurrencyInput v-model="form.price" :currency="balance.currentCash" :decimalDigit="2" placeholder="请输入价格"
+                           class="col-left"/>
           </div>
 
-          <i class="iconfont icon-bothway"></i>
-
-          <!--todo: 浮动比例的限制、amount的限制(特别是卖的时候的限制）-->
-          <div class="item-float-rate-container">
-            <div class="input-label">
-              浮动比例
-              <CTooltip content=" 以当前市场价为基数设定浮动比例，大于100%为溢价；小于100%为折价。" x="4"/>
+          <div v-else class="item-float-price-container">
+            <div class="item-price-container">
+              <div class="input-label">
+                当前参考价格
+                <b-btn variant="plain-yellow" size="xxs" @click="onSetPrice2MarketPrice">{{marketPrice}}</b-btn>
+                <CTooltip v-if="form.coin_type !== 'USDT'" content="采用Bitfinex、Coinbase和Bitstamp 三个交易所的平均价格，仅供参考。"
+                          x="4"/>
+              </div>
+              <CurrencyInput :value="floatPrice" :currency="balance.currentCash" :disabled="true" plain
+                             placeholder="请输入价格"/>
             </div>
-            <CurrencyInput v-model="form.float_rate" currency="%" placeholder="请输入价格" :decimalDigit="2"/>
-          </div>
 
-          <div class="item-price-limit-container">
-            <div class="input-label">
-              {{form.side === 'buy' ? '最高单价（可留空）' : '最低单价（可留空）'}}
+            <i class="iconfont icon-bothway"></i>
+
+            <!--todo: 浮动比例的限制、amount的限制(特别是卖的时候的限制）-->
+            <div class="item-float-rate-container">
+              <div class="input-label">
+                浮动比例
+                <CTooltip content=" 以当前市场价为基数设定浮动比例，大于100%为溢价；小于100%为折价。" x="4"/>
+              </div>
+              <CurrencyInput v-model="form.float_rate" currency="%" placeholder="请输入价格" :decimalDigit="2"/>
             </div>
-            <CurrencyInput v-model="form.price_limit" :currency="balance.currentCash" :decimalDigit="2"
-                           placeholder="请输入价格"/>
-          </div>
-        </div>
-      </b-form-group>
 
-      <b-form-group label="交易数量" class="coin-amount-group">
-        <div v-if="form.side === constant.SIDE.SELL && balance.otcMap">
-          <Language text="最多可售[a][/a][c][/c]">
-            <b-btn slot="a" variant="plain-yellow" @click="onSetCoinAmount2All">
-              {{balance.otcMap[form.coin_type].available}}
-            </b-btn>
-            <span slot="c">{{form.coin_type}}</span>
-          </Language>
-          <b-btn variant="plain-green" size="xxs" class="ml-10" @click="onSetCoinAmount2All">全部出售</b-btn>
-        </div>
-
-        <div class="coin-amount-container">
-          <!--todo:coin_amount、float_rate最大值100,000,000-->
-          <CurrencyInput v-model="form.coin_amount" :currency="form.coin_type" placeholder="请输入数量" class="col-left"/>
-          <div class="item-total-cash col-right">
-            <span class="fz-16">总金额 ≈</span>
-            <span class="c-bright-yellow fz-22 ml-1"> {{totalCash}} {{balance.currentCash}}</span>
+            <div class="item-price-limit-container">
+              <div class="input-label">
+                {{form.side === 'buy' ? '最高单价（可留空）' : '最低单价（可留空）'}}
+              </div>
+              <CurrencyInput v-model="form.price_limit" :currency="balance.currentCash" :decimalDigit="2"
+                             placeholder="请输入价格"/>
+            </div>
           </div>
-        </div>
-        <div class="c-9b mt-2 fz-14">
-          *
-          <span v-if="form.side === constant.SIDE.BUY">
+        </b-form-group>
+
+        <b-form-group label="交易数量" class="coin-amount-group">
+          <div v-if="form.side === constant.SIDE.SELL && balance.otcMap">
+            <Language text="最多可售[a][/a][c][/c]">
+              <b-btn slot="a" variant="plain-yellow" @click="onSetCoinAmount2All">
+                {{balance.otcMap[form.coin_type].available}}
+              </b-btn>
+              <span slot="c">{{form.coin_type}}</span>
+            </Language>
+            <b-btn variant="plain-green" size="xxs" class="ml-10" @click="onSetCoinAmount2All">全部出售</b-btn>
+          </div>
+
+          <div class="coin-amount-container">
+            <!--todo:coin_amount、float_rate最大值100,000,000-->
+            <CurrencyInput v-model="form.coin_amount" :currency="form.coin_type" placeholder="请输入数量" class="col-left"/>
+            <div class="item-total-cash col-right">
+              <span class="fz-16">总金额 ≈</span>
+              <span class="c-bright-yellow fz-22 ml-1"> {{totalCash}} {{balance.currentCash}}</span>
+            </div>
+          </div>
+          <div class="c-9b mt-2 fz-14">
+            *
+            <span v-if="form.side === constant.SIDE.BUY">
             当日取消订单超过3次，会被限制交易功能。
           </span>
-          <span v-else>
+            <span v-else>
             广告上架期间，您的数字货币会被冻结。
           </span>
-          <b-link href="https://support.coinex.com/hc/articles/360007643734" class="ml-1" target="_blank">更多交易须知 >
-          </b-link>
+            <b-link href="https://support.coinex.com/hc/articles/360007643734" class="ml-1" target="_blank">更多交易须知 >
+            </b-link>
+          </div>
+        </b-form-group>
+
+        <div class="more-setting-container">
+          <b-btn variant="plain-green" class="btn-more-setting" size="xs" @click="onClickMoreSetting">
+            更多设置 <i class="iconfont icon-double-arrow-down" :class="{'upsideDown': moreSettingShowing}"></i>
+          </b-btn>
+          <b-btn class="btn-item-setting" variant="plain" to="/my/item-setting" @click="onClickItemSetting">
+            广告设置
+            <CTooltip content="交易限额、自动回复、交易方限制可在广告设置中统一编辑默认值" size="16" :x="2"/>
+          </b-btn>
         </div>
-      </b-form-group>
 
-      <div class="more-setting-container">
-        <b-btn variant="plain-green" class="btn-more-setting" size="xs" @click="onClickMoreSetting">
-          更多设置 <i class="iconfont icon-double-arrow-down" :class="{'upsideDown': moreSettingShowing}"></i>
-        </b-btn>
-        <b-btn class="btn-item-setting" variant="plain" to="/my/item-setting" @click="onClickItemSetting">
-          广告设置
-          <CTooltip content="交易限额、自动回复、交易方限制可在广告设置中统一编辑默认值" size="16" :x="2"/>
-        </b-btn>
+        <!--更多设置-->
+        <div v-if="moreSettingShowing">
+          <b-form-group label="交易限额" class="order-cash-limit-group">
+            <div class="col-left">
+              <Language text="最低金额 [p][/p] 元" class="input-label" tag="div">
+                <span slot="p">{{constant.DEAL_CASH_AMOUNT.MIN}}</span>
+              </Language>
+              <CurrencyInput v-model="form.min_deal_cash_amount" :currency="balance.currentCash" placeholder="最低单笔金额"
+                             :decimalDigit="2"/>
+              <EMsgs :result="$v.form" :messages="itemValidations.messages" keyName="min_deal_cash_amount"/>
+            </div>
+            <div class="order-cash-limit-separator">至</div>
+            <div class="col-right ml-0">
+              <Language text="最高金额 [p][/p] 元" class="input-label" tag="div">
+                <span slot="p">{{constant.DEAL_CASH_AMOUNT.MAX.formatMoney()}}</span>
+              </Language>
+              <CurrencyInput v-model="form.max_deal_cash_amount" :currency="balance.currentCash" placeholder="最高单笔金额"
+                             :decimalDigit="2"/>
+              <EMsgs :result="$v.form" :messages="itemValidations.messages" keyName="max_deal_cash_amount"/>
+            </div>
+          </b-form-group>
+
+          <b-form-group label="自动回复" class="auto-reply-group">
+            <b-form-textarea v-model="form.auto_reply_content" rows="3" class="fz-14"></b-form-textarea>
+            <EMsgs :result="$v.form" :messages="itemValidations.messages" keyName="auto_reply_content" class="ps-a"/>
+            <p class="auto-reply-content-limit"
+               :class="{'c-red': form.auto_reply_content.length > constant.MAX_AUTO_REPLY_LENGTH}">
+              {{form.auto_reply_content.length}} / {{constant.MAX_AUTO_REPLY_LENGTH}}字
+            </p>
+          </b-form-group>
+
+          <b-form-group label="交易方限制" class="counterparty-limit-group">
+            <b-form-checkbox-group v-model="form.counterparty_limit"
+                                   :options="constant.COUNTERPARTY_LIMIT_OPTIONS"
+                                   class="fz-14" style="line-height: 21px;">
+            </b-form-checkbox-group>
+          </b-form-group>
+        </div>
+      </b-form>
+    </b-modal>
+    <b-modal title="价格警告"
+             ok-variant="gradient-yellow"
+             cancel-variant="outline-green"
+             button-size="lg"
+             class="text-center"
+             v-model="showPriceAlertModal"
+             okTitle="确认发布"
+             cancel-title="取消"
+             @ok="confirmPriceAlert">
+      <div>
+        您设置的广告价格
+        <span class="c-brand-green">（{{priceAlert.price}}）</span>
+        {{priceAlert.direction > 0 ? '高' : '低'}}于当前市场价格
+        <span class="c-brand-green">（{{priceAlert.basePrice}}）</span>的
+        {{(priceAlert.bias *100).setDigit(2)}}%，请确认是否以该价格发布广告。
       </div>
-
-      <!--更多设置-->
-      <div v-if="moreSettingShowing">
-        <b-form-group label="交易限额" class="order-cash-limit-group">
-          <div class="col-left">
-            <Language text="最低金额 [p][/p] 元" class="input-label" tag="div">
-              <span slot="p">{{constant.DEAL_CASH_AMOUNT.MIN}}</span>
-            </Language>
-            <CurrencyInput v-model="form.min_deal_cash_amount" :currency="balance.currentCash" placeholder="最低单笔金额"
-                           :decimalDigit="2"/>
-            <EMsgs :result="$v.form" :messages="itemValidations.messages" keyName="min_deal_cash_amount"/>
-          </div>
-          <div class="order-cash-limit-separator">至</div>
-          <div class="col-right ml-0">
-            <Language text="最高金额 [p][/p] 元" class="input-label" tag="div">
-              <span slot="p">{{constant.DEAL_CASH_AMOUNT.MAX.formatMoney()}}</span>
-            </Language>
-            <CurrencyInput v-model="form.max_deal_cash_amount" :currency="balance.currentCash" placeholder="最高单笔金额"
-                           :decimalDigit="2"/>
-            <EMsgs :result="$v.form" :messages="itemValidations.messages" keyName="max_deal_cash_amount"/>
-          </div>
-        </b-form-group>
-
-        <b-form-group label="自动回复" class="auto-reply-group">
-          <b-form-textarea v-model="form.auto_reply_content" rows="3" class="fz-14"></b-form-textarea>
-          <EMsgs :result="$v.form" :messages="itemValidations.messages" keyName="auto_reply_content" class="ps-a"/>
-          <p class="auto-reply-content-limit"
-             :class="{'c-red': form.auto_reply_content.length > constant.MAX_AUTO_REPLY_LENGTH}">
-            {{form.auto_reply_content.length}} / {{constant.MAX_AUTO_REPLY_LENGTH}}字
-          </p>
-        </b-form-group>
-
-        <b-form-group label="交易方限制" class="counterparty-limit-group">
-          <b-form-checkbox-group v-model="form.counterparty_limit"
-                                 :options="constant.COUNTERPARTY_LIMIT_OPTIONS"
-                                 class="fz-14" style="line-height: 21px;">
-          </b-form-checkbox-group>
-        </b-form-group>
-      </div>
-    </b-form>
-  </b-modal>
+    </b-modal>
+  </div>
 </template>
 
 <script>
@@ -329,7 +349,8 @@
           auto_reply_content: '',
           counterparty_limit: [],
         },
-
+        priceAlert: {},
+        showPriceAlertModal: false,
         moreSettingShowing: false,
       }
     },
@@ -449,27 +470,23 @@
         const direction = this.form.side === this.constant.SIDE.BUY ? 1 : -1
         const bias = (this.form.price - basePrice) * direction / basePrice
         if (basePrice && bias > delta) {
-          this.$emit('input', false)
-          setTimeout(() => {
-            this.$showDialog({
-              title: '价格警告',
-              content: (
-                <div>
-                  您设置的广告价格
-                  <span class="c-brand-green">（{this.form.price}）</span>{direction > 0 ? '高' : '低'}于当前市场价格
-                  <span class="c-brand-green">（{basePrice}）</span>的{(bias * 100).setDigit(2)}%，请确认是否以该价格发布广告。
-                </div>),
-              okTitle: '确认发布',
-              onOk: () => {
-                this.confirmSumbit(isEdit)
-              }
-            })
-          }, 500)
+          this.priceAlert = {
+            price: this.form.price,
+            isEdit,
+            direction,
+            bias,
+            basePrice,
+          }
+          this.showPriceAlertModal = true
         } else {
           this.confirmSumbit(isEdit)
         }
       },
+      confirmPriceAlert() {
+        this.confirmSumbit(this.priceAlert.isEdit)
+      },
       confirmSumbit(isEdit) {
+        this.$emit('input', false)
         const itemPromise = isEdit ? this.axios.item.updateAndOnlineItem : this.axios.item.createItem
         itemPromise(this.form).then(res => {
           this.$showTips('广告发布成功')

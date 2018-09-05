@@ -201,6 +201,23 @@
                link="//support.coinex.com/hc/articles/360007643734"
                :isOutLink="true">
     </LinkModal>
+    <b-modal title="价格警告"
+             ok-variant="gradient-yellow"
+             cancel-variant="outline-green"
+             button-size="lg"
+             class="text-center"
+             v-model="showPriceAlertModal"
+             okTitle="确认发布"
+             cancel-title="取消"
+             @ok="confirmPriceAlert">
+      <div>
+        您设置的广告价格
+        <span class="c-brand-green">（{{priceAlert.price}}）</span>
+        {{priceAlert.direction > 0 ? '高' : '低'}}于当前市场价格
+        <span class="c-brand-green">（{{priceAlert.basePrice}}）</span>的
+        {{(priceAlert.bias *100).setDigit(2)}}%，请确认是否以该价格发布广告。
+      </div>
+    </b-modal>
   </div>
 </template>
 
@@ -240,6 +257,8 @@
         isItemEditing: false,   // 是否在编辑广告
         queryParams: {},
         showConstraintModal: false,
+        showPriceAlertModal: false,
+        priceAlert: {},
       }
     },
     head() {
@@ -447,22 +466,14 @@
         const direction = this.editingItem.side === this.constant.SIDE.BUY ? 1 : -1
         const bias = (this.editingItem.price - basePrice) * direction / basePrice
         if (basePrice && bias > delta) {
-          this.$emit('input', false)
-          setTimeout(() => {
-            this.$showDialog({
-              title: '价格警告',
-              content: (
-                <div>
-                  您设置的广告价格
-                  <span class="c-brand-green">（{this.editingItem.price}）</span>{direction > 0 ? '高' : '低'}于当前市场价格
-                  <span class="c-brand-green">（{basePrice}）</span>的{(bias * 100).setDigit(2)}%，请确认是否以该价格发布广告。
-                </div>),
-              okTitle: '确认发布',
-              onOk: () => {
-                this.confirmSumbitItemOnline()
-              }
-            })
-          }, 500)
+          this.priceAlert = {
+            price: this.editingItem.price,
+            isEdit: true,
+            direction,
+            bias,
+            basePrice,
+          }
+          this.showPriceAlertModal = true
         } else {
           this.confirmSumbitItemOnline()
         }
