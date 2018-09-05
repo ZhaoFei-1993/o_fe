@@ -451,11 +451,6 @@
         VERIFY_EMAIL: 'bd@coinex.com',
         formEditing: false,
         coinexDomain,
-        resCode: {
-          HAS_ON_ITEMS: 610, // 还有上架的广告
-          HAS_PROCESSING_ORDERS: 611, // 还有未处理的订单
-          SUCCESS: 0,
-        },
       }
     },
     computed: {
