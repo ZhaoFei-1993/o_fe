@@ -45,6 +45,7 @@ export const VERIFY_CODE_BUSINESS = {
   MODIFY_PAYMENT: 'otc_modify_payment_method',
   CONFIRM_RECEIPT: 'otc_receipt_order',
   MODIFY_FREQUENCY: 'otc_modify_validate_frequency',
+  CANCEL_MERCHANT_AUTH: 'otc_cancel_merchant_auth',
 }
 
 /**
@@ -193,6 +194,7 @@ export default function getConstant($t) {
       PASS: 'pass',
       NO: 'no',
       CANCEL: 'cancel',
+      CANCELLING: 'cancelling',
     },
     APPEAL_REASONS: ['卖家未放币', '买家付款未收到', '买家付款金额错误', '其他'],
     APPEAL_STATUS: {

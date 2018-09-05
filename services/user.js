@@ -40,10 +40,28 @@ export default (axios) => {
      * 根据参数不同，可用于取消商家认证申请(还未成为商家)、取消商家身份(已经成为商家)
      * 暂时后台只做了取消认证申请 jeff 20180716
      */
-    cancelMerchant() {
+    cancelMerchant(data) {
       // require('./mock/user').merchant.data.status = 'cancel'
-      // return Promise.resolve({data: {}, code: 0})
-      return axios.delete('/user/merchant')
+      // return Promise.resolve({data: {}, code: 0, message: 'fafa'})
+      return axios.post('/user/merchant/cancel', data)
+    },
+
+    /**
+     * 取消商家认证前检查是否有上架中广告
+     * @return {Promise}
+     */
+    beforeCancelMerchant() {
+      // require('./mock/user').merchant.data.status = 'cancel'
+      // return Promise.resolve({data: {}, code: 0, message: 'fafa'})
+      return axios.get('/user/merchant/cancel')
+    },
+
+    /**
+     * 撤销取消认证
+     * @return {Promise}
+     */
+    deleteCancelMerchant() {
+      return axios.delete('/user/merchant/cancel')
     },
 
     /**
