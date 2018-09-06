@@ -334,14 +334,14 @@
       cashAmountChanged() {
         this.$v.form.cash_amount.$touch()
         if (this.form.focusInput === 'cashAmount') {
-          this.form.coin_amount = this.form.cash_amount === '' ? null : `${this.form.cash_amount / this.item.price}`.setDigit(8)
+          this.form.coin_amount = this.form.cash_amount === '' ? null : `${this.form.cash_amount.decimalDiv(this.item.price)}`.setDigit(8)
         }
         this.$v.form.coin_amount.$touch()
       },
       coinAmountChanged() {
         this.$v.form.coin_amount.$touch()
         if (this.form.focusInput === 'coinAmount') {
-          this.form.cash_amount = this.form.coin_amount === '' ? null : `${this.form.coin_amount * this.item.price}`.setDigit(2)
+          this.form.cash_amount = this.form.coin_amount === '' ? null : `${this.form.coin_amount.decimalMul(this.item.price)}`.setDigit(2)
         }
         this.$v.form.cash_amount.$touch()
       },

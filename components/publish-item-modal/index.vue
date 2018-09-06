@@ -293,6 +293,7 @@
              v-model="showPriceAlertModal"
              okTitle="确认发布"
              cancel-title="取消"
+             @cancel="reopenPublishModal"
              @ok="confirmPriceAlert">
       <div>
         您设置的广告价格
@@ -441,11 +442,10 @@
     },
     methods: {
       onRouteChange(route) {
-        // 如果当前是首页，则会有coin/side，设为默认值
-        const {coin, side} = route.query
-        if (coin && side) {
+        // 可能会重复打开弹窗，不需要更新方向
+        const {coin} = route.query
+        if (coin) {
           this.form.coin_type = coin
-          this.form.side = side
         }
       },
       onClickMoreSetting() {
@@ -527,6 +527,9 @@
         if (this.form.coin_type === 'USDT') {
           this.form.pricing_type = this.constant.PRICING_TYPE.FIXED
         }
+      },
+      reopenPublishModal() {
+        this.$emit('input', true)
       }
     }
   }
