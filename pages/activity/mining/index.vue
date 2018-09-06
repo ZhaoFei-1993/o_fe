@@ -20,7 +20,7 @@
             活动期间，按规则发布广告赢取积分，每天的积分前20名可参与瓜分20万CET ：
           </div>
           <ul class="mining-rule-content">
-            <li><span><span class="mining-rule-content-bold">广告发布要求：</span>最低限额 ≤ 10000 CNY、最大限额 ≥ 50000 CNY，剩余数量金额 ≥ 10000 CNY。</span></li>
+            <li><span><span class="mining-rule-content-bold">广告发布要求：</span>最低限额 ≤ 1000 CNY、最大限额 ≥ 50000 CNY、广告初始数量金额 ≥ 50000 CNY，剩余数量金额 ≥ 10000 CNY。</span></li>
             <li><span><span class="mining-rule-content-bold">广告排名规则：</span>1. 价格越优，排名越靠前 2. 价格相同时，剩余数量越多越靠前 3. 价格与剩余数量均相同时，越早发布越靠前。</span></li>
             <li><span><span class="mining-rule-content-bold">广告积分计算：</span>每分钟进行快照，排名第1至第20依次获得 20、19 … 2、1积分，USDT市场在此基础上采用双倍积分。</span></li>
             <li><span><span class="mining-rule-content-bold">CET奖励分配：</span>每天总积分的第1名奖励<span class="mining-text-highlight">20000CET</span>，第2至第3名奖励<span class="mining-text-highlight">15000CET</span>，第4至10名奖励<span class="mining-text-highlight">10000CET</span>，第11至20名奖励<span class="mining-text-highlight">8000CET</span>。</span></li>
