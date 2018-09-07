@@ -267,6 +267,15 @@
             </div>
           </b-form-group>
 
+          <b-form-group label="商家备注" class="auto-reply-group">
+            <b-form-textarea v-model="form.remark" rows="3" class="fz-14"></b-form-textarea>
+            <EMsgs :result="$v.form" :messages="itemValidations.messages" keyName="remark" class="ps-a"/>
+            <p class="auto-reply-content-limit"
+               :class="{'c-red': form.remark.length > constant.MAX_REMARK_LENGTH}">
+              {{form.remark.length}} / {{constant.MAX_REMARK_LENGTH}}字
+            </p>
+          </b-form-group>
+
           <b-form-group label="自动回复" class="auto-reply-group">
             <b-form-textarea v-model="form.auto_reply_content" rows="3" class="fz-14"></b-form-textarea>
             <EMsgs :result="$v.form" :messages="itemValidations.messages" keyName="auto_reply_content" class="ps-a"/>
@@ -337,18 +346,19 @@
     data() {
       return {
         form: {
-          side: 'buy',
-          float_rate: 100,
-          price: 0,
-          price_limit: '',           // 价格限制，根据买卖方向不同，表示最大限制/最小限制
-          coin_amount: '',
-          pricing_type: 'fixed',
-          min_deal_cash_amount: '',
-          max_deal_cash_amount: '',
-          coin_type: 'BCH',
-          cash_type: '',
-          auto_reply_content: '',
+          side: 'buy',  // 方向 buy/sell
+          float_rate: 100, // 浮动比例, float定价类型必填
+          price: 0, // 单价，fixed定价类型必填
+          price_limit: 0, // 价格限制，根据买卖方向不同，表示最大限制/最小限制
+          coin_amount: '', // 币量
+          pricing_type: 'fixed', // 定价方式 fixed/float
+          min_deal_cash_amount: '', // 最小成交额
+          max_deal_cash_amount: '', // 最大成交额
+          coin_type: 'BCH',  // 币种
+          cash_type: '', // 法币类型
+          auto_reply_content: '', // 自动回复内容
           counterparty_limit: [],
+          remark: '',
         },
         priceAlert: {},
         showPriceAlertModal: false,

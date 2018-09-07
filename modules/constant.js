@@ -20,6 +20,9 @@ export const KYC_STATUS = {
 // 自动回复内容的最大长度
 export const MAX_AUTO_REPLY_LENGTH = 50
 
+// 商家备注内容的最大长度
+export const MAX_REMARK_LENGTH = 30
+
 // 允许的交易最大最小值的上下限（暂时只针对CNY）
 export const DEAL_CASH_AMOUNT = {
   MIN: 100,
@@ -228,6 +231,7 @@ export default function getConstant($t) {
 
     // 自动回复内容的最大长度
     MAX_AUTO_REPLY_LENGTH,
+    MAX_REMARK_LENGTH,
 
     // 允许的交易最大最小值的上下限（暂时只针对CNY）
     DEAL_CASH_AMOUNT,
