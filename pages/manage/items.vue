@@ -346,6 +346,11 @@
             label: '上架时间',
             thStyle: {},
           }
+        } else {
+          fields.off_time = {
+            label: '下架时间',
+            thStyle: {},
+          }
         }
 
         fields.action = {

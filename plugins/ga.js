@@ -31,6 +31,6 @@ if (process.env.MODE === 'production') {
     console.log(ev)
   })
   window.ga = function (op, category, obj) {
-    console.error(obj)
+    console.log('ga',obj)
   }
 }
