@@ -36,7 +36,9 @@ export function onApiError(err, vm) {
   if (errorCodeMessageMap[err.code]) {
     message = errorCodeMessageMap[err.code]
   }
-
+  if (err.code === 'ECONNABORTED') {
+    message = '网络连接失败，请重试'
+  }
   vm.$showTips && vm.$showTips(message, 'error')
   reportError(err)
 }

@@ -283,7 +283,7 @@
                 v-if="showConfirmReceiptStep">
               <div class="message">{{stepsMessage.payCoin}}</div>
               <div class="step-time" v-if="order.complete_time">{{order.complete_time| getTimeText}}</div>
-              <button v-if="!isBuySide&&order.status===constant.ORDER_STATUS.PAID.value"
+              <button v-if="showSellerConfirmButton"
                       class="btn btn-gradient-yellow btn-xs"
                       @click="confirmReceipt()">确认收款
               </button>
@@ -326,7 +326,9 @@
           <template v-if="appeal && appeal.result_desc && appeal.result_desc.length>0">
             <span>{{appeal.result_desc}}</span>
             <span v-if="appeal.allow_appeal_again" class="c-brand-green appeal-btn ml-10"
-                                                     @click="startAppeal">再次申诉</span>
+                  @click="startAppeal">再次申诉</span>
+            <button v-if="canCancelAppeal" class="btn btn-outline-green btn-xs" @click="cancelAppeal">取消申诉
+            </button>
           </template>
           <div class="divider" v-if="canCancel||showAppeal||appeal"></div>
         </div>
@@ -489,9 +491,10 @@
         if (!this.appeal) return null
         return this.isBuyerAppeal ? this.userNames.buyer + '(买家)' : this.userNames.seller + '(卖家)'
       },
-      isCurrentUserAppealing() {
+      canCancelAppeal() {
         if (!this.appeal) return false
-        return this.appeal.user_id === this.user.account.id
+        const pending = this.appeal.status === this.constant.APPEAL_STATUS.PROCESSING || this.appeal.status === this.constant.APPEAL_STATUS.PENDING
+        return this.appeal.user_id === this.user.account.id && pending
       },
       isAppealing() {
         // 平局和取消一样处理？？？？！！！！！
@@ -558,10 +561,11 @@
       expired() {
         return this.order.status === this.constant.ORDER_STATUS.CREATED.value && this.payRemainTime <= 0
       },
+      showSellerConfirmButton() {
+        return !this.isBuySide && this.order.status === this.constant.ORDER_STATUS.PAID.value
+      },
       showConfirmReceiptStep() {
-        // 各种状态太混乱了！！！判断逻辑详见产品原型。。。
-        const appealOk = !this.appeal || !(this.appeal.status === this.constant.APPEAL_STATUS.COMPLETED && this.appeal.result !== this.constant.APPEAL_RESULT_MAP.draw.value)
-        return appealOk && this.order.status !== this.constant.ORDER_STATUS.CANCEL.value && this.order.status !== this.constant.ORDER_STATUS.CLOSED.value
+        return this.showSellerConfirmButton || this.order.status === this.constant.ORDER_STATUS.SUCCESS.value
       },
       paymentStatusMessage() {
         let payMessage = '订单已超时'

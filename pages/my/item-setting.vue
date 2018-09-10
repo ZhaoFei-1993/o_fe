@@ -81,6 +81,29 @@
       </div>
     </MyInfoItem>
 
+    <MyInfoItem title="商家备注">
+      <template slot="content">
+        <div slot="content" v-if="remarkEditing">
+          <b-form-textarea v-model="editingSettings.remark" rows="3"></b-form-textarea>
+          <p class="text-right"
+             :class="{'c-red': editingSettings.remark.length > constant.MAX_REMARK_LENGTH}">
+            {{editingSettings.remark.length}} / {{constant.MAX_REMARK_LENGTH}}字
+          </p>
+          <EMsgs :result="$v.editingSettings" :messages="editingSettingsValidation.messages"
+                 keyName="remark" style="margin-top: -20px;"/>
+        </div>
+        <p v-else class="auto-reply-content">{{settings.remark ? settings.remark : '无'}}</p>
+      </template>
+
+      <div slot="action" class="setting-button-group">
+        <template v-if="remarkEditing">
+          <b-btn variant="gradient-yellow" size="xs" @click="onEditTextareaConfirm({contentKey: 'remark', editingKey: 'remarkEditing'})">确定</b-btn>
+          <b-btn variant="outline-green" size="xs" @click="onEditTextareaCancel('remarkEditing')">取消</b-btn>
+        </template>
+        <b-btn v-else variant="outline-green" size="xs" @click="onEditTextarea('remarkEditing')">修改</b-btn>
+      </div>
+    </MyInfoItem>
+
     <MyInfoItem title="自动回复">
       <template slot="content">
         <div slot="content" v-if="autoReplyEditing">
@@ -97,10 +120,10 @@
 
       <div slot="action" class="setting-button-group">
         <template v-if="autoReplyEditing">
-          <b-btn variant="gradient-yellow" size="xs" @click="onEditAutoReplyConfirm">确定</b-btn>
-          <b-btn variant="outline-green" size="xs" @click="onEditAutoReplyCancel">取消</b-btn>
+          <b-btn variant="gradient-yellow" size="xs" @click="onEditTextareaConfirm({contentKey: 'auto_reply_content', editingKey: 'autoReplyEditing'})">确定</b-btn>
+          <b-btn variant="outline-green" size="xs" @click="onEditTextareaCancel('autoReplyEditing')">取消</b-btn>
         </template>
-        <b-btn v-else variant="outline-green" size="xs" @click="onEditAutoReply">修改</b-btn>
+        <b-btn v-else variant="outline-green" size="xs" @click="onEditTextarea('autoReplyEditing')">修改</b-btn>
       </div>
     </MyInfoItem>
 
@@ -151,6 +174,7 @@
     },
     data() {
       return {
+        remarkEditing: false,
         amountLimitEditing: false,
         autoReplyEditing: false,
         counterpartyLimitEditing: false,
@@ -224,22 +248,22 @@
         this.amountLimitEditing = false
       },
 
-      onEditAutoReply() {
-        this.autoReplyEditing = true
+      onEditTextarea(key) {
+        this[key] = true
         this.store2Data()
       },
-      onEditAutoReplyConfirm() {
-        this.$v.editingSettings.auto_reply_content.$touch()
-        if (this.$v.editingSettings.auto_reply_content.$invalid) return
+      onEditTextareaConfirm(obj) {
+        this.$v.editingSettings[obj.contentKey].$touch()
+        if (this.$v.editingSettings[obj.contentKey].$invalid) return
 
         this.onEditConfirm({
-          auto_reply_content: this.editingSettings.auto_reply_content
+          [obj.contentKey]: this.editingSettings[obj.contentKey]
         }).then(res => {
-          this.autoReplyEditing = false
+          this[obj.editingKey] = false
         })
       },
-      onEditAutoReplyCancel() {
-        this.autoReplyEditing = false
+      onEditTextareaCancel(key) {
+        this[key] = false
       },
 
       onEditCounterpartyLimit() {
