@@ -440,7 +440,7 @@
           },
           status: {
             label: '状态',
-            tdClass: ['text-right', 'pr-30'],
+            tdClass: ['text-right', 'pr-30', 'order-status'],
             thStyle: {
               textAlign: 'center',
             },
@@ -893,6 +893,9 @@
       }
       .table thead th {
         background: #f9f9f9;
+      }
+      .order-status{
+        min-width: 140px;
       }
       .order-type {
         display: inline-block;
