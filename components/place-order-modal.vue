@@ -315,7 +315,7 @@
           this.$router.push(`/orders/${response.data.id}`)
         }).catch(err => {
           this.submitting = false
-          this.$showTips(`下单失败 ${err.message}`, 'error')
+          this.$showTips(err.message, 'error')
           this.hideModal()
         })
       },
