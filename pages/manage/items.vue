@@ -145,7 +145,7 @@
         <template v-if="itemStatus === constant.ITEM_STATUS.ONLINE" slot="on_time" slot-scope="{item}">
           {{utils.getTimeText(item.on_time)}}
         </template>
-        <template v-else slot="off_time" slot-scope="{item}">
+        <template v-if="itemStatus === constant.ITEM_STATUS.OFFLINE" slot="off_time" slot-scope="{item}">
           {{utils.getTimeText(item.off_time)}}
         </template>
         <template slot="action" slot-scope="{ item }">
