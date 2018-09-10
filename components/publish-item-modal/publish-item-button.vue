@@ -11,7 +11,7 @@
     </div>
     <PublishModal v-model="modalShowing" @published="onPublished"/>
     <LinkModal v-model="showConstraintModal"
-               content="您今日已取消交易3次，无法发布和上架广告"
+               :content="itemLimitReason||'您今日已取消交易3次，无法发布和上架广告'"
                title="发布广告限制"
                linkText="查看规则"
                link="//support.coinex.com/hc/articles/360007643734"
@@ -35,6 +35,7 @@
       return {
         modalShowing: false,
         showConstraintModal: false,
+        itemLimitReason: null,
       }
     },
     computed: {
@@ -70,6 +71,7 @@
         const constraint = constraintResponse.data
         if (!constraint.can_publish_item) {
           this.showConstraintModal = true
+          this.itemLimitReason = constraint.item_limit_reason
           return
         }
 
