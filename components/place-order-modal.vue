@@ -47,6 +47,10 @@
               <EMsgs :result="$v.form.coin_amount" :msgs="invalidMessages.coin_amount"/>
             </div>
           </div>
+          <div class="merchant-remark" v-if="item.remark">
+            <span style="color: #6f6f6f;">商家备注：</span>
+            <span>{{ item.remark }}</span>
+          </div>
           <div class="payment-tip">
             <span v-if="this.item.side === this.constant.SIDE.SELL">* 提交信息即生成订单，请在15分钟内完成打款。</span>
             <span v-else>* 提交信息即生成订单，在订单结算期间您的数字货币会被冻结。</span>
@@ -113,6 +117,10 @@
           }
         }
         .item-payment {
+          .merchant-remark {
+            font-size: 16px;
+            margin-bottom: 30px;
+          }
           .price-input {
             display: flex;
             justify-content: space-between;

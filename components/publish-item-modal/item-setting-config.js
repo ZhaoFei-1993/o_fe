@@ -1,6 +1,6 @@
 /* @i18n $t */
 import {maxLength, maxValue, minValue, required, helpers} from 'vuelidate/lib/validators'
-import {MAX_AUTO_REPLY_LENGTH, DEAL_CASH_AMOUNT} from '~/modules/constant'
+import {MAX_AUTO_REPLY_LENGTH, DEAL_CASH_AMOUNT, MAX_REMARK_LENGTH} from '~/modules/constant'
 
 function smallerThan(compareField) {
   return helpers.withParams({ type: 'smallerThan', field: compareField }, function (value, parentVm) {
@@ -21,6 +21,14 @@ function biggerThan(compareField) {
  */
 export default function getConfig($t, $tt) {
   return {
+    remark: {
+      validation: {
+        maxLength: maxLength(MAX_REMARK_LENGTH),
+      },
+      message: {
+        maxLength: '最大长度为30'.replace('30', MAX_REMARK_LENGTH),
+      },
+    },
     auto_reply_content: {
       validation: {
         maxLength: maxLength(MAX_AUTO_REPLY_LENGTH),
