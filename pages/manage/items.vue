@@ -195,7 +195,7 @@
       <PublishItemModal v-model="isItemEditing" :editingItem="editingItem" :editing="true" @edited="onItemEdited"/>
     </CBlock>
     <LinkModal v-model="showConstraintModal"
-               content="您今日已取消交易3次，无法发布和上架广告"
+               :content="itemLimitReason||'您今日已取消交易3次，无法发布和上架广告'"
                title="发布广告限制"
                linkText="查看规则"
                link="//support.coinex.com/hc/articles/360007643734"
@@ -257,6 +257,7 @@
         isItemEditing: false,   // 是否在编辑广告
         queryParams: {},
         showConstraintModal: false,
+        itemLimitReason: null,
         showPriceAlertModal: false,
         priceAlert: {},
       }
@@ -428,6 +429,7 @@
         const constraint = constraintResponse.data
         if (!constraint.can_publish_item) {
           this.showConstraintModal = true
+          this.itemLimitReason = constraint.item_limit_reason
           return
         }
         const onlineItems = this.itemsOnline.filter(onlineItem => onlineItem.coin_type === item.coin_type && onlineItem.side === item.side)

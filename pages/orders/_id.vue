@@ -310,7 +310,7 @@
             <b-btn size="xs" variant="outline-green" :disabled="expired" @click="cancelOrder">取消订单</b-btn>
           </div>
           <template v-if="showAppeal">
-            <span v-if="!appeal||appeal.status===''">
+            <span v-if="!appeal||appeal.status===''||appeal.status===constant.APPEAL_STATUS.CANCEL">
               交易出现问题？需要
               <span class="c-brand-green appeal-btn" v-if="canAppeal" @click="startAppeal">申诉</span>
               <span class="c-brand-green appeal-btn" v-else v-b-tooltip.hover title="买家付款10分钟后，可发起申诉。">申诉</span>
@@ -323,34 +323,10 @@
                 class="c-brand-green appeal-btn">提交工单</span></b-link>
             </span>
           </template>
-          <template v-if="appeal">
-            <div v-if="appeal.status===constant.APPEAL_STATUS.CREATED"
-                 class="d-flex align-items-center justify-content-between">
-              <span>{{appealSide}}已发起申诉，请等待申诉专员介入</span>
-              <button v-if="isCurrentUserAppealing" class="btn btn-outline-green btn-xs" @click="cancelAppeal">取消申诉
-              </button>
-            </div>
-            <div
-              v-else-if="appeal.status===constant.APPEAL_STATUS.PROCESSING || appeal.status===constant.APPEAL_STATUS.PENDING"
-              class="d-flex align-items-center justify-content-between">
-              <span>申诉专员已经介入，请及时提供必要的信息</span>
-            </div>
-            <div v-else-if="appeal.status===constant.APPEAL_STATUS.COMPLETED">
-              <span>申诉裁决：{{appealResult}}</span>
-              <!--判定平局-->
-              <span v-if="appeal.order_result==='none'" class="c-brand-green appeal-btn ml-10"
-                    @click="startAppeal">再次申诉</span>
-            </div>
-            <div v-else-if="canAppeal && appeal.status===constant.APPEAL_STATUS.CANCEL">
-              <!--取消 但仍在申诉期-->
-              交易出现问题？需要
-              <span class="c-brand-green appeal-btn" @click="startAppeal">申诉</span>
-            </div>
-            <span v-else>
-                交易出现问题？需要
-                <b-link :href="`${coinexDomain}/res/support/ticket`" target="_blank"><span
-                  class="c-brand-green appeal-btn">提交工单</span></b-link>
-              </span>
+          <template v-if="appeal && appeal.result_desc && appeal.result_desc.length>0">
+            <span>{{appeal.result_desc}}</span>
+            <span v-if="appeal.allow_appeal_again" class="c-brand-green appeal-btn ml-10"
+                                                     @click="startAppeal">再次申诉</span>
           </template>
           <div class="divider" v-if="canCancel||showAppeal||appeal"></div>
         </div>

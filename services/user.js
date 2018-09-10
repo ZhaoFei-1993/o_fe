@@ -156,7 +156,7 @@ export default (axios) => {
     },
 
     dynamicConstraint() {
-      return axios.get('/user/today/limit')
+      return axios.get('/user/limit')
     },
 
     /**

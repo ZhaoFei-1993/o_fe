@@ -429,7 +429,8 @@
         pager: defaultPager,
         noKycLimit: NO_KYC_LIMIT,
         requestItems: null,
-        announcements: []
+        announcements: [],
+        orderLimitReason: null,
       }
     },
     asyncData({app, store, route}) {
@@ -596,7 +597,7 @@
                 case this.constant.PLACE_ORDER_ERROR.CANCEL_LIMIT:
                   this.currentConstraint = {
                     title: '交易限制',
-                    content: '您今天累计取消超过 3 次订单，被冻结交易功能。',
+                    content: this.orderLimitReason || '您今天累计取消超过 3 次订单，被冻结交易功能。',
                     linkText: '查看规则',
                     link: '//support.coinex.com/hc/articles/360007643734',
                     isOutLink: true,
@@ -657,6 +658,7 @@
         return this.axios.user.dynamicConstraint().then(response => {
           const constraint = response.data
           if (!constraint.can_place_order) {
+            this.orderLimitReason = constraint.order_limit_reason
             return Promise.reject(new PlaceOrderError('限制交易', this.constant.PLACE_ORDER_ERROR.CANCEL_LIMIT))
           } else {
             return Promise.resolve()
