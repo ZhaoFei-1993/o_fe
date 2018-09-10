@@ -97,7 +97,7 @@
 
       <div slot="action" class="setting-button-group">
         <template v-if="remarkEditing">
-          <b-btn variant="gradient-yellow" size="xs" @click="onEditTextareaConfirm({key1: 'remark', key2: 'remarkEditing'})">确定</b-btn>
+          <b-btn variant="gradient-yellow" size="xs" @click="onEditTextareaConfirm({contentKey: 'remark', editingKey: 'remarkEditing'})">确定</b-btn>
           <b-btn variant="outline-green" size="xs" @click="onEditTextareaCancel('remarkEditing')">取消</b-btn>
         </template>
         <b-btn v-else variant="outline-green" size="xs" @click="onEditTextarea('remarkEditing')">修改</b-btn>
@@ -120,7 +120,7 @@
 
       <div slot="action" class="setting-button-group">
         <template v-if="autoReplyEditing">
-          <b-btn variant="gradient-yellow" size="xs" @click="onEditTextareaConfirm({key1: 'auto_reply_content', key2: 'autoReplyEditing'})">确定</b-btn>
+          <b-btn variant="gradient-yellow" size="xs" @click="onEditTextareaConfirm({contentKey: 'auto_reply_content', editingKey: 'autoReplyEditing'})">确定</b-btn>
           <b-btn variant="outline-green" size="xs" @click="onEditTextareaCancel('autoReplyEditing')">取消</b-btn>
         </template>
         <b-btn v-else variant="outline-green" size="xs" @click="onEditTextarea('autoReplyEditing')">修改</b-btn>
@@ -253,13 +253,13 @@
         this.store2Data()
       },
       onEditTextareaConfirm(obj) {
-        this.$v.editingSettings[obj.key1].$touch()
-        if (this.$v.editingSettings[obj.key1].$invalid) return
+        this.$v.editingSettings[obj.contentKey].$touch()
+        if (this.$v.editingSettings[obj.contentKey].$invalid) return
 
         this.onEditConfirm({
-          [obj.key1]: this.editingSettings[obj.key1]
+          [obj.contentKey]: this.editingSettings[obj.contentKey]
         }).then(res => {
-          this[obj.key2] = false
+          this[obj.editingKey] = false
         })
       },
       onEditTextareaCancel(key) {
