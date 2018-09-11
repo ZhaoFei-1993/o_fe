@@ -10,6 +10,16 @@
     .items-header-left {
       display: flex;
       align-items: center;
+      .available-time-wrapper {
+        display: flex;
+        width: 350px;
+        align-items: center;
+        margin-left: 8px;
+        .available-time-label {
+          display: inline-block;
+          margin: 0 6px;
+        }
+      }
     }
 
     .items-table {
@@ -76,18 +86,24 @@
 <template>
   <div class="page-content-container">
     <CBlock class="page-my-items" x="0">
-      <h2 class="items-header" v-if="user.merchant">
-      <span class="items-header-left">
-        广告管理
-        <ToggleButton :value="user.merchant.is_available" class="mb-0 mx-5" @input="onUserStatusChange"/>
-        <span v-if="user.merchant.is_available" class="c-brand-green fz-12">正在接单</span>
-        <span v-else class="c-gray fz-12">暂停接单</span>
-      </span>
+      <div class="items-header" v-if="user.merchant">
+        <span class="items-header-left">
+          广告管理
+          <ToggleButton :value="user.merchant.is_available" class="mb-0 mx-5" @input="onUserStatusChange"/>
+          <span v-if="user.merchant.is_available" class="c-brand-green fz-12">正在接单</span>
+          <span v-else class="c-gray fz-12">暂停接单</span>
+          <div class="fz-12 available-time-wrapper">
+            自动接单时间：<span class="available-time-label">从</span>
+            <TimeSelector type="available_start_time" @click="onClickTimeSelector" :before-click="onBeforeClickTimeSelector" :options="startTimeRangeOptions"></TimeSelector>
+            <span class="available-time-label">至</span>
+            <TimeSelector type="available_end_time" @click="onClickTimeSelector" :before-click="onBeforeClickTimeSelector" :options="endTimeRangeOptions"></TimeSelector>
+          </div>
+        </span>
 
         <PublishItemButton @published="onItemPublished">
           <b-btn size="xs" variant="gradient-yellow">发布广告</b-btn>
         </PublishItemButton>
-      </h2>
+      </div>
 
       <div class="my-25 px-30">
         <b-btn v-for="(status, index) in filterOptions"
@@ -233,6 +249,7 @@
   import TableHeadDropdown from '~/components/table-head-dropdown'
   import LinkModal from '~/components/link-modal'
   import Blank from '~/components/blank'
+  import TimeSelector from './_c/time-selector'
   import {mapState} from 'vuex'
   import ClickOutside from 'vue-click-outside'
 
@@ -248,6 +265,7 @@
       PublishItemButton,
       TableHeadDropdown,
       LinkModal,
+      TimeSelector,
     },
     data() {
       return {
@@ -273,6 +291,12 @@
     },
     computed: {
       ...mapState(['user', 'constant', 'balance']),
+      startTimeRangeOptions() {
+        return this.getRimeRangeOptions('available_start_time')
+      },
+      endTimeRangeOptions() {
+        return this.getRimeRangeOptions('available_end_time')
+      },
       // 当前展示的广告列表
       itemsCurrent: function () {
         return this.itemStatus === this.constant.ITEM_STATUS.ONLINE ? this.itemsOnline : this.itemsOffline
@@ -388,6 +412,39 @@
       document.querySelector('.layout-content').style.position = 'static'
     },
     methods: {
+      onBeforeClickTimeSelector(data, type) { // 点击接单时间段下拉选项前的检查，防止设置同一时间段
+        const timeMap = {
+          available_start_time: 'available_end_time',
+          available_end_time: 'available_start_time',
+        }
+        if (data.value === this.user.settings[timeMap[type]]) {
+          this.$errorTips('不能设置同一时间段')
+          return false
+        }
+        return true
+      },
+      onClickTimeSelector(data, type) { // 修改接单时间
+        this.$store.dispatch('setUserSettings', {
+          ...this.user.settings,
+          [type]: data.value,
+        }).catch(err => {
+          this.$errorTips(`设置失败，error=${err}`)
+        })
+      },
+      getRimeRangeOptions(type) {
+        const { settings } = this.user
+        const range = []
+        if (settings) {
+          const availableTime = settings[type]
+          for (let i = 0, step = 0; i < 24; i++) {
+            range.push({ text: `${`${i}`.padStart(2, '0')}:00`, value: step, active: availableTime === step })
+            step += 30
+            range.push({ text: `${`${i}`.padStart(2, '0')}:30`, value: step, active: availableTime === step })
+            step += 30
+          }
+        }
+        return range
+      },
       onClickSideDropdown(item) {
         this.queryParams.side = item.value
         this.getItems()
