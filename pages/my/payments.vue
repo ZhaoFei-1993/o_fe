@@ -277,27 +277,29 @@
 
   <CBlock class="page-my-payments" y="0" v-else>
     <h3 class="layout-my-title pl-0">2步完成添加支付方式</h3>
-    <KycStep :step="1" title="完成实名认证" highlight>
+    <KycStep :step="1" title="完成高级实名认证" highlight>
       <span v-if="user.account.kyc_status === constant.KYC_STATUS.PROCESSING">审核中</span>
-      <b-link v-else :href="`${constant.coinexDomain}/my/info/basic`" target="_blank">去实名 ></b-link>
+      <b-link v-else @click="showDownloadModal = true">去实名 ></b-link>
     </KycStep>
     <KycStep :step="2" title="添加支付方式"/>
+    <DownloadModal v-model="showDownloadModal"></DownloadModal>
   </CBlock>
 </template>
 
 <script>
   import Vue from 'vue'
   import {mapState, mapGetters} from 'vuex'
-  import MySidebar from '~/components/my-sidebar.vue'
-  import My2Column from '~/components/my-2column.vue'
-  import MyInfoItem from './_c/my-info-item.vue'
-  import ToggleButton from '~/components/toggle-button.vue'
-  import VerifyCode from '~/components/verify-code.vue'
-  import ImageUploadPreview from '~/components/image-upload-components/image-upload-preview.vue'
-  import QrcodePopover from '~/components/qrcode-popover.vue'
+  import MySidebar from '~/components/my-sidebar'
+  import My2Column from '~/components/my-2column'
+  import MyInfoItem from './_c/my-info-item'
+  import DownloadModal from './_c/download-modal'
+  import ToggleButton from '~/components/toggle-button'
+  import VerifyCode from '~/components/verify-code'
+  import ImageUploadPreview from '~/components/image-upload-components/image-upload-preview'
+  import QrcodePopover from '~/components/qrcode-popover'
   import Vuelidate from 'vuelidate'
   import getPaymentFormConfig from './payment-form-config'
-  import EMsgs from '~/components/error-message.vue'
+  import EMsgs from '~/components/error-message'
   import {coinexDomain} from '~/modules/variables'
   import {PAYMENT_TYPES, VERIFY_CODE_TYPE} from '~/modules/constant'
 
@@ -342,6 +344,7 @@
       ImageUploadPreview,
       QrcodePopover,
       KycStep,
+      DownloadModal,
     },
     head() {
       return {
@@ -351,6 +354,7 @@
     },
     data() {
       return {
+        showDownloadModal: false,
         verify: {
           codeType: VERIFY_CODE_TYPE.GOOGLE,
           sms: '',
