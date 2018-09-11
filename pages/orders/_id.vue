@@ -566,7 +566,7 @@
       },
       showConfirmReceiptStep() {
         const validOrder = this.order.status !== this.constant.ORDER_STATUS.CANCEL.value && this.order.status !== this.constant.ORDER_STATUS.CLOSED.value
-        const appealClosed = this.appeal && this.appeal.order_result !== this.constant.ORDER_RESULT_MAP.none.value
+        const appealClosed = this.appeal && this.appeal.order_result !== this.constant.ORDER_RESULT_MAP.none.value && this.appeal.order_result !== ''
         return validOrder && !appealClosed
       },
       paymentStatusMessage() {
