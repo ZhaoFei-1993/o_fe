@@ -36,7 +36,7 @@
     },
     computed: {
       sortedPayments: function () {
-        return this.payments.map(p => p.method).sort((a, b) => {
+        return Array.from(new Set(this.payments.map(p => p.method))).sort((a, b) => {
           return SORT_WEIGHT[a] - SORT_WEIGHT[b]
         })
       }
