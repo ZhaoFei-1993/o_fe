@@ -327,10 +327,10 @@
             <span>{{appeal.result_desc}}</span>
             <span v-if="appeal.allow_appeal_again" class="c-brand-green appeal-btn ml-10"
                   @click="startAppeal">再次申诉</span>
-            <button v-if="canCancelAppeal" class="btn btn-outline-green btn-xs" @click="cancelAppeal">取消申诉
+            <button v-if="canCancelAppeal" class="btn btn-outline-green btn-xs ml-10" @click="cancelAppeal">取消申诉
             </button>
           </template>
-          <div class="divider" v-if="canCancel||showAppeal||appeal"></div>
+          <div class="divider" v-if="canCancel||showAppeal||(appeal&&appeal.result!=='')"></div>
         </div>
         <div class="order-notice">
           <div class="title c-dark">交易须知</div>
@@ -493,7 +493,7 @@
       },
       canCancelAppeal() {
         if (!this.appeal) return false
-        const pending = this.appeal.status === this.constant.APPEAL_STATUS.PROCESSING || this.appeal.status === this.constant.APPEAL_STATUS.PENDING
+        const pending = this.appeal.status === this.constant.APPEAL_STATUS.CREATED
         return this.appeal.user_id === this.user.account.id && pending
       },
       isAppealing() {
@@ -565,7 +565,9 @@
         return !this.isBuySide && this.order.status === this.constant.ORDER_STATUS.PAID.value
       },
       showConfirmReceiptStep() {
-        return this.showSellerConfirmButton || this.order.status === this.constant.ORDER_STATUS.SUCCESS.value
+        const validOrder = this.order.status !== this.constant.ORDER_STATUS.CANCEL.value && this.order.status !== this.constant.ORDER_STATUS.CLOSED.value;
+        const appealClosed = this.appeal && this.appeal.order_result !== this.constant.ORDER_RESULT_MAP.none.value
+        return validOrder && !appealClosed
       },
       paymentStatusMessage() {
         let payMessage = '订单已超时'
