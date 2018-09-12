@@ -200,7 +200,7 @@
         }
         .col-wide {
           display: inline-block;
-          width: 200px;
+          width: 190px;
           padding-right: 16px;
         }
         .col-price {
@@ -211,7 +211,7 @@
         .col-name {
         }
         .col-amount {
-          width: 160px;
+          width: 180px;
         }
         .col-price-limit {
           width: 180px;

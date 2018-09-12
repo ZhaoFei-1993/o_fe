@@ -27,7 +27,7 @@
       value: [Number, String],
       max: {
         type: Number,
-        default: Number.MAX_SAFE_INTEGER,
+        default: 99999999, // 后端限制数量发布广告币数量<1亿，前端限制9千万
       },
       min: {
         type: Number,
