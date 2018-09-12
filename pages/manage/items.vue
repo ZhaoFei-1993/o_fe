@@ -292,10 +292,10 @@
     computed: {
       ...mapState(['user', 'constant', 'balance']),
       startTimeRangeOptions() {
-        return this.getRimeRangeOptions('available_start_time')
+        return this.getTimeRangeOptions('available_start_time')
       },
       endTimeRangeOptions() {
-        return this.getRimeRangeOptions('available_end_time')
+        return this.getTimeRangeOptions('available_end_time')
       },
       // 当前展示的广告列表
       itemsCurrent: function () {
@@ -431,7 +431,7 @@
           this.$errorTips(`设置失败，error=${err}`)
         })
       },
-      getRimeRangeOptions(type) {
+      getTimeRangeOptions(type) {
         const { settings } = this.user
         const range = []
         if (settings) {

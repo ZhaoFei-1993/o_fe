@@ -27,11 +27,11 @@
         type: Array,
         default: [],
       },
-      type: {
+      type: { // 下拉框类型，为了区分开始时间 or 结束时间
         type: String,
         default: '',
       },
-      beforeClick: {
+      beforeClick: { // 改变下拉项前的检查钩子，返回true才勾选
         type: Function,
         default: () => {
           return true
