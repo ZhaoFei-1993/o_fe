@@ -92,11 +92,13 @@
           <ToggleButton :value="user.merchant.is_available" class="mb-0 mx-5" @input="onUserStatusChange"/>
           <span v-if="user.merchant.is_available" class="c-brand-green fz-12">正在接单</span>
           <span v-else class="c-gray fz-12">暂停接单</span>
-          <div class="fz-12 available-time-wrapper">
-            自动接单时间：<span class="available-time-label">从</span>
+          <div class="fz-12 available-time-wrapper" v-if="user.settings">
+            自动接单时间：
             <TimeSelector type="available_start_time" @click="onClickTimeSelector" :before-click="onBeforeClickTimeSelector" :options="startTimeRangeOptions"></TimeSelector>
-            <span class="available-time-label">至</span>
-            <TimeSelector type="available_end_time" @click="onClickTimeSelector" :before-click="onBeforeClickTimeSelector" :options="endTimeRangeOptions"></TimeSelector>
+            <span style="display: inline-block;" v-show="!(user.settings.available_start_time === 0 && user.settings.available_end_time === 0)">
+              <span class="available-time-label">至</span>
+              <TimeSelector type="available_end_time" @click="onClickTimeSelector" :before-click="onBeforeClickTimeSelector" :options="endTimeRangeOptions"></TimeSelector>
+            </span>
           </div>
         </span>
 
@@ -417,16 +419,25 @@
           available_start_time: 'available_end_time',
           available_end_time: 'available_start_time',
         }
-        if (data.value === this.user.settings[timeMap[type]]) {
+        if (data.value > 0 && data.value === this.user.settings[timeMap[type]]) {
           this.$errorTips('不能设置同一时间段')
           return false
         }
         return true
       },
       onClickTimeSelector(data, type) { // 修改接单时间
+        let finalData = {
+          [type]: data.value,
+        }
+        if (data.value === -1) {
+          finalData = {
+            available_start_time: 0,
+            available_end_time: 0,
+          }
+        }
         this.$store.dispatch('setUserSettings', {
           ...this.user.settings,
-          [type]: data.value,
+          ...finalData,
         }).catch(err => {
           this.$errorTips(`设置失败，error=${err}`)
         })
@@ -436,10 +447,13 @@
         const range = []
         if (settings) {
           const availableTime = settings[type]
+          const { available_start_time: startTime, available_end_time: endTime } = settings
+          const notAvailable = (startTime === 0 && endTime === 0) // 开始与结束时间都为0表示不设置接单时间
+          range.push({ text: '不设置', value: -1, active: notAvailable })
           for (let i = 0, step = 0; i < 24; i++) {
-            range.push({ text: `${`${i}`.padStart(2, '0')}:00`, value: step, active: availableTime === step })
+            range.push({ text: `${`${i}`.padStart(2, '0')}:00`, value: step, active: availableTime === step && !notAvailable })
             step += 30
-            range.push({ text: `${`${i}`.padStart(2, '0')}:30`, value: step, active: availableTime === step })
+            range.push({ text: `${`${i}`.padStart(2, '0')}:30`, value: step, active: availableTime === step && !notAvailable })
             step += 30
           }
         }
