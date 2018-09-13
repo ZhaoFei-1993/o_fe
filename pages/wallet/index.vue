@@ -156,6 +156,7 @@
           sell_order: '出售',
           transfer_in: '转入',
           transfer_out: '转出',
+          transfer_return: '退还',
           gift: '赠送',
         },
         totalBalance: 0,
