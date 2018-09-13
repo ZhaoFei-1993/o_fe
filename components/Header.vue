@@ -19,6 +19,48 @@
     z-index: 11;
     top: 0px;
     font-size: 14px;
+    .banner-wrapper {
+      width: 100%;
+      height: 100px;
+      background-color: #00C1CE;
+      .banner-content-wrapper {
+        width: 1200px;
+        margin: 0 auto;
+        position: relative;
+        .banner-img {
+          display: block;
+          width: 100%;
+          height: 100%;
+        }
+        .banner-main-btn {
+          background-color: transparent;
+          width: 210px;
+          height: 46px;
+          border: 2px solid #fff;
+          font-size: 22px;
+          line-height: 42px;
+          color: #fff;
+          position: absolute;
+          right: 44px;
+          top: 30px;
+          border-radius: 100px;
+          cursor: pointer;
+          outline: none;
+        }
+        .banner-close-btn {
+          position: absolute;
+          top: 0;
+          right: 0;
+          width: 24px;
+          height: 24px;
+          color: #fff;
+          cursor: pointer;
+          .icon-close {
+            font-size: 20px;
+          }
+        }
+      }
+    }
     &.scrolled {
       box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.1);
     }
@@ -240,11 +282,11 @@
 
 <template>
   <div :class="['page-header pr bgc-w', headerClass, actClass]">
-    <div style="width: 100%;height: 100px;background-color: #00C1CE;" v-show="showBanner">
-      <div style="width: 1200px;margin: 0 auto;position: relative;">
-        <img src="~assets/img/banner/app-download-banner.png" style="width: 100%;height: 100%;">
-        <button @click="showDownloadModal = true" style="background-color: transparent;width: 210px;height: 46px;border: 2px solid #fff;font-size: 22px;line-height: 42px;color: #fff;position: absolute;right: 44px;top: 30px;border-radius: 100px;cursor: pointer;outline: none;">下载APP ></button>
-        <div @click="hideBanner" style="position: absolute;top: 0;right: 0;width: 24px;height: 24px;color: #fff;cursor: pointer;"><i class="iconfont icon-close" style="font-size: 20px;"></i></div>
+    <div class="banner-wrapper" v-show="showBanner">
+      <div class="banner-content-wrapper">
+        <img src="~assets/img/banner/app-download-banner.png" class="banner-img">
+        <button @click="showDownloadModal = true" class="banner-main-btn">下载APP ></button>
+        <div @click="hideBanner" class="banner-close-btn"><i class="iconfont icon-close"></i></div>
       </div>
     </div>
     <b-navbar class="navbar-main" toggleable="md">
