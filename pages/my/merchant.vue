@@ -275,7 +275,7 @@
         <b-btn variant="gradient-yellow" size="lg" style="width:330px;" @click="onSubmit">提交</b-btn>
       </div>
     </template>
-    <DownloadModal v-model="showDownloadModal"></DownloadModal>
+    <DownloadModal v-model="showDownloadModal" title="实名认证" header="实名认证请前往CoinEx APP中 「 账户 」-「 实名认证 」 中进行。"></DownloadModal>
     <b-modal id="cancel-merchant-modal"
              title="取消认证"
              ok-title="确认"
@@ -356,7 +356,7 @@
   import My2Column from '~/components/my-2column'
   import ProgressIndicator from '~/components/progress-indicator'
   import MyInfoItem from './_c/my-info-item'
-  import DownloadModal from './_c/download-modal'
+  import DownloadModal from '~/components/download-modal'
   import {coinexDomain} from '~/modules/variables'
   import VerifyCode from '~/components/verify-code'
   import {VERIFY_CODE_TYPE, VERIFY_CODE_BUSINESS} from '~/modules/constant'
