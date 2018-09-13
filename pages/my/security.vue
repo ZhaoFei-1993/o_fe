@@ -177,7 +177,7 @@
                   :smsSequence.sync="verify.smsSequence"
       />
     </b-modal>
-    <DownloadModal v-model="showDownloadModal"></DownloadModal>
+    <DownloadModal v-model="showDownloadModal" title="实名认证" header="实名认证请前往CoinEx APP中 「 账户 」-「 实名认证 」 中进行。"></DownloadModal>
   </CBlock>
 </template>
 
@@ -188,7 +188,7 @@
   import MySidebar from '~/components/my-sidebar'
   import My2Column from '~/components/my-2column'
   import MyInfoItem from './_c/my-info-item'
-  import DownloadModal from './_c/download-modal'
+  import DownloadModal from '~/components/download-modal'
   import StarRate from '~/components/star-rate'
   import {coinexDomain} from '~/modules/variables'
 

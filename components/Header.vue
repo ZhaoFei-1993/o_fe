@@ -240,6 +240,13 @@
 
 <template>
   <div :class="['page-header pr bgc-w', headerClass, actClass]">
+    <div style="width: 100%;height: 100px;background-color: #00C1CE;" v-show="showBanner">
+      <div style="width: 1200px;margin: 0 auto;position: relative;">
+        <img src="~assets/img/banner/app-download-banner.png" style="width: 100%;height: 100%;">
+        <button @click="showDownloadModal = true" style="background-color: transparent;width: 210px;height: 46px;border: 2px solid #fff;font-size: 22px;line-height: 42px;color: #fff;position: absolute;right: 44px;top: 30px;border-radius: 100px;cursor: pointer;outline: none;">下载APP ></button>
+        <div @click="hideBanner" style="position: absolute;top: 0;right: 0;width: 24px;height: 24px;color: #fff;cursor: pointer;"><i class="iconfont icon-close" style="font-size: 20px;"></i></div>
+      </div>
+    </div>
     <b-navbar class="navbar-main" toggleable="md">
       <b-navbar-brand to="/">
         <img v-if="actClass" src="~assets/img/logo-white.svg" alt="CoinEx OTC" height="34" width="120">
@@ -361,6 +368,7 @@
         </b-form>
       </div>
     </b-modal>
+    <DownloadModal v-model="showDownloadModal" header="法币交易正式上线 CoinEx APP，欢迎下载升级！"></DownloadModal>
   </div>
 </template>
 
@@ -375,8 +383,10 @@
   import PublishItemButton from '~/components/publish-item-modal/publish-item-button.vue'
   import UserAvatar from '~/components/user-avatar'
   import Blank from '~/components/blank'
+  import DownloadModal from '~/components/download-modal'
   import preventParentScroll from 'vue-prevent-parent-scroll'
   import {COLORS} from '~/components/chat/constant.js'
+  import cookies from '~/plugins/cookies'
 
   Vue.use(Vuelidate)
   export default {
@@ -388,9 +398,12 @@
       EMsgs,
       UserAvatar,
       Blank,
+      DownloadModal,
     },
     data() {
       return {
+        showBanner: false,
+        showDownloadModal: false,
         colors: COLORS,
         orderList: [],
         showOrders: false,
@@ -473,11 +486,17 @@
         this.axios.onError(err)
       })
       window.addEventListener('scroll', this.onScroll)
+
+      this.showBanner = cookies.getItem(window.document, 'showBanner') !== 'false' // 控制banner显示
     },
     beforeDestroy() {
       window.removeEventListener('scroll', this.onScroll)
     },
     methods: {
+      hideBanner() {
+        this.showBanner = false
+        cookies.setItem(window.document, 'showBanner', false)
+      },
       isMerchant(order) { // 是否商家
         return order.merchant_id === this.user.account.id
       },

@@ -38,6 +38,7 @@
             <b-link href="https://support.coinex.com/hc/sections/360001604474" target="_blank">新手帮助</b-link>
             <b-link :href="`${coinexDomain}/res/support/ticket`" target="_blank">提交工单</b-link>
             <b-link href="https://support.coinex.com/hc/sections/360001631693" target="_blank">公告</b-link>
+            <b-link @click="showDownloadModal = true">下载APP</b-link>
           </div>
         </div>
       </div>
@@ -52,17 +53,20 @@
     <div style="position: fixed;right: 20px;bottom: 20px;">
       <ChatList></ChatList>
     </div>
+    <DownloadModal v-model="showDownloadModal" header="法币交易正式上线 CoinEx APP，欢迎下载升级！"></DownloadModal>
   </footer>
 </template>
 
 <script>
 import { mapState } from 'vuex'
+import DownloadModal from '~/components/download-modal'
 import {coinexDomain} from '~/modules/variables'
 import ChatList from '~/components/chat-list'
 
 export default {
   data() {
     return {
+      showDownloadModal: false,
       coinexDomain,
     }
   },
@@ -71,6 +75,7 @@ export default {
   },
   components: {
     ChatList,
+    DownloadModal,
   },
 }
 </script>
