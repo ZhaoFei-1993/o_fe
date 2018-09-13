@@ -188,28 +188,18 @@
         myMiningData: null,
         tableItems: [],
         todayRankFields: {
-          username: {
-            label: '用户昵称',
-            sortable: false,
-            thStyle: {
-              width: '185px',
-            },
-            thClass: ['text-left', 'pl-20'],
-            tdClass: ['text-left', 'pl-20'],
-          },
           sort: {
             label: '今日排名',
-            thStyle: {
-              width: '135px',
-            },
-            thClass: ['text-right'],
-            tdClass: ['text-right'],
             sortable: false,
+            thStyle: {
+              width: '45px',
+            },
+            thClass: ['text-left', 'pl-20'],
           },
           score: {
             label: '今日积分',
             thStyle: {
-              width: '260px',
+              width: '220px',
             },
             thClass: ['text-right'],
             tdClass: ['text-right'],
