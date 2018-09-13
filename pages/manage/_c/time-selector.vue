@@ -1,7 +1,7 @@
 <template>
   <div class="time-selector-wrapper" v-click-outside="hide">
     <div class="time-selector-label" @click="showSelector = !showSelector">
-      <div class="time-selector-selected">{{ selectedValue }}</div>
+      <div class="time-selector-selected">{{ selectedValueLabel }}</div>
       <div class="time-selector-arrow"><i class="iconfont icon-icon_drop_down_arrow"></i></div>
     </div>
     <div class="time-selector-dropdown-wrapper" v-show="showSelector">
@@ -23,6 +23,10 @@
 
   export default {
     props: {
+      value: {
+        type: [Number, String],
+        default: -1,
+      },
       options: {
         type: Array,
         default: [],
@@ -48,20 +52,21 @@
       }
     },
     computed: {
-      selectedValue: {
-        get() {
-          if (this.options.length) {
-            for (let i = 0, len = this.options.length; i < len; i++) {
-              const item = this.options[i]
-              if (item.active) {
-                this.activeId = i
-                return item.text
-              }
+      selectedValueLabel() {
+        if (this.options.length) {
+          let res = ''
+          for (let i = 0, len = this.options.length; i < len; i++) {
+            const item = this.options[i]
+            if (item.value === this.value) {
+              this.activeId = i
+              item.active = true
+              res = item.text
+            } else {
+              item.active = false
             }
           }
-          return ''
-        },
-        set() {},
+          return res
+        }
       },
     },
     methods: {
@@ -81,7 +86,6 @@
               item.active = false
             }
           })
-          this.selectedValue = option.value
           this.$emit('click', option, this.type)
         }
       },

@@ -94,10 +94,10 @@
           <span v-else class="c-gray fz-12">暂停接单</span>
           <div class="fz-12 available-time-wrapper" v-if="user.settings">
             自动接单时间：
-            <TimeSelector type="available_start_time" @click="onClickTimeSelector" :before-click="onBeforeClickTimeSelector" :options="startTimeRangeOptions"></TimeSelector>
-            <span style="display: inline-block;" v-show="!(user.settings.available_start_time === 0 && user.settings.available_end_time === 0)">
+            <TimeSelector type="available_start_time" @click="onClickTimeSelector" :before-click="onBeforeClickTimeSelector" :options="startTimeRangeOptions" :value="startTimeRangeValue"></TimeSelector>
+            <span style="display: inline-block;" v-show="startTimeRangeValue > -1 && endTimeRangeValue > -1">
               <span class="available-time-label">至</span>
-              <TimeSelector type="available_end_time" @click="onClickTimeSelector" :before-click="onBeforeClickTimeSelector" :options="endTimeRangeOptions"></TimeSelector>
+              <TimeSelector type="available_end_time" @click="onClickTimeSelector" :before-click="onBeforeClickTimeSelector" :options="endTimeRangeOptions" :value="endTimeRangeValue"></TimeSelector>
             </span>
           </div>
         </span>
@@ -283,6 +283,8 @@
         itemLimitReason: null,
         showPriceAlertModal: false,
         priceAlert: {},
+        startTimeRangeValue: -1, // 接单开始时间
+        endTimeRangeValue: -1, // 接单结束时间
       }
     },
     head() {
@@ -290,6 +292,20 @@
         title: '广告管理' +
         this.$t('global.pageTitle.common')
       }
+    },
+    watch: {
+      'user.settings'() {
+        if (this.user && this.user.settings) {
+          const { available_start_time: startTime, available_end_time: endTime } = this.user.settings
+          if (startTime === 0 && endTime === 0) {
+            this.startTimeRangeValue = -1
+            this.endTimeRangeValue = -1
+          } else {
+            this.startTimeRangeValue = startTime
+            this.endTimeRangeValue = endTime
+          }
+        }
+      },
     },
     computed: {
       ...mapState(['user', 'constant', 'balance']),
@@ -425,7 +441,7 @@
         }
         return true
       },
-      onClickTimeSelector(data, type) { // 修改接单时间
+      onClickTimeSelector(data, type) { // 修改接单时间, 逻辑很复杂。。。请亲自问作者
         let finalData = {
           [type]: data.value,
         }
@@ -433,6 +449,25 @@
           finalData = {
             available_start_time: 0,
             available_end_time: 0,
+          }
+          this.startTimeRangeValue = -1
+          this.endTimeRangeValue = -1
+        } else {
+          const { available_start_time: startTime, available_end_time: endTime } = this.user.settings
+          if (startTime === 0 && endTime === 0 && type === 'available_start_time') { // 从`不设置`状态到具体时间状态
+            this.startTimeRangeValue = data.value
+            let nextTime = data.value + 30
+            if (nextTime > this.startTimeRangeOptions[this.startTimeRangeOptions.length - 1].value) {
+              nextTime = this.startTimeRangeOptions[1].value
+            }
+
+            finalData.available_end_time = nextTime // 结束时间给个延后30分钟的时间，防止一直显示`不设置`
+          } else {
+            if (type === 'available_start_time') {
+              this.startTimeRangeValue = data.value
+            } else if (type === 'available_end_time') {
+              this.endTimeRangeValue = data.value
+            }
           }
         }
         this.$store.dispatch('setUserSettings', {
