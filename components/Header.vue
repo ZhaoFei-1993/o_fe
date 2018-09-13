@@ -19,6 +19,48 @@
     z-index: 11;
     top: 0px;
     font-size: 14px;
+    .banner-wrapper {
+      width: 100%;
+      height: 100px;
+      background-color: #00C1CE;
+      .banner-content-wrapper {
+        width: 1200px;
+        margin: 0 auto;
+        position: relative;
+        .banner-img {
+          display: block;
+          width: 100%;
+          height: 100%;
+        }
+        .banner-main-btn {
+          background-color: transparent;
+          width: 210px;
+          height: 46px;
+          border: 2px solid #fff;
+          font-size: 22px;
+          line-height: 42px;
+          color: #fff;
+          position: absolute;
+          right: 44px;
+          top: 30px;
+          border-radius: 100px;
+          cursor: pointer;
+          outline: none;
+        }
+        .banner-close-btn {
+          position: absolute;
+          top: 0;
+          right: 0;
+          width: 24px;
+          height: 24px;
+          color: #fff;
+          cursor: pointer;
+          .icon-close {
+            font-size: 20px;
+          }
+        }
+      }
+    }
     &.scrolled {
       box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.1);
     }
@@ -240,6 +282,13 @@
 
 <template>
   <div :class="['page-header pr bgc-w', headerClass, actClass]">
+    <div class="banner-wrapper" v-show="showBanner">
+      <div class="banner-content-wrapper">
+        <img src="~assets/img/banner/app-download-banner.png" class="banner-img">
+        <button @click="showDownloadModal = true" class="banner-main-btn">下载APP ></button>
+        <div @click="hideBanner" class="banner-close-btn"><i class="iconfont icon-close"></i></div>
+      </div>
+    </div>
     <b-navbar class="navbar-main" toggleable="md">
       <b-navbar-brand to="/">
         <img v-if="actClass" src="~assets/img/logo-white.svg" alt="CoinEx OTC" height="34" width="120">
@@ -361,6 +410,7 @@
         </b-form>
       </div>
     </b-modal>
+    <DownloadModal v-model="showDownloadModal" header="法币交易正式上线 CoinEx APP，欢迎下载升级！"></DownloadModal>
   </div>
 </template>
 
@@ -375,8 +425,10 @@
   import PublishItemButton from '~/components/publish-item-modal/publish-item-button.vue'
   import UserAvatar from '~/components/user-avatar'
   import Blank from '~/components/blank'
+  import DownloadModal from '~/components/download-modal'
   import preventParentScroll from 'vue-prevent-parent-scroll'
   import {COLORS} from '~/components/chat/constant.js'
+  import cookies from '~/plugins/cookies'
 
   Vue.use(Vuelidate)
   export default {
@@ -388,9 +440,12 @@
       EMsgs,
       UserAvatar,
       Blank,
+      DownloadModal,
     },
     data() {
       return {
+        showBanner: false,
+        showDownloadModal: false,
         colors: COLORS,
         orderList: [],
         showOrders: false,
@@ -473,11 +528,17 @@
         this.axios.onError(err)
       })
       window.addEventListener('scroll', this.onScroll)
+
+      this.showBanner = cookies.getItem(window.document, 'showBanner') !== 'false' // 控制banner显示
     },
     beforeDestroy() {
       window.removeEventListener('scroll', this.onScroll)
     },
     methods: {
+      hideBanner() {
+        this.showBanner = false
+        cookies.setItem(window.document, 'showBanner', false)
+      },
       isMerchant(order) { // 是否商家
         return order.merchant_id === this.user.account.id
       },
