@@ -51,7 +51,7 @@
             {{ item.total | formatMoney }}
           </template>
           <template slot="marketValue" slot-scope="{ item }">
-            {{ item.marketValue | formatMoney }} CNY
+            {{ item.marketValue | formatMoney(2) }} CNY
           </template>
           <template slot="action" slot-scope="{ item }">
             <b-link @click="onShowTransferModal('in', item)">转入</b-link>
