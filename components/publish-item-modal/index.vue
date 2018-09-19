@@ -346,7 +346,7 @@
     data() {
       return {
         form: {
-          side: 'buy',  // 方向 buy/sell
+          side: 'sell',  // 方向 buy/sell
           float_rate: 100, // 浮动比例, float定价类型必填
           price: 0, // 单价，fixed定价类型必填
           price_limit: 0, // 价格限制，根据买卖方向不同，表示最大限制/最小限制
@@ -453,9 +453,12 @@
     methods: {
       onRouteChange(route) {
         // 可能会重复打开弹窗，不需要更新方向
-        const {coin} = route.query
+        const {coin, side} = route.query
         if (coin) {
           this.form.coin_type = coin
+        }
+        if (side) {
+          this.form.side = side === 'sell' ? 'buy' : 'sell'
         }
       },
       onClickMoreSetting() {
