@@ -65,6 +65,7 @@
     },
     "components_c-block_vue": {},
     "components_chat-list_index_vue": {
+        "消息列表": "消息列表",
         "[图片]": "[图片]",
         "[未知消息类型]": "[未知消息类型]",
         "标为已读": "标为已读",
