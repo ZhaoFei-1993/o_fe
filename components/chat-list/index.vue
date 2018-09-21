@@ -349,11 +349,8 @@ export default {
     position: absolute;
     right: 0;
     bottom: 75px;
-    width: 404px;
+    width: 400px;
     height: 504px;
-    box-shadow: 0 0 20px 0 #dddddd;
-    background-color: #ffffff;
-    border: solid 4px #52cbca;
     background-color: #fff;
     box-shadow: 0 0 20px 0 #dddddd;
     .chat-list-header {
@@ -382,13 +379,16 @@ export default {
       }
       .icon-close {
         font-size: 14px;
+        cursor: pointer;
       }
     }
     ul {
-      max-height: 460px;
+      max-height: 462px;
       flex-grow: 1;
       flex-shrink: 1;
       overflow-y: auto;
+      border: solid 4px #52cbca;
+      border-top:none; 
     }
     .chat-list-item {
       padding: 11px 20px 13px 20px;
