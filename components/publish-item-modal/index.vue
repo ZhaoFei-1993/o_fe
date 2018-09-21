@@ -388,11 +388,11 @@
         } else {
           this.form.pricing_type = 'float'
           return [{
-            value: PRICING_TYPE.FIXED,
-            text: '固定价格'
-          }, {
             value: PRICING_TYPE.FLOAT,
             text: '浮动价格',
+          }, {
+            value: PRICING_TYPE.FIXED,
+            text: '固定价格'
           }]
         }
       },
