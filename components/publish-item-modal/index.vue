@@ -346,12 +346,12 @@
     data() {
       return {
         form: {
-          side: 'buy',  // 方向 buy/sell
+          side: 'sell',  // 方向 buy/sell
           float_rate: 100, // 浮动比例, float定价类型必填
           price: 0, // 单价，fixed定价类型必填
           price_limit: 0, // 价格限制，根据买卖方向不同，表示最大限制/最小限制
           coin_amount: '', // 币量
-          pricing_type: 'fixed', // 定价方式 fixed/float
+          pricing_type: 'float', // 定价方式 fixed/float，除了usdt外默认是浮动价格
           min_deal_cash_amount: '', // 最小成交额
           max_deal_cash_amount: '', // 最大成交额
           coin_type: 'BCH',  // 币种
@@ -380,17 +380,19 @@
         const PRICING_TYPE = this.constant.PRICING_TYPE
         // usdt没有浮动定价
         if (this.form.coin_type === 'USDT') {
+          this.form.pricing_type = 'fixed'
           return [{
             value: PRICING_TYPE.FIXED,
             text: '固定价格'
           }]
         } else {
+          this.form.pricing_type = 'float'
           return [{
-            value: PRICING_TYPE.FIXED,
-            text: '固定价格'
-          }, {
             value: PRICING_TYPE.FLOAT,
             text: '浮动价格',
+          }, {
+            value: PRICING_TYPE.FIXED,
+            text: '固定价格'
           }]
         }
       },
@@ -453,9 +455,12 @@
     methods: {
       onRouteChange(route) {
         // 可能会重复打开弹窗，不需要更新方向
-        const {coin} = route.query
+        const {coin, side} = route.query
         if (coin) {
           this.form.coin_type = coin
+        }
+        if (side) {
+          this.form.side = side === 'sell' ? 'buy' : 'sell'
         }
       },
       onClickMoreSetting() {

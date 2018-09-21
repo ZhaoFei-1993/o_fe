@@ -81,7 +81,7 @@
     </div>
     <div class="input-box" :style="{height: `${inputHeight}px`}">
       <div class="input-group">
-        <input placeholder="输入信息，回车发送" type="text" class="input-text" v-model="message" @keyup.enter="onSendMsg">
+        <input ref="messageInput" @paste="onPaste" placeholder="输入信息，回车发送（支持粘贴发送图片）" type="text" class="input-text" v-model="message" @keyup.enter="onSendMsg">
         <input id="chat-file-image" type="file" accept="image/*" style="display: none;" ref="fileSelector"
                @change="onUpload">
         <button id="upload" @click="onSelectFile">
@@ -90,6 +90,16 @@
       </div>
     </div>
     <image-modal v-model="imageModalData.show" :src="imageModalData.src"></image-modal>
+    <div v-show="showImageConfirm" class="image-confirm-modal-wrapper">
+      <div class="image-confirm-modal"></div>
+      <div class="image-confirm-content">
+        <img :src="imageConfirmData.src">
+        <div class="image-confirm-button">
+          <button class="image-confirm-button-cancel" @click="onClearImage">取消</button>
+          <button class="image-confirm-button-ok" @click="onSendSingleImage">确认发送</button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -106,6 +116,11 @@
   export default {
     data() {
       return {
+        imageConfirmData: {
+          src: '',
+          blob: null,
+        },
+        showImageConfirm: false,
         orderMessages: ORDER_MESSAGES,
         messageType: MESSAGE_TYPE,
         MessageStatus,
@@ -216,6 +231,47 @@
       })
     },
     methods: {
+      onClearImage() {
+        this.imageConfirmData = {
+          src: '',
+          blob: null,
+        }
+        this.showImageConfirm = false
+      },
+      onSendSingleImage() {
+        this.uploadHandler(this.imageConfirmData.blob, () => {
+          this.onClearImage()
+        })
+      },
+      retrieveImageFromClipboardAsBlob(pasteEvent, callback = () => {}) {
+        if (!pasteEvent.clipboardData) {
+          callback()
+        }
+
+        const items = pasteEvent.clipboardData.items
+
+        if (!items) {
+          callback()
+        }
+
+        for (let i = 0; i < items.length; i++) {
+          if (items[i].type.indexOf('image') === -1) continue
+          const blob = items[i].getAsFile()
+
+          callback(blob)
+        }
+      },
+      onPaste(event) {
+        this.retrieveImageFromClipboardAsBlob(event, (imageBlob) => {
+          if (imageBlob) {
+            this.$refs.messageInput.blur()
+            this.showImageConfirm = true
+            const URLObj = window.URL || window.webkitURL
+            this.imageConfirmData.src = URLObj.createObjectURL(imageBlob)
+            this.imageConfirmData.blob = imageBlob
+          }
+        })
+      },
       init() { // 全部功能初始化
         const {client, conversationId} = this
         if (!client) return
@@ -280,8 +336,7 @@
         this.imageModalData.src = src
         this.imageModalData.show = true
       },
-      onUpload(evt) {
-        const file = evt.target.files[0]
+      uploadHandler(file, callback = () => {}) {
         if (!file) return
         if (file.size > 5000000) {
           this.$refs.fileSelector.value = '' // 需要重置dom
@@ -296,6 +351,7 @@
               $toast.show(`发送中...${Math.round(e.percent)}%`)
             },
           }).then(savedFile => {
+            callback(savedFile)
             const message = new ImageMessage(savedFile)
             return this.conversation.send(message)
           }).then((message) => {
@@ -312,6 +368,10 @@
             $toast.show(`发送失败 ${err}`, 1500)
           })
         }
+      },
+      onUpload(evt) {
+        const file = evt.target.files[0]
+        this.uploadHandler(file)
       },
       onSelectFile() {
         this.$refs.fileSelector.click()
@@ -490,6 +550,52 @@
     position: relative;
     display: flex;
     flex-direction: column;
+    .image-confirm-modal-wrapper {
+      .image-confirm-modal {
+        background-color: #000;
+        opacity: 0.7;
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+      }
+      .image-confirm-content {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        img {
+          display: block;
+          height: 250px;
+          width: 100%;
+        }
+        .image-confirm-button {
+          display: flex;
+          justify-content: space-around;
+          margin-top: 20px;
+          button {
+            cursor: pointer;
+            outline: none;
+            width: 100px;
+            height: 30px;
+            border-radius: 100px;
+          }
+          .image-confirm-button-cancel {
+            background-color: #fff;
+            color: #52cbca;
+            border: 1px solid #52cbca;
+            line-height: 28px;
+          }
+          .image-confirm-button-ok {
+            background-image: linear-gradient(to left, #ffe170, #ffb900);
+            color: #fff;
+            line-height: 28px;
+            border: none;
+          }
+        }
+      }
+    }
     .title {
       position: relative;
       width: 100%;

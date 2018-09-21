@@ -27,7 +27,7 @@
       value: [Number, String],
       max: {
         type: Number,
-        default: 99999999, // 后端限制数量发布广告币数量<1亿，前端限制9千万
+        default: 100000000, // 后端限制数量发布广告币数量<1亿，前端限制9千万
       },
       min: {
         type: Number,
