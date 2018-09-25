@@ -62,8 +62,8 @@
 </template>
 
 <script>
-import { Event } from 'leancloud-realtime'
-import { mapState } from 'vuex'
+import {Event} from 'leancloud-realtime'
+import {mapState} from 'vuex'
 import UserAvatar from '~/components/chat/avatar'
 import preventParentScroll from 'vue-prevent-parent-scroll'
 import {
@@ -158,7 +158,7 @@ export default {
       }
     },
     toOrderDetail(item) {
-      const { _attributes: { attr: { order }, name } } = item
+      const {_attributes: {attr: {order}, name}} = item
       let orderId
       if (order && order.id) {
         // 兼容旧数据，优先使用扩展字段id
@@ -191,7 +191,7 @@ export default {
             let defaultColor
             conv.members.forEach(member => {
               // 找出除了自己以外的用户
-              const { _attributes: { attr: { username } } } = conv
+              const {_attributes: {attr: {username}}} = conv
               if (member !== myClientId && username && username[member]) {
                 if (!otherMembers.length) {
                   defaultColor = this.colors[member % 10]
