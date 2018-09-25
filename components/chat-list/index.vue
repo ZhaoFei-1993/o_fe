@@ -62,15 +62,15 @@
 </template>
 
 <script>
-import { Event } from "leancloud-realtime";
-import { mapState } from "vuex";
-import UserAvatar from "~/components/chat/avatar";
-import preventParentScroll from "vue-prevent-parent-scroll";
+import {Event} from 'leancloud-realtime'
+import {mapState} from 'vuex'
+import UserAvatar from '~/components/chat/avatar'
+import preventParentScroll from 'vue-prevent-parent-scroll'
 import {
   COLORS,
   MESSAGE_TYPE,
-  ORDER_MESSAGES
-} from "~/components/chat/constant.js";
+  ORDER_MESSAGES,
+} from '~/components/chat/constant.js'
 
 export default {
   data() {
@@ -82,7 +82,7 @@ export default {
       convList: [], // 对话列表
       maxLimit: 20, // 对话列表条数
       clientEventMap: {}
-    };
+    }
   },
   directives: {
     preventParentScroll // 阻止滚动下拉框时候body滚动
@@ -91,55 +91,55 @@ export default {
     UserAvatar
   },
   computed: {
-    ...mapState(["chat", "user"]),
+    ...mapState(['chat', 'user']),
     hasUnreadMessage() {
       // 列表是否有未读消息
       return this.convList.some(conv => {
-        return conv._unreadMessageCount > 0;
-      });
+        return conv._unreadMessageCount > 0
+      })
     },
     tips() {
-      return !this.convList.length ? "您还未收到任何消息" : "";
+      return !this.convList.length ? '您还未收到任何消息' : ''
     }
   },
   watch: {
-    "user.account"(account) {
+    'user.account'(account) {
       if (!this.chat.imClient && account && account.id) {
-        const clientId = `${account.id}`;
+        const clientId = `${account.id}`
         this.$store
-          .dispatch("chat/newChatClient", clientId)
+          .dispatch('chat/newChatClient', clientId)
           .then(() => {
-            this.init();
+            this.init()
           })
           .catch(err => {
-            this.$errorTips(`初始化聊天失败，error=${err}`);
-          });
-        this.$nuxt.$on("IM.Event.SINGLE_MESSAGE_UPDATE", () => {
+            this.$errorTips(`初始化聊天失败，error=${err}`)
+          })
+        this.$nuxt.$on('IM.Event.SINGLE_MESSAGE_UPDATE', () => {
           // 手动强制更新聊天列表
           this.fetchMessageList({
             success: convList => {
-              this.convList = convList;
+              this.convList = convList
             }
-          });
-        });
+          })
+        })
       }
     }
   },
   beforeDestroy() {
-    this.unbindClientEvent();
-    this.$nuxt.$off("IM.Event.SINGLE_MESSAGE_UPDATE");
+    this.unbindClientEvent()
+    this.$nuxt.$off('IM.Event.SINGLE_MESSAGE_UPDATE')
   },
   methods: {
     init() {
       this.fetchMessageList({
         success: convList => {
-          this.convList = convList;
+          this.convList = convList
         },
         error: err => {
-          console.error(`获取消息列表失败，error=${err}`); // 不显示错误提示
+          console.error(`获取消息列表失败，error=${err}`) // 不显示错误提示
         }
-      });
-      this.bindClientEvent(); // 绑定事件
+      })
+      this.bindClientEvent() // 绑定事件
     },
     onRead(curConv) {
       if (this.chat.imClient) {
@@ -148,35 +148,35 @@ export default {
           .then(conv => {
             if (conv) {
               conv.read().catch(err => {
-                this.$errorTips(`标记已读失败，error=${err}`);
-              });
+                this.$errorTips(`标记已读失败，error=${err}`)
+              })
             }
           })
           .catch(err => {
-            this.$errorTips(`获取对话失败，error=${err}`);
-          });
+            this.$errorTips(`获取对话失败，error=${err}`)
+          })
       }
     },
     toOrderDetail(item) {
-      const { _attributes: { attr: { order }, name } } = item;
-      let orderId;
+      const {_attributes: {attr: {order}, name}} = item
+      let orderId
       if (order && order.id) {
         // 兼容旧数据，优先使用扩展字段id
-        orderId = order.id;
+        orderId = order.id
       } else if (name) {
-        orderId = name.match(/\d+/);
+        orderId = name.match(/\d+/)
       }
       if (orderId) {
-        this.$router.push(`/orders/${orderId}`);
+        this.$router.push(`/orders/${orderId}`)
       }
     },
     onShowList() {
-      if (!this.convList.length) return;
-      this.showList = !this.showList;
+      if (!this.convList.length) return
+      this.showList = !this.showList
     },
     fetchMessageList(options = {}) {
-      const todayString = new Date().toDateString();
-      const myClientId = `${this.user.account.id}`;
+      const todayString = new Date().toDateString()
+      const myClientId = `${this.user.account.id}`
       this.chat.imClient
         .getQuery()
         .limit(this.maxLimit)
@@ -184,49 +184,49 @@ export default {
         .containsMembers([myClientId])
         .find()
         .then(conversations => {
-          const convList = [];
+          const convList = []
           // 默认按每个对话的最后更新日期（收到最后一条消息的时间）倒序排列
           conversations.forEach(conv => {
-            const otherMembers = [];
-            let defaultColor;
+            const otherMembers = []
+            let defaultColor
             conv.members.forEach(member => {
               // 找出除了自己以外的用户
-              const { _attributes: { attr: { username } } } = conv;
+              const {_attributes: {attr: {username}}} = conv
               if (member !== myClientId && username && username[member]) {
                 if (!otherMembers.length) {
-                  defaultColor = this.colors[member % 10];
+                  defaultColor = this.colors[member % 10]
                 }
-                otherMembers.push(username[member]);
+                otherMembers.push(username[member])
               }
-            });
+            })
             if (defaultColor) {
               // 排除只有自己的对话
-              const date = conv.lastMessageAt;
-              let formatTime;
+              const date = conv.lastMessageAt
+              let formatTime
               if (date) {
                 if (todayString === date.toDateString()) {
                   // 时间为今天内，显示时:分
                   formatTime = `${String(date.getHours()).padStart(
                     2,
-                    "0"
-                  )}:${String(date.getMinutes()).padStart(2, "0")}`;
+                    '0'
+                  )}:${String(date.getMinutes()).padStart(2, '0')}`
                 } else {
                   // 时间为昨天以前，显示日期
                   formatTime = `${String(date.getMonth() + 1).padStart(
                     2,
-                    "0"
-                  )}/${String(date.getDate()).padStart(2, "0")}`;
+                    '0'
+                  )}/${String(date.getDate()).padStart(2, '0')}`
                 }
               }
-              const orderInfo = conv._attributes.attr.order;
-              let side = "buyer";
+              const orderInfo = conv._attributes.attr.order
+              let side = 'buyer'
               if (orderInfo) {
                 if (+orderInfo.buyer === +myClientId) {
-                  side = "buyer";
+                  side = 'buyer'
                 } else if (+orderInfo.seller === +myClientId) {
-                  side = "seller";
+                  side = 'seller'
                 } else {
-                  side = "customer";
+                  side = 'customer'
                 }
               }
               convList.push({
@@ -237,61 +237,61 @@ export default {
                 _otherMembers: otherMembers, // 除了自己以外的聊天用户
                 _defaultColor: defaultColor, // 头像颜色，取第一个用户id尾号
                 _unreadMessageCount: conv.unreadMessagesCount || 0
-              });
+              })
             }
-          });
+          })
           if (options.success) {
-            options.success(convList);
+            options.success(convList)
           }
         })
         .catch(err => {
           if (options.error) {
-            options.error(err);
+            options.error(err)
           }
-        });
+        })
     },
     bindClientEvent() {
-      const self = this;
+      const self = this
       this.clientEventMap = {
         [Event.MESSAGE]: message => {
           self.fetchMessageList({
             success: convList => {
-              self.convList = convList;
+              self.convList = convList
             }
-          });
+          })
         },
         [Event.UNREAD_MESSAGES_COUNT_UPDATE]: conversations => {
           conversations.forEach(conv => {
             const findConv = self.convList.find(item => {
-              return item.id === conv.id;
-            });
+              return item.id === conv.id
+            })
             if (findConv) {
               self.$set(
                 findConv,
-                "_unreadMessageCount",
+                '_unreadMessageCount',
                 conv.unreadMessagesCount
-              );
+              )
             }
-          });
+          })
           self.$nuxt.$emit(
-            "IM.Event.UNREAD_MESSAGES_COUNT_UPDATE",
+            'IM.Event.UNREAD_MESSAGES_COUNT_UPDATE',
             conversations
-          ); // 发送全局事件
+          ) // 发送全局事件
         }
-      };
+      }
       Object.keys(this.clientEventMap).forEach(evtType => {
-        this.chat.imClient.on(evtType, this.clientEventMap[evtType]);
-      });
+        this.chat.imClient.on(evtType, this.clientEventMap[evtType])
+      })
     },
     unbindClientEvent() {
       if (this.chat.imClient) {
         Object.keys(this.clientEventMap).forEach(evtType => {
-          this.chat.imClient.off(evtType);
-        });
+          this.chat.imClient.off(evtType)
+        })
       }
     }
   }
-};
+}
 </script>
 
 <style lang="scss">

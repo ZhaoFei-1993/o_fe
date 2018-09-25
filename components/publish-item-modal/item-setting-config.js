@@ -3,13 +3,13 @@ import {maxLength, maxValue, minValue, required, helpers} from 'vuelidate/lib/va
 import {MAX_AUTO_REPLY_LENGTH, DEAL_CASH_AMOUNT, MAX_REMARK_LENGTH} from '~/modules/constant'
 
 function smallerThan(compareField) {
-  return helpers.withParams({ type: 'smallerThan', field: compareField }, function (value, parentVm) {
+  return helpers.withParams({type: 'smallerThan', field: compareField}, function (value, parentVm) {
     return Number(value) < helpers.ref(compareField, this, parentVm)
   })
 }
 
 function biggerThan(compareField) {
-  return helpers.withParams({ type: 'biggerThan', field: compareField }, function (value, parentVm) {
+  return helpers.withParams({type: 'biggerThan', field: compareField}, function (value, parentVm) {
     return Number(value) > helpers.ref(compareField, this, parentVm)
   })
 }

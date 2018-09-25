@@ -260,10 +260,10 @@
       },
       kycStatus() { // 判断各种组合kyc状态
         let result = [{}, {}] // [初级认证, 高级认证]
-        const { account } = this.user
+        const {account} = this.user
         if (account && account.kyc_status) {
           const status = account.kyc_status
-          const { KYC_STATUS } = this.constant
+          const {KYC_STATUS} = this.constant
           switch (status) {
             case KYC_STATUS.ADVANCED_PASS: // 高级已完成，初级已完成
               result = [this.getKycStatusData('PASS', false), this.getKycStatusData('ADVANCED_PASS', false)]
@@ -292,7 +292,7 @@
     },
     methods: {
       getKycStatusData(status, isShowEntry = false) { // isShowEntry：是否显示`去验证`入口
-        return { status: this.KYC_STATUS_MAP[status], text: this.KYC_STATUS_TEXT[status], showEntry: isShowEntry }
+        return {status: this.KYC_STATUS_MAP[status], text: this.KYC_STATUS_TEXT[status], showEntry: isShowEntry}
       },
       onChangeFrequency() {
         const account = this.user.account
