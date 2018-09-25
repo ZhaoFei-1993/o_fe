@@ -325,7 +325,7 @@
     computed: {
       ...mapState(['balance', 'constant']),
       walletCoinTypes() { // 增加币种CET, 只在钱包使用
-        return [ ...this.constant.COIN_TYPES, 'CET' ]
+        return [...this.constant.COIN_TYPES, 'CET']
       },
       otcBalance() {
         if (this.balance.otcBalance) {
@@ -346,7 +346,7 @@
                 })
                 totalBalance += curCoinMarketValue
               }
-              return { ...item, marketValue: curCoinMarketValue }
+              return {...item, marketValue: curCoinMarketValue}
             }
           })
           this.pieDatas = pieDatas

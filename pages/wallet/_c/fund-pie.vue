@@ -49,7 +49,7 @@ export default {
           height: '180',
           width: this.width,
           plotShadow: false,
-          spacing: [ 0, -60, 20, 0 ], // 控制币种几个圆点的四个方向margin
+          spacing: [0, -60, 20, 0], // 控制币种几个圆点的四个方向margin
           events: {
             render: function (event) {
               pipChart = event.target
@@ -214,7 +214,7 @@ export default {
         series: [
           {
             type: 'pie',
-            center: [ 120, '50%' ],
+            center: [120, '50%'],
             innerSize: '70%',
             name: this.name,
             colors: [

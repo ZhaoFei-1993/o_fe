@@ -626,7 +626,7 @@
                 }
               }
             }
-          }, 1000)
+          }, 10000)
           // 刷新订单状态
           this.startRefreshOrders()
         }

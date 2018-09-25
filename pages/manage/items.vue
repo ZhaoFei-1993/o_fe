@@ -296,7 +296,7 @@
     watch: {
       'user.settings'() {
         if (this.user && this.user.settings) {
-          const { available_start_time: startTime, available_end_time: endTime } = this.user.settings
+          const {available_start_time: startTime, available_end_time: endTime} = this.user.settings
           if (startTime === 0 && endTime === 0) {
             this.startTimeRangeValue = -1
             this.endTimeRangeValue = -1
@@ -453,7 +453,7 @@
           this.startTimeRangeValue = -1
           this.endTimeRangeValue = -1
         } else {
-          const { available_start_time: startTime, available_end_time: endTime } = this.user.settings
+          const {available_start_time: startTime, available_end_time: endTime} = this.user.settings
           if (startTime === 0 && endTime === 0 && type === 'available_start_time') { // 从`不设置`状态到具体时间状态
             this.startTimeRangeValue = data.value
             let nextTime = data.value + 30
@@ -478,17 +478,17 @@
         })
       },
       getTimeRangeOptions(type) {
-        const { settings } = this.user
+        const {settings} = this.user
         const range = []
         if (settings) {
           const availableTime = settings[type]
-          const { available_start_time: startTime, available_end_time: endTime } = settings
+          const {available_start_time: startTime, available_end_time: endTime} = settings
           const notAvailable = (startTime === 0 && endTime === 0) // 开始与结束时间都为0表示不设置接单时间
-          range.push({ text: '不设置', value: -1, active: notAvailable })
+          range.push({text: '不设置', value: -1, active: notAvailable})
           for (let i = 0, step = 0; i < 24; i++) {
-            range.push({ text: `${`${i}`.padStart(2, '0')}:00`, value: step, active: availableTime === step && !notAvailable })
+            range.push({text: `${`${i}`.padStart(2, '0')}:00`, value: step, active: availableTime === step && !notAvailable})
             step += 30
-            range.push({ text: `${`${i}`.padStart(2, '0')}:30`, value: step, active: availableTime === step && !notAvailable })
+            range.push({text: `${`${i}`.padStart(2, '0')}:30`, value: step, active: availableTime === step && !notAvailable})
             step += 30
           }
         }
