@@ -679,7 +679,7 @@
           } else {
             this.stopCountDown()
           }
-        }, 1000)
+        }, 5000)
       },
       stopCountDown() {
         if (!this.secondCountdown) return
