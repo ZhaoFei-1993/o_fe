@@ -76,7 +76,7 @@
 <script>
   import {mapState} from 'vuex'
   import UserStatsProfile from '~/components/user-stats-profile.vue'
-  import { COLORS } from '~/components/chat/constant.js'
+  import {COLORS} from '~/components/chat/constant.js'
 
   export default {
     components: {

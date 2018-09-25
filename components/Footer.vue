@@ -58,7 +58,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import {mapState} from 'vuex'
 import DownloadModal from '~/components/download-modal'
 import {coinexDomain} from '~/modules/variables'
 import ChatList from '~/components/chat-list'

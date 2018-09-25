@@ -1,8 +1,8 @@
 /**
  * IM常量定义
  */
-import { TextMessage } from 'leancloud-realtime'
-import { ImageMessage } from 'leancloud-realtime-plugin-typed-messages'
+import {TextMessage} from 'leancloud-realtime'
+import {ImageMessage} from 'leancloud-realtime-plugin-typed-messages'
 
 export const COLORS = ['#b2d9fd', '#fae7a3', '#ceeaaf', '#ffddd3', '#d4bfe8', '#b1ebde', '#ffd5bb', '#a9b2e0', '#e0a9cf', '#e0d0a9']
 

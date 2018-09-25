@@ -20,6 +20,12 @@ module.exports = {
         named: 'never',
       },
     ],
+    "object-curly-spacing":[
+      "error","never"
+    ],
+    "array-bracket-spacing":[
+      "error","never"
+    ],
     "no-multi-spaces": [0], // todo: 看一下如何允许注释的格式化前面的空格
     "no-console": 0,
     "comma-dangle": [2, {

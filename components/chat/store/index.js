@@ -1,4 +1,4 @@
-import { Realtime } from 'leancloud-realtime'
+import {Realtime} from 'leancloud-realtime'
 import AV from 'leancloud-storage'
 
 const MODE = process.env.MODE || 'production'
@@ -31,7 +31,7 @@ export default () => {
   }
 
   const actions = {
-    newChatClient({ commit, state }, clientId) {
+    newChatClient({commit, state}, clientId) {
       if (!state.imClient) {
         const realtime = new Realtime({
           appId: APP_ID,
@@ -58,7 +58,7 @@ export default () => {
       return state.imClient
     },
 
-    logout({ commit, state }) {
+    logout({commit, state}) {
       commit('LOGOUT_CHAT_CLIENT')
     },
   }

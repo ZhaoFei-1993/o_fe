@@ -129,7 +129,7 @@
   import ViaPagination from '~/components/via-pagination'
   import CTooltip from '~/components/c-tooltip.vue'
   import ICountUp from 'vue-countup-v2'
-  import { mapState } from 'vuex'
+  import {mapState} from 'vuex'
   import {loginPage, webDomain} from '~/modules/variables'
 
   export default {
@@ -390,7 +390,7 @@
           return
         }
 
-        const { limit, page } = this.myHistoryQuery
+        const {limit, page} = this.myHistoryQuery
 
         this.axios.mining.getMyHistory({
           limit,
