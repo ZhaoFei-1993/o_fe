@@ -484,7 +484,7 @@
         const basePrice = parseFloat(this.balance.currentRate[this.form.coin_type])
         const price = this.form.pricing_type === this.constant.PRICING_TYPE.FIXED ? this.form.price : this.floatPrice
         const direction = this.form.side === this.constant.SIDE.BUY ? 1 : -1
-        const bias = price * direction / basePrice
+        const bias = (price - basePrice) * direction / basePrice
         if (basePrice && bias > delta) {
           this.priceAlert = {
             price: this.form.price,
