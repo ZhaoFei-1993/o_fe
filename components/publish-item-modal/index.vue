@@ -487,7 +487,7 @@
         const bias = (price - basePrice) * direction / basePrice
         if (basePrice && bias > delta) {
           this.priceAlert = {
-            price: this.form.price,
+            price: price,
             isEdit,
             direction,
             bias,
