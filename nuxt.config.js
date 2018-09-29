@@ -59,6 +59,7 @@ module.exports = {
 
         if (route.component.match(/\/_c/)) {
           routes.splice(i, 1)
+          i -= 1
         }
       }
     },
