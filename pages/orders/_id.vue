@@ -292,9 +292,9 @@
           <div class="order-step-body" style="padding: 18px 30px;">
             <div class="order-step-wrapper" style="position: relative;height: 25px;display: flex;align-items: center;" v-if="steps.length">
               <template v-for="(item, index) in steps">
-                <div v-if="index > 0" style="display: inline-block;width: 228px;height: 2px;" :style="{backgroundColor: index <= curStepIndex ? mainColor : '#eeeeee'}"></div>
+                <div v-if="index > 0" style="display: inline-block;height: 2px;" :style="{backgroundColor: index <= curStepIndex ? mainColor : '#eeeeee', width: index < curStepIndex ? '220px' : '264px'}"></div>
                 <div class="order-step-dot" :style="{width: index === curStepIndex ? '10px' : '8px', height: index === curStepIndex ? '10px' : '8px', backgroundColor: index <= curStepIndex ? mainColor : '#eeeeee'}" style="border-radius: 100px;position: relative;">
-                  <div style="width: 185px;position: absolute;top: 15px;" :style="index === 3 ? 'right: 0;text-align: right;' : 'left: 0;'">
+                  <div style="width: 130px;position: absolute;top: 15px;" :style="index === 3 ? `right: 0;text-align: right;top: ${index === curStepIndex ? 16 : 15}px;` : 'left: 0;'">
                     <div :style="{color: index === curStepIndex ? mainColor : ''}">{{ item.label }}</div>
                     <div v-if="item.time" class="order-step-time" style="font-size: 12px;color: #6f6f6f;">{{ item.time | getTimeText }}</div>
                   </div>
@@ -303,13 +303,16 @@
             </div>
             <div class="order-step-body-title" style="color: #27313e;font-size: 18px;font-weight: 500;margin-top: 70px;" v-html="paymentStatusMessage.message"></div>
             <div class="payment-warning" v-if="paymentStatusMessage.warning" v-html="paymentStatusMessage.warning"></div>
+            <div v-if="toWalletPage" class="link-to-wallet" style="margin-top: 10px;">
+              <b-link to="/wallet">划转数字货币</b-link>
+            </div>
             <div class="order-step-contact" style="margin-top: 10px;" v-if="order.status === constant.ORDER_STATUS.PAID.value">
               <b-link :disabled="!phoneStatus.network_phone">
                 <i class="iconfont icon-netphone" v-b-tooltip.hover :title="order.network_phone_reason"></i>
                 <span style="display: inline-block;margin-left: 2px;">联系对方</span>
               </b-link>
             </div>
-            <div class="payment-method" style="margin-top: 10px;" v-if="showPayment">
+            <div class="payment-method" style="margin-top: 38px;" v-if="showPayment">
               <template v-if="order.status === constant.ORDER_STATUS.CREATED.value">
                 <template v-if="isBuySide">
                   <div class="payment-radio-group" style="display: flex;justify-content: flex-start;margin-left: 30px;">
@@ -333,7 +336,7 @@
                   </div>
                 </template>
               </template>
-              <template v-else>
+              <div v-else style="display: inline-block;width: 150px;">
                 <span v-if="selectedMethod.method === constant.PAYMENT_TYPES.BANKCARD">
                   <i class="mr-10 iconfont icon-bankcard"></i>银行转帐
                 </span>
@@ -343,8 +346,8 @@
                 <span v-if="selectedMethod.method === constant.PAYMENT_TYPES.ALIPAY">
                   <i class="mr-10 iconfont icon-alipay"></i>支付宝支付
                 </span>
-              </template>
-              <div style="margin-top: 23px;height: 25px;line-height: 25px;">
+              </div>
+              <span>
                 <span class="payment-account">
                   <span>{{selectedMethod.account_name + ' '}}</span>
                   <span v-if="selectedMethod.method === constant.PAYMENT_TYPES.BANKCARD">
@@ -359,26 +362,19 @@
                 </span>
                 <QrcodePopover v-if="selectedMethod.method !== constant.PAYMENT_TYPES.BANKCARD && selectedMethod.qr_code_image"
                   :src="selectedMethod.qr_code_image_url"/>
-              </div>
+              </span>
             </div>
             <div style="margin-top: 30px;">
-              <div v-if="(order.status !== constant.ORDER_STATUS.CANCEL.value || order.pay_time) && order.status !== constant.ORDER_STATUS.CLOSED.value" style="display: flex;justify-content: space-between;">
+              <div v-if="(order.status !== constant.ORDER_STATUS.CANCEL.value || order.pay_time) && order.status !== constant.ORDER_STATUS.CLOSED.value" style="display: flex;justify-content: space-between;width: 300px;">
                 <b-btn v-if="isBuySide && !order.pay_time"
                        :disabled="expired"
                        size="xs" variant="gradient-yellow"
-                       @click="confirmPay">我已付款</b-btn>
-
-                <div style="display: flex;width: 300px;justify-content: space-between;">
-                  <template v-if="canCancel">
-                    <div style="width: 150px;height: 30px;box-shadow: 2px 2px 6px 0 rgba(0, 0, 0, 0.1);text-align: center;line-height: 30px;font-size: 16px;color: #ffbc32;"><i class="iconfont icon-tea"></i><span style="display: inline-block;margin-left: 3px;">等待卖方放币</span></div>
-                    <b-btn v-if="canCancel" size="xs" style="width: 120px;" variant="outline-green" :disabled="expired" @click="cancelOrder">取消订单</b-btn>
-                  </template>
-                  <template v-if="showConfirmReceiptStep && showSellerConfirmButton">
-                    <button class="btn btn-gradient-yellow btn-xs"
-                            @click="confirmReceipt" style="width: 120px;">确认收款
-                    </button>
-                  </template>
-                </div>
+                       @click="confirmPay" style="width: 120px;">我已支付</b-btn>
+                <div v-if="order.status === constant.ORDER_STATUS.PAID.value && isBuySide" style="width: 150px;height: 30px;box-shadow: 2px 2px 6px 0 rgba(0, 0, 0, 0.1);text-align: center;line-height: 30px;font-size: 16px;color: #ffbc32;"><i class="iconfont icon-tea"></i><span style="display: inline-block;margin-left: 3px;">等待对方放币</span></div>
+                <b-btn v-if="canCancel" size="xs" style="width: 120px;" variant="outline-green" :disabled="expired" @click="cancelOrder">取消订单</b-btn>
+                <button v-if="showConfirmReceiptStep && showSellerConfirmButton" class="btn btn-gradient-yellow btn-xs"
+                        @click="confirmReceipt" style="width: 150px;">确认收款并放币
+                </button>
               </div>
             </div>
           </div>
@@ -398,7 +394,7 @@
           <div class="order-notices-body" style="padding: 18px 30px;">
             <ul class="order-notices" v-if="isBuySide" style="color: #6f6f6f;list-style-type: disc;list-style-position: inside;">
               <li>您支付的法币将直接进入卖方收款账户，交易中卖方的数字货币由平台托管冻结。</li>
-              <li>请尽快完成付款，并务必<span class="c-red">点击“我已付款”</span>，卖方确认收款后，平台将数字货币划转到您的账户。</li>
+              <li>请尽快完成付款，并务必<span class="c-red">点击“我已支付”</span>，卖方确认收款后，平台将数字货币划转到您的账户。</li>
               <li>买方当日取消订单达3笔（含超时未支付订单），会被限制当日交易功能。</li>
               <li>请<span class="c-red">使用即时到账支付方式</span>，付款后2小时内未到账订单，卖方有权要求退款后取消交易，请知悉。</li>
             </ul>
@@ -475,6 +471,8 @@
     data() {
       return {
         copyed: false,
+        toWalletPage: false, // 是否显示划转入口
+        curStepIndex: 0, // 记录当前进行到的步骤
         selectedPaymentAccount: '',
         statusIconMap: {
           created: {
@@ -528,7 +526,6 @@
             icon: 'icon-wechat-round',
           },
         },
-        curStepIndex: 0, // 记录当前进行到的步骤
       }
     },
     components: {
@@ -726,34 +723,58 @@
         return validOrder && !appealClosed
       },
       paymentStatusMessage() {
-        let payMessage = '订单已超时'
-        if (this.payRemainTime > 0) {
-          payMessage = `
-                ${this.userNames.buyer}(买家)需在
-                <span class="c-red">${Math.floor(this.payRemainTime / 60)}分${this.payRemainTime % 60}秒</span>
-                内完成支付，付款参考号：<span class="c-red">${this.referCode}</span>
-                `
+        let message
+        let warning
+        if (this.order) {
+          switch (this.order.status) {
+            case this.constant.ORDER_STATUS.CREATED.value:
+              if (this.payRemainTime > 0) { // 订单创建后，需要先判断是否超时
+                if (this.isBuySide) {
+                  message = `请支付${this.order.cash_amount}${this.order.cash_type}，剩余时间
+                  <span class="c-red">${Math.floor(this.payRemainTime / 60)}分${this.payRemainTime % 60}秒</span>`
+                  warning = '请使用实名付款，转账时除参考号外请不要备注任何信息！'
+                } else {
+                  message = `等待对方支付${this.order.cash_amount}${this.order.cash_type}，剩余时间
+                  <span class="c-red">${Math.floor(this.payRemainTime / 60)}分${this.payRemainTime % 60}秒</span>`
+                }
+                message += `，付款参考号：<span class="c-red">${this.referCode}</span>`
+              } else {
+                message = '超时未付款，系统已将订单关闭'
+              }
+              break
+            case this.constant.ORDER_STATUS.PAID.value:
+              if (this.isBuySide) {
+                message = `等待对方确认收款`
+              } else {
+                message = `对方已支付${this.order.cash_amount}${this.order.cash_type}，请查收并放币`
+                warning = '请务必查看您的收款账户，并核实买家是否实名付款。'
+              }
+              message += `，付款参考号：<span class="c-red">${this.referCode}</span>`
+              break
+            case this.constant.ORDER_STATUS.SUCCESS.value:
+              if (this.isBuySide) {
+                message = `对方已确认收款，您已收到对方出售的数字货币`
+                this.toWalletPage = true
+              } else {
+                message = `您已确认收款，对方已收到您出售的数字货币`
+              }
+              message += `，付款参考号：<span class="c-red">${this.referCode}</span>`
+              break
+            case this.constant.ORDER_STATUS.CANCEL.value:
+              if (this.isBuySide) {
+                message = '您已将订单取消'
+              } else {
+                message = '对方已将订单取消'
+              }
+              break
+            case this.constant.ORDER_STATUS.CLOSED.value:
+              message = '超时未付款，系统已将订单关闭'
+              break
+          }
         }
-        const kycName = `${this.counterparty.kyc_name && this.counterparty.kyc_name.length ? '<span>买家实名： ' + this.counterparty.kyc_name + ' </span>' : ''}`
-        switch (this.order.status) {
-          case this.constant.ORDER_STATUS.CREATED.value:
-            return {
-              message: payMessage,
-              warning: this.isBuySide && !this.expired ? `<span class="c-red">请使用实名付款，转账时除参考号外请不要备注任何信息！</span>` : undefined,
-            }
-          case this.constant.ORDER_STATUS.PAID.value:
-            return {
-              message: `等待${this.userNames.seller}(卖家)确认并放币，付款参考号：<span class="c-red">${this.referCode}</span>`,
-              warning: this.isBuySide ? undefined : `<div>${kycName}<span class="c-red">请务必查看您的收款账户，并核实买家是否实名付款。</span></div>`
-            }
-          case this.constant.ORDER_STATUS.SUCCESS.value:
-            return {message: `${this.userNames.seller}(卖家)已确认收款，付款参考号：<span class="c-red">${this.referCode}</span>`}
-          case this.constant.ORDER_STATUS.CANCEL.value:
-            return {message: `${this.userNames.buyer}(买家)已取消交易，无法查看支付信息。`}
-          case this.constant.ORDER_STATUS.CLOSED.value:
-            return {message: `订单超时已关闭，无法查看支付信息。`}
-          default:
-            return {}
+        return {
+          message,
+          warning,
         }
       },
       appealResult() {
@@ -866,8 +887,8 @@
       confirmPay() {
         this.$showDialog({
           title: '确认付款',
-          content: (<div class="text-left">请确认已向卖方付款。<p class="c-red">未付款点击“我已付款”将被冻结账户。</p></div>),
-          okTitle: '我已付款',
+          content: (<div class="text-left">请确认已向卖方付款。<p class="c-red">未付款点击“我已支付”将被冻结账户。</p></div>),
+          okTitle: '我已支付',
           cancelTitle: '取消',
           onOk: () => {
             this.axios.order.confirmPay(this.order.id, this.selectedMethod).then(res => {
