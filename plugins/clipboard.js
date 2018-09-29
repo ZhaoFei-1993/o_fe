@@ -1,5 +1,5 @@
 import Vue from 'vue'
 
-var VueClipboard = require('vue-clipboard2')
+const VueClipboard = require('vue-clipboard2')
 
 Vue.use(VueClipboard)

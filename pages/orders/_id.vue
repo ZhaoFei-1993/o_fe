@@ -588,33 +588,33 @@
       },
       steps() {
         const stepList = []
-        const { CANCEL, CLOSED, CREATED, PAID, SUCCESS } = this.constant.ORDER_STATUS
+        const {CANCEL, CLOSED, CREATED, PAID, SUCCESS} = this.constant.ORDER_STATUS
         if (this.order && this.stepsMessage) {
-          const { order, stepsMessage } = this
-          stepList.push({ time: order.create_time, label: stepsMessage.created, isActived: true })
+          const {order, stepsMessage} = this
+          stepList.push({time: order.create_time, label: stepsMessage.created, isActived: true})
           if ((order.status !== CANCEL.value || order.pay_time) && order.status !== CLOSED.value) {
             const isActived = order.status === CREATED.value
-            stepList.push({ time: order.pay_time, label: stepsMessage.payCash, isActived })
+            stepList.push({time: order.pay_time, label: stepsMessage.payCash, isActived})
             if (isActived) this.curStepIndex = stepList.length - 1
           }
           if (this.showConfirmReceiptStep) {
             const isActived = order.status === PAID.value
-            stepList.push({ time: order.complete_time, label: stepsMessage.payCoin, isActived })
+            stepList.push({time: order.complete_time, label: stepsMessage.payCoin, isActived})
             if (isActived) this.curStepIndex = stepList.length - 1
           }
           if (order.status !== CANCEL.value && order.status !== CLOSED.value) {
             const isActived = order.status === SUCCESS.value
-            stepList.push({ time: order.complete_time, label: stepsMessage.success, isActived })
+            stepList.push({time: order.complete_time, label: stepsMessage.success, isActived})
             if (isActived) this.curStepIndex = stepList.length - 1
           }
           if (order.status === CANCEL.value) {
             const isActived = true
-            stepList.push({ time: order.update_time, label: stepsMessage.cancel, isActived })
+            stepList.push({time: order.update_time, label: stepsMessage.cancel, isActived})
             if (isActived) this.curStepIndex = stepList.length - 1
           }
           if (order.status === CLOSED.value) {
             const isActived = true
-            stepList.push({ time: null, label: stepsMessage.closed, isActived })
+            stepList.push({time: null, label: stepsMessage.closed, isActived})
             if (isActived) this.curStepIndex = stepList.length - 1
           }
         }
