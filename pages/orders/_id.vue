@@ -149,7 +149,7 @@
             }
             .order-payment-selected {
               display: inline-block;
-              width: 150px;
+              width: 120px;
             }
             .order-payment-account-wrapper {
               display: inline-block;
@@ -158,6 +158,10 @@
                 color: #52cbca;
                 cursor: pointer;
                 font-size: 15px;
+              }
+              .order-payment-col {
+                display: inline-block;
+                margin: 0 10px;
               }
             }
           }
@@ -302,7 +306,7 @@
             <div class="order-step-contact" v-if="order.status === constant.ORDER_STATUS.PAID.value">
               <b-link :disabled="!phoneStatus.network_phone">
                 <i class="iconfont icon-netphone" v-b-tooltip.hover :title="order.network_phone_reason"></i>
-                <span class="order-step-contact-detail">联系对方</span>
+                <span class="order-step-contact-detail" @click="onContact">联系对方</span>
               </b-link>
             </div>
             <div class="order-payment-method" v-if="showPayment">
@@ -339,16 +343,14 @@
                 </span>
               </div>
               <span class="order-payment-account-wrapper">
-                <span>
-                  <span>{{selectedMethod.account_name + ' '}}</span>
-                  <span v-if="selectedMethod.method === constant.PAYMENT_TYPES.BANKCARD">
-                    {{ selectedMethod.account_no | splitCardNumber }}
-                    <i id="icon-copy" class="iconfont icon-copy order-payment-copy" v-clipboard:copy="selectedMethod.account_no" v-clipboard:success="copySuccess"></i>
-                    <b-tooltip target="icon-copy" content="已复制" :show="copyed" :triggers="'false'" placement="top">已复制</b-tooltip>
-                  </span>
+                <span class="order-payment-col">{{selectedMethod.account_name + ' '}}</span>
+                <span class="order-payment-col" v-if="selectedMethod.account_no">
+                  <span v-if="selectedMethod.method === constant.PAYMENT_TYPES.BANKCARD">{{ selectedMethod.account_no | splitCardNumber }}</span>
                   <span v-else>{{ selectedMethod.account_no }}</span>
+                  <i id="icon-copy" class="iconfont icon-copy order-payment-copy" v-clipboard:copy="selectedMethod.account_no" v-clipboard:success="copySuccess"></i>
+                  <b-tooltip target="icon-copy" content="已复制" :show="copyed" :triggers="'false'" placement="top">已复制</b-tooltip>
                 </span>
-                <span v-if="selectedMethod.method === constant.PAYMENT_TYPES.BANKCARD">
+                <span v-if="selectedMethod.method === constant.PAYMENT_TYPES.BANKCARD" class="order-payment-col">
                   {{ selectedMethod.bank_name }}<span v-if="selectedMethod.branch">, {{ selectedMethod.branch }}</span>
                 </span>
                 <QrcodePopover v-if="selectedMethod.method !== constant.PAYMENT_TYPES.BANKCARD && selectedMethod.qr_code_image"
@@ -373,7 +375,25 @@
           <div class="order-box-head">订单申诉</div>
           <div class="order-box-line"></div>
           <div class="order-appeal-body">
-            订单遇到问题？您可以<span class="order-appeal-text" @click="startAppeal">发起申诉</span>
+            <template v-if="showAppeal && (!appeal || !appeal.status || appeal.status === constant.APPEAL_STATUS.CANCEL)">
+              订单遇到问题？您可以
+              <span v-if="canAppeal" class="order-appeal-text" @click="startAppeal">发起申诉</span>
+              <span v-else class="c-brand-green" v-b-tooltip.hover title="买家付款10分钟后，可发起申诉。">申诉</span>
+            </template>
+            <template v-else-if="showSupport">
+              <span>
+                交易出现问题？需要
+                <b-link :href="`${coinexDomain}/res/support/ticket`" target="_blank"><span
+                                class="c-brand-green">提交工单</span></b-link>
+              </span>
+            </template>
+            <template v-else-if="appeal && appeal.result_desc">
+              <span>{{ appeal.result_desc }}</span>
+              <span v-if="appeal.allow_appeal_again" class="c-brand-green ml-10"
+                    @click="startAppeal">再次申诉</span>
+              <button v-if="canCancelAppeal" class="btn btn-outline-green btn-xs ml-10" @click="cancelAppeal">取消申诉
+              </button>
+            </template>
           </div>
         </CBlock>
 
@@ -570,6 +590,9 @@
         }
         return '#52cbca'
       },
+      showSupport() {
+        return this.order.status === this.constant.ORDER_STATUS.SUCCESS.value && !this.appeal && !this.showAppeal
+      },
       steps() {
         const stepList = []
         const {CANCEL, CLOSED, CREATED, PAID, SUCCESS} = this.constant.ORDER_STATUS
@@ -706,12 +729,12 @@
                 } else {
                   message = '您已确认收款，对方已收到您出售的数字货币'
                 }
+                message += `，付款参考号：<span class="c-red">${this.referCode}</span>`
               }
-              message += `，付款参考号：<span class="c-red">${this.referCode}</span>`
               break
             case this.constant.ORDER_STATUS.CANCEL.value:
               if (this.appeal && this.appeal.result) {
-                message = '系统裁决订单完成'
+                message = '系统裁决订单取消'
               } else {
                 if (this.isBuySide) {
                   message = '您已将订单取消'
@@ -740,6 +763,17 @@
       }
     },
     methods: {
+      onContact() {
+        this.$showDialog({
+          title: '联系对方',
+          content: (<div>
+            <p class="c-dark fz-20">{this.phoneStatus.network_phone}</p>
+            <p class="c-gray">平台会对双方号码做隐私保护，请务必使用{this.phoneStatus.self_phone}拨打，否则将无法接通</p>
+          </div>),
+          okTitle: '我知道了',
+          okOnly: true,
+        })
+      },
       copySuccess() {
         this.copyed = true
         setTimeout(() => {
