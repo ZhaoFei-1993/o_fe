@@ -1,43 +1,6 @@
 <style lang="scss">
   @import "~assets/scss/variables.scss";
 
-  .order-step-detail {
-    &::after {
-      display: inline-block;
-      content: '';
-      width: 100px;
-      height: 2px;
-      background-color: #ffbc32;
-    }
-  }
-
-  .payment-radio-group {
-    .payment-radio {
-      .payment-radio-input {
-        display: none;
-        &:checked + label:before {
-          background-color: #52cbca;
-          border-color: #52cbca;
-          box-shadow: inset 0 0 0 2px #fff;
-        }
-      }
-      .payment-radio-label {
-        position: relative;
-        margin-bottom: 0;
-        &:before {
-          border-radius: 50%;
-          position: absolute;
-          top: 5px;
-          left: -32px;
-          width: 14px;
-          height: 14px;
-          content: '';
-          border: 1px solid #dddddd;
-        }
-      }
-    }
-  }
-
   .page-order-detail {
     padding: 40px 0 118px 0px;
     width: 1200px;
@@ -50,162 +13,194 @@
       padding: 0px;
       overflow: hidden;
       box-shadow: 0 0 10px 0 #ececec;
-      .order-basic-info {
-        padding: 30px 30px 10px;
-        .info-header {
-          display: flex;
-          justify-content: space-between;
-          border-bottom: 1px solid #eeeeee;
-        }
-        .info-detail {
-          .title {
-            font-size: 20px;
-            color: #27313e;
-            margin-top: 20px;
-          }
-          .content {
-            font-size: 16px;
-            color: #6f6f6f;
-            margin-top: 10px;
-            a {
-              color: #6f6f6f;
-              margin: 0 0.5rem;
-            }
-          }
-        }
-
-      }
-      .payment-info {
-        padding: 20px 30px;
-        background-color: #f9f9f9;
-
-        .payment-method {
-          display: flex;
-          align-items: center;
-          margin-bottom: 20px;
-          color: #6f6f6f;
-
-          select {
-            border: none;
-            background-color: transparent;
-            color: #6f6f6f;
-            &:focus {
-              outline: none;
-            }
-            option {
-              width: 120px;
-            }
-          }
-
-          .payment-account {
-            margin-left: 10px;
-            margin-right: 4px;
-          }
-        }
-
-        .payment-status {
-          font-size: 18px;
-          color: #27313e;
-          font-weight: 500;
-        }
-        .payment-warning {
+      .c-block {
+        &:not(:first-child) {
           margin-top: 10px;
         }
       }
-      .order-steps {
-        padding: 25px 30px;
-        ol {
-          list-style-type: none;
-          border-bottom: 1px solid #eeeeee;
-          li {
-            counter-increment: level1;
-            font-size: 16px;
+      .order-box-head {
+        padding: 9px 30px;
+        font-size: 16px;
+        color: #27313e;
+      }
+      .order-box-line {
+        border-bottom: solid 1px #eeeeee;
+      }
+      .order-box-body {
+        padding: 18px 30px;
+        display: flex;
+        justify-content: space-between;
+      }
+      .order-summary-box {
+        .order-summary-wrapper {
+          display: flex;
+          align-items: center;
+          padding: 14px 30px;
+          .order-summary-icon {
+            height: 21px;
+            width: 15px;
+          }
+          .order-summary-left {
+            display: inline-block;
+            font-size: 22px;
+            font-weight: 500;
+            margin-left: 5px;
+          }
+          .order-summary-right {
+            display: inline-block;
+            margin-left: 11px;
+          }
+        }
+      }
+      .order-detail-box {
+        .order-detail-body {
+          .order-detail-title {
             color: #6f6f6f;
-            margin-bottom: 50px;
-            width: 100%;
-            position: relative;
-            &.active {
-              color: #192330;
-              font-weight: 500;
-              div:first-child {
-                &:after {
-                  position: absolute;
-                  content: '';
-                  width: 11px;
-                  height: 11px;
-                  border-radius: 50%;
-                  background-color: $brandGreen;
-                  border: 1px solid $brandGreen;
-                  left: 40px;
-                  top: 8px;
-                }
-              }
-            }
-            &:before {
-              content: counter(level1) " "; /*Instead of ". " */
-              color: $brandGreen;
-              margin-right: 24px;
-              position: absolute;
-              left: 0;
-              top: 0px;
-            }
-            &:not(:last-child):after {
-              position: absolute;
-              left: 45px;
-              top: 18px;
-              content: '';
-              width: 0px;
-              height: 64px;
-              border-right: 1px solid $brandGreen;
-            }
-            div:first-child {
-              position: relative;
-              padding-left: 60px;
-              &:before {
-                position: absolute;
-                content: '';
-                width: 11px;
-                height: 11px;
-                border-radius: 50%;
-                background-color: white;
-                border: 1px solid $brandGreen;
-                left: 40px;
-                top: 8px;
-              }
-            }
-            div.step-time {
-              position: absolute;
-              left: 60px;
-            }
-            button {
-              position: absolute;
-              right: 0;
-              top: 0;
+          }
+          .order-detail-content {
+            margin-top: 10px;
+            font-size: 22px;
+            .iconfont {
+              vertical-align: baseline;
+              font-size: 20px;
             }
           }
         }
       }
-      .order-helper {
-        padding: 0 30px;
-        font-size: 16px;
-        .appeal-btn {
-          cursor: pointer;
-        }
-        .divider {
-          margin-top: 25px;
-          border-bottom: 1px solid #eeeeee;
+      .order-step-box {
+        .order-step-body {
+          padding: 18px 30px;
+          .order-step-wrapper {
+            position: relative;
+            height: 25px;
+            display: flex;
+            align-items: center;
+            .order-step-dot-line {
+              display: inline-block;
+              height: 2px;
+            }
+            .order-step-dot {
+              border-radius: 100px;
+              position: relative;
+              .order-step-detail {
+                width: 130px;
+                position: absolute;
+                top: 15px;
+                .order-step-time {
+                  font-size: 12px;
+                  color: #6f6f6f;
+                }
+              }
+            }
+          }
+          .order-step-body-title {
+            color: #27313e;
+            font-size: 18px;
+            font-weight: 500;
+            margin-top: 70px;
+          }
+          .link-to-wallet {
+            margin-top: 10px;
+          }
+          .order-step-contact {
+            margin-top: 10px;
+            .order-step-contact-detail {
+              display: inline-block;
+              margin-left: 2px;
+            }
+          }
+          .order-payment-method {
+            margin-top: 38px;
+            .order-payment-radio-group {
+              display: flex;
+              justify-content: flex-start;
+              margin-left: 30px;
+              .order-payment-radio {
+                font-size: 16px;
+                color: #6f6f6f;
+                width: 140px;
+                .order-payment-radio-input {
+                  display: none;
+                  &:checked + label:before {
+                    background-color: #52cbca;
+                    border-color: #52cbca;
+                    box-shadow: inset 0 0 0 2px #fff;
+                  }
+                }
+                .order-payment-radio-label {
+                  position: relative;
+                  margin-bottom: 0;
+                  &:before {
+                    border-radius: 50%;
+                    position: absolute;
+                    top: 5px;
+                    left: -32px;
+                    width: 14px;
+                    height: 14px;
+                    content: '';
+                    border: 1px solid #dddddd;
+                  }
+                  .order-payment-text {
+                    display: inline-block;
+                    margin-left: 6px;
+                  }
+                }
+              }
+            }
+            .order-payment-selected {
+              display: inline-block;
+              width: 150px;
+            }
+            .order-payment-account-wrapper {
+              display: inline-block;
+              height: 20px;
+              .order-payment-copy {
+                color: #52cbca;
+                cursor: pointer;
+                font-size: 15px;
+              }
+            }
+          }
+          .order-payment-btn-wrapper {
+            margin-top: 30px;
+            display: flex;
+            justify-content: space-between;
+            width: 300px;
+            .order-wrating-seller {
+              width: 150px;
+              height: 30px;
+              box-shadow: 2px 2px 6px 0 rgba(0, 0, 0, 0.1);
+              text-align: center;
+              line-height: 30px;
+              font-size: 16px;
+              color: #ffbc32;
+              .order-wrating-seller-text {
+                display: inline-block;
+                margin-left: 3px;
+              }
+            }
+          }
         }
       }
-      .order-notice {
-        padding: 10px 30px 30px;
-        .title {
-          font-size: 16px;
-          margin: 10px 0;
+      .order-appeal-box {
+        .order-appeal-body {
+          padding: 18px 30px;
+          font-size: 18px;
+          color: #192330;
+          .order-appeal-text {
+            color: #52cbca;
+            cursor: pointer;
+          }
         }
-        .notices {
-          color: #6f6f6f;
-          list-style-type: decimal;
-          list-style-position: inside;
+      }
+      .order-notices-box {
+        .order-notices-body {
+          padding: 18px 30px;
+          .order-notices-content {
+            color: #6f6f6f;
+            list-style-type: disc;
+            list-style-position: inside;
+          }
         }
       }
     }
@@ -249,94 +244,90 @@
   <div class="page-content-container">
     <div v-if="order" class="page-order-detail">
       <div class="main-content">
-        <CBlock class="order-summary-box" style="padding: 0;">
-          <div class="order-summary-wrapper" style="display: flex;align-items: center;padding: 14px 30px;">
-            <img v-if="isBuySide" class="order-summary-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAABCCAMAAAAmNqV/AAAAzFBMVEUAAAD//47/1kr/ugD/zzz/11H/wRL/1U3/yS3/3GD/1U3/yCn/xB7/vAb/4Gv/xiH/4Wz/0kr/3GH/2Fj/3Wb/217/2Fb/zTj/whj/vQr/1k//0kX/yzH/vAT/327/3mv/0EH/0D3/vxP/vxD/3V//00j/ugD/ugD/0kv/1E3/00r/1lH/11T/wxv/uwP/2Fj/vxH/wRX/2Vv/yCn/yS3/xiT/zz3/xSD/vgz/yzH/vAj/zTn/21//0UT/zDX/0kf/3GP/0EH/3Wb/32p+t7/zAAAAKXRSTlMAAz5zpEm0pKRJ+LS0tKSkST6kpPj4+LSkpP22tKT4+LS0pKQ0xlFKEZjxug0AAAFGSURBVEjHxcsJV4JAGIVho8X2sswW27MNsyiGLSui/v9/6mMgyWt45ZwpX4ZRj/ep/XdXs9j1eLB2jx1NHTxj+8ZBmJd/YWAhxBhwQsdxwlC/6e1cMABVB+cEPEqOPOmtPyjA9gyD1R7292CDgCCrJ0+gXwogCrzAkxME2SWHgBUP48CtBlxs0TRQrlLKdfWb3ooCiIFDpaLBNpJDQYSZBrtv2Jxp0MdMgzM/qy9PFgUQA6eJn8jx/e8roQBioP2KVQb1GtaxGpauIc9ljLWtn//fCJhftuPYtuVIsf4s/V2fqWViwvRei9uJ0nsQbF+I7kF3qNHf+b4QpHxfiNbd2LZlj4LvUTyUlu2xpRbdo9h5+jXYU7El+3LxMhLuUdA9iub7ULCnQva0zebHoHW95wL2XJx86mBPBOyZOMY9F7CndWRvpi/KPexpAEtaaAAAAABJRU5ErkJggg==" style="height: 21px;width: 15px;">
-            <img v-else class="order-summary-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAABCCAMAAAAmNqV/AAAAhFBMVEUAAAAY3MOA//8Awc8O0cYa3r8P0cYf47sDxc0Jy8kCxM0Z3b8IysoY3L8d4Lwg5LoT18Mf5LwT1sIj5rsV2cEAxNAX2sEW2cAe4cMY3L8Z3r0W2r8Iyskb4LwFyMoKzccMz8YV2cAQ08QO0cUCxM0ExswR1cMT1sId4rsAws4U2MEf5Lpvy+ckAAAAGXRSTlMAPwJ0pEi0o7S0pKOk+Pj4tEikSKROx7sR2Qzv4gAAAUpJREFUSMfNiwlOhEAQRQEd9210RmVrdmTg/vfzF21SpAIWRIjzautO/nP+Dddbln97vvaW5bsOxqK8MNT8EmOPvDCUfNN0VGhr6HlGN/ZPlNMNzsdNHDdNTIXWDOQZUsBvxo7zDAwtL7n3pvJBEKNRBG37Z0PmJxkzdo8BUA2Z9+22w5sNzvsKbHBeNzgf+ihalnDkbw3Ohxhm5M8G8jMhg/IZEWZ8Jv8HMtwh75nkwx3y6Qhe2qxtMbTsOciIFASq8AXafrX28aoJgjlCjcGuMShNqCVrC1d5ntcoOvZxqQmC9YWiyHMMwKKtCoLthBQ9S0iHFJgFAthESNIkSbFRaFW4TSSLhYe1hSiJQGKHUAXmbARjosj0hWt0wUjWFm6M5E4TKoOmqSpcXagk6wslQiXWT6tCKdlAOPWFS60LJ8nawvFCcnT+yDc3npQjvm6WdgAAAABJRU5ErkJggg==" style="height: 21px;width: 15px;">
-            <div class="order-summary-left" :style="{color: mainColor}" style="display: inline-block;font-size: 22px;font-weight: 500;margin-left: 5px;"> {{ isBuySide ? '购买' : '出售' }} {{ order.coin_type }}</div>
-            <div class="order-summary-right" style="display: inline-block;margin-left: 11px;">订单编号 #{{ order.id }}</div>
+        <CBlock x="0" y="0" class="order-summary-box">
+          <div class="order-summary-wrapper">
+            <img v-if="isBuySide" class="order-summary-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAABCCAMAAAAmNqV/AAAAzFBMVEUAAAD//47/1kr/ugD/zzz/11H/wRL/1U3/yS3/3GD/1U3/yCn/xB7/vAb/4Gv/xiH/4Wz/0kr/3GH/2Fj/3Wb/217/2Fb/zTj/whj/vQr/1k//0kX/yzH/vAT/327/3mv/0EH/0D3/vxP/vxD/3V//00j/ugD/ugD/0kv/1E3/00r/1lH/11T/wxv/uwP/2Fj/vxH/wRX/2Vv/yCn/yS3/xiT/zz3/xSD/vgz/yzH/vAj/zTn/21//0UT/zDX/0kf/3GP/0EH/3Wb/32p+t7/zAAAAKXRSTlMAAz5zpEm0pKRJ+LS0tKSkST6kpPj4+LSkpP22tKT4+LS0pKQ0xlFKEZjxug0AAAFGSURBVEjHxcsJV4JAGIVho8X2sswW27MNsyiGLSui/v9/6mMgyWt45ZwpX4ZRj/ep/XdXs9j1eLB2jx1NHTxj+8ZBmJd/YWAhxBhwQsdxwlC/6e1cMABVB+cEPEqOPOmtPyjA9gyD1R7292CDgCCrJ0+gXwogCrzAkxME2SWHgBUP48CtBlxs0TRQrlLKdfWb3ooCiIFDpaLBNpJDQYSZBrtv2Jxp0MdMgzM/qy9PFgUQA6eJn8jx/e8roQBioP2KVQb1GtaxGpauIc9ljLWtn//fCJhftuPYtuVIsf4s/V2fqWViwvRei9uJ0nsQbF+I7kF3qNHf+b4QpHxfiNbd2LZlj4LvUTyUlu2xpRbdo9h5+jXYU7El+3LxMhLuUdA9iub7ULCnQva0zebHoHW95wL2XJx86mBPBOyZOMY9F7CndWRvpi/KPexpAEtaaAAAAABJRU5ErkJggg==">
+            <img v-else class="order-summary-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAABCCAMAAAAmNqV/AAAAhFBMVEUAAAAY3MOA//8Awc8O0cYa3r8P0cYf47sDxc0Jy8kCxM0Z3b8IysoY3L8d4Lwg5LoT18Mf5LwT1sIj5rsV2cEAxNAX2sEW2cAe4cMY3L8Z3r0W2r8Iyskb4LwFyMoKzccMz8YV2cAQ08QO0cUCxM0ExswR1cMT1sId4rsAws4U2MEf5Lpvy+ckAAAAGXRSTlMAPwJ0pEi0o7S0pKOk+Pj4tEikSKROx7sR2Qzv4gAAAUpJREFUSMfNiwlOhEAQRQEd9210RmVrdmTg/vfzF21SpAIWRIjzautO/nP+Dddbln97vvaW5bsOxqK8MNT8EmOPvDCUfNN0VGhr6HlGN/ZPlNMNzsdNHDdNTIXWDOQZUsBvxo7zDAwtL7n3pvJBEKNRBG37Z0PmJxkzdo8BUA2Z9+22w5sNzvsKbHBeNzgf+ihalnDkbw3Ohxhm5M8G8jMhg/IZEWZ8Jv8HMtwh75nkwx3y6Qhe2qxtMbTsOciIFASq8AXafrX28aoJgjlCjcGuMShNqCVrC1d5ntcoOvZxqQmC9YWiyHMMwKKtCoLthBQ9S0iHFJgFAthESNIkSbFRaFW4TSSLhYe1hSiJQGKHUAXmbARjosj0hWt0wUjWFm6M5E4TKoOmqSpcXagk6wslQiXWT6tCKdlAOPWFS60LJ8nawvFCcnT+yDc3npQjvm6WdgAAAABJRU5ErkJggg==">
+            <div class="order-summary-left" :style="{color: mainColor}"> {{ isBuySide ? '购买' : '出售' }} {{ order.coin_type }}</div>
+            <div class="order-summary-right">订单编号 #{{ order.id }}</div>
           </div>
         </CBlock>
 
-        <CBlock class="order-detail-box" style="padding: 0;margin-top: 10px;">
-          <div class="order-detail-head" style="padding: 9px 30px;font-size: 16px;color: #27313e;">订单详情</div>
-          <div class="order-detail-line" style="border-bottom: solid 1px #eeeeee;"></div>
-          <div class="order-detail-body" style="padding: 18px 30px;display: flex;justify-content: space-between;">
+        <CBlock x="0" y="0" class="order-detail-box">
+          <div class="order-box-head">订单详情</div>
+          <div class="order-box-line"></div>
+          <div class="order-box-body order-detail-body">
             <div>
-              <div class="order-detail-title" style="color: #6f6f6f;">订单状态</div>
-              <div class="order-detail-content" v-if="statusIconMap[orderStatus.value]" style="margin-top: 10px;font-size: 22px;" :style="{color: statusIconMap[orderStatus.value].color}">
-                <i class="iconfont"
-                    style="vertical-align: baseline;font-size: 20px;" 
-                   :class="statusIconMap[orderStatus.value].class"></i>
+              <div class="order-detail-title">订单状态</div>
+              <div class="order-detail-content" v-if="statusIconMap[orderStatus.value]" :style="{color: statusIconMap[orderStatus.value].color}">
+                <i class="iconfont" :class="statusIconMap[orderStatus.value].class"></i>
                 {{ orderStatus.text }}
               </div>
             </div>
             <div>
-              <div style="color: #6f6f6f;">订单金额（{{ order.cash_type }}）</div>
-              <div class="order-detail-content" style="margin-top: 10px;font-size: 22px;color: #192330;">{{ order.cash_amount | formatMoney }}</div>
+              <div class="order-detail-title">订单金额（{{ order.cash_type }}）</div>
+              <div class="order-detail-content">{{ order.cash_amount | formatMoney }}</div>
             </div>
             <div>
-              <div style="color: #6f6f6f;">订单单价（{{ order.cash_type }}）</div>
-              <div class="order-detail-content" style="margin-top: 10px;font-size: 22px;color: #192330;">{{ order.price | formatMoney }}</div>
+              <div class="order-detail-title">订单单价（{{ order.cash_type }}）</div>
+              <div class="order-detail-content">{{ order.price | formatMoney }}</div>
             </div>
             <div>
-              <div style="color: #6f6f6f;">交易数量（{{ order.coin_type }}）</div>
-              <div class="order-detail-content" style="margin-top: 10px;font-size: 22px;color: #192330;">{{ order.coin_amount | formatMoney }}</div>
+              <div class="order-detail-title">交易数量（{{ order.coin_type }}）</div>
+              <div class="order-detail-content">{{ order.coin_amount | formatMoney }}</div>
             </div>
           </div>
         </CBlock>
 
-        <CBlock class="order-step-box" style="padding: 0;margin-top: 10px;">
-          <div class="order-step-head" style="padding: 9px 30px;font-size: 16px;color: #27313e;">订单进程</div>
-          <div class="order-step-line" style="border-bottom: solid 1px #eeeeee;"></div>
-          <div class="order-step-body" style="padding: 18px 30px;">
-            <div class="order-step-wrapper" style="position: relative;height: 25px;display: flex;align-items: center;" v-if="steps.length">
+        <CBlock x="0" y="0" class="order-step-box">
+          <div class="order-box-head">订单进程</div>
+          <div class="order-box-line"></div>
+          <div class="order-step-body">
+            <div class="order-step-wrapper" v-if="steps.length">
               <template v-for="(item, index) in steps">
-                <div v-if="index > 0" style="display: inline-block;height: 2px;" :style="{backgroundColor: index <= curStepIndex ? mainColor : '#eeeeee', width: index < curStepIndex ? '220px' : '264px'}"></div>
-                <div class="order-step-dot" :style="{width: index === curStepIndex ? '10px' : '8px', height: index === curStepIndex ? '10px' : '8px', backgroundColor: index <= curStepIndex ? mainColor : '#eeeeee'}" style="border-radius: 100px;position: relative;">
-                  <div style="width: 130px;position: absolute;top: 15px;" :style="index === 3 ? `right: 0;text-align: right;top: ${index === curStepIndex ? 16 : 15}px;` : 'left: 0;'">
+                <div v-if="index > 0" class="order-step-dot-line" :style="{backgroundColor: index <= curStepIndex ? mainColor : '#eeeeee', width: index < curStepIndex ? '220px' : '264px'}"></div>
+                <div class="order-step-dot" :style="{width: index === curStepIndex ? '10px' : '8px', height: index === curStepIndex ? '10px' : '8px', backgroundColor: index <= curStepIndex ? mainColor : '#eeeeee'}">
+                  <div class="order-step-detail" :style="index === 3 ? `right: 0;text-align: right;top: ${index === curStepIndex ? 16 : 15}px;` : 'left: 0;'">
                     <div :style="{color: index === curStepIndex ? mainColor : ''}">{{ item.label }}</div>
-                    <div v-if="item.time" class="order-step-time" style="font-size: 12px;color: #6f6f6f;">{{ item.time | getTimeText }}</div>
+                    <div v-if="item.time" class="order-step-time">{{ item.time | getTimeText }}</div>
                   </div>
                 </div>
               </template>
             </div>
-            <div class="order-step-body-title" style="color: #27313e;font-size: 18px;font-weight: 500;margin-top: 70px;" v-html="paymentStatusMessage.message"></div>
+            <div class="order-step-body-title" v-html="paymentStatusMessage.message"></div>
             <div class="payment-warning" v-if="paymentStatusMessage.warning" v-html="paymentStatusMessage.warning"></div>
-            <div v-if="toWalletPage" class="link-to-wallet" style="margin-top: 10px;">
+            <div v-if="toWalletPage" class="link-to-wallet">
               <b-link to="/wallet">划转数字货币</b-link>
             </div>
-            <div class="order-step-contact" style="margin-top: 10px;" v-if="order.status === constant.ORDER_STATUS.PAID.value">
+            <div class="order-step-contact" v-if="order.status === constant.ORDER_STATUS.PAID.value">
               <b-link :disabled="!phoneStatus.network_phone">
                 <i class="iconfont icon-netphone" v-b-tooltip.hover :title="order.network_phone_reason"></i>
-                <span style="display: inline-block;margin-left: 2px;">联系对方</span>
+                <span class="order-step-contact-detail">联系对方</span>
               </b-link>
             </div>
-            <div class="payment-method" style="margin-top: 38px;" v-if="showPayment">
-              <template v-if="order.status === constant.ORDER_STATUS.CREATED.value">
-                <template v-if="isBuySide">
-                  <div class="payment-radio-group" style="display: flex;justify-content: flex-start;margin-left: 30px;">
-                    <div class="payment-radio" style="font-size: 16px;color: #6f6f6f;width: 140px;" v-for="(item, index) in order.payment_methods">
-                      <input :id="`payment-radio-${index}`" class="payment-radio-input" type="radio" v-model="selectedPaymentAccount" :value="item.account_no">
-                      <label class="payment-radio-label" :for="`payment-radio-${index}`">
-                        <template v-if="selectedPaymentAccount === item.account_no">
-                          <i class="iconfont" :class="paymentNameMap[item.method].icon"></i>
-                          <span style="display: inline-block;margin-left: 6px;color: #192330;">
-                            {{ paymentNameMap[item.method].text }}
-                          </span>
-                        </template>
-                        <template v-else>
-                          <i class="iconfont" :class="paymentNameMap[item.method].icon" style="color: #9b9b9b;"></i>
-                          <span style="display: inline-block;margin-left: 6px;color: #9b9b9b;">
-                            {{ paymentNameMap[item.method].text }}
-                          </span>
-                        </template>
-                      </label>
-                    </div>
+            <div class="order-payment-method" v-if="showPayment">
+              <template v-if="order.status === constant.ORDER_STATUS.CREATED.value && isBuySide">
+                <div class="order-payment-radio-group">
+                  <div class="order-payment-radio" v-for="(item, index) in order.payment_methods">
+                    <input :id="`payment-radio-${index}`" class="order-payment-radio-input" type="radio" v-model="selectedPaymentAccount" :value="item.account_no">
+                    <label class="order-payment-radio-label" :for="`payment-radio-${index}`">
+                      <template v-if="selectedPaymentAccount === item.account_no">
+                        <i class="iconfont" :class="paymentNameMap[item.method].icon"></i>
+                        <span class="order-payment-text" style="color: #192330;">
+                          {{ paymentNameMap[item.method].text }}
+                        </span>
+                      </template>
+                      <template v-else>
+                        <i class="iconfont" :class="paymentNameMap[item.method].icon" style="color: #9b9b9b;"></i>
+                        <span class="order-payment-text" style="color: #9b9b9b;">
+                          {{ paymentNameMap[item.method].text }}
+                        </span>
+                      </template>
+                    </label>
                   </div>
-                </template>
+                </div>
               </template>
-              <div v-else style="display: inline-block;width: 150px;">
+              <div v-else class="order-payment-selected">
                 <span v-if="selectedMethod.method === constant.PAYMENT_TYPES.BANKCARD">
                   <i class="mr-10 iconfont icon-bankcard"></i>银行转帐
                 </span>
@@ -347,72 +338,70 @@
                   <i class="mr-10 iconfont icon-alipay"></i>支付宝支付
                 </span>
               </div>
-              <span>
-                <span class="payment-account">
+              <span class="order-payment-account-wrapper">
+                <span>
                   <span>{{selectedMethod.account_name + ' '}}</span>
                   <span v-if="selectedMethod.method === constant.PAYMENT_TYPES.BANKCARD">
                     {{ selectedMethod.account_no | splitCardNumber }}
-                    <i id="icon-copy" class="iconfont icon-copy" style="color: #52cbca;cursor: pointer;" v-clipboard:copy="selectedMethod.account_no" v-clipboard:success="copySuccess"></i>
+                    <i id="icon-copy" class="iconfont icon-copy order-payment-copy" v-clipboard:copy="selectedMethod.account_no" v-clipboard:success="copySuccess"></i>
                     <b-tooltip target="icon-copy" content="已复制" :show="copyed" :triggers="'false'" placement="top">已复制</b-tooltip>
                   </span>
                   <span v-else>{{ selectedMethod.account_no }}</span>
                 </span>
-                <span v-if="selectedMethod.method === constant.PAYMENT_TYPES.BANKCARD" class="detail-text">
+                <span v-if="selectedMethod.method === constant.PAYMENT_TYPES.BANKCARD">
                   {{ selectedMethod.bank_name }}<span v-if="selectedMethod.branch">, {{ selectedMethod.branch }}</span>
                 </span>
                 <QrcodePopover v-if="selectedMethod.method !== constant.PAYMENT_TYPES.BANKCARD && selectedMethod.qr_code_image"
                   :src="selectedMethod.qr_code_image_url"/>
               </span>
             </div>
-            <div style="margin-top: 30px;">
-              <div v-if="(order.status !== constant.ORDER_STATUS.CANCEL.value || order.pay_time) && order.status !== constant.ORDER_STATUS.CLOSED.value" style="display: flex;justify-content: space-between;width: 300px;">
-                <b-btn v-if="isBuySide && !order.pay_time"
-                       :disabled="expired"
-                       size="xs" variant="gradient-yellow"
-                       @click="confirmPay" style="width: 120px;">我已支付</b-btn>
-                <div v-if="order.status === constant.ORDER_STATUS.PAID.value && isBuySide" style="width: 150px;height: 30px;box-shadow: 2px 2px 6px 0 rgba(0, 0, 0, 0.1);text-align: center;line-height: 30px;font-size: 16px;color: #ffbc32;"><i class="iconfont icon-tea"></i><span style="display: inline-block;margin-left: 3px;">等待对方放币</span></div>
-                <b-btn v-if="canCancel" size="xs" style="width: 120px;" variant="outline-green" :disabled="expired" @click="cancelOrder">取消订单</b-btn>
-                <button v-if="showConfirmReceiptStep && showSellerConfirmButton" class="btn btn-gradient-yellow btn-xs"
-                        @click="confirmReceipt" style="width: 150px;">确认收款并放币
-                </button>
-              </div>
+            <div v-if="(order.status !== constant.ORDER_STATUS.CANCEL.value || order.pay_time) && order.status !== constant.ORDER_STATUS.CLOSED.value" class="order-payment-btn-wrapper">
+              <b-btn v-if="isBuySide && !order.pay_time"
+                     :disabled="expired"
+                     size="xs" variant="gradient-yellow"
+                     @click="confirmPay" style="width: 120px;">我已支付</b-btn>
+              <div v-if="order.status === constant.ORDER_STATUS.PAID.value && isBuySide" class="order-wrating-seller"><i class="iconfont icon-tea"></i><span class="order-wrating-seller-text">等待对方放币</span></div>
+              <b-btn v-if="canCancel" size="xs" style="width: 120px;" variant="outline-green" :disabled="expired" @click="cancelOrder">取消订单</b-btn>
+              <button v-if="showConfirmReceiptStep && showSellerConfirmButton" class="btn btn-gradient-yellow btn-xs"
+                      @click="confirmReceipt" style="width: 150px;">确认收款并放币
+              </button>
             </div>
           </div>
         </CBlock>
 
-        <CBlock class="order-appeal-box" style="padding: 0;margin-top: 10px;" v-if="showAppeal">
-          <div class="order-appeal-head" style="padding: 9px 30px;font-size: 16px;color: #27313e;">订单申诉</div>
-          <div class="order-appeal-line" style="border-bottom: solid 1px #eeeeee;"></div>
-          <div class="order-appeal-body" style="padding: 18px 30px;font-size: 18px;color: #192330;">
-            订单遇到问题？您可以<span style="color: #52cbca;cursor: pointer;" @click="startAppeal">发起申诉</span>
+        <CBlock x="0" y="0" class="order-appeal-box" v-if="showAppeal">
+          <div class="order-box-head">订单申诉</div>
+          <div class="order-box-line"></div>
+          <div class="order-appeal-body">
+            订单遇到问题？您可以<span class="order-appeal-text" @click="startAppeal">发起申诉</span>
           </div>
         </CBlock>
 
-        <CBlock class="order-notices-box" style="padding: 0;margin-top: 10px;">
-          <div class="order-notices-head" style="padding: 9px 30px;font-size: 16px;color: #27313e;">交易须知</div>
-          <div class="order-notices-line" style="border-bottom: solid 1px #eeeeee;"></div>
-          <div class="order-notices-body" style="padding: 18px 30px;">
-            <ul class="order-notices" v-if="isBuySide" style="color: #6f6f6f;list-style-type: disc;list-style-position: inside;">
+        <CBlock x="0" y="0" class="order-notices-box">
+          <div class="order-box-head">交易须知</div>
+          <div class="order-box-line"></div>
+          <div class="order-notices-body">
+            <ul class="order-notices-content" v-if="isBuySide">
               <li>您支付的法币将直接进入卖方收款账户，交易中卖方的数字货币由平台托管冻结。</li>
               <li>请尽快完成付款，并务必<span class="c-red">点击“我已支付”</span>，卖方确认收款后，平台将数字货币划转到您的账户。</li>
-              <li>买方当日取消订单达3笔（含超时未支付订单），会被限制当日交易功能。</li>
-              <li>请<span class="c-red">使用即时到账支付方式</span>，付款后2小时内未到账订单，卖方有权要求退款后取消交易，请知悉。</li>
+              <li>请使用即时到账支付方式，付款后2小时内未到账订单，卖方有权要求退款后取消交易。</li>
+              <li>当日取消订单达到3笔（包括超时自动关闭的订单），将被限制当日交易功能。</li>
             </ul>
-            <ul class="order-notices" v-else style="color: #6f6f6f;list-style-type: disc;list-style-position: inside;">
+            <ul class="order-notices-content" v-else>
               <li>买方支付的法币将直接进入您的收款账户，交易中您的数字货币由平台托管冻结。</li>
-              <li>确认收到买方付款后，请及时<span class="c-red">点击“确认收款”</span>，放行数字货币给买方。</li>
-              <li>收到到账短信后，请<span class="c-red">务必登录收款账户确认款项是否到账</span>，避免因收到诈骗短信错误释放数字货币。</li>
+              <li>确认收到买方付款后，请及时<span class="c-red">点击“确认收款”</span>放行数字货币。</li>
+              <li>收到到账短信后，请务必登录收款账户确认款项是否到账，避免因收到诈骗短信错误释放数字货币。</li>
             </ul>
           </div>
         </CBlock>
       </div>
       <div class="sidebar">
-        <CBlock class="my-sidebar-info" style="padding: 30px 0 13px 0;">
+        <CBlock x="0" y="0" class="my-sidebar-info" style="padding: 30px 0 13px 0;">
           <UserStatsProfile :user-data="counterparty" v-if="counterparty"
                             :color="colors[counterparty.id % 10]"
                             :is-merchant="counterparty.id===order.merchant_id"/>
         </CBlock>
-        <CBlock id="my-chat-box">
+        <CBlock x="0" y="0" id="my-chat-box">
           <Chat v-if="user.account" :client="chat.imClient" :conversation-id="order.conversation_id"
                 :client-id="`${user.account.id}`" :is-buy-side="isBuySide"></Chat>
         </CBlock>
@@ -526,6 +515,14 @@
             icon: 'icon-wechat-round',
           },
         },
+        stepsMessage: {
+          created: '生成订单',
+          payCash: '买方付款',
+          payCoin: '卖方放币',
+          success: '订单完成',
+          closed: '订单已关闭',
+          cancel: '订单已取消',
+        },
       }
     },
     components: {
@@ -567,21 +564,11 @@
     },
     computed: {
       ...mapState(['user', 'constant', 'chat']),
-      mainColor() {
+      mainColor() { // 区分买卖双方主色调
         if (this.isBuySide) {
           return '#ffbc32'
         }
         return '#52cbca'
-      },
-      stepsMessage() {
-        return {
-          created: '生成订单',
-          payCash: '买方付款',
-          payCoin: '卖方放币',
-          success: '订单完成',
-          closed: '订单已关闭',
-          cancel: '订单已取消',
-        }
       },
       steps() {
         const stepList = []
@@ -629,21 +616,6 @@
       isBuySide() {
         return this.order.merchant_side === this.constant.SIDE.BUY ? this.isMerchant : !this.isMerchant
       },
-      isBuyerAppeal() {
-        if (!this.appeal) return false
-        return (this.order.user_side === this.constant.SIDE.BUY) === (this.appeal.user_id === this.order.user_id)
-      },
-      userNames() {
-        if (this.isBuySide) {
-          return {buyer: '您', seller: this.counterparty.name}
-        } else {
-          return {seller: '您', buyer: this.counterparty.name}
-        }
-      },
-      appealSide() {
-        if (!this.appeal) return null
-        return this.isBuyerAppeal ? this.userNames.buyer + '(买家)' : this.userNames.seller + '(卖家)'
-      },
       canCancelAppeal() {
         if (!this.appeal) return false
         const pending = this.appeal.status === this.constant.APPEAL_STATUS.CREATED
@@ -670,9 +642,6 @@
         return paid ||
           (success && this.utils.getTimeDifference(this.order.complete_time) < SUCCESS_CAN_APPEAL)
       },
-      showSupport() {
-        return this.order.status === this.constant.ORDER_STATUS.SUCCESS.value && !this.appeal && !this.showAppeal
-      },
       canCancel() {
         const orderStatusOk = this.order.status === this.constant.ORDER_STATUS.CREATED.value || this.order.status === this.constant.ORDER_STATUS.PAID.value
         return this.isBuySide && orderStatusOk && !this.isAppealing
@@ -682,30 +651,6 @@
         const paid = this.order.status === this.constant.ORDER_STATUS.PAID.value
         const success = this.order.status === this.constant.ORDER_STATUS.SUCCESS.value
         return this.selectedMethod && (createdBuyer || paid || success) && !this.expired
-      },
-      tradeText() {
-        if (!this.counterparty) return {}
-        if (this.isBuySide) {
-          return {
-            side: '购买',
-            payment: '需支付',
-            need: '请于',
-            counterparty: '卖家',
-          }
-        }
-        return {
-          side: '出售',
-          payment: '对方需支付',
-          need: this.counterparty.name + ' 需在',
-          counterparty: '买家'
-        }
-      },
-
-      paymentTitle() {
-        return this.tradeText.side + ' ' + this.order.coin_amount + ' ' + this.order.coin_type + ', ' + this.tradeText.payment + ' ' + this.order.cash_amount + ' ' + this.order.cash_type
-      },
-      paymentOrigin() {
-        return '交易广告 #' + this.order.item_id + ' ，单价 ' + this.order.price + ' CNY/ ' + this.order.coin_type
       },
       referCode() {
         // 去最后六位，防止后端返回数字，都先转换为字符串
@@ -744,7 +689,7 @@
               break
             case this.constant.ORDER_STATUS.PAID.value:
               if (this.isBuySide) {
-                message = `等待对方确认收款`
+                message = '等待对方确认收款'
               } else {
                 message = `对方已支付${this.order.cash_amount}${this.order.cash_type}，请查收并放币`
                 warning = '请务必查看您的收款账户，并核实买家是否实名付款。'
@@ -752,19 +697,27 @@
               message += `，付款参考号：<span class="c-red">${this.referCode}</span>`
               break
             case this.constant.ORDER_STATUS.SUCCESS.value:
-              if (this.isBuySide) {
-                message = `对方已确认收款，您已收到对方出售的数字货币`
-                this.toWalletPage = true
+              if (this.appeal && this.appeal.result) {
+                message = '系统裁决订单完成'
               } else {
-                message = `您已确认收款，对方已收到您出售的数字货币`
+                if (this.isBuySide) {
+                  message = '对方已确认收款，您已收到对方出售的数字货币'
+                  this.toWalletPage = true
+                } else {
+                  message = '您已确认收款，对方已收到您出售的数字货币'
+                }
               }
               message += `，付款参考号：<span class="c-red">${this.referCode}</span>`
               break
             case this.constant.ORDER_STATUS.CANCEL.value:
-              if (this.isBuySide) {
-                message = '您已将订单取消'
+              if (this.appeal && this.appeal.result) {
+                message = '系统裁决订单完成'
               } else {
-                message = '对方已将订单取消'
+                if (this.isBuySide) {
+                  message = '您已将订单取消'
+                } else {
+                  message = '对方已将订单取消'
+                }
               }
               break
             case this.constant.ORDER_STATUS.CLOSED.value:
@@ -776,12 +729,6 @@
           message,
           warning,
         }
-      },
-      appealResult() {
-        if (!this.appeal) {
-          return ''
-        }
-        return this.constant.APPEAL_RESULT_MAP[this.appeal.result].text + '，' + this.constant.ORDER_RESULT_MAP[this.appeal.order_result].text
       },
       phoneStatus() {
         return {
