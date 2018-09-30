@@ -206,6 +206,7 @@ module.exports = {
     '~/plugins/cookies',
     {src: '~/plugins/i18n'},
     {src: '~/plugins/axios'},
+    {src: '~/plugins/clipboard', ssr: false},
     {src: '~/plugins/ga', ssr: false},
     {src: '~/plugins/webp'},
     {src: '~/plugins/utils'},
