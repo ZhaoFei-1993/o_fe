@@ -303,10 +303,10 @@
             <div v-if="toWalletPage" class="link-to-wallet">
               <b-link to="/wallet">划转数字货币</b-link>
             </div>
-            <div class="order-step-contact" v-if="order.status === constant.ORDER_STATUS.PAID.value">
-              <b-link :disabled="!phoneStatus.network_phone">
+            <div class="order-step-contact" v-if="phoneStatus && phoneStatus.show">
+              <b-link :disabled="!phoneStatus.network_phone" @click="onContact">
                 <i class="iconfont icon-netphone" v-b-tooltip.hover :title="order.network_phone_reason"></i>
-                <span class="order-step-contact-detail" @click="onContact">联系对方</span>
+                <span class="order-step-contact-detail">联系对方</span>
               </b-link>
             </div>
             <div class="order-payment-method" v-if="showPayment">
@@ -371,7 +371,7 @@
           </div>
         </CBlock>
 
-        <CBlock x="0" y="0" class="order-appeal-box" v-if="showAppeal">
+        <CBlock x="0" y="0" class="order-appeal-box">
           <div class="order-box-head">订单申诉</div>
           <div class="order-box-line"></div>
           <div class="order-appeal-body">
