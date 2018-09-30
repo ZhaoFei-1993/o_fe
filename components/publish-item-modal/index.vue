@@ -5,7 +5,7 @@
     .modal-dialog {
       max-width: 940px !important;
       .modal-body {
-        max-height: 500px;
+        max-height: 520px;
         overflow-y: auto;
       }
     }
