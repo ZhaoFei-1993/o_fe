@@ -122,29 +122,38 @@
                   </div>
                   <div class="payment-method">
                     <template v-if="item.status ===constant.ORDER_STATUS.CREATED.value">
-                        <span v-if="item._isBuySide">
-                          <i v-if="item._selected_payment_method.method === constant.PAYMENT_TYPES.WECHAT"
-                             class="iconfont icon-wechat-round"></i>
-                          <i v-if="item._selected_payment_method.method === constant.PAYMENT_TYPES.BANKCARD"
-                             class="iconfont icon-bankcard"></i>
-                          <i v-if="item._selected_payment_method.method === constant.PAYMENT_TYPES.ALIPAY"
-                             class="iconfont icon-alipay"></i>
-                          <select v-model="item._selected_payment_method">
-                            <option v-for="payment in item.payment_methods" :value="payment" :class="payment.method">
-                              <span v-if="payment.method === constant.PAYMENT_TYPES.BANKCARD">银行转帐</span>
-                              <span v-if="payment.method === constant.PAYMENT_TYPES.WECHAT">微信支付</span>
-                              <span v-if="payment.method === constant.PAYMENT_TYPES.ALIPAY">支付宝支付</span>
-                            </option>
-                          </select>
-                        </span>
+                        <div v-if="item._isBuySide" class="select-wrap">
+                          <div class="select-head" @click.stop="clickPayment">
+                            <i v-if="item._selected_payment_method.method === constant.PAYMENT_TYPES.WECHAT"
+                               class="iconfont icon-wechat-round"></i>
+                            <i v-if="item._selected_payment_method.method === constant.PAYMENT_TYPES.BANKCARD"
+                               class="iconfont icon-bankcard"></i>
+                            <i v-if="item._selected_payment_method.method === constant.PAYMENT_TYPES.ALIPAY"
+                               class="iconfont icon-alipay"></i>
+                            <span v-model="item._selected_payment_method">
+                              <span v-if="item._selected_payment_method.method === constant.PAYMENT_TYPES.BANKCARD">银行卡</span>
+                              <span v-if="item._selected_payment_method.method === constant.PAYMENT_TYPES.WECHAT">微信</span>
+                              <span v-if="item._selected_payment_method.method === constant.PAYMENT_TYPES.ALIPAY">支付宝</span>
+                            </span>
+                            <i class="iconfont icon-xialajiantou"></i>
+                          </div>
+                          <ul id="select-op" class="select-option">
+                            <li v-for="payment in item.payment_methods" :value="payment" @click="choosePayment(item,payment)" :class="{selected : payment.method === item._selected_payment_method.method }">
+                              <i class="iconfont icon-tick"></i>
+                              <span v-if="payment.method === constant.PAYMENT_TYPES.BANKCARD">银行卡</span>
+                              <span v-if="payment.method === constant.PAYMENT_TYPES.WECHAT">微信</span>
+                              <span v-if="payment.method === constant.PAYMENT_TYPES.ALIPAY">支付宝</span>
+                            </li>
+                          </ul>
+                        </div>
                     </template>
                     <template v-else>
                         <span v-if="item._selected_payment_method.method === constant.PAYMENT_TYPES.BANKCARD">
-                          <i class="mr-10 iconfont icon-bankcard"></i>银行转帐</span>
+                          <i class="mr-10 iconfont icon-bankcard"></i>银行卡</span>
                       <span v-if="item._selected_payment_method.method === constant.PAYMENT_TYPES.WECHAT">
-                          <i class="mr-10 iconfont icon-wechat-round"></i>微信支付</span>
+                          <i class="mr-10 iconfont icon-wechat-round"></i>微信</span>
                       <span v-if="item._selected_payment_method.method === constant.PAYMENT_TYPES.ALIPAY">
-                          <i class="mr-10 iconfont icon-alipay"></i>支付宝支付</span>
+                          <i class="mr-10 iconfont icon-alipay"></i>支付宝</span>
                     </template>
                     <span class="payment-account" v-if="!(item.status === constant.ORDER_STATUS.CREATED.value && !item._isBuySide)">
                         <span style="margin-right: 10px;">{{item._selected_payment_method.account_name + ' '}}</span>
@@ -154,13 +163,13 @@
                           <b-tooltip target="icon-copy" content="已复制" :show="copyed" :triggers="'false'" placement="top">已复制</b-tooltip>
                         </span>
                         <span v-else>{{ item._selected_payment_method.account_no }}</span>
-                        </span>
                         <span v-if="item._selected_payment_method.method === constant.PAYMENT_TYPES.BANKCARD">
                           {{ item._selected_payment_method.bank_name }}
                           <span style="margin-left: 20px;" v-if="item._selected_payment_method.branch&&item._selected_payment_method.branch.length">
                            {{ item._selected_payment_method.branch }}
                           </span>
                         </span>
+                    </span>
                   </div>
                 </div>
                 <div class="payment-wrapper">
@@ -478,6 +487,7 @@
           }
         })
       })
+      this.initCustomSelect()
     },
     beforeDestroy() {
       clearInterval(this.timer) // 清除定时器
@@ -768,6 +778,23 @@
             okOnly: true,
         })
         }
+      },
+      initCustomSelect() {
+        document.body.addEventListener('click', function (event) {
+          if (!event.target.matches('.select-head')) {
+            const dropdown = document.getElementById('select-op')
+            if (dropdown && dropdown.classList.contains('show')) {
+              dropdown.classList.remove('show')
+            }
+          }
+        })
+      },
+      clickPayment() {
+        document.getElementById('select-op').classList.toggle('show')
+      },
+      choosePayment(item, payment) {
+        item._selected_payment_method = {...payment}
+        document.getElementById('select-op').classList.remove('show')
       }
     }
   }
@@ -953,27 +980,7 @@
           }
         }
       }
-      .payment-method {
-        margin-bottom: 20px;
-        color: #6f6f6f;
-        font-size: 14px;
-        .payment-text {
-          color: #27313e;
-          display: inline-block;
-          margin-left: 9px;
-        }
-        select {
-          border: none;
-          background-color: transparent;
-          color: #27313e;
-          &:focus {
-            outline: none;
-          }
-          option {
-            width: 120px;
-          }
-        }
-      }
+
       .order-detail {
         display: flex;
         justify-content: space-between;
@@ -997,6 +1004,7 @@
         .payment-warning {
           margin-top: 10px;
           color: #e35555;
+          font-size: 14px;
         }
         .order-other-side {
           margin-top: 10px;
@@ -1008,11 +1016,53 @@
           margin-top: 10px;
           .payment-account {
             margin-left: 20px;
+            font-size: 14px;
+            color: #192330;
           }
           .order-payment-copy {
             color: #52cbca;
             cursor: pointer;
             font-size: 15px;
+          }
+          .select-wrap {
+            position: relative;
+            display: inline-block;
+            width: 80px;
+            color: #192330;
+            font-size: 14px;
+          }
+          .select-head {
+            span {
+              display: inline-block;
+              width: 46px;
+            }
+          }
+          .select-option {
+            display:none;
+            position: absolute;
+            width: 80px;
+            height: 90px;
+            background-color: #fff;
+            z-index: 5;
+            li {
+              line-height: 30px;
+              padding-left: 5px;
+              text-align: left;
+              cursor: pointer;
+              .icon-tick {
+                visibility: hidden;
+              }
+            }
+            .selected {
+              color: #52cbca;
+              .icon-tick {
+                visibility: visible;
+              }
+            }
+          }
+
+          .show {
+            display: block;
           }
         }
 
@@ -1042,6 +1092,7 @@
         }
       }
     }
+
     @mixin shake($x, $y, $rot, $name, $steps:10, $opacity:false) {
       $r: 0deg;
       $h: 0px;
