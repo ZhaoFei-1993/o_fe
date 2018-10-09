@@ -148,11 +148,11 @@
                         </div>
                     </template>
                     <template v-else>
-                        <span v-if="item._selected_payment_method.method === constant.PAYMENT_TYPES.BANKCARD">
+                        <span v-if="item._selected_payment_method.method === constant.PAYMENT_TYPES.BANKCARD" class="payments">
                           <i class="mr-10 iconfont icon-bankcard"></i>银行卡</span>
-                      <span v-if="item._selected_payment_method.method === constant.PAYMENT_TYPES.WECHAT">
+                      <span v-if="item._selected_payment_method.method === constant.PAYMENT_TYPES.WECHAT" class="payments">
                           <i class="mr-10 iconfont icon-wechat-round"></i>微信</span>
-                      <span v-if="item._selected_payment_method.method === constant.PAYMENT_TYPES.ALIPAY">
+                      <span v-if="item._selected_payment_method.method === constant.PAYMENT_TYPES.ALIPAY" class="payments">
                           <i class="mr-10 iconfont icon-alipay"></i>支付宝</span>
                     </template>
                     <span class="payment-account" v-if="!(item.status === constant.ORDER_STATUS.CREATED.value && !item._isBuySide)">
@@ -772,11 +772,11 @@
               title: '联系对方',
               content: (<div>
                 <p class="c-dark fz-20">{item.network_phone}</p>
-            <p class="c-gray">平台会对双方号码做隐私保护，请务必使用{this.user.account.mobile}拨打，否则将无法接通</p>
-          </div>),
-          okTitle: '我知道了',
-            okOnly: true,
-        })
+                <p class="c-gray">平台会对双方号码做隐私保护，请务必使用{this.user.account.mobile}拨打，否则将无法接通</p>
+              </div>),
+              okTitle: '我知道了',
+                okOnly: true,
+          })
         }
       },
       initCustomSelect() {
@@ -1063,6 +1063,10 @@
 
           .show {
             display: block;
+          }
+          .payments {
+            font-size: 14px;
+            color: #192330;
           }
         }
 
