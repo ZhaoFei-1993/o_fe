@@ -85,21 +85,21 @@
                       <template v-if="item.status === constant.ORDER_STATUS.CREATED.value">
                         请支付{{item.cash_amount}}{{item.cash_type}}，剩余时间为{{ item._remaining_time | formatDuration
                         }}，付款参考号：
-                        <span style="color: #e35555;">{{item.id}}</span>
+                        <span class="warning-text">{{item.id}}</span>
                       </template>
                       <template v-if="item.status === constant.ORDER_STATUS.PAID.value">
-                        等待对方确认收款，付款参考号：<span style="color: #e35555;">{{item.id}}</span>
+                        等待对方确认收款，付款参考号：<span class="warning-text">{{item.id}}</span>
                       </template>
                     </template>
                     <template v-if="!item._isBuySide">
                       <template v-if="item.status === constant.ORDER_STATUS.CREATED.value">
                         等待对方支付{{item.cash_amount}}{{item.cash_type}},剩余时间为{{ item._remaining_time | formatDuration
                         }}，付款参考号：
-                        <span style="color: #e35555;">{{item.id}}</span>
+                        <span class="warning-text">{{item.id}}</span>
                       </template>
                       <template v-if="item.status === constant.ORDER_STATUS.PAID.value">
                         对方已支付{{item.cash_amount}}{{item.cash_type}}，请查收并放币，付款参考号:
-                        <span style="color: #e35555;">{{item.id}}</span>
+                        <span class="warning-text">{{item.id}}</span>
                       </template>
                     </template>
                   </div>
@@ -122,8 +122,8 @@
                   </div>
                   <div class="payment-method">
                     <template v-if="item.status ===constant.ORDER_STATUS.CREATED.value">
-                        <div v-if="item._isBuySide" class="select-wrap">
-                          <div class="select-head" @click.stop="clickPayment">
+                        <div v-if="item._isBuySide" class="select-wrap" v-click-outside="onClickOutsidePayment">
+                          <div class="select-head" @click="isShowPaymentMethod = !isShowPaymentMethod" >
                             <i v-if="item._selected_payment_method.method === constant.PAYMENT_TYPES.WECHAT"
                                class="iconfont icon-wechat-round"></i>
                             <i v-if="item._selected_payment_method.method === constant.PAYMENT_TYPES.BANKCARD"
@@ -137,9 +137,9 @@
                             </span>
                             <i class="iconfont icon-xialajiantou"></i>
                           </div>
-                          <ul id="select-op" class="select-option">
-                            <li v-for="payment in item.payment_methods" :value="payment" @click="choosePayment(item,payment)" :class="{selected : payment.method === item._selected_payment_method.method }">
-                              <i class="iconfont icon-tick"></i>
+                          <ul id="select-op" class="select-option" v-show="isShowPaymentMethod">
+                            <li v-for="(payment,index) in item.payment_methods" :value="payment" @click="choosePayment({item,index,payment})" :class="{'selected' : item._selected_payment_method.method === payment.method}">
+                              <span class="select-item-placeholder"><i class="iconfont icon-tick" v-show="item._selected_payment_method.method === payment.method"></i></span>
                               <span v-if="payment.method === constant.PAYMENT_TYPES.BANKCARD">银行卡</span>
                               <span v-if="payment.method === constant.PAYMENT_TYPES.WECHAT">微信</span>
                               <span v-if="payment.method === constant.PAYMENT_TYPES.ALIPAY">支付宝</span>
@@ -252,6 +252,7 @@
   import TableHeadDropdown from '~/components/table-head-dropdown'
   import ViaPagination from '~/components/via-pagination'
   import QrcodePopover from '~/components/qrcode-popover'
+  import ClickOutside from 'vue-click-outside'
 
   const LIMIT = 10
   const ORDER_PAY_TIME = 15 // 订单可付款时间
@@ -265,6 +266,7 @@
     data() {
       return {
         copyed: false,
+        isShowPaymentMethod: false,
         showSideType: false,
         ORDERS_FILTERS,
         statusIconMap: {
@@ -328,6 +330,9 @@
           limit: LIMIT,
         },
       }
+    },
+    directives: {
+      ClickOutside,
     },
     fetch({store, app, req, redirect, route}) {
       app.axios.init(req)
@@ -487,7 +492,6 @@
           }
         })
       })
-      this.initCustomSelect()
     },
     beforeDestroy() {
       clearInterval(this.timer) // 清除定时器
@@ -779,22 +783,14 @@
           })
         }
       },
-      initCustomSelect() {
-        document.body.addEventListener('click', function (event) {
-          if (!event.target.matches('.select-head')) {
-            const dropdown = document.getElementById('select-op')
-            if (dropdown && dropdown.classList.contains('show')) {
-              dropdown.classList.remove('show')
-            }
-          }
-        })
+      onClickOutsidePayment() {
+        if (this.isShowPaymentMethod) {
+          this.isShowPaymentMethod = false
+        }
       },
-      clickPayment() {
-        document.getElementById('select-op').classList.toggle('show')
-      },
-      choosePayment(item, payment) {
+      choosePayment({item, index, payment}) {
+        this.isShowPaymentMethod = false
         item._selected_payment_method = {...payment}
-        document.getElementById('select-op').classList.remove('show')
       }
     }
   }
@@ -1000,6 +996,9 @@
           color: #27313e;
           font-size: 18px;
           font-weight: 500;
+          .warning-text {
+            color: #e35555;
+          }
         }
         .payment-warning {
           margin-top: 10px;
@@ -1038,10 +1037,8 @@
             }
           }
           .select-option {
-            display:none;
             position: absolute;
             width: 80px;
-            height: 90px;
             background-color: #fff;
             z-index: 5;
             li {
@@ -1052,6 +1049,12 @@
               .icon-tick {
                 visibility: hidden;
               }
+            }
+            .select-item-placeholder {
+              display: inline-block;
+              width: 16px;
+              height: 16px;
+              line-height: 16px;
             }
             .selected {
               color: #52cbca;
