@@ -769,13 +769,13 @@
       clickNetPhone(item) {
         if (item.network_phone && item.network_phone.length) {
           this.$showDialog({
-              title: '联系对方',
-              content: (<div>
-                <p class="c-dark fz-20">{item.network_phone}</p>
-                <p class="c-gray">平台会对双方号码做隐私保护，请务必使用{this.user.account.mobile}拨打，否则将无法接通</p>
-              </div>),
-              okTitle: '我知道了',
-                okOnly: true,
+            title: '联系对方',
+            content: (<div>
+              <p class="c-dark fz-20">{item.network_phone}</p>
+              <p class="c-gray">平台会对双方号码做隐私保护，请务必使用{this.user.account.mobile}拨打，否则将无法接通</p>
+            </div>),
+            okTitle: '我知道了',
+            okOnly: true,
           })
         }
       },
