@@ -162,15 +162,20 @@
               .order-payment-col {
                 display: inline-block;
                 margin: 0 10px;
+                .order-payment-account {
+                  display: inline-block;
+                  margin: 0 5px;
+                }
               }
             }
           }
           .order-payment-btn-wrapper {
             margin-top: 30px;
-            display: flex;
-            justify-content: space-between;
-            width: 300px;
+            .order-payment-btn-left {
+              margin-right: 20px;
+            }
             .order-wrating-seller {
+              display: inline-block;
               width: 150px;
               height: 30px;
               box-shadow: 2px 2px 6px 0 rgba(0, 0, 0, 0.1);
@@ -286,20 +291,20 @@
         <CBlock x="0" y="0" class="order-step-box">
           <div class="order-box-head">订单进程</div>
           <div class="order-box-line"></div>
-          <div class="order-step-body">
+          <div class="order-step-body" style="padding-bottom: 30px;">
             <div class="order-step-wrapper" v-if="steps.length">
               <template v-for="(item, index) in steps">
-                <div v-if="index > 0" class="order-step-dot-line" :style="{backgroundColor: index <= curStepIndex ? mainColor : '#eeeeee', width: index < curStepIndex ? '220px' : '264px'}"></div>
+                <div v-if="index > 0" class="order-step-dot-line" :style="{backgroundColor: index <= curStepIndex ? mainColor : '#eeeeee', width: index < curStepIndex ? '220px' : '254px'}"></div>
                 <div class="order-step-dot" :style="{width: index === curStepIndex ? '10px' : '8px', height: index === curStepIndex ? '10px' : '8px', backgroundColor: index <= curStepIndex ? mainColor : '#eeeeee'}">
                   <div class="order-step-detail" :style="index === 3 ? `right: 0;text-align: right;top: ${index === curStepIndex ? 16 : 15}px;` : 'left: 0;'">
-                    <div :style="{color: index === curStepIndex ? mainColor : ''}">{{ item.label }}</div>
+                    <div :style="{color: getColor(index, curStepIndex)}">{{ item.label }}</div>
                     <div v-if="item.time" class="order-step-time">{{ item.time | getTimeText }}</div>
                   </div>
                 </div>
               </template>
             </div>
             <div class="order-step-body-title" v-html="paymentStatusMessage.message"></div>
-            <div class="payment-warning" v-if="paymentStatusMessage.warning" v-html="paymentStatusMessage.warning"></div>
+            <div class="payment-warning c-red" v-if="paymentStatusMessage.warning" v-html="paymentStatusMessage.warning"></div>
             <div v-if="toWalletPage" class="link-to-wallet">
               <b-link to="/wallet">划转数字货币</b-link>
             </div>
@@ -344,14 +349,17 @@
               </div>
               <span class="order-payment-account-wrapper">
                 <span class="order-payment-col">{{selectedMethod.account_name + ' '}}</span>
+                <span v-if="selectedMethod.method === constant.PAYMENT_TYPES.BANKCARD" class="order-payment-col">
+                  {{ selectedMethod.bank_name }}
+                </span>
                 <span class="order-payment-col" v-if="selectedMethod.account_no">
-                  <span v-if="selectedMethod.method === constant.PAYMENT_TYPES.BANKCARD">{{ selectedMethod.account_no | splitCardNumber }}</span>
-                  <span v-else>{{ selectedMethod.account_no }}</span>
+                  <span class="order-payment-account" v-if="selectedMethod.method === constant.PAYMENT_TYPES.BANKCARD">{{ selectedMethod.account_no | splitCardNumber }}</span>
+                  <span class="order-payment-account" v-else>{{ selectedMethod.account_no }}</span>
                   <i id="icon-copy" class="iconfont icon-copy order-payment-copy" v-clipboard:copy="selectedMethod.account_no" v-clipboard:success="copySuccess"></i>
                   <b-tooltip target="icon-copy" content="已复制" :show="copyed" :triggers="'false'" placement="top">已复制</b-tooltip>
                 </span>
-                <span v-if="selectedMethod.method === constant.PAYMENT_TYPES.BANKCARD" class="order-payment-col">
-                  {{ selectedMethod.bank_name }}<span v-if="selectedMethod.branch">, {{ selectedMethod.branch }}</span>
+                <span v-if="selectedMethod.method === constant.PAYMENT_TYPES.BANKCARD && selectedMethod.branch" class="order-payment-col">
+                  {{ selectedMethod.branch }}
                 </span>
                 <QrcodePopover v-if="selectedMethod.method !== constant.PAYMENT_TYPES.BANKCARD && selectedMethod.qr_code_image"
                   :src="selectedMethod.qr_code_image_url"/>
@@ -360,22 +368,24 @@
             <div v-if="(order.status !== constant.ORDER_STATUS.CANCEL.value || order.pay_time) && order.status !== constant.ORDER_STATUS.CLOSED.value" class="order-payment-btn-wrapper">
               <b-btn v-if="isBuySide && !order.pay_time"
                      :disabled="expired"
-                     size="xs" variant="gradient-yellow"
+                     size="xs"
+                     variant="gradient-yellow"
+                     class="order-payment-btn-left"
                      @click="confirmPay" style="width: 120px;">我已支付</b-btn>
-              <div v-if="order.status === constant.ORDER_STATUS.PAID.value && isBuySide" class="order-wrating-seller"><i class="iconfont icon-tea"></i><span class="order-wrating-seller-text">等待对方放币</span></div>
+              <div v-if="order.status === constant.ORDER_STATUS.PAID.value && isBuySide" class="order-wrating-seller order-payment-btn-left"><i class="iconfont icon-tea"></i><span class="order-wrating-seller-text">等待对方放币</span></div>
               <b-btn v-if="canCancel" size="xs" style="width: 120px;" variant="outline-green" :disabled="expired" @click="cancelOrder">取消订单</b-btn>
-              <button v-if="showConfirmReceiptStep && showSellerConfirmButton" class="btn btn-gradient-yellow btn-xs"
+              <b-btn v-if="showConfirmReceiptStep && showSellerConfirmButton" class="btn btn-gradient-yellow btn-xs"
                       @click="confirmReceipt" style="width: 150px;">确认收款并放币
-              </button>
+              </b-btn>
             </div>
           </div>
         </CBlock>
 
-        <CBlock x="0" y="0" class="order-appeal-box">
+        <CBlock v-if="showAppeal" x="0" y="0" class="order-appeal-box">
           <div class="order-box-head">订单申诉</div>
           <div class="order-box-line"></div>
           <div class="order-appeal-body">
-            <template v-if="showAppeal && (!appeal || !appeal.status || appeal.status === constant.APPEAL_STATUS.CANCEL)">
+            <template v-if="!appeal || !appeal.status || appeal.status === constant.APPEAL_STATUS.CANCEL">
               订单遇到问题？您可以
               <span v-if="canAppeal" class="order-appeal-text" @click="startAppeal">发起申诉</span>
               <span v-else class="c-brand-green" v-b-tooltip.hover title="买家付款10分钟后，可发起申诉。">申诉</span>
@@ -699,11 +709,11 @@
               if (this.payRemainTime > 0) { // 订单创建后，需要先判断是否超时
                 if (this.isBuySide) {
                   message = `请支付${this.order.cash_amount}${this.order.cash_type}，剩余时间
-                  <span class="c-red">${Math.floor(this.payRemainTime / 60)}分${this.payRemainTime % 60}秒</span>`
+                  <span>${Math.floor(this.payRemainTime / 60)}分${this.payRemainTime % 60}秒</span>`
                   warning = '请使用实名付款，转账时除参考号外请不要备注任何信息！'
                 } else {
                   message = `等待对方支付${this.order.cash_amount}${this.order.cash_type}，剩余时间
-                  <span class="c-red">${Math.floor(this.payRemainTime / 60)}分${this.payRemainTime % 60}秒</span>`
+                  <span>${Math.floor(this.payRemainTime / 60)}分${this.payRemainTime % 60}秒</span>`
                 }
                 message += `，付款参考号：<span class="c-red">${this.referCode}</span>`
               } else {
@@ -715,7 +725,7 @@
                 message = '等待对方确认收款'
               } else {
                 message = `对方已支付${this.order.cash_amount}${this.order.cash_type}，请查收并放币`
-                warning = '请务必查看您的收款账户，并核实买家是否实名付款。'
+                warning = '请务必查看您的收款账户，并核实对方是否实名付款。'
               }
               message += `，付款参考号：<span class="c-red">${this.referCode}</span>`
               break
@@ -763,6 +773,14 @@
       }
     },
     methods: {
+      getColor(index, curStepIndex) { // 获取进度条文字颜色
+        if (index === curStepIndex) {
+          return this.mainColor
+        } else if (index > curStepIndex) {
+          return '#9b9b9b'
+        }
+        return ''
+      },
       onContact() {
         this.$showDialog({
           title: '联系对方',
