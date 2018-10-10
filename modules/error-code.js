@@ -30,21 +30,15 @@ export const errorCodeMessageMap = {
  * @param vm
  */
 export function onApiError(err, vm) {
-  console.dir(err)
-  let { message } = err
-  const { response, code } = err // `code`是axios的状态
-  if (!response) {
-    // http请求失败，没有返回
-    message = errorCodeMessageMap[code] || `网络连接失败，请刷新页面重试，code=${code}`
-  } else {
-    let status = response.status // http状态码
-    if (response.data) { // http=200有返回数据的情况
-      status = response.data.code // 取服务器返回状态码
-    }
-    if (status >= 500) {
-      message = `系统繁忙，请刷新页面重试，code=${status}`
+  let {message} = err
+  const {code} = err // `code`有可能经过axios.js处理的服务器json状态，也可能axios原生状态
+  if (errorCodeMessageMap[code]) {
+    message = errorCodeMessageMap[code]
+  } else if (!message) {
+    if (code >= 500) {
+      message = `系统繁忙，请刷新页面重试，code=${code}`
     } else {
-      message = `网络连接失败，请刷新页面重试，code=${status}`
+      message = `网络连接失败，请刷新页面重试，code=${code}`
     }
   }
   vm.$showTips && vm.$showTips(message, 'error')

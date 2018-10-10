@@ -2,7 +2,7 @@
   @import "~assets/scss/variables.scss";
 
   .page-order-detail {
-    padding: 0 0 118px 0px;
+    padding: 0 0 60px 0px;
     width: 1200px;
     margin: 0 auto;
     min-height: 900px;
@@ -60,16 +60,20 @@
           .order-detail-content {
             margin-top: 10px;
             font-size: 22px;
-            .iconfont {
-              vertical-align: baseline;
-              font-size: 20px;
+            &.order-detail-status {
+              font-size: 18px;
+              margin-top: 12px;
+              .iconfont {
+                vertical-align: baseline;
+                font-size: 18px;
+              }
             }
           }
         }
       }
       .order-step-box {
         .order-step-body {
-          padding: 18px 30px;
+          padding: 8px 30px 30px 30px;
           .order-step-wrapper {
             position: relative;
             height: 25px;
@@ -102,6 +106,10 @@
           .link-to-wallet {
             margin-top: 10px;
           }
+          .order-kyc-name {
+            display: inline-block;
+            margin-right: 20px;
+          }
           .order-step-contact {
             margin-top: 10px;
             .order-step-contact-detail {
@@ -114,7 +122,8 @@
             .order-payment-radio-group {
               display: flex;
               justify-content: flex-start;
-              margin-left: 30px;
+              margin-left: 34px;
+              margin-bottom: 26px;
               .order-payment-radio {
                 font-size: 16px;
                 color: #6f6f6f;
@@ -161,10 +170,15 @@
               }
               .order-payment-col {
                 display: inline-block;
-                margin: 0 10px;
+                margin-right: 15px;
                 .order-payment-account {
                   display: inline-block;
                   margin: 0 5px;
+                }
+              }
+              .qrcode-popover {
+                .icon-qrcode {
+                  font-size: 15px;
                 }
               }
             }
@@ -268,7 +282,7 @@
           <div class="order-box-body order-detail-body">
             <div>
               <div class="order-detail-title">订单状态</div>
-              <div class="order-detail-content" v-if="statusIconMap[orderStatus.value]" :style="{color: statusIconMap[orderStatus.value].color}">
+              <div class="order-detail-content order-detail-status" v-if="statusIconMap[orderStatus.value]" :style="{color: statusIconMap[orderStatus.value].color}">
                 <i class="iconfont" :class="statusIconMap[orderStatus.value].class"></i>
                 {{ orderStatus.text }}
               </div>
@@ -291,10 +305,10 @@
         <CBlock x="0" y="0" class="order-step-box">
           <div class="order-box-head">订单进程</div>
           <div class="order-box-line"></div>
-          <div class="order-step-body" style="padding-bottom: 30px;">
+          <div class="order-step-body">
             <div class="order-step-wrapper" v-if="steps.length">
               <template v-for="(item, index) in steps">
-                <div v-if="index > 0" class="order-step-dot-line" :style="{backgroundColor: index <= curStepIndex ? mainColor : '#eeeeee', width: index < curStepIndex ? '220px' : '254px'}"></div>
+                <div v-if="index > 0" class="order-step-dot-line" :style="{backgroundColor: index <= curStepIndex ? mainColor : '#eeeeee', width: index < curStepIndex ? '220px' : '230px'}"></div>
                 <div class="order-step-dot" :style="{width: index === curStepIndex ? '10px' : '8px', height: index === curStepIndex ? '10px' : '8px', backgroundColor: index <= curStepIndex ? mainColor : '#eeeeee'}">
                   <div class="order-step-detail" :style="index === 3 ? `right: 0;text-align: right;top: ${index === curStepIndex ? 16 : 15}px;` : 'left: 0;'">
                     <div :style="{color: getColor(index, curStepIndex)}">{{ item.label }}</div>
@@ -308,7 +322,8 @@
             <div v-if="toWalletPage" class="link-to-wallet">
               <b-link to="/wallet">划转数字货币</b-link>
             </div>
-            <div class="order-step-contact" v-if="phoneStatus && phoneStatus.show">
+            <div v-if="!isBuySide" class="order-kyc-name">对方实名：{{ order.merchant.kyc_name }}</div>
+            <div class="order-step-contact" style="display: inline-block;" v-if="phoneStatus && phoneStatus.show">
               <b-link :disabled="!phoneStatus.network_phone" @click="onContact">
                 <i class="iconfont icon-netphone" v-b-tooltip.hover :title="order.network_phone_reason"></i>
                 <span class="order-step-contact-detail">联系对方</span>
@@ -372,7 +387,10 @@
                      variant="gradient-yellow"
                      class="order-payment-btn-left"
                      @click="confirmPay" style="width: 120px;">我已支付</b-btn>
-              <div v-if="order.status === constant.ORDER_STATUS.PAID.value && isBuySide" class="order-wrating-seller order-payment-btn-left"><i class="iconfont icon-tea"></i><span class="order-wrating-seller-text">等待对方放币</span></div>
+              <div v-if="order.status === constant.ORDER_STATUS.PAID.value && isBuySide" class="order-wrating-seller order-payment-btn-left">
+                <i class="iconfont icon-tea"></i>
+                <span class="order-wrating-seller-text">等待对方放币</span>
+              </div>
               <b-btn v-if="canCancel" size="xs" style="width: 120px;" variant="outline-green" :disabled="expired" @click="cancelOrder">取消订单</b-btn>
               <b-btn v-if="showConfirmReceiptStep && showSellerConfirmButton" class="btn btn-gradient-yellow btn-xs"
                       @click="confirmReceipt" style="width: 150px;">确认收款并放币
