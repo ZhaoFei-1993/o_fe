@@ -34,10 +34,10 @@ export function onApiError(err, vm) {
   const {code} = err // `code`有可能经过axios.js处理的服务器json状态，也可能axios原生状态
   if (errorCodeMessageMap[code]) {
     message = errorCodeMessageMap[code]
-  } else if (!message) {
+  } else {
     if (code >= 500) {
       message = `系统繁忙，请刷新页面重试，code=${code}`
-    } else {
+    } else if (!message) {
       message = `网络连接失败，请刷新页面重试，code=${code}`
     }
   }

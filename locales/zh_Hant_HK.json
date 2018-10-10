@@ -1,9 +1,9 @@
 {
     "i18n_autotrans_version": 3,
     "global": {
-      "pageTitle": {
-        "common": " | CoinEx-场外交易平台"
-      }
+        "pageTitle": {
+            "common": " | CoinEx-场外交易平台"
+        }
     },
     "components_Footer_vue": {
         "CoinExOT_7006": "CoinEx OTC 法幣交易",
@@ -57,7 +57,8 @@
         "昵称最多": "昵稱最多",
         "仅允许中英文、数_0675": "僅允許中英文、數字、下劃線，不支持重復昵稱",
         "请检查表单并正确_7e3a": "請檢查表單並正確輸入內容",
-        "下载APP&gt_a3e3": "下載APP &gt;"
+        "下载APP&gt_a3e3": "下載APP &gt;",
+        "下载APP&gt_a3e3****DEPRECATED****": "下載APP &gt;"
     },
     "components_blank_vue": {
         "无内容": "無內容"
@@ -398,7 +399,8 @@
         "尚未添加该广告支_ed07": "尚未添加該廣告支持的支付方式",
         "未完成实名认证": "未完成實名認證",
         "限制交易": "限制交易",
-        "<iclass=_2e11": "<i class=\"iconfont icon-announcement mr-10\"></i>公告："
+        "<iclass=_2e11": "<i class=\"iconfont icon-announcement mr-10\"></i>公告：",
+        "<iclass=_2e11****DEPRECATED****": "<i class=\"iconfont icon-announcement mr-10\"></i>公告："
     },
     "pages_manage__c_time-selector_vue": {},
     "pages_manage_items_vue": {
