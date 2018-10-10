@@ -730,7 +730,7 @@
               message += `，付款参考号：<span class="c-red">${this.referCode}</span>`
               break
             case this.constant.ORDER_STATUS.SUCCESS.value:
-              if (this.appeal && this.appeal.result) {
+              if (this.order.is_appeal_complete) { // admin申诉裁决结果字段
                 message = '系统裁决订单完成'
               } else {
                 if (this.isBuySide) {
@@ -743,7 +743,7 @@
               }
               break
             case this.constant.ORDER_STATUS.CANCEL.value:
-              if (this.appeal && this.appeal.result) {
+              if (this.order.is_appeal_complete) {
                 message = '系统裁决订单取消'
               } else {
                 if (this.isBuySide) {
