@@ -74,6 +74,9 @@
       .order-step-box {
         .order-step-body {
           padding: 8px 30px 30px 30px;
+          .payment-warning {
+            margin-top: 10px;
+          }
           .order-step-wrapper {
             position: relative;
             height: 25px;
@@ -152,6 +155,7 @@
                   .order-payment-text {
                     display: inline-block;
                     margin-left: 6px;
+                    font-size: 14px;
                   }
                 }
               }
@@ -210,6 +214,7 @@
           padding: 18px 30px;
           font-size: 18px;
           color: #192330;
+          font-weight: 500;
           .order-appeal-text {
             color: #52cbca;
             cursor: pointer;
