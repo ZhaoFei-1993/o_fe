@@ -2,7 +2,7 @@
   @import "~assets/scss/variables.scss";
 
   .page-order-detail {
-    padding: 40px 0 118px 0px;
+    padding: 0 0 118px 0px;
     width: 1200px;
     margin: 0 auto;
     min-height: 900px;
