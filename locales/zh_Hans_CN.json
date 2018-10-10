@@ -1,6 +1,10 @@
 {
     "i18n_autotrans_version": 3,
-    "global": {},
+    "global": {
+      "pageTitle": {
+        "common": " | CoinEx-场外交易平台"
+      }
+    },
     "components_Footer_vue": {
         "CoinExOT_7006": "CoinEx OTC 法币交易",
         "产品": "产品",
