@@ -112,7 +112,7 @@ export default {
             this.init()
           })
           .catch(err => {
-            this.$errorTips(`初始化聊天失败，error=${err}`)
+            console.error(`初始化聊天失败，error=${err}`) // 不显示错误提示
           })
         this.$nuxt.$on('IM.Event.SINGLE_MESSAGE_UPDATE', () => {
           // 手动强制更新聊天列表
