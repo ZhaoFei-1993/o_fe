@@ -166,7 +166,7 @@
               <b-btn variant="plain-yellow" size="xxs" @click="onSetPrice2MarketPrice">{{marketPrice}}</b-btn>
               <CTooltip v-if="form.coin_type !== 'USDT'" content="采用Bitfinex、Coinbase和Bitstamp 三个交易所的平均价格，仅供参考。" x="4"/>
             </div>
-            <CurrencyInput v-model="form.price" :currency="balance.currentCash" :decimalDigit="2" placeholder="请输入价格"
+            <CurrencyInput id="price-input" v-model="form.price" :currency="balance.currentCash" :decimalDigit="2" placeholder="请输入价格"
                            class="col-left"/>
           </div>
 
@@ -190,7 +190,7 @@
                 浮动比例
                 <CTooltip content=" 以当前市场价为基数设定浮动比例，大于100%为溢价；小于100%为折价。" x="4"/>
               </div>
-              <CurrencyInput v-model="form.float_rate" currency="%" placeholder="请输入价格" :decimalDigit="2"/>
+              <CurrencyInput id="float-rate-input" v-model="form.float_rate" currency="%" placeholder="请输入浮动比例" :decimalDigit="2"/>
             </div>
 
             <div class="item-price-limit-container">
@@ -434,7 +434,12 @@
       },
       $route: function (route) {
         this.onRouteChange(route)
-      }
+      },
+      modalShowing(val) { // 弹窗出现后更新市场价格
+        if (val) {
+          this.$store.dispatch('fetchExchangeRate')
+        }
+      },
     },
     mounted() {
       this.onRouteChange(this.$route)
@@ -510,11 +515,34 @@
         }).catch(err => {
           const ERROR_CODE = this.constant.ERROR_CODE
           if (err.code === ERROR_CODE.MISSING_PAY_METHODS) {
-            this.$showTips('缺少支付方式，请先添加支付方式')
+            this.$errorTips('缺少支付方式，请先添加支付方式')
           } else {
             this.axios.onError(err)
           }
         })
+      },
+      checkPrice() { // 检测价格是否偏离市场价
+        let errorText
+        let inputId
+        const limitRate = 0.3
+        const form = this.form
+        if (form.pricing_type === 'float') {
+          const canPlaceOrder = form.side === 'buy' ? form.float_rate >= (1 - limitRate) * 100 : form.float_rate <= (1 + limitRate) * 100
+          if (!canPlaceOrder) {
+            errorText = `购买价格不得${form.side === 'buy' ? '低于' : '高于'}市场价格${limitRate * 100}%`
+            inputId = 'float-rate-input'
+          }
+        } else if (form.pricing_type === 'fixed') {
+          const canPlaceOrder = form.side === 'buy' ? form.price / this.marketPrice >= (1 - limitRate) : form.price / this.marketPrice <= (1 + limitRate)
+          if (!canPlaceOrder) {
+            errorText = `购买价格不得${form.side === 'buy' ? '低于' : '高于'}市场价格${limitRate * 100}%`
+            inputId = 'price-input'
+          }
+        }
+        return {
+          errorText,
+          inputId,
+        }
       },
       onSubmit(e) {
         e.preventDefault()
@@ -522,9 +550,15 @@
         if (this.$v.$invalid) return
 
         const form = this.form
-        if (!Number(form.price)) return this.$showTips('价格不可以为0')
-        if (!Number(form.coin_amount)) return this.$showTips('请输入交易数量')
-        if (form.auto_reply_content.length > this.constant.MAX_AUTO_REPLY_LENGTH) return this.$showTips(this.$tt('最大自动回复长度不可超过{0}', this.constant.MAX_AUTO_REPLY_LENGTH))
+        if (!Number(form.price)) return this.$errorTips('价格不可以为0')
+        if (!Number(form.coin_amount)) return this.$errorTips('请输入交易数量')
+        if (form.auto_reply_content.length > this.constant.MAX_AUTO_REPLY_LENGTH) return this.$errorTips(this.$tt('最大自动回复长度不可超过{0}', this.constant.MAX_AUTO_REPLY_LENGTH))
+
+        const checkPriceData = this.checkPrice()
+        if (checkPriceData.errorText) {
+          document.getElementById(checkPriceData.inputId).focus()
+          return this.$errorTips(checkPriceData.errorText)
+        }
 
         if (this.editing) {
           this.doCreateOrUpdateItem(true)
