@@ -59,6 +59,7 @@ module.exports = {
 
         if (route.component.match(/\/_c/)) {
           routes.splice(i, 1)
+          i -= 1
         }
       }
     },
@@ -205,6 +206,7 @@ module.exports = {
     '~/plugins/cookies',
     {src: '~/plugins/i18n'},
     {src: '~/plugins/axios'},
+    {src: '~/plugins/clipboard', ssr: false},
     {src: '~/plugins/ga', ssr: false},
     {src: '~/plugins/webp'},
     {src: '~/plugins/utils'},

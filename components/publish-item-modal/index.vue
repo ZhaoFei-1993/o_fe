@@ -5,7 +5,7 @@
     .modal-dialog {
       max-width: 940px !important;
       .modal-body {
-        max-height: 500px;
+        max-height: 520px;
         overflow-y: auto;
       }
     }
@@ -481,12 +481,13 @@
       doCreateOrUpdateItem(isEdit) {
         // 判定价格是否偏离, 广告管理页面有一个类似的上架
         const delta = this.constant.ITEM_PRICE_DELTA
-        const basePrice = this.balance.currentRate[this.form.coin_type]
+        const basePrice = parseFloat(this.balance.currentRate[this.form.coin_type])
+        const price = this.form.pricing_type === this.constant.PRICING_TYPE.FIXED ? this.form.price : this.floatPrice
         const direction = this.form.side === this.constant.SIDE.BUY ? 1 : -1
-        const bias = (this.form.price - basePrice) * direction / basePrice
+        const bias = (price - basePrice) * direction / basePrice
         if (basePrice && bias > delta) {
           this.priceAlert = {
-            price: this.form.price,
+            price: price,
             isEdit,
             direction,
             bias,

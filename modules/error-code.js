@@ -20,7 +20,7 @@ export const ERROR_CODE = {
 
 // code对应的错误信息
 export const errorCodeMessageMap = {
-  [ECONNABORTED]: '网络连接超时',
+  [ECONNABORTED]: '网络连接超时，请刷新页面重试。',
 }
 
 /**
@@ -30,14 +30,16 @@ export const errorCodeMessageMap = {
  * @param vm
  */
 export function onApiError(err, vm) {
-  let message = err.message
-
-  // 覆盖默认的错误信息
-  if (errorCodeMessageMap[err.code]) {
-    message = errorCodeMessageMap[err.code]
-  }
-  if (err.code === 'ECONNABORTED') {
-    message = '网络连接失败，请重试'
+  let {message} = err
+  const {code} = err // `code`有可能经过axios.js处理的服务器json状态，也可能axios原生状态
+  if (errorCodeMessageMap[code]) {
+    message = errorCodeMessageMap[code]
+  } else {
+    if (code >= 500) {
+      message = `系统繁忙，请刷新页面重试，code=${code}`
+    } else if (!message) {
+      message = `网络连接失败，请刷新页面重试，code=${code}`
+    }
   }
   vm.$showTips && vm.$showTips(message, 'error')
   reportError(err)
