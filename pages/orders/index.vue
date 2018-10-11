@@ -138,8 +138,8 @@
                             <i class="iconfont icon-xialajiantou"></i>
                           </div>
                           <ul id="select-op" class="select-option" v-show="isShowPaymentMethod">
-                            <li v-for="(payment,index) in item.payment_methods" :value="payment" @click="choosePayment({item,index,payment})" :class="{'selected' : item._selected_payment_method.method === payment.method}">
-                              <span class="select-item-placeholder"><i class="iconfont icon-tick" v-show="item._selected_payment_method.method === payment.method"></i></span>
+                            <li v-for="(payment,index) in item.payment_methods" :value="payment" @click="choosePayment({item,index,payment})" :class="{'selected' : item._selected_payment_method.account_no === payment.account_no}">
+                              <span class="select-item-placeholder"><i class="iconfont icon-tick" v-show="item._selected_payment_method.account_no === payment.account_no"></i></span>
                               <span v-if="payment.method === constant.PAYMENT_TYPES.BANKCARD">银行卡</span>
                               <span v-if="payment.method === constant.PAYMENT_TYPES.WECHAT">微信</span>
                               <span v-if="payment.method === constant.PAYMENT_TYPES.ALIPAY">支付宝</span>
@@ -156,19 +156,23 @@
                           <i class="mr-10 iconfont icon-alipay"></i>支付宝</span>
                     </template>
                     <span class="payment-account" v-if="!(item.status === constant.ORDER_STATUS.CREATED.value && !item._isBuySide)">
-                        <span style="margin-right: 10px;">{{item._selected_payment_method.account_name + ' '}}</span>
-                        <span style="margin-right: 10px;" v-if="item._selected_payment_method.method === constant.PAYMENT_TYPES.BANKCARD">
-                          {{ item._selected_payment_method.account_no | splitCardNumber }}
+                        <span class="payment-account-col">{{item._selected_payment_method.account_name + ' '}}</span>
+                        <span class="payment-account-col" v-if="item._selected_payment_method.method === constant.PAYMENT_TYPES.BANKCARD && item._selected_payment_method.bank_name">
+                          {{ item._selected_payment_method.bank_name }}
+                        </span>
+                        <span class="payment-account-col" v-if="item._selected_payment_method.account_no">
+                          <span  v-if="item._selected_payment_method.method === constant.PAYMENT_TYPES.BANKCARD">
+                            {{ item._selected_payment_method.account_no | splitCardNumber }}
+                          </span>
+                          <span v-else>{{ item._selected_payment_method.account_no }}</span>
                           <i id="icon-copy" class="iconfont icon-copy order-payment-copy" v-clipboard:copy="item._selected_payment_method.account_no" v-clipboard:success="copySuccess"></i>
                           <b-tooltip target="icon-copy" content="已复制" :show="copyed" :triggers="'false'" placement="top">已复制</b-tooltip>
                         </span>
-                        <span v-else>{{ item._selected_payment_method.account_no }}</span>
-                        <span v-if="item._selected_payment_method.method === constant.PAYMENT_TYPES.BANKCARD">
-                          {{ item._selected_payment_method.bank_name }}
-                          <span style="margin-left: 20px;" v-if="item._selected_payment_method.branch&&item._selected_payment_method.branch.length">
+                        <span class="payment-account-col" v-if="item._selected_payment_method.method === constant.PAYMENT_TYPES.BANKCARD && item._selected_payment_method.branch">
                            {{ item._selected_payment_method.branch }}
-                          </span>
                         </span>
+                        <QrcodePopover v-if="item._selected_payment_method.method !== constant.PAYMENT_TYPES.BANKCARD && item._selected_payment_method.qr_code_image"
+                                     :src="item._selected_payment_method.qr_code_image_url"/>
                     </span>
                   </div>
                 </div>
@@ -397,7 +401,7 @@
           coin_amount: {
             label: '数量',
             thStyle: {
-              width: '185px',
+              width: '120px',
             },
             thClass: ['text-center'],
             tdClass: ['text-center'],
@@ -408,7 +412,7 @@
             thClass: ['text-center'],
             tdClass: ['text-center'],
             thStyle: {
-              width: '185px',
+              width: '120px',
             },
             sortable: false,
           },
@@ -417,7 +421,7 @@
             thClass: ['text-center'],
             tdClass: ['text-center'],
             thStyle: {
-              width: '185px',
+              width: '150px',
             },
             sortable: false,
           },
@@ -426,7 +430,7 @@
             thClass: ['text-center'],
             tdClass: ['text-center'],
             thStyle: {
-              width: '185px',
+              width: '150px',
             },
             sortable: false,
           },
@@ -492,6 +496,9 @@
           }
         })
       })
+      setInterval(()=>{
+        console.log(this.orderTableItems[0].pay_remain_time)
+      },1000)
     },
     beforeDestroy() {
       clearInterval(this.timer) // 清除定时器
@@ -1014,9 +1021,13 @@
         .payment-method {
           margin-top: 10px;
           .payment-account {
-            margin-left: 20px;
+            margin-left: 30px;
             font-size: 14px;
             color: #192330;
+            .payment-account-col {
+              display: inline-block;
+              margin: 0 10px;
+            }
           }
           .order-payment-copy {
             color: #52cbca;
@@ -1041,13 +1052,14 @@
             width: 80px;
             background-color: #fff;
             z-index: 5;
+            box-shadow: 0 0 20px 0 #ececec;
             li {
               line-height: 30px;
               padding-left: 5px;
               text-align: left;
               cursor: pointer;
-              .icon-tick {
-                visibility: hidden;
+              &:not(:last-child) {
+                border-bottom: 1px solid #e9ecef;
               }
             }
             .select-item-placeholder {
@@ -1078,7 +1090,7 @@
         display: flex;
         flex-direction: column;
         justify-content: center;
-        align-items: flex-end;
+        align-items: center;
         .detail-btn-wrapper {
           margin-top: 16px;
           .cancel-order-btn {
