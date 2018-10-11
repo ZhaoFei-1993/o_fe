@@ -327,7 +327,7 @@
             <div v-if="toWalletPage" class="link-to-wallet">
               <b-link to="/wallet">划转数字货币</b-link>
             </div>
-            <div v-if="!isBuySide" class="order-kyc-name">对方实名：{{ order.merchant.kyc_name }}</div>
+            <div v-if="!isBuySide && counterparty.kyc_name" class="order-kyc-name">对方实名：{{ counterparty.kyc_name }}</div>
             <div class="order-step-contact" style="display: inline-block;" v-if="phoneStatus && phoneStatus.show">
               <b-link :disabled="!phoneStatus.network_phone" @click="onContact">
                 <i class="iconfont icon-netphone" v-b-tooltip.hover :title="!!phoneStatus.network_phone ? null : order.network_phone_reason"></i>
