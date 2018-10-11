@@ -330,7 +330,7 @@
             <div v-if="!isBuySide" class="order-kyc-name">对方实名：{{ order.merchant.kyc_name }}</div>
             <div class="order-step-contact" style="display: inline-block;" v-if="phoneStatus && phoneStatus.show">
               <b-link :disabled="!phoneStatus.network_phone" @click="onContact">
-                <i class="iconfont icon-netphone" v-b-tooltip.hover :title="order.network_phone_reason"></i>
+                <i class="iconfont icon-netphone" v-b-tooltip.hover :title="!!phoneStatus.network_phone ? null : order.network_phone_reason"></i>
                 <span class="order-step-contact-detail">联系对方</span>
               </b-link>
             </div>
@@ -805,15 +805,17 @@
         return ''
       },
       onContact() {
-        this.$showDialog({
-          title: '联系对方',
-          content: (<div>
-            <p class="c-dark fz-20">{this.phoneStatus.network_phone}</p>
-            <p class="c-gray">平台会对双方号码做隐私保护，请务必使用{this.phoneStatus.self_phone}拨打，否则将无法接通</p>
-          </div>),
-          okTitle: '我知道了',
-          okOnly: true,
-        })
+        if (this.phoneStatus.network_phone) {
+          this.$showDialog({
+            title: '联系对方',
+            content: (<div>
+              <p class="c-dark fz-20">{this.phoneStatus.network_phone}</p>
+              <p class="c-gray">平台会对双方号码做隐私保护，请务必使用{this.phoneStatus.self_phone}拨打，否则将无法接通</p>
+            </div>),
+            okTitle: '我知道了',
+            okOnly: true,
+          })
+        }
       },
       copySuccess() {
         this.copyed = true
