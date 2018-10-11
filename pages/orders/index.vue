@@ -412,7 +412,7 @@
             thClass: ['text-center'],
             tdClass: ['text-center'],
             thStyle: {
-              width: '120px',
+              width: '130px',
             },
             sortable: false,
           },
@@ -421,7 +421,7 @@
             thClass: ['text-center'],
             tdClass: ['text-center'],
             thStyle: {
-              width: '150px',
+              width: '140px',
             },
             sortable: false,
           },
@@ -496,9 +496,6 @@
           }
         })
       })
-      setInterval(()=>{
-        console.log(this.orderTableItems[0].pay_remain_time)
-      },1000)
     },
     beforeDestroy() {
       clearInterval(this.timer) // 清除定时器
