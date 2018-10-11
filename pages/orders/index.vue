@@ -107,8 +107,8 @@
                       <span class="other-name" v-if="!item._isBuySide">
                         对方实名：{{ item._counterparty.kyc_name }}
                       </span>
-                      <b-link :disabled="!item.network_phone">
-                        <i class="iconfont icon-netphone" v-b-tooltip.hover :title="item.network_phone_reason" @click="clickNetPhone(item)"></i>
+                      <b-link :disabled="!item.network_phone" @click="clickNetPhone(item)">
+                        <i class="iconfont icon-netphone" v-b-tooltip.hover :title="item.network_phone_reason"></i>
                         <span style="margin-left: 5px;">联系对方</span>
                       </b-link>
                   </div>
