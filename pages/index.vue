@@ -363,7 +363,6 @@
 
     </div>
     <PlaceOrderModal
-      v-if="selectedItem&&user.account"
       :item="selectedItem"
       v-model="showPlaceOrderModal"/>
     <LinkModal v-bind="currentConstraint" v-model="showConstraintModal"></LinkModal>
@@ -386,7 +385,7 @@
     const side = $route.query.side || constant.SIDE.BUY
     return {
       selectedCoin: $route.query.coin || 'USDT',
-      selectedSide: side,
+      selectedSide: side, // 我的买卖方向
       selectedPayment: $route.query.payment || 'ALL',
       sortPrice: $route.query.sort || side === constant.SIDE.BUY ? 'ASC' : 'DESC',
     }
@@ -431,6 +430,20 @@
         requestItems: null,
         announcements: [],
         orderLimitReason: null,
+        kycModalData: { // 实名认证弹窗提示参数
+          title: '实名认证',
+          content: '您需先完成高级实名认证，才可进行交易。',
+          linkText: '去认证',
+          link: '/my/security',
+          isOutLink: false,
+        },
+        paymentModalData: { // 支付方式弹窗提示参数
+          title: '开启支付方式',
+          content: '您需要开启该广告支持的支付方式后，才可以进行交易。',
+          linkText: '去开启',
+          link: '/my/payments',
+          isOutLink: false,
+        },
       }
     },
     asyncData({app, store, route}) {
@@ -531,29 +544,37 @@
         this.pager.currentPage = currentPage
         this.getItems()
       },
-      placeOrder(item) {
+      async checkPrice(item) {
+        const limit = 0.1 // 价格偏离比例
+        const res = await this.$store.dispatch('fetchExchangeRate')
+        const CNY = res.CNY[item.coin_type]
+        const percent = (item.price / CNY).toFixed(4)
+        const isBuy = this.selectedSide === this.constant.SIDE.BUY // 不能用item.side判断买卖方
+        const canOrder = isBuy ? percent <= (1 + limit) : percent >= (1 - limit)
+        if (!canOrder) {
+          this.$showDialog({
+            title: '价格警告',
+            content: `该广告价格（${item.price}）${isBuy ? '高于' : '低于'}当前市场价格（${CNY}）的${(Math.abs(percent - 1) * 100).toFixed(2)}%，请确认是否以该价格进行下单`,
+            okTitle: '确认下单',
+            okOnly: false,
+            onOk: () => {
+              setTimeout(() => {
+                this.order(item) // 加延时防止无法弹窗
+              }, 300)
+            }
+          })
+        }
+        return canOrder
+      },
+      async placeOrder(item) {
         if (!this.user.account) {
           window.location.href = this.loginPage
           return
         }
-        const kycModalData = { // 实名认证弹窗提示参数
-          title: '实名认证',
-          content: '您需先完成高级实名认证，才可进行交易。',
-          linkText: '去认证',
-          link: '/my/security',
-          isOutLink: false,
-        }
-        const paymentModalData = { // 支付方式弹窗提示参数
-          title: '开启支付方式',
-          content: '您需要开启该广告支持的支付方式后，才可以进行交易。',
-          linkText: '去开启',
-          link: '/my/payments',
-          isOutLink: false,
-        }
         // 预判条件，需要全部为true才能发起请求
         const conditions = [() => {
           if (!this.kycPassed) { // 要求必须完成高级kyc才能交易
-            this.currentConstraint = kycModalData
+            this.currentConstraint = this.kycModalData
             this.showConstraintModal = true
             return false
           }
@@ -561,67 +582,74 @@
         }, () => {
           const {account: {user_kyc: {country}}, payments} = this.user
           if (country !== 'CHN' && !(Array.isArray(payments) && payments.length > 0)) { // kyc国籍为非中国大陆地区且没有绑定支付方式需要弹窗提示
-            this.currentConstraint = paymentModalData
+            this.currentConstraint = this.paymentModalData
             this.showConstraintModal = true
             return false
           }
           return true
         }]
+
         if (conditions.every(fn => fn() === true)) {
-          this.verifyDynamicConstraint(item).then(res => {
-            this.$store.dispatch('fetchOtcBalance').then(_ => {
-              const available = parseFloat(this.balance.otcBalance.find(b => b.coin_type === item.coin_type).available)
-              if (item.side === this.constant.SIDE.BUY && available < (item.min_deal_cash_amount / item.price)) {
-                this.currentConstraint = {
-                  title: '交易限制',
-                  content: `您的余额为${available} ${item.coin_type}小于该广告最低限额`,
-                  linkText: '去划转',
-                  link: `/wallet`,
-                  isOutLink: false,
-                }
-                this.showConstraintModal = true
-                return
-              }
-              this.selectedItem = item
-              this.showPlaceOrderModal = true
-            })
-          }).catch(err => {
-            if (err.errorType) {
-              switch (err.errorType) {
-                case this.constant.PLACE_ORDER_ERROR.PAYMENT_LIMIT:
-                  this.currentConstraint = paymentModalData
-                  break
-                case this.constant.PLACE_ORDER_ERROR.NO_KYC_LIMIT:
-                  this.currentConstraint = kycModalData
-                  break
-                case this.constant.PLACE_ORDER_ERROR.CANCEL_LIMIT:
-                  this.currentConstraint = {
-                    title: '交易限制',
-                    content: this.orderLimitReason || '您今天累计取消超过 3 次订单，被冻结交易功能。',
-                    linkText: '查看规则',
-                    link: '//support.coinex.com/hc/articles/360007643734',
-                    isOutLink: true,
-                  }
-                  break
-                default:
-                  this.$showDialog({
-                    title: '下单失败',
-                    content: err.message,
-                    okTitle: '确定',
-                    okOnly: true,
-                  })
+          const priceAllow = await this.checkPrice(item) // 检查价格偏离
+          if (priceAllow) {
+            this.order(item) // 下单
+          }
+        }
+      },
+      async order(item) {
+        this.verifyDynamicConstraint(item).then(res => {
+          this.$store.dispatch('fetchOtcBalance').then(_ => {
+            const available = parseFloat(this.balance.otcBalance.find(b => b.coin_type === item.coin_type).available)
+            if (item.side === this.constant.SIDE.BUY && available < (item.min_deal_cash_amount / item.price)) {
+              this.currentConstraint = {
+                title: '交易限制',
+                content: `您的余额为${available} ${item.coin_type}小于该广告最低限额`,
+                linkText: '去划转',
+                link: `/wallet`,
+                isOutLink: false,
               }
               this.showConstraintModal = true
-            } else {
-              this.$showDialog({
-                title: '下单失败',
-                content: err.message,
-                okTitle: '确定',
-                okOnly: true,
-              })
+              return
             }
+            this.selectedItem = item
+            this.showPlaceOrderModal = true
           })
-        }
+        }).catch(err => {
+          if (err.errorType) {
+            switch (err.errorType) {
+              case this.constant.PLACE_ORDER_ERROR.PAYMENT_LIMIT:
+                this.currentConstraint = this.paymentModalData
+                break
+              case this.constant.PLACE_ORDER_ERROR.NO_KYC_LIMIT:
+                this.currentConstraint = this.kycModalData
+                break
+              case this.constant.PLACE_ORDER_ERROR.CANCEL_LIMIT:
+                this.currentConstraint = {
+                  title: '交易限制',
+                  content: this.orderLimitReason || '您今天累计取消超过 3 次订单，被冻结交易功能。',
+                  linkText: '查看规则',
+                  link: '//support.coinex.com/hc/articles/360007643734',
+                  isOutLink: true,
+                }
+                break
+              default:
+                this.$showDialog({
+                  title: '下单失败',
+                  content: err.message,
+                  okTitle: '确定',
+                  okOnly: true,
+                })
+            }
+            this.showConstraintModal = true
+          } else {
+            this.$showDialog({
+              title: '下单失败',
+              content: err.message,
+              okTitle: '确定',
+              okOnly: true,
+            })
+          }
+        })
       },
       qualified(item) {
         for (const limit of item.counterparty_limit) {
