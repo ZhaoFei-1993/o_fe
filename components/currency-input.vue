@@ -42,7 +42,7 @@
 
 <template>
   <b-input-group :append="currency" class="currency-input">
-    <ExtendedInputNumber :value="value"
+    <ExtendedInputNumber :id="id" :value="value"
                          :disabled="disabled"
                          :placeholder="placeholder"
                          :decimalDigit="decimalDigit"
@@ -65,6 +65,10 @@ export default {
     width: Number,              // 组件总宽度
     disabled: Boolean,
     decimalDigit: Number,
+    id: {
+      type: String,
+      default: null,
+    },
   },
   methods: {
     onInput(value) {

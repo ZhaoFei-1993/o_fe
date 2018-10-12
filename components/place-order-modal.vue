@@ -193,7 +193,7 @@
   export default {
     props: {
       item: {
-        required: true,
+        required: false,
         type: Object,
       },
       value: {
