@@ -166,7 +166,7 @@
               <b-btn variant="plain-yellow" size="xxs" @click="onSetPrice2MarketPrice">{{marketPrice}}</b-btn>
               <CTooltip v-if="form.coin_type !== 'USDT'" content="采用Bitfinex、Coinbase和Bitstamp 三个交易所的平均价格，仅供参考。" x="4"/>
             </div>
-            <CurrencyInput id="price-input" v-model="form.price" :currency="balance.currentCash" :decimalDigit="2" placeholder="请输入价格"
+            <CurrencyInput :id="priceInputId" v-model="form.price" :currency="balance.currentCash" :decimalDigit="2" placeholder="请输入价格"
                            class="col-left"/>
           </div>
 
@@ -190,7 +190,7 @@
                 浮动比例
                 <CTooltip content=" 以当前市场价为基数设定浮动比例，大于100%为溢价；小于100%为折价。" x="4"/>
               </div>
-              <CurrencyInput id="float-rate-input" v-model="form.float_rate" currency="%" placeholder="请输入浮动比例" :decimalDigit="2"/>
+              <CurrencyInput :id="floatRateInputId" v-model="form.float_rate" currency="%" placeholder="请输入浮动比例" :decimalDigit="2"/>
             </div>
 
             <div class="item-price-limit-container">
@@ -363,6 +363,8 @@
         priceAlert: {},
         showPriceAlertModal: false,
         moreSettingShowing: false,
+        floatRateInputId: 'float-rate-input',
+        priceInputId: 'price-input',
       }
     },
     computed: {
@@ -524,19 +526,19 @@
       checkPrice() { // 检测价格是否偏离市场价
         let errorText
         let inputId
-        const limitRate = 0.3
+        const limitRate = 0.3 // 偏离值
         const form = this.form
         if (form.pricing_type === 'float') {
           const canPlaceOrder = form.side === 'buy' ? form.float_rate >= (1 - limitRate) * 100 : form.float_rate <= (1 + limitRate) * 100
           if (!canPlaceOrder) {
             errorText = `购买价格不得${form.side === 'buy' ? '低于' : '高于'}市场价格${limitRate * 100}%`
-            inputId = 'float-rate-input'
+            inputId = this.floatRateInputId
           }
         } else if (form.pricing_type === 'fixed') {
           const canPlaceOrder = form.side === 'buy' ? form.price / this.marketPrice >= (1 - limitRate) : form.price / this.marketPrice <= (1 + limitRate)
           if (!canPlaceOrder) {
             errorText = `购买价格不得${form.side === 'buy' ? '低于' : '高于'}市场价格${limitRate * 100}%`
-            inputId = 'price-input'
+            inputId = this.priceInputId
           }
         }
         return {
@@ -556,7 +558,7 @@
 
         const checkPriceData = this.checkPrice()
         if (checkPriceData.errorText) {
-          document.getElementById(checkPriceData.inputId).focus()
+          document.getElementById(checkPriceData.inputId).focus() // $refs无法获取子组件id
           return this.$errorTips(checkPriceData.errorText)
         }
 
