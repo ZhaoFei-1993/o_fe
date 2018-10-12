@@ -349,7 +349,7 @@
           side: 'sell',  // 方向 buy/sell
           float_rate: 100, // 浮动比例, float定价类型必填
           price: 0, // 单价，fixed定价类型必填
-          price_limit: 0, // 价格限制，根据买卖方向不同，表示最大限制/最小限制
+          price_limit: '', // 价格限制，根据买卖方向不同，表示最大限制/最小限制
           coin_amount: '', // 币量
           pricing_type: 'float', // 定价方式 fixed/float，除了usdt外默认是浮动价格
           min_deal_cash_amount: '', // 最小成交额
@@ -511,7 +511,12 @@
       confirmSumbit(isEdit) {
         this.$emit('input', false)
         const itemPromise = isEdit ? this.axios.item.updateAndOnlineItem : this.axios.item.createItem
-        itemPromise(this.form).then(res => {
+        let finalForm = this.form
+        if (!finalForm.price_limit) { // 最低单价为0或者空则不传参数
+          const {price_limit: priceLimit, ...restData} = finalForm
+          finalForm = restData
+        }
+        itemPromise(finalForm).then(res => {
           this.$showTips('广告发布成功')
           this.$emit(isEdit ? 'edited' : 'published', this.form)
         }).catch(err => {
