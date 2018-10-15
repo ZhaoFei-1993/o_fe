@@ -383,12 +383,12 @@ export default {
       }
     }
     ul {
-      max-height: 462px;
+      height: 462px;
       flex-grow: 1;
       flex-shrink: 1;
       overflow-y: auto;
       border: solid 4px #52cbca;
-      border-top:none; 
+      border-top:none;
     }
     .chat-list-item {
       padding: 11px 20px 13px 20px;
