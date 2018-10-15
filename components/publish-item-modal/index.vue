@@ -164,7 +164,7 @@
             <div class="input-label">
               当前参考价格
               <b-btn variant="plain-yellow" size="xxs" @click="onSetPrice2MarketPrice">{{marketPrice}}</b-btn>
-              <CTooltip v-if="form.coin_type !== 'USDT'" content="采用Bitfinex、Coinbase和Bitstamp 三个交易所的平均价格，仅供参考。" x="4"/>
+              <CTooltip v-if="!isFixCoin(form.coin_type)" content="采用Bitfinex、Coinbase和Bitstamp 三个交易所的平均价格，仅供参考。" x="4"/>
             </div>
             <CurrencyInput :id="priceInputId" v-model="form.price" :currency="balance.currentCash" :decimalDigit="2" placeholder="请输入价格"
                            class="col-left"/>
@@ -175,7 +175,7 @@
               <div class="input-label">
                 当前参考价格
                 <b-btn variant="plain-yellow" size="xxs" @click="onSetPrice2MarketPrice">{{marketPrice}}</b-btn>
-                <CTooltip v-if="form.coin_type !== 'USDT'" content="采用Bitfinex、Coinbase和Bitstamp 三个交易所的平均价格，仅供参考。"
+                <CTooltip v-if="!isFixCoin(form.coin_type)" content="采用Bitfinex、Coinbase和Bitstamp 三个交易所的平均价格，仅供参考。"
                           x="4"/>
               </div>
               <CurrencyInput :value="floatPrice" :currency="balance.currentCash" :disabled="true" plain
@@ -381,7 +381,7 @@
       pricingTypeOptions: function () {
         const PRICING_TYPE = this.constant.PRICING_TYPE
         // usdt没有浮动定价
-        if (this.form.coin_type === 'USDT') {
+        if (this.isFixCoin(this.form.coin_type)) {
           this.form.pricing_type = 'fixed'
           return [{
             value: PRICING_TYPE.FIXED,
@@ -581,13 +581,16 @@
           this.form.price = this.balance.currentRate[this.form.coin_type]
         }
         // usdt没有浮动定价
-        if (this.form.coin_type === 'USDT') {
+        if (this.isFixCoin(this.form.coin_type)) {
           this.form.pricing_type = this.constant.PRICING_TYPE.FIXED
         }
       },
       reopenPublishModal() {
         this.$emit('input', true)
-      }
+      },
+      isFixCoin(coin) { // 是否固定货币
+        return coin === 'USDT' || coin === 'USDC'
+      },
     }
   }
 </script>

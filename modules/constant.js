@@ -61,7 +61,7 @@ export default function getConstant($t) {
     return $t ? $t(text) : text
   }
 
-  const COIN_TYPES = ['USDT', 'BCH', 'BTC', 'ETH']
+  const COIN_TYPES = ['USDT', 'USDC', 'BCH', 'BTC', 'ETH']
 
   // 实际支持的支付方式
   const ACTUAL_PAYMENT_OPTIONS = [
