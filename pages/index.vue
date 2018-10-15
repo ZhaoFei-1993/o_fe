@@ -72,11 +72,21 @@
             line-height: 50px;
             flex: 1;
             .coin-type {
+              position: relative;
               font-size: 18px;
               line-height: 50px;
               margin: 0 20px;
               display: inline-block;
               cursor: pointer;
+              .new-icon {
+                display: inline-block;
+                font-size: 16px;
+                width: 20px;
+                height: 14px;
+                position: absolute;
+                top: -5px;
+                right: -21px;
+              }
             }
           }
           &.active {
@@ -258,7 +268,7 @@
             <div class="side" @click="showItems(constant.SIDE.BUY)"><i class="iconfont icon-arrow-down"></i>购买</div>
             <div class="coin-types">
               <span :class="['coin-type', {active:coin===selectedCoin}]" v-for="coin in constant.COIN_TYPES"
-                    @click="showItems(constant.SIDE.BUY,coin)">{{coin}}</span>
+                    @click="showItems(constant.SIDE.BUY,coin)">{{coin}}<span v-if="coin === 'USDC'" class="new-icon"><i class="iconfont icon-new-icon"></i></span></span>
             </div>
           </div>
         </div>
@@ -267,7 +277,7 @@
             <div class="side" @click="showItems(constant.SIDE.SELL)"><i class="iconfont icon-arrow-up"></i>出售</div>
             <div class="coin-types">
               <span :class="['coin-type', {active:coin===selectedCoin}]" v-for="coin in constant.COIN_TYPES"
-                    @click="showItems(constant.SIDE.SELL,coin)">{{coin}}</span>
+                    @click="showItems(constant.SIDE.SELL,coin)">{{coin}}<span v-if="coin === 'USDC'" class="new-icon"><i class="iconfont icon-new-icon"></i></span></span>
             </div>
           </div>
         </div>
