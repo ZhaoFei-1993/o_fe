@@ -59,13 +59,17 @@
           }
           .order-detail-content {
             margin-top: 10px;
-            font-size: 22px;
+            font-size: 18px;
+            .order-detail-subtitle {
+              color: #9b9b9b;
+              font-size: 14px;
+            }
             &.order-detail-status {
-              font-size: 18px;
+              font-size: 16px;
               margin-top: 12px;
               .iconfont {
                 vertical-align: baseline;
-                font-size: 18px;
+                font-size: 16px;
               }
             }
           }
@@ -293,16 +297,25 @@
               </div>
             </div>
             <div>
-              <div class="order-detail-title">订单金额（{{ order.cash_type }}）</div>
-              <div class="order-detail-content">{{ order.cash_amount | formatMoney }}</div>
+              <div class="order-detail-title">订单单价</div>
+              <div class="order-detail-content">
+                {{ order.price | formatMoney }}
+                <span class="order-detail-subtitle">{{ order.cash_type }}/{{ order.coin_type }}</span>
+              </div>
             </div>
             <div>
-              <div class="order-detail-title">订单单价（{{ order.cash_type }}）</div>
-              <div class="order-detail-content">{{ order.price | formatMoney }}</div>
+              <div class="order-detail-title">交易数量</div>
+              <div class="order-detail-content">
+                {{ order.coin_amount | formatMoney }}
+                <span class="order-detail-subtitle">{{ order.coin_type }}</span>
+              </div>
             </div>
             <div>
-              <div class="order-detail-title">交易数量（{{ order.coin_type }}）</div>
-              <div class="order-detail-content">{{ order.coin_amount | formatMoney }}</div>
+              <div class="order-detail-title">订单金额</div>
+              <div class="order-detail-content" :style="{color: mainColor}" style="font-size: 20px;">
+                {{ order.cash_amount | formatMoney }}
+                <span class="order-detail-subtitle">{{ order.cash_type }}</span>
+              </div>
             </div>
           </div>
         </CBlock>
@@ -313,7 +326,7 @@
           <div class="order-step-body">
             <div class="order-step-wrapper" v-if="steps.length">
               <template v-for="(item, index) in steps">
-                <div v-if="index > 0" class="order-step-dot-line" :style="{backgroundColor: index <= curStepIndex ? mainColor : '#eeeeee', width: index < curStepIndex ? '220px' : '230px'}"></div>
+                <div v-if="index > 0" class="order-step-dot-line" :style="{backgroundColor: index <= curStepIndex ? mainColor : '#eeeeee', width: '220px'}"></div>
                 <div class="order-step-dot" :style="{width: index === curStepIndex ? '10px' : '8px', height: index === curStepIndex ? '10px' : '8px', backgroundColor: index <= curStepIndex ? mainColor : '#eeeeee'}">
                   <div class="order-step-detail" :style="index === 3 ? `right: 0;text-align: right;top: ${index === curStepIndex ? 16 : 15}px;` : 'left: 0;'">
                     <div :style="{color: getColor(index, curStepIndex)}">{{ item.label }}</div>
