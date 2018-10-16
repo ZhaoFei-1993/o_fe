@@ -35,7 +35,7 @@ module.exports = {
         rel: 'stylesheet',
         type: 'text/css',
         charset: 'utf-8',
-        href: '//cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/6.0.0/sanitize.min.css'
+        href: '/assets/css/sanitize-6.0.0.min.css'
       },
     ],
   },
