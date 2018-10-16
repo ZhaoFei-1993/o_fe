@@ -290,28 +290,28 @@
           <div class="order-box-line"></div>
           <div class="order-box-body order-detail-body">
             <div>
-              <div class="order-detail-title">订单状态</div>
+              <div class="order-detail-title">状态</div>
               <div class="order-detail-content order-detail-status" v-if="statusIconMap[orderStatus.value]" :style="{color: statusIconMap[orderStatus.value].color}">
                 <i class="iconfont" :class="statusIconMap[orderStatus.value].class"></i>
                 {{ orderStatus.text }}
               </div>
             </div>
             <div>
-              <div class="order-detail-title">订单单价</div>
+              <div class="order-detail-title">单价</div>
               <div class="order-detail-content">
                 {{ order.price | formatMoney }}
                 <span class="order-detail-subtitle">{{ order.cash_type }}/{{ order.coin_type }}</span>
               </div>
             </div>
             <div>
-              <div class="order-detail-title">交易数量</div>
+              <div class="order-detail-title">数量</div>
               <div class="order-detail-content">
                 {{ order.coin_amount | formatMoney }}
                 <span class="order-detail-subtitle">{{ order.coin_type }}</span>
               </div>
             </div>
             <div>
-              <div class="order-detail-title">订单金额</div>
+              <div class="order-detail-title">总额</div>
               <div class="order-detail-content" :style="{color: mainColor}" style="font-size: 20px;">
                 {{ order.cash_amount | formatMoney }}
                 <span class="order-detail-subtitle">{{ order.cash_type }}</span>
