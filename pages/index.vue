@@ -534,7 +534,7 @@
         if (!sessionStorage.getItem('bchWarning')) {
           this.$showDialog({
             title: '注意！',
-            content: (<div>CoinEx已在11月14日24:00（HKT）完成BCH的资产快照，CoinEx所有交易区的BCH即代表BCHABC。详情见
+            content: (<div>CoinEx已在11月14日24:00（HKT）完成BCH的资产快照，<span class="c-red">CoinEx所有交易区的BCH即代表BCHABC。</span>详情见
               <a
                 href="https://www.coinex.com/announcement/detail?id=156"
                 target="_blank"
