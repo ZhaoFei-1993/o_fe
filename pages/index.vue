@@ -513,13 +513,18 @@
       },
       showItems(side, coin) {
         // 临时代码
-        if (coin === 'BCH' && !sessionStorage.bchWarning) {
+        if (coin === 'BCH' && !sessionStorage.getItem('bchWarning')) {
           this.$showDialog({
             title: '注意！',
-            content: (<div>CoinEx已在11月14日24:00（HKT）完成BCH的资产快照，CoinEx所有交易区的BCH即代表BCHABC。详情见<a href="https://www.coinex.com/announcement/detail?id=156">最新公告</a></div>),
+            content: (<div>CoinEx已在11月14日24:00（HKT）完成BCH的资产快照，CoinEx所有交易区的BCH即代表BCHABC。详情见
+              <a
+                href="https://www.coinex.com/announcement/detail?id=156">最新公告
+              </a>
+            </div>),
             okTitle: '我已知晓',
             okOnly: true,
           })
+          sessionStorage.setItem('bchWarning', true)
         }
         // 重置page
         this.pager.currentPage = 1
