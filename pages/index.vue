@@ -486,6 +486,9 @@
       // browser only
       this.Visibility = require('visibilityjs')
       this.Visibility.change(this.onVisibilityChange)
+      if (this.selectedCoin === 'BCH') {
+        this.checkBCH()
+      }
     },
     beforeRouteUpdate(to, from, next) {
       next()
@@ -512,8 +515,23 @@
         })
       },
       showItems(side, coin) {
+        if (coin === 'BCH') {
+          this.checkBCH()
+        }
+        // 重置page
+        this.pager.currentPage = 1
+
+        this.$router.replace({
+          query: {
+            side,
+            coin: coin || this.selectedCoin,
+            payment: this.selectedPayment,
+          },
+        })
+      },
+      checkBCH() {
         // 临时代码
-        if (coin === 'BCH' && !sessionStorage.getItem('bchWarning')) {
+        if (!sessionStorage.getItem('bchWarning')) {
           this.$showDialog({
             title: '注意！',
             content: (<div>CoinEx已在11月14日24:00（HKT）完成BCH的资产快照，CoinEx所有交易区的BCH即代表BCHABC。详情见
@@ -526,16 +544,6 @@
           })
           sessionStorage.setItem('bchWarning', true)
         }
-        // 重置page
-        this.pager.currentPage = 1
-
-        this.$router.replace({
-          query: {
-            side,
-            coin: coin || this.selectedCoin,
-            payment: this.selectedPayment,
-          },
-        })
       },
       filterPayment(payment) {
         this.$router.replace({
