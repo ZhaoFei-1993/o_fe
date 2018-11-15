@@ -536,7 +536,9 @@
             title: '注意！',
             content: (<div>CoinEx已在11月14日24:00（HKT）完成BCH的资产快照，CoinEx所有交易区的BCH即代表BCHABC。详情见
               <a
-                href="https://www.coinex.com/announcement/detail?id=156">最新公告
+                href="https://www.coinex.com/announcement/detail?id=156"
+                target="_blank"
+              >最新公告
               </a>
             </div>),
             okTitle: '我已知晓',
