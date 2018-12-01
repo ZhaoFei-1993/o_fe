@@ -5,7 +5,11 @@ const Decimal = require("decimal.js").default;
 Number.prototype.setDigit = String.prototype.setDigit = function (digit) {
   // 返回字符串，不能直接用> <对比，要对比的时候请用lt,lte,gt,gte 或者 a-b>0这种方式
   const str = String(this);
+  if(str.indexOf('.')<0){
+    return digit;
+  }
   const parts = str.split(".");
+
   if (parts[1] && parts[1].length > digit) {
     return parts[0] + (digit > 0 ? "." : "") + parts[1].substr(0, digit);
   }
