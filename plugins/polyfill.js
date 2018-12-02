@@ -6,7 +6,7 @@ Number.prototype.setDigit = String.prototype.setDigit = function (digit) {
   // 返回字符串，不能直接用> <对比，要对比的时候请用lt,lte,gt,gte 或者 a-b>0这种方式
   const str = String(this);
   if(str.indexOf('.')<0){
-    return digit;
+    return str;
   }
   const parts = str.split(".");
 
